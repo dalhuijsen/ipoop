@@ -8,4 +8,11 @@ interface IRunnableMergeEffect {
 }
 
 
+interface IMenuRunnable {
+  String title();// = "iMenuRunnable";
+  String group();
+  Boolean saveHistory();// = false;
+  Boolean savePreFxImage();// = false;
+  void run(int rowidx, int btnidx, int xPerc, int yPerc);
+}
 
