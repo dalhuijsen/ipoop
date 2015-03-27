@@ -1,4 +1,10 @@
 class Recipe { 
+	Recipe(){};
+	Recipe(IRunnableEffect eff, float x, float y) { 
+		this.RunnableEffect = eff;
+		this.XPercent = x;
+		this.YPercent = y;
+	}
 	String name = "";
 	IRunnableEffect RunnableEffect = null;
 	IRunnableMergeEffect RunnableMergeEffect = null;
