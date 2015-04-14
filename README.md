@@ -1,3 +1,0 @@
-# ipoop
-processing.org stuff
-
