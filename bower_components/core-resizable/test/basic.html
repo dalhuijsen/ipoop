@@ -1,0 +1,102 @@
+<!DOCTYPE html><!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><html><head>
+  <title>core-resizable tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <link rel="import" href="../core-resizable.html">
+  <link rel="import" href="test-elements.html">
+</head>
+<body fit="">
+
+<!-- 
+
+Notes on Polyfill compatibility in tests:
+- Test elements loaded via imports, to ensure load order correctness
+  w.r.t. Polymer.mixin being availbale
+- Resize notifications and asserts are done asynchronously, since
+  there are timing differences w.r.t. when detached callbacks occur
+
+-->
+
+<polymer-element name="test-element" noscript="">
+  <template>
+
+    <!-- Normal CoreResizer parent with child CoreResizables -->
+    <core-resizer-parent id="parent">
+      <core-resizable id="child1a"></core-resizable>
+      <div>
+        <core-resizable id="child1b"></core-resizable>
+      </div>
+      <core-resizable-in-shadow id="shadow1c"></core-resizable-in-shadow>
+      <div>
+        <core-resizable-in-shadow id="shadow1d"></core-resizable-in-shadow>
+      </div>
+    </core-resizer-parent>
+
+    <!-- CoreResizer parent using shouldNotify, with child CoreResizables -->
+    <core-resizer-parent-filtered id="parentFiltered">
+      <core-resizable id="child2a"></core-resizable>
+      <div>
+        <core-resizable id="child2b"></core-resizable>
+      </div>
+      <core-resizable-in-shadow id="shadow2c"></core-resizable-in-shadow>
+      <div>
+        <core-resizable-in-shadow id="shadow2d"></core-resizable-in-shadow>
+      </div>
+    </core-resizer-parent-filtered>
+
+    <!-- CoreResizer using resizerIsPeer:true, with peer CoreResizables -->
+    <div>
+      <core-resizable id="child3a"></core-resizable>
+      <div>
+        <core-resizable id="child3b"></core-resizable>
+      </div>
+      <core-resizer-peer id="peer"></core-resizer-peer>
+      <core-resizable-in-shadow id="shadow3c"></core-resizable-in-shadow>
+      <div>
+        <core-resizable-in-shadow id="shadow3d"></core-resizable-in-shadow>
+      </div>
+    </div>
+
+    <!-- CoreResizer using resizerIsPeer:true and shouldNotify, with peer CoreResizables -->
+    <div>
+      <core-resizable id="child4a"></core-resizable>
+      <div>
+        <core-resizable id="child4b"></core-resizable>
+      </div>
+      <core-resizer-peer-filtered id="peerFiltered"></core-resizer-peer-filtered>
+      <core-resizable-in-shadow id="shadow4c"></core-resizable-in-shadow>
+      <div>
+        <core-resizable-in-shadow id="shadow4d"></core-resizable-in-shadow>
+      </div>
+    </div>
+
+    <!-- Nested CoreResizers -->
+    <core-resizer-parent id="parentTop">
+      <core-resizer-parent id="parentNested">
+        <core-resizable id="child5a"></core-resizable>
+        <core-resizer-peer id="peerNested"></core-resizer-peer>
+        <div>
+          <core-resizable-in-shadow id="shadow5b"></core-resizable-in-shadow>
+        </div>
+      </core-resizer-parent>
+    </core-resizer-parent>
+
+  </template>
+
+</polymer-element>
+
+<test-element></test-element>
+
+<script src="basic.html.0.js"></script>
+
+
+
+</body></html>

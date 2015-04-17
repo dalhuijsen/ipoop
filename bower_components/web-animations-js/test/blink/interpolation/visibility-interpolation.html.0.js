@@ -1,0 +1,51 @@
+
+assertInterpolation({
+  property: 'visibility',
+  from: 'visible',
+  to: 'visible'
+}, [
+  {at: -1, is: 'visible'},
+  {at: 0, is: 'visible'},
+  {at: 0.5, is: 'visible'},
+  {at: 1, is: 'visible'},
+  {at: 1.5, is: 'visible'},
+]);
+
+assertInterpolation({
+  property: 'visibility',
+  from: 'visible',
+  to: 'hidden'
+}, [
+  {at: -1, is: 'visible'},
+  {at: 0, is: 'visible'},
+  {at: 0.1, is: 'visible'},
+  {at: 0.9, is: 'visible'},
+  {at: 1, is: 'hidden'},
+  {at: 1.5, is: 'hidden'},
+]);
+
+assertInterpolation({
+  property: 'visibility',
+  from: 'collapse',
+  to: 'visible'
+}, [
+  {at: -1, is: 'collapse'},
+  {at: 0, is: 'collapse'},
+  {at: 0.1, is: 'visible'},
+  {at: 0.9, is: 'visible'},
+  {at: 1, is: 'visible'},
+  {at: 1.5, is: 'visible'},
+]);
+
+assertInterpolation({
+  property: 'visibility',
+  from: 'collapse',
+  to: 'hidden'
+}, [
+  {at: -1, is: 'collapse'},
+  {at: 0, is: 'collapse'},
+  {at: 0.4, is: 'collapse'},
+  {at: 0.5, is: 'hidden'},
+  {at: 1, is: 'hidden'},
+  {at: 1.5, is: 'hidden'},
+]);

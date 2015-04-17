@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+.target {
+  width: 50px;
+  height: 50px;
+  background-color: black;
+  display: inline-block;
+  margin: 18px;
+  border-collapse: separate;
+}
+.target td {
+  background-color: white;
+  border: 1px solid orange;
+  width: 10px;
+  height: 10px;
+}
+.replica {
+  background-color: green;
+}
+</style>
+</head><body>
+<template id="target-template">
+  <table>
+    <tbody>
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</template>
+<script src="../testharness/testharness.js"></script>
+<script src="../testharness/testharnessreport.js"></script>
+<script src="resources/interpolation-test.js"></script>
+<script src="border-spacing-interpolation.html.0.js"></script>
+
+</body></html>

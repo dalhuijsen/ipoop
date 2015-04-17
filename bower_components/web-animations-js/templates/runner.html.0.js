@@ -1,0 +1,2 @@
+
+loadWebAnimationsBuildTarget('<%= target %>');
