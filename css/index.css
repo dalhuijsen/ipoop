@@ -1,0 +1,202 @@
+﻿        html, body {
+            height: 100%;
+            width: 100%;
+            background-color: #E0DFE0;
+        }
+
+        html, body, h5, h4, h3, h2, h1, p, td, table, tr {
+            margin: 0;
+            padding: 0;
+        }
+
+        body, td {
+            font-family: sans-serif;
+        }
+
+        .pname {
+            font-weight: bolder;
+            font-family: sans-serif;
+            letter-spacing: -2px;
+        }
+
+        .docowner {
+            text-align: right;
+            position: absolute;
+            top: 2px;
+            right: 12px;
+            color: #000;
+            color: rgba(0,0,0,.42);
+            display: block;
+            font-weight: bolder;
+            font-size: 0.75em;
+            letter-spacing: 0.13em;
+        }
+
+        .menubutton {
+            min-width: 40px;
+            max-width: 100px;
+            text-overflow: ellipsis;
+        }
+
+        .toplogo {
+            margin: 12px 0 4px 2px;
+            width: 200px;
+        }
+
+        .topmenu {
+            margin-left: 23px;
+            margin-top: 2px;
+        }
+
+            .topmenu:hover {
+                /*background: #fffded;*/
+            }
+
+        .menubutton {
+            font-size: .8em;
+            display: block;
+            float: left;
+            margin-top: 3px;
+            margin-right: 3px;
+            text-align: center;
+            margin-left: 2px;
+            cursor: pointer;
+        }
+
+            .menubutton:hover {
+                border-top: solid 1px #fff;
+                border-left: solid 1px #fff;
+                border-right: solid 1px #888;
+                border-bottom: solid 1px #666;
+                margin-right: 2px;
+                margin-top: 1px;
+                cursor: pointer;
+            }
+
+            .menubutton:active {
+                border-bottom: solid 1px #fff;
+                border-right: solid 1px #fff;
+                border-left: solid 1px #888;
+                border-top: solid 1px #666;
+                margin-right: 2px;
+                margin-top: 1px;
+                cursor: wait;
+            }
+
+        .insetbox {
+            background: #fefdff;
+            border-bottom: solid 1px #ccc;
+            border-right: solid 1px #ddd;
+            border-left: solid 1px #666;
+            border-top: solid 1px #333;
+        }
+
+        .padder {
+            margin: 6px;
+        }
+
+        .padder20 {
+            margin: 20px;
+        }
+
+        .padder12 {
+            margin: 12px;
+        }
+
+
+        .psquish {
+            letter-spacing: -4px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .clearleft {
+            clear: left;
+        }
+
+        .clearright {
+            clear: right;
+        }
+
+        .hidden {
+            display: none;
+        }
+		  
+        /** {
+            border: solid 1px black;
+            opacity: 0.86;
+        }*/
+		  
+        .wrapper {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            margin-bottom: -200px;
+        }
+        .orangebar {
+            background: orange;
+            height: 100%;
+            width: 25px;
+            margin-top: -70px;
+        }
+        .head {
+            height: 70px; 
+        }
+        .worksheet {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 100px;
+            right: 0;
+            margin-left: 26px;
+            margin-top: 60px;
+            overflow: hidden;
+            overflow-y: scroll;
+        }
+
+        .hiddenfiler {
+            position: relative;
+            top: -4px;
+            left: -50px;
+            opacity: 0;
+            cursor: pointer;
+            margin-right: -120px;
+            width: 50px;
+            overflow: hidden;
+        }
+        .hiddenfiler:hover {
+            opacity: 0;
+            margin-right: -120px;
+            cursor: pointer;
+        }
+
+
+
+        .sidebarbuttons {
+        }
+        .sidebarbuttonsmargin {
+
+            margin-top: 200px;
+            height: 100px;
+            text-align: center;
+        }
+
+        #filtermenu {
+            position: absolute;
+            top: 60px;
+            left: 70px;
+            background: #E0DFE0;
+            border: solid 1px orange;
+        }
+
+        .botbanner {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: white;
+            opacity: 0.8;
+        }

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+
+    <title>g</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/css/offcanvas.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/index.css"/>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .hiddenfiler {
+            opacity: 0;
+            position: absolute;
+            top: -100px;
+            
+        }
+        .dd{
+            position: relative;
+            top: -4px;
+            left: -50px;
+            opacity: 0;
+            cursor: pointer;
+            margin-right: -120px;
+            width: 50px;
+            overflow: hidden;
+        }
+        .hiddenfiler:hover {
+            opacity: 0;
+            margin-right: -120px;
+            cursor: pointer;
+        }
+
+
+    </style>
+</head>
+
+                <input type="file" id="filer" class="menubutton hiddenfiler" />
+                        <canvas id="canvas" data-bind="height: innerHeight(), width: innerWidth()" data-processing-sources="pde/darkmagic_0_4.pde" data-bind="click: function () { filtermenuvisible(!filtermenuvisible()); }, clickBubble: false"></canvas>
+
+
+    <!--/.container-->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-1.11.3.min.js"></script>
+    <!--<script src="/js/bootstrap.min.js"></script>-->
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+    <script src="/js/offcanvas.js"></script>
+    <script src="/js/knockout-3.3.0.js"></script>
+    <!--<script src="/js/knockout-bootstrap.min.js"></script>-->
+    <script src="/js/processing.js"></script>
+
+
+    <script type="text/javascript">
+        (function($, ko, undefined) {
+            $(window).ready(function() {
+                var canvas = document.getElementById('canvas');
+                setResizer(canvas);
+
+                function setResizer(el) {
+                    var thisel = el;
+
+                    window.addEventListener('resize', function() {
+                        if (typeof processingInstance === 'undefined')
+                            processingInstance = Processing.getInstanceById('canvas');
+
+                        processingInstance.width = el.parentElement.clientWidth;
+                        processingInstance.height = el.parentElement.clientHeight-5;
+                        processingInstance.size(el.parentElement.clientWidth, window.innerHeight-5);
+                        processingInstance.redraw();
+                    });
+                }
+            });
+        })(jQuery, ko);
+
+    </script>
+    <script type="text/javascript">
+        (function ($, undefined) {
+            $(window).ready(function () {
+                setTimeout(function() {
+                    if (typeof processingInstance === 'undefined')
+                        processingInstance = Processing.getInstanceById('canvas');
+                    var el = document.getElementById('canvas');
+                    processingInstance.width = el.parentElement.clientWidth;
+                    processingInstance.height = el.parentElement.clientHeight-5;
+                    processingInstance.size(el.parentElement.clientWidth, window.innerHeight-5);
+                    processingInstance.redraw();
+                }, 2000);
+                function easteregg1() { 
+                var classes = [];
+                for (var i = 0, l = document.styleSheets.length; i < l; i++) {
+                    if (document.styleSheets[i].cssRules) {
+                        for (var x = 0, xl = document.styleSheets[i].cssRules.length; x < xl; x++) {
+                            if (typeof document.styleSheets[i].cssRules[x].selectorText !== 'undefined')
+                                if (document.styleSheets[i].cssRules[x].selectorText.indexOf(":before") != -1 && document.styleSheets[i].cssRules[x].selectorText.indexOf(".fa-") != -1) {
+                                    classes[classes.length] = document.styleSheets[i].cssRules[x].selectorText.substring(1);
+                                    classes[classes.length-1] = classes[classes.length-1].substring(0, classes[classes.length-1].indexOf(":"));
+                                }
+                        }
+                    }
+                }
+                var div = document.createElement("div");
+                for (i = 0, l = classes.length; i < l; i++) {
+                    var ico = document.createElement("i");
+                    ico.setAttribute("class","fa fa-spin "+classes[i]);
+                    ico.style.marginRight = "1em";
+                    div.appendChild(ico);
+                }
+                div.style.fontSize = "2em";
+                div.style.textAlign = "justify";
+                document.body.appendChild(div);
+                return this;
+
+}
+
+            });
+        })(jQuery, undefined);
+    </script>
+    
+        <script type="text/javascript">
+            function __(id) {
+                return document.getElementById(id);
+            }
+            var viewData = {
+                version: "0.0.0a",
+                height: (function () { return document.body.offsetHeight; }),
+                height: (function () { return document.body.offsetWidth; }),
+                headHeight: (function () { return __('head').offsetHeight; }),
+                logo: function () {
+                    var low = 0xf042;
+                    var high = 0xf259;
+                    var diff = high - low;
+                    var res = Math.floor(Math.random() * diff) + low;
+                    //alert(res.toString(16));
+                    return "&#x" + res.toString(16) + ";";
+                },
+                worksheet: function () {
+                    return "top: 50px; left: 30px; width: 400px; height: 300px; background: green;";
+                },
+                filtermenuvisible: ko.observable(false),
+
+            };
+            ko.applyBindings(viewData, __('body'));
+
+            function handleFiler(e) {
+                var fileList = e.target.files;
+                for (var i = 0, l = fileList.length; i < l; i++) {
+                    var fil = fileList[i];
+                    if (!fil.type.match('image.*')) {
+                        continue;
+                    }
+                    var reader = new FileReader();;
+                    reader.onload = (function (theFile) {
+                        return function (e) {
+                            //var s = document.createElement('span');
+                            //s.innerHTML = "<img src=\"" + e.target.result + "\">";
+                            //__('worksheet').appendChild(s);
+                            loadFile(e.target.result);
+                        };
+                    })(fil);
+                    reader.readAsDataURL(fil);
+                }
+            }
+
+            __('filer').addEventListener('change', handleFiler, false);
+
+            function loadFile(datauri) {
+                //    alert(datauri);
+                var pi = Processing.getInstanceById('canvas');
+                pi.setImage(datauri);
+            }
+            function filtclick(arg) {
+                var pi = Processing.getInstanceById('canvas');
+                pi.menuClick(arg);
+            }
+
+
+        </script>
+
+
+
+</body>
+</html>
