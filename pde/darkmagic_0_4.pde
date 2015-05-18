@@ -19,13 +19,12 @@ String[][] buttonText = {
 //  {"","","","","","","","spielerei","","","","","","open"}
   
 // standard:
-  { "open",      "blendmode",    "mode",      "revert",      "reset",      "save",        "",              "",        "doublex",     "fltThresh",  "","",  "fltErode",    "exit"},
-  { "ymirror",   "blendSauce",   "vert",      "brDrift",            "pxlWidth",   "pxlHeight",   "sensitivity",   "diag",    "doubley",            "fltGray",  "","",      "fltDilate",    "" },
-  { "lSort",     "blendPrev",    "rstPrev",   "lameGlitch",  "echo1",      "faces",       "superlame",     "transbuffer",        "dubsiz",            "fltOpaque",     "","", "jarimg",    "slicer"}, 
-  {"",    "background",   "edge000",   "filter",      "interlace",  "buffer",      "rgboffset",     "poster",  "halfsiz",            "fltInvert",   "","",   "sinsin",    "stretch"},
-  {"vBlur",      "",/*echo2*/    "",/*echo3*/ "warp",        "mirror",     "blendbuffer", "offset",        "lameglitch2","halfx",            "fltPoster",    "","",  "sinsin2",    "stretch2"},
-  {"undo",       "redo",         "vertdu",    "hordu",       "bw",         "contrast",    "brighter",      "edged",        "halfy",            "fltBlur",      "","",  "sinsin3",    "stretch3"},
-  {"horiz3","hibufcol","dus","blendbfr","selfie","sinwav","switchcolor","","","","lacebuf","","",""}
+  { "open",      "save",    "blendmode",      "undo",      "redo",      "reset",        "background",              "",        "doublex",     "fltThresh",  "","",  "fltErode",    ""},
+  { "ymirror",   "mirror",   "sinwav",      "brDrift",            "sinsin",   "sinsin2",   "sinsin3",   "diag",    "doubley",            "fltGray",  "","",      "fltDilate",    "" },
+  { "lSort",     "vertdu",    "hordu",   "lameGlitch",  "echo1",      "switchcolor",       "superlame",     "transbuffer",        "dubsiz",            "fltOpaque",     "","", "jarimg",    "slicer"}, 
+  {"hibufcol",    "dus",   "edge000",   "bw",      "interlace",  "buffer",      "rgboffset",     "poster",  "halfsiz",            "fltInvert",   "","",   "",    "stretch"},
+  {"vBlur",      "selfie",/*echo2*/    "contrast",/*echo3*/ "warp",        "blendbfr",     "blendbuffer", "offset",        "lameglitch2","halfx",            "fltPoster",    "","",  "",    "stretch2"},
+  {"",       "",         "",    "",       "",         "",    "brighter",      "edged",        "halfy",            "fltBlur",      "lacebuf","",  "",    "stretch3"},
 };
 String fontName = "Consolas";
 int buttonCount = buttonText[0].length, buttonRowCount = buttonText.length;
@@ -83,6 +82,8 @@ void setImage(String datauri) {
 	img1.copy(tmpimg,0,0,tmpimg.width,tmpimg.height,0,0,img1.width,img1.height);
  */
 	img1 = loadImage(datauri);
+	_img1 = img1;
+
  Log("Opening '"+imgName+"' from '"+imgPath+"'"); 
     fileIsLoaded();
 	//redraw();
