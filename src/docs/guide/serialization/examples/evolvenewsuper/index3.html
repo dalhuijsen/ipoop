@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<HTML>
+  
+  <HEAD>
+    <TITLE>Serialization, Evolution, and the Addition of a New SuperClass</TITLE>
+  </HEAD>
+  
+  <BODY BGCOLOR="ffffff"><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+    
+    <H2>Serialization, Evolution, and the Addition of a New SuperClass</H2>
+    
+    <IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+    
+    <H3>Abstract</H3>
+    
+    <BLOCKQUOTE>
+      
+      <P>Shows how to use versioning in serialization to evolve the class to
+        have a new superclass. For example, if the initial class structure was
+        as follows: </P>
+
+<PRE>
+  class A {...};
+  class C extends A {...};
+</PRE>
+      
+      <P> and the evolved class structure is as follows: </P>
+
+<PRE>
+  class A {...};
+  class B extends A {...};
+  class C extends B {...};
+</PRE>
+      
+      <P>then the new version of subclass C should be able to read the old
+        version of subclass C, and vice versa. The example demonstrates this
+        principle. </P>
+      
+      <P>The evolved classses (<TT>ASuperClass</TT> and <TT>ASubClass</TT>)
+        must define a <TT>serialVersionUID</TT> field that is obtained using
+        the command <TT>serialver</TT> on the original classes (<TT>ASuperClass</TT>
+        and <TT>ASubClass</TT>). </P>
+      
+      <P>Note that in this example, the superclasses (A and B) implement the
+        <TT>Serializable</TT> interface. If they did not, subclass C would be
+        responsible for saving and restoring the fields of A and B. See
+        <A HREF="../nonserialsuper/index3.html"> Serialization with a
+          NonSerializable Superclass </A> for additional information about this
+        topic.</P> </BLOCKQUOTE><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="190" 
+    HEIGHT="2">
+    
+    <H3>Additional Information: </H3>
+    
+    <DL>
+      <DD><A HREF="./sources.html">Source Files</A> </DD>
+      <DD><A HREF="./torun.html">Running the Example</A> </DD>
+      <DD><A HREF="../index.html">List of Examples</A> </DD>
+    </DL><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+  </BODY>
+</HTML>

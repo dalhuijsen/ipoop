@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<title>JTabbedPane: Scrollable Tabs</title>
+</head>
+
+<body bgcolor="white">
+
+<h1>JTabbedPane: Scrollable Tabs</h1>
+
+<p>Previously with <code>JTabbedPane</code>, if all the tabs did not
+fit within a single tab run, the <code>JTabbedPane</code> wrapped tabs onto
+multiple runs. There have been many requests to provide an alternative scheme,
+where the <code>JTabbedPane</code> would
+instead display a single, scrollable run of tabs. This document describes the new
+API for providing such scrollable tab support in <code>JTabbedPane</code> for the 1.4
+release. The bugtraq report that corresponds to this change is:
+<a href="http://developer.java.sun.com/developer/bugParade/bugs/4093898.html">4093898</a>.
+
+<ul>
+ <li><a href="#too_many">The Too-Many-Tabs Dilemma</a>
+ <li><a href="#api">New <code>JTabbedPane</code> API</a>
+ <li><a href="#compat">Compatibility</a>
+</ul>
+
+<h3><a name="too_many">The Too-Many-Tabs Dilemma</a></h3>
+
+<p>Wrapping tabs onto multiple lines provides the benefit of
+always allowing the user to view all
+possible tab selections at a given time:
+
+<p><img src="../../../images/wintabs0.gif" alt="Graphic with two rows of tabs. The first row has five, the second row has four." align=center>
+
+<p>However, the problem with multiple runs is
+in handling the case where the user selects a tab in a run which is not
+adjacent to the panel display area. For the Windows and Motif look and feel
+implementations, this action will cause the runs to rotate such that the run
+containing the selected tab is placed adjacent to the panel display area.
+
+<p><img src="../../../images/wintabs.gif" alt="Graphic with selected tab adjacent to panel display area" align=center>
+
+<p>This behavior can be extremely disorienting to the user because it constantly
+re-arranges the tabs, eliminating predictability in the UI.
+The Metal look and feel solved this problem by always
+leaving the runs fixed, even if the selected tab is not adjacent to the panel
+display area:
+
+<p><img src="../../../images/metaltabs.gif" alt="Graphic with selected tab is denoted by different color"align=center>
+
+<p>Unfortunately the downside of the Metal solution is that it visually departs
+from the 'tabbed folder' metaphor (the selected tab is not 'attached' to its content).
+In fact, Chapter 7 of the
+<a href="http://java.sun.com/products/jlf/">Java Look and Feel
+Guidelines</a> recommends against creating tabbed panes with multiple runs:
+
+<p>&quot;If your tabbed pane requires multiple rows of tabs, consider
+dividing the content among several dialog boxes or components. Multiple rows of
+tabs can be confusing.&quot;
+
+<p>While constraining tabs in a tabbed pane to a number which will fit within a
+single run is an important UI guideline, there are circumstances where a
+proliferation of tabs cannot be avoided. This is often the case if the tabs are
+created dynamically by the application at runtime (perhaps driven off the
+content of a database).
+
+<p>An alternate solution for handling the tab proliferation case is to
+constrain the tabbed pane to a single, scrollable run of tabs: 
+
+<p><img src="../../../images/scrolltabs.gif" alt="Graphic with a single row of tabs that does not include all the possible choices" align=center>
+
+<p>Naturally, this solution has its own set of usability problems, the most
+obvious of which is that the user can no longer view all possible selections at
+one time. However, this scrollable-tab behavior is becoming increasingly common
+in user interfaces and therefore Swing now supports it as an option.
+
+<h3><a name=api>New </a><code>JTabbedPane</code> API</h3>
+
+<p>To allow programs to define which tab layout behavior they require,
+we now provide a &quot;tabLayoutPolicy&quot; bound property on
+<a href="../../../api/javax/swing/JTabbedPane.html"><code>JTabbedPane</code></a>:
+
+<pre>
+    public void <a href="../../../api/javax/swing/JTabbedPane.html#setTabLayoutPolicy(int)">setTabLayoutPolicy(int layoutPolicy)</a>
+
+    public boolean <a href="../../../api/javax/swing/JTabbedPane.html#getTabLayoutPolicy()">getTabLayoutPolicy()</a>
+</pre>
+
+<p>Additionally, constants for the supported policy values have been added to
+<a href="../../../api/javax/swing/JTabbedPane.html"><code>JTabbedPane</code></a>:
+
+<pre>
+    public static final int <a href="../../../api/javax/swing/JTabbedPane.html#WRAP_TAB_LAYOUT">WRAP_TAB_LAYOUT = 0;</a>
+
+    public static final int <a href="../../../api/javax/swing/JTabbedPane.html#SCROLL_TAB_LAYOUT">SCROLL_TAB_LAYOUT = 1;</a>
+</pre>
+
+<h3><a name=compat>Compatibility</a></h3>
+
+<p>This feature had no impact on compatibility,
+as the default value for the <code>tabLayoutPolicy</code> property is 
+<code>WRAP_TAB_LAYOUT</code> which matches the previous layout
+behavior of the tabbed pane.
+
+</body>
+</html>

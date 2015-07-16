@@ -1,0 +1,118 @@
+<HTML>
+<HEAD>
+<title>Collections Framework Change Summary for J2SDK 1.4</title>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH=60>
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+<TD>
+<center>
+           <h1>Collections Framework Enhancements</h1>
+</center>
+</TD>
+</TR>
+</TABLE>
+<!-- Body text begins here -->
+This page summarizes the enhancements made to the collections 
+framework in version 1.4 of the Java<sup><font
+size="-2">TM</font></sup>&nbsp;2 SDK.
+
+<ul>
+<li>The <tt>Collections</tt> utility class has several new methods:
+
+<ul>
+<li><tt><a href="../../api/java/util/Collections.html#rotate(java.util.List,
+int)">rotate(List list, int distance)</a></tt> -  Rotates all of the elements
+in the list by the the specified distance.  This operation is common in GUI 
+    computations: moving one or more columns in a table can be accomplished
+    efficiently by applying this operation to a sublist.  This operation is
+    also common in mathematical and scientific calculations.
+
+<p><li><tt><a
+href="../../api/java/util/Collections.html#replaceAll(java.util.List,
+java.lang.Object, java.lang.Object)">replaceAll(List list, Object oldVal,
+Object newVal)</a></tt> - Replaces all 
+    occurrences of one specified value with another.  This is essentially a
+    convenience method.  Though not difficult to program, it's very commonly
+    needed.
+
+<p><li><tt><a
+href="../../api/java/util/Collections.html#indexOfSubList(java.util.List,
+java.util.List)">indexOfSubList(List source, List target)</a></tt> - Returns
+the index of the first sublist of <tt>source</tt> that is equal to
+<tt>target</tt>.  Commonly used in many domains including text processing.
+<p><li><tt><a
+href="../../api/java/util/Collections.html#lastIndexOfSubList(java.util.List,
+java.util.List)">lastIndexOfSubList(List source, List target)</a></tt> -
+Returns the index of the last sublist of <tt>source</tt> that is equal to
+<tt>target</tt>.  Commonly used in many domains including text processing.
+
+<p><li><tt><a href="../../api/java/util/Collections.html#swap(java.util.List,
+int, int)">swap(List list, int i, int j)</a></tt> - Swaps the elements at the
+specified positions in the specified list.  Essentially a convenience method,
+though this implementation is faster than the naive implementation.
+
+<p><li><tt><a
+href="../../api/java/util/Collections.html#list(java.util.Enumeration)">list(Enumeration
+e)</a></tt> - Returns an <tt>ArrayList</tt> containing the elements returned
+by the specified enumeration.  This convenience method provides
+interoperability between legacy APIs that return enumerations and new APIs
+that require collections.  </ul>
+
+<p><li>New interface <tt><a href="../../api/java/util/RandomAccess.html">RandomAccess</a></tt> is a marker interface that allows <tt>List</tt>
+implementations to indicate that they support fast (generally 
+constant time) random access.  This allows generic algorithms to 
+alter their behavior to provide good performance when applied to either 
+random or sequential access lists.
+
+<p><li>New class <tt><a
+href="../../api/java/util/LinkedHashMap.html">LinkedHashMap</a></tt> provides
+an insertion-ordered <tt>Map</tt> implementation that runs nearly as fast as
+<tt>HashMap</tt>.  Internally, it uses a hash table with a doubly linked list
+running through it in insertion order.  Also available is a corresponding
+<tt>Set</tt> implementation, called <tt><a
+href="../../api/java/util/LinkedHashSet.html">LinkedHashSet</a></tt>.
+
+<p><li>New class <tt><a
+href="../../api/java/util/IdentityHashMap.html">IdentityHashMap</a></tt> is an
+identity-based Map implementation based on a hash table. This class is useful
+for topology-preserving object graph transformations (such as serialization or
+deep-copying).  To perform such transformations, you need to maintain an
+identity-based "node table" that keeps track of which objects have already
+been seen. Identity-based maps are also used to maintain
+object-to-meta-information mappings in dynamic debuggers and similar systems.
+Finally, identity-based maps are useful in thwarting "spoof attacks" resulting
+from intentionally perverse equals methods.  (<tt>IdentityHashMap</tt> never
+invokes the equals method on its keys.)  An added benefit of this
+implementation is that it is fast.  </ul>
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2001
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+   <br>
+   <br>
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:collections-comments@java.sun.com">collections-comments@java.sun.com</a> 
+   </FONT>
+</TD>
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+</TR>
+</TABLE>
+</body>
+</html>

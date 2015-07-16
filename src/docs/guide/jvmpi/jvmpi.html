@@ -1,0 +1,3428 @@
+<HTML>
+<HEAD>
+   <META NAME="Author" CONTENT="deepa viswanathan">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.04 [en] (WinNT; U) [Netscape]">
+   <TITLE>The Java Virtual Machine Profiler Interface (JVMPI)</TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EE" VLINK="#551A8B" ALINK="#FF0000">
+
+<CENTER>
+<H2>
+Java<sup><font size=-2>TM</font></sup> Virtual Machine Profiler Interface (JVMPI)</H2></CENTER>
+<hr>
+
+<P>This document describes the Java Virtual Machine Profiler Interface
+(JVMPI) in the Java 2 SDK, Standard Edition. It is intended for tools vendors to
+ develop profilers
+that work in conjunction with Sun's Java virtual machine<B>*</B> implementation.
+
+<P><B>Note:</B> This interface is an experimental feature in the Java 2 SDK. 
+The JVMPI is not yet a standard profiling
+interface. We provide the documentation for the benefit of tools
+vendors who have an immediate need for profiling hooks in the Java
+virtual machine. The JVMPI will continue to evolve, based on the
+feedback from customers and tools vendors. Please send comments to&nbsp; <A
+HREF="mailto:jvmpi@eng.sun.com">jvmpi@eng.sun.com.</A>
+
+<P><B>Note:</B> VERSION_1 of this interface is implemented in the Classic VM.
+  The Java HotSpot Client VM and the Java HotSpot Server VM both implement
+  VERSION_1_1 (as of Java 2 SDK 1.2.2) or VERSION_1_2 (as of Java 2 SDK
+  1.4.2) of this interface with Java HotSpot technology. Notes
+  specific to Java Hotspot technology are marked as such.
+
+<H3>Contents</H3>
+<ul>
+<li><a href=#overview>Overview</a>
+    <ul>
+     <li> <a href=#start_up>Start-up</a>
+     <li> <a href=#function_call_interface>Function Call Interface</a>
+     <li> <a href=#event_notification>Event Notification</a>
+     <li> <a href=#jvmpi_ids>JVMPI IDs</a>
+     <li> <a href=#threading_and_locking>Threading and Locking Issues</a>
+     <li> <a href=#data_exchange>Data Communication between the Profiler Agent a
+nd Front-End</a>
+    </ul>
+<li><a href=#JVMPI_Functions>Interface Functions</a>
+<li><a href=#JVMPI_Events>Events</a>
+<li><a href=#JVMPI_Dumps>Dump Formats</a>
+<li><a href=#JVMPI_Structures>Data Types</a>
+<li><a href=#impl_notes>Notes on Changes Since Java 2 SDK, v1.2</a>
+    <ul>
+     <li><a href=#whatsnew>What's new?</a>
+     <li><a href=#limitations>Limitations</a>
+     <li><a href=#changes1.3>Changes in VERSION_1_1</a>
+     <li><a href=#changes_1_2>Changes in VERSION_1_2</a>
+    </ul>
+<li><a href=#hprof>The HPROF Profiler Agent</a>
+    <ul>
+    <li><a href=#hprof-overview>Overview</a>
+    <li><a href=#hprof-heap>Heap Allocation Profiles</a>
+    <li><a href=#hprof-cpu>CPU Usage Profiles</a>
+    </ul>
+<li> <a href=#example>Code Examples</a>
+         <ul>
+         <li><a href=#simple-example>A Simple Class Load Tracer</a>
+         <li><a href=#hprof-example>The HPROF Profiling Agent</a>
+         </ul>
+</ul>
+
+<hr>
+
+<a name=overview></a>
+<H3>1. Overview</H3>
+
+The JVMPI is a two-way function call interface between the Java
+virtual machine and an in-process profiler agent. On one hand, the
+virtual machine notifies the profiler agent of various events,
+corresponding to, for example, heap allocation, thread start, etc. On
+the other hand, the profiler agent issues controls and requests for
+more information through the JVMPI. For example, the profiler agent 
+can turn on/off a specific event notification, based on the needs of 
+the profiler front-end.  
+
+<P><CENTER><IMG alt="See long description" longdesc="jvmpi.txt" SRC=jvmpi_diag1.gif><a href="jvmpi.txt" title="Long description for">[D]</a></CENTER>
+
+<P>The profiler front-end may or may not run in the same process as
+the profiler agent. It may reside in a different process on the same
+machine, or on a remote machine connected via the network. The JVMPI
+does not specify a standard wire protocol. Tools vendors may design
+wire protocols suitable for the needs of different profiler
+front-ends.
+
+<P> A profiling tool based on JVMPI can obtain a variety of information
+such as heavy memory allocation sites, CPU usage hot-spots, unnecessary 
+object retention, and monitor contention, for a comprehensive performance
+analysis.
+
+<P> JVMPI supports partial profiling, i.e a user can selectively profile
+an application for certain subsets of the time the virtual machine is up and can
+also choose to obtain only certain types of profiling information. 
+
+<p> In the current version of JVMPI, only one agent per virtual
+machine can be supported.
+
+<a name=start_up></a>
+<H4>1.1. Start-up</H4>
+
+The user can specify the name of the profiler agent and the options to
+the profiler agent through a command line option to the Java virtual
+machine. For example, suppose the user specifies:
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; java -Xrun<B>myprofiler</B>:heapdump=on,file=log.txt ToBeProfiledClass</PRE>
+
+The VM attempts to locate a profiler agent library called
+<B><TT>myprofiler</TT></B> in Java's library directory:
+
+<UL>
+<LI>
+On Microsoft Windows, 
+it is <TT>[value of java.home property]\bin\myprofiler.dll</TT></LI>
+
+<LI>
+On SPARC/Solaris, 
+it is <TT>[value of java.home property]/lib/sparc/libmyprofiler.so</TT></LI>
+</UL>
+
+If the library is not found in the Java library directory, the VM continues
+to search for the library following the normal library search mechanism of
+the given platform:
+
+<ul>
+<li>On Microsoft Windows, 
+the VM searches the current directory, Windows system directories,
+and the directories in the <code>PATH</code> environment variable.
+
+<li>On Solaris, the VM searches the directories in
+<code>LD_LIBRARY_PATH</code>.
+</ul>
+
+
+The VM loads the profiler agent library and looks for the entry point:
+<BLOCKQUOTE>
+<PRE>jint JNICALL JVM_OnLoad(JavaVM *jvm, char *options, void *reserved);
+</PRE>
+</BLOCKQUOTE>
+
+The VM calls the <TT>JVM_OnLoad</TT> function, passing a pointer to
+the <code>JavaVM</code> instance as the first argument, and string
+<TT>"heapdump=on,file=log.txt"</TT> as the second argument.  The third
+argument to <code>JVM_OnLoad</code> is reserved and set to
+<code>NULL</code>.
+
+<p>
+On success, the <code>JVM_OnLoad</code> function must return <code>
+JNI_OK</code>. If for some reason the <code>JVM_OnLoad</code> function
+fails, it must return <code>JNI_ERR</code>.
+
+<a name=function_call_interface></a>
+<H4>1.2. Function Call Interface</H4>
+
+The profiler agent can obtain a function call interface by issuing a 
+<code>GetEnv</code> call on the <code>JavaVM</code> pointer. 
+For example, the following code retrieves the version of JVMPI 
+interface that is implemented in the Java 2 SDK:
+
+<blockquote>
+<pre>
+JVMPI_Interface *jvmpi_interface;
+
+JNIEXPORT jint JNICALL JVM_OnLoad(JavaVM *jvm, char *options, void *reserved)
+{
+    int res = (*jvm)->GetEnv(jvm, (void **)&jvmpi_interface, JVMPI_VERSION_1);
+    if (res < 0) {
+        return JNI_ERR;
+    }
+    ... /* use entries in jvmpi_interface */
+}
+</pre>
+</blockquote>
+
+The <code>JVMPI_Interface</code> structure defines the function call interface
+between the profiler agent and the VM:
+
+<BLOCKQUOTE>
+<PRE>
+/* interface functions */
+typedef struct {
+    jint version;   /* JVMPI version */
+    
+    /* ------interface implemented by the profiler------ */
+
+    void (*<a href=#NotifyEvent>NotifyEvent</a>)(JVMPI_Event *event);
+  
+    /* ------interface implemented by the JVM------ */
+        
+    jint (*<a href=#EnableEvent>EnableEvent</a>)(jint event_type, void *arg);
+    jint (*<a href=#DisableEvent>DisableEvent</a>)(jint event_type, void *arg);
+    jint (*<a href=#RequestEvent>RequestEvent</a>)(jint event_type, void *arg);
+  
+    void (*<a href=#GetCallTrace>GetCallTrace</a>)(JVMPI_CallTrace *trace, jint depth);
+
+    void (*<a href=#ProfilerExit>ProfilerExit</a>)(jint);
+
+    JVMPI_RawMonitor (*<a href=#RawMonitorCreate>RawMonitorCreate</a>)(char *lock_name);
+    void (*<a href=#RawMonitorEnter>RawMonitorEnter</a>)(JVMPI_RawMonitor lock_id);
+    void (*<a href=#RawMonitorExit>RawMonitorExit</a>)(JVMPI_RawMonitor lock_id);
+    void (*<a href=#RawMonitorWait>RawMonitorWait</a>)(JVMPI_RawMonitor lock_id, jlong ms);
+    void (*<a href=#RawMonitorNotifyAll>RawMonitorNotifyAll</a>)(JVMPI_RawMonitor lock_id);
+    void (*<a href=#RawMonitorDestroy>RawMonitorDestroy</a>)(JVMPI_RawMonitor lock_id);
+
+
+    jlong (*<a href=#GetCurrentThreadCpuTime>GetCurrentThreadCpuTime</a>)(void);
+    void (*<a href=#SuspendThread>SuspendThread</a>)(JNIEnv *env);
+    void (*<a href=#ResumeThread>ResumeThread</a>)(JNIEnv *env);
+    jint (*<a href=#GetThreadStatus>GetThreadStatus</a>)(JNIEnv *env);
+    jboolean (*<a href=#ThreadHasRun>ThreadHasRun</a>)(JNIEnv *env);
+    jint (*<a href=#CreateSystemThread>CreateSystemThread</a>)(char *name, jint priority, void (*f)(void *));
+    void (*<a href=#SetThreadLocalStorage>SetThreadLocalStorage</a>)(JNIEnv *env_id, void *ptr);
+    void * (*<a href=#GetThreadLocalStorage>GetThreadLocalStorage</a>)(JNIEnv *env_id);
+
+    void (*<a href=#DisableGC>DisableGC</a>)(void);
+    void (*<a href=#EnableGC>EnableGC</a>)(void);
+    void (*<a href=#RunGC>RunGC</a>)(void);
+
+    jobjectID (*<a href=#GetThreadObject>GetThreadObject</a>)(JNIEnv *env);
+    jobjectID (*<a href=#GetMethodClass>GetMethodClass</a>)(jmethodID mid);
+
+    /* JNI handle <-> object ID conversions; VERSION_1_1 and newer */
+
+    jobject   (*<a href=#jobjectID2jobject>jobjectID2jobject</a>)(jobjectID jid);
+    jobjectID (*<a href=#jobject2jobjectID>jobject2jobjectID</a>)(jobject   j);
+
+    /* VERSION_1_2 and newer: */
+
+    void (*<a href="#SuspendThreadList">SuspendThreadList</a>)(jint reqCount, JNIEnv **reqList, jint *results);
+    void (*<a href="#ResumeThreadList">ResumeThreadList</a>)(jint reqCount, JNIEnv **reqList, jint *results);
+
+} JVMPI_Interface;
+</pre>
+</BLOCKQUOTE>
+
+The <code>GetEnv</code> function returns a pointer to a
+<code>JVMPI_Interface</code> whose <code>version</code> field
+indicates a JVMPI version that is compatible to the version number
+argument passed in the <code>GetEnv</code> call. Note that the value
+of the <code>version</code> field is not necessarily identical to the
+version argument passed in the <code>GetEnv</code> call.
+
+<p>
+The <code>JVMPI_Interface</code> returned by <code>GetEnv</code> has
+all the functions set up except for <TT>NotifyEvent</TT>.  The
+profiler agent must set up the <TT>NotifyEvent</TT> function pointer
+before returning from <TT>JVM_OnLoad</TT>.
+
+<a name=event_notification></a>
+<H4>1.3. Event Notification</H4>
+
+The VM sends an event by calling <TT><a href=#NotifyEvent>NotifyEvent</a></TT> with a <TT>JVMPI_Event</TT>
+data structure as the argument. The following events are supported:
+<ul>
+<li>method <a href=#method_entry>enter</a> and <a href=#method_exit>exit</a>
+<li>object <a href=#obj_alloc>alloc</a>, <a href=#obj_move>move</a>, and <a href=#obj_free>free</a>
+<li>heap arena <a href=#new_arena>create</a> and <a href=#delete_arena>delete</a>
+<li>GC <a href=#gc_start>start</a> and <a href=#gc_finish>finish</a>
+<li>JNI global reference <a href=#global_ref_alloc>alloc</a> and <a href=#global_ref_free>free</a>
+<li>JNI weak global reference <a href=#weak_alloc>alloc</a> and <a href=#weak_free>free</a>
+<li>compiled method <a href=#method_load>load</a> and <a href=#method_unload>unload</a>
+<li>thread <a href=#thread_start>start</a> and <a href=#thread_end>end</a>
+<li>class file data <a href=#class_hook>ready for instrumentation</a>
+<li>class <a href=#class_load>load</a> and <a href=#class_unload>unload</a>
+<li>contended Java monitor <a href=#mon_enter>wait to enter </a>, <a href=#mon_entered>entered</a>, and <a href=#mon_exit>exit</a>
+<li>contended raw monitor <a href=#raw_enter>wait to enter</a>, <a href=#raw_entered>entered</a>, and <a href=#raw_exit>exit</a>
+<li>Java monitor <a href=#mon_wait>wait</a> and <a href=#mon_waited>waited</a>
+<li><a href=#mon_dump>monitor dump</a>
+<li><a href=#heap_dump>heap dump</a>
+<li><a href=#object_dump>object dump</a>
+<li>request to <a href=#dump_data>dump</a> or <a href=#reset_data>reset</a> profiling data
+<li>Java virtual machine <a href=#init_done>initialization</a> and <a href=#shut_down>shutdown</a>
+</ul>
+
+
+
+<p>The <TT>JVMPI_Event</TT> structure contains the event type, the
+<code>JNIEnv</code> pointer of the current thread, and other
+event-specific information.  The event specific information is
+represented as a union of event-specific structures. The
+<a href=#JVMPI_Events>JVMPI Events</a> section provides a
+complete description of all event-specific structures. For
+now, we show the event-specific structures for class load and 
+class unload below.
+
+<blockquote>
+<pre>
+typedef struct {
+    jint event_type;                  /* event_type */
+    JNIEnv *env_id;                   /* env where this event occurred */
+  
+    union {
+        struct {
+	    char *class_name;         /* class name */
+	    char *source_name;        /* name of source file */
+	    jint num_interfaces;      /* number of interfaces implemented */
+  	    jint num_methods;         /* number of methods in the class */
+	    JVMPI_Method *methods;    /* methods */
+	    jint num_static_fields;   /* number of static fields */
+	    JVMPI_Field *statics;     /* static fields */
+	    jint num_instance_fields; /* number of instance fields */
+	    JVMPI_Field *instances;   /* instance fields */
+	    jobjectID class_id;       /* id of the class object */
+	} class_load;
+
+        struct {
+	    jobjectID class_id;       /* id of the class object */
+	} class_unload;
+
+        ... /* Refer to the section on JVMPI events for a full listing */
+    } u;
+} JVMPI_Event;
+</blockquote>
+</pre>
+
+<a name=jvmpi_ids></a> <h4>1.4. JVMPI IDs</h4> 
+
+<p> The JVMPI refers to entities in the Java virtual machine as
+various kinds of IDs. Threads, classes, methods, objects, heap arenas
+and JNI global references all have unique IDs.
+
+<p>Each ID has a defining event and an undefining event.  A defining
+event provides the information related to an ID. For example, the
+defining event for a thread ID contains, among other entries, the name
+of the thread.
+
+<p>An ID is valid until its undefining event arrives. An undefining
+event invalidates the ID, whose value may be reused later as a
+different kind of ID. The value of a thread ID, for example, may be
+redefined as a method ID after the thread ends.
+
+<dl><dd>
+<p><table summary="types of IDs" border=1>
+<thead><tr><th><b>ID</b></th> <th><b>data type</b></th><th><b>defining event</b></th> <th><b>undefining event</b></th></tr></thead>
+<tr><td>thread ID</td> <td><code>JNIEnv *</code></td><td><a href=#thread_start>thread start</a></td> <td><a href=#thread_end>thread end</a></td></tr>
+<tr><td>object ID</td> <td><code>jobjectID</code></td><td><a href=#obj_alloc>object alloc</a></td> <td><a href=#obj_free>object free</a>, <a href=#obj_move>object move</a>, and <a href=#delete_arena>arena delete</a></td></tr>
+<tr><td>class ID</td>  <td><code>jobjectID</code></td><td><a href=#class_load>class load</a></td> <td><a href=#class_unload>class unload</a> and <a href=#obj_move>object move</a></td></tr>
+<tr><td>method ID</td> <td><code>jmethodID</code></td><td><a href=#class_load>defining class load</a></td> <td><a href=#class_unload>defining class unload</a></td></tr>
+
+<tr><td>arena ID</td> <td><code>jint</code></td><td><a href=#new_arena>arena new</a></td> <td><a href=#delete_arena>arena delete</a></td></tr>
+<tr><td>JNI global ref ID</td> <td><code>jobject</code></td><td><a href=#global_ref_alloc>global ref alloc</a></td> <td><a href=#global_ref_free>global ref free</a></td></tr>
+</table>
+</dd></dl>
+
+<p>Assuming the defining events are enabled during the profiler
+initialization, the profiler agent is guaranteed to be notified of an
+entity's creation through a defining event, before the entity appears
+in other JVMPI events.
+
+<p>If the defining events are not enabled, the profiler agent may
+receive an unknown ID. In that case the profiler agent may
+request the corresponding defining event to be sent on demand by
+issuing a <a href=#RequestEvent>RequestEvent</a> call.
+
+
+
+<p>IDs representing objects have type <a
+href=#jobjectID><code>jobjectID</code></a>.  A class is represented by
+the object ID of the corresponding <code>java.lang.Class</code>
+object.  Therefore, class IDs are also of type <code>jobjectID</code>.
+
+<p>A <code>jobjectID</code> is defined by an <a href=#obj_alloc>object
+alloc</a> event, and remains valid in the arena in which the object is
+allocated until one of its undefining events arrive:
+<ul>
+
+<li>An <a href=#obj_free>object free</a> event invalidates an
+object ID.
+
+<li>An <a href=#obj_move>object move</a> event is a special type of
+undefining events.  Unlike other undefining events which signal the
+end-of-life of the corresponding entities, the object still exists, but
+its ID changes, and it may have been moved to a new arena.
+
+<li>An <a href=#delete_arena>arena delete</a> event invalidates
+all remaining object IDs in the arena.
+</ul>
+
+<p>
+When an object free or arena delete event invalidates an object ID,
+the object is known as being garbage collected.
+
+<p>
+Typically, the profiler agent maintains a mapping between
+<code>jobjectID</code>s and its internal representation of object
+identities, and updates the mapping in response to the defining and
+undefining events for JVMPI object IDs.
+
+<p>Since object IDs may be invalidated during GC, the VM issues all
+events that contain <code>jobjectID</code> entries with GC disabled.
+In addition, the profiling agent must disable GC when it is directly
+manipulating any <code>jobjectID</code> data types.  Otherwise the GC
+may invalidate a <code>jobjectID</code> while it is being manipulated
+in the agent code.  The profiler agent must make sure that GC is
+disabled when it calls a JVMPI function that either takes a
+<code>jobjectID</code> argument or returns a <code>jobjectID</code>
+result.  If the function call is inside an event handler where GC is
+already disabled, then the profiler agent need not explicitly disable
+the GC again.
+
+<p>
+A thread may be identified either by its <code>JNIEnv</code> interface
+pointer or by the object ID of the corresponding
+<code>java.lang.Thread</code> object.  The <code>JNIEnv</code> pointer
+is valid between thread start and thread end events, and remains
+constant during the lifetime of a thread. The
+<code>java.lang.Thread</code> object ID, on the other hand, could
+remain valid after the thread ends, until it is garbage collected. The
+profiler agent can convert a <code>JNIEnv</code> pointer to the
+corresponding thread object ID by calling the <a
+href=#GetThreadObject><code>GetThreadObject</code></a> function.
+
+
+<a name=threading_and_locking></a>
+<h4>1.5. Threading and Locking Issues</h4>
+
+The JVMPI is used by the profiler agent that runs in the same process
+as the Java virtual machine. Programmers who write the agent must be
+careful in dealing with threading and locking issues in order to
+prevent data corruption and deadlocks.
+
+<p>
+Events are sent in the same thread where they are generated. For example,
+a class loading event is sent in the same thread in which the class is loaded.
+Multiple events may arrive concurrently in different threads. 
+The agent program must therefore provide the necessary synchronization
+in order to avoid data corruption caused by multiple threads updating
+the same data structure at the same time. 
+
+<p>In some cases, synchronizing on certain frequent events (such as
+method entry and method exit) may impose unacceptable overhead to
+program execution. Agents may utilize the thread-local storage support
+provided by the JVMPI to record profiling data without having to
+contend for global locks, and only merge the thread-local data into
+global profiles at selected intervals. The JVMPI supplies the agent
+with a pointer-size thread-local storage. Following is a simple
+example that illustrates how a profiler agent may take advantage of
+this feature. Suppose we need to write a profiler agent that counts
+the number of methods executed in each thread. The agent installs
+event handlers for thread start, method entry, and thread end events:
+
+<blockquote>
+<pre>
+/* thread start event handler
+ * sets up the storage for thread-local method invocation counter
+ */
+void ThreadStartHandler(JNIEnv *thread_id)
+{
+    int *p_ctr = (int *)malloc(sizeof(int));
+    CALL(SetThreadLocalStorage)(thread_id, p_ctr);
+}
+
+/* method enter event handler
+ * increments thread local method invocation counter
+ */
+void MethodEntryHandler(jmethodID method_id, JNIEnv *thread_id)
+{
+    int *p_ctr = (int *)CALL(GetThreadLocalStorage)(thread_id);
+    (*p_ctr)++;
+}
+
+/* thread end handler
+ * prints the number of methods executed
+ */
+void ThreadEndHandler(JNIEnv *thread_id)
+{
+    int *p_ctr = (int *)CALL(GetThreadLocalStorage)(thread_id);
+    fprintf(stdout, "Thread %x executed %d methods\n",
+	    thread_id, (*p_ctr));
+    free(p_ctr);
+}
+</pre>
+</blockquote>
+
+<p>The following JVMPI functions can cause event notification to
+be sent synchronously in the same thread during the function
+execution:
+
+<ul>
+<li><a href=#RequestEvent><code>RequestEvent</code></a>
+<li><a href=#CreateSystemThread><code>CreateSystemThread</code></a>  
+<li><a href=#RunGC><code>RunGC</code></a>
+</ul>   
+
+<p>The <code>RequestEvent</code> function supplies the JVMPI event
+explicitly requested by the profiler agent. The
+<code>CreateSystemThread</code> function causes thread object
+allocation and thread start events to be issued. The
+<code>RunGC</code> function causes GC-related events to be generated.
+
+<p>
+When a profiling agent is loaded into the Java virtual machine, the
+process can either be in one of three modes: multi-threaded mode with
+GC enabled, multi-threaded mode with GC disabled, and the thread
+suspended mode. Different JVMPI events are issued in different modes.
+Certain JVMPI functions change the process from one mode to another.
+
+<p>The profiler agent must obey the following guidelines to avoid
+deadlocks:
+
+<ul>
+<p><li>
+In the multi-threaded mode with GC enabled, the agent code has a
+great deal of freedom in acquiring locks and calling JVMPI
+functions. Of course the normal rules of deadlock avoidance
+apply. Different threads must not enter the same set of locks in
+different orders.
+
+<p><li> When the GC is disabled the agent program must not call any
+JVMPI function that could require new Java objects to be created or
+cause the garbage collector to run.  Currently, such functions include
+<code>CreateSystemThread</code> and <code>RunGC</code>.  In addition,
+programmers need to be aware that disabling the GC creates an implicit
+locking dependency among threads.  When the GC is disabled, the
+current thread may not be able to safely acquire certain
+locks. Deadlocks may happen, for example, if one thread disables GC
+and tries to acquire a lock, while another thread already acquired
+that lock but is triggering a GC.
+
+<p><li>
+In the thread suspended mode, one or more of the threads have been suspended. 
+In this case, the agent program must not perform any operations that may cause
+ the current thread to block. Such operations include, for example, the 
+<code>malloc</code> and <code>fprintf</code> functions provided by the 
+standard C library. These functions typically acquire internal C library locks
+that may be held by one of the suspended threads.  
+</ul>
+
+<a name=data_exchange></a>
+<h4>1.6 Data Communication between the Profiler Agent and Front-End</h4>
+
+The JVMPI provides a low-level mechanism for a profiler agent to
+communicate with the virtual machine.  The goal is to provide maximum
+flexiblity for the profiler agent to present the data depending on the
+needs of the front-end, and also to keep the processing work done by
+the virtual machine at a minimum. Therefore, the JVMPI does not
+specify a wire protocol between the profiling agent and the front-end.
+Instead, tools vendors design their own profiling agents that suit the
+needs of their front-ends.
+
+<p>
+The following issues need to be considered when designing the wire
+protocol in order to allow the profiler agent and front-end to reside on
+different machines:
+<ul>
+<li> Pointer size (e.g., 32 or 64 bit) - all of the JVMPI IDs are of
+     pointer type (see <a href=#JVMPI_Structures>Data Types</a>).
+<li> Byte order (little endian or big endian).
+<li> Bit order (most significant bit first or least significant bit first).
+<li> String encoding - the JVMPI uses the UTF-8 encoding as documented in the
+     Java virtual machine specification.
+</ul>
+
+<p>
+For example, the <I>HPROF</I> profiler agent shipped with the Java 2 SDK sends
+the size of all IDs as the first record, and uses the standard network byte order
+for integer and floating-point data.
+
+<a name=JVMPI_Functions></a>
+<h3>2. Interface Functions</h3>
+
+      <ul>
+       <li><a href=#CreateSystemThread>CreateSystemThread</a>
+       <li><a href=#DisableEvent>DisableEvent</a>
+       <li><a href=#DisableGC>DisableGC</a>
+       <li><a href=#EnableEvent>EnableEvent</a>
+       <li><a href=#EnableGC>EnableGC</a>
+       <li><a href=#GetCallTrace>GetCallTrace</a>
+       <li><a href=#GetCurrentThreadCpuTime>GetCurrentThreadCpuTime</a>
+       <li><a href=#GetMethodClass>GetMethodClass</a>
+       <li><a href=#GetThreadLocalStorage>GetThreadLocalStorage</a>
+       <li><a href=#GetThreadObject>GetThreadObject</a>
+       <li><a href=#GetThreadStatus>GetThreadStatus</a>
+       <li><a href=#NotifyEvent>NotifyEvent</a>
+       <li><a href=#ProfilerExit>ProfilerExit</a>
+       <li><a href=#RawMonitorCreate>RawMonitorCreate</a>
+       <li><a href=#RawMonitorDestroy>RawMonitorDestroy</a>
+       <li><a href=#RawMonitorEnter>RawMonitorEnter</a>
+       <li><a href=#RawMonitorExit>RawMonitorExit</a>
+       <li><a href=#RawMonitorNotifyAll>RawMonitorNotifyAll</a>
+       <li><a href=#RawMonitorWait>RawMonitorWait</a>
+       <li><a href=#RequestEvent>RequestEvent</a>
+       <li><a href=#ResumeThread>ResumeThread</a>
+       <li><a href=#ResumeThreadList>ResumeThreadList</a>
+       <li><a href=#RunGC>RunGC</a>
+       <li><a href=#SetThreadLocalStorage>SetThreadLocalStorage</a>
+       <li><a href=#SuspendThread>SuspendThread</a>
+       <li><a href=#SuspendThreadList>SuspendThreadList</a>
+       <li><a href=#ThreadHasRun>ThreadHasRun</a>
+       <li><a href=#jobjectID2jobject>jobjectID2jobject</a>
+       <li><a href=#jobject2jobjectID>jobject2jobjectID</a>
+     </ul>
+
+<a name=CreateSystemThread></a>
+<h4><code>jint (*CreateSystemThread)(char *name, jint priority, void (*f)(void *));</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to create a daemon thread in the Java
+virtual machine.
+
+<p>
+It is safe for the profiler agent to make this call only after the JVM
+notifies a <code>JVMPI_EVENT_INIT_DONE</code> and when the system is
+in a multi-threaded mode with GC enabled.
+
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>name</code>
+	<td> - name of the thread.
+<tr><td><code>priority</code>
+	<td> - thread priority; the values can be:
+        <tr> <td><td>
+                 <blockquote>
+                 <table summary="layout" border=0>
+                 <tr><td><code>JVMPI_NORMAL_PRIORITY</code></td>
+	         <tr><td><code>JVMPI_MAXIMUM_PRIORITY</code></td>
+	         <tr><td><code>JVMPI_MINIMUM_PRIORITY</code></td>  
+                 </table>
+                 </blockquote>
+<tr><td><code>f</code>
+	<td> - function to be run by the thread.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>JNI_OK</code>
+	<td> - success.
+<tr><td><code>JNI_ERR</code>
+	<td> - failure.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=DisableEvent></a>
+<h4><code>jint (*DisableEvent)(jint event_type, void *arg);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to disable the notification of a
+particular type of event.  Apart from <TT>event_type</TT>, the
+profiler agent may also pass an argument that provides additional
+information specific to the given event type.
+
+<p>All events are disabled when the VM starts up. Once enabled, an
+event stays enabled until it is explicitly disabled.
+
+<p>This function returns <code>JVMPI_NOT_AVAILABLE</code> if
+<TT>event_type</TT> is <code>JVMPI_EVENT_HEAP_DUMP</code>,
+<code>JVMPI_EVENT_MONITOR_DUMP</code> or
+<code>JVMPI_EVENT_OBJECT_DUMP</code>.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>event_type</code>
+	<td> - type of event, <code>JVMPI_EVENT_CLASS_LOAD</code> etc.
+<tr><td><code>arg</code>
+        <td> - event specific information.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>JVMPI_SUCCESS</code>
+        <td> disable succeeded.
+<tr><td><code>JVMPI_FAIL</code>
+        <td> disable failed.
+<tr><td><code>JVMPI_NOT_AVAILABLE</code>
+        <td> support for disabling the given <code>event_type</code> is not available.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+<a name=DisableGC></a>
+<h4><code>void (*DisableGC)(void);</code></h4>
+<dl>
+<dd>Called by the profiler to disable garbage collection, until
+<code>EnabledGC</code> is called.  <code>DisableGC</code> and
+<code>EnableGC</code> calls may be nested.
+</dd>
+</dl>
+
+<a name=EnableEvent></a>
+<h4><code>jint (*EnableEvent)(jint event_type, void *arg);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to enable notification of a
+particular type of event.  Apart from <TT>event_type</TT>, the
+profiler may also pass an argument that provides additional
+information specific to the given event type.
+
+<p>All events are disabled when the VM starts up. Once enabled, an
+event stays enabled until it is explicitly disabled.
+
+<p>This function returns <code>JVMPI_NOT_AVAILABLE</code>  if <TT>event_type</TT> is <code>JVMPI_EVENT_HEAP_DUMP</code>, <code>JVMPI_EVENT_MONITOR_DUMP</code> or
+<code>JVMPI_EVENT_OBJECT_DUMP</code>. The profiler agent must use the
+<code><a href=#RequestEvent>RequestEvent</a></code> function to request these events.
+
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>event_type</code>
+	<td> - type of event, <code>JVMPI_EVENT_CLASS_LOAD</code> etc.
+<tr><td><code>arg</code>
+        <td> - event specific argument.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>JVMPI_SUCCESS</code>
+        <td> enable succeeded.
+<tr><td><code>JVMPI_FAIL</code>
+        <td> enable failed.
+<tr><td><code>JVMPI_NOT_AVAILABLE</code>
+        <td> support for enabling the given <code>event_type</code> is not available.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+
+<a name=EnableGC></a>
+<h4><code>void (*EnableGC)(void);</code></h4>
+
+<dl>
+<dd>Enables garbage collections. <code>DisableGC</code> and
+<code>EnableGC</code> calls may be nested.
+</dd>
+</dl>
+
+<a name=GetCallTrace></a>
+<h4><code>void (*GetCallTrace)(<a href=#jvmpi_calltrace>JVMPI_CallTrace</a> *trace, jint depth);</code></h4>
+
+<dl>
+<dd>Called by the profiler to obtain the current method call stack
+trace for a given thread. The thread is identified by the
+<code>env_id</code> field in the <a
+href=#jvmpi_calltrace><code>JVMPI_CallTrace</code></a> structure. The
+profiler agent should allocate a <a
+href=#jvmpi_calltrace><code>JVMPI_CallTrace</code></a> structure with
+enough memory for the requested stack depth.
+ The VM fills in the
+<code>frames</code> buffer and the <code>num_frames</code> field.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>trace</code>
+	<td> - trace data structure to be filled by the VM.
+<tr><td><code>depth</code>
+        <td> - depth of the call stack trace.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+
+<a name=GetCurrentThreadCpuTime></a>
+<h4><code>jlong (*GetCurrentThreadCpuTime)(void);</code></h4>
+<dl>
+<dd>Called by the profiler agent to obtain the accumulated CPU time
+consumed by the current thread.
+
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td>time in nanoseconds
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=GetMethodClass></a>
+<h4><code><a href=#jobjectID>jobjectID</a> (*GetMethodClass)(jmethodID mid);</code></h4>
+<dl>
+<dd>Called by the profiler agent to obtain the object ID of the class
+that defines a method.
+
+<p> The profiler must disable GC before calling this function.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>mid</code>
+	<td> - a method ID.
+</table>
+</blockquote>
+
+<p>
+<b>Returns</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td> object ID of the defining class.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=GetThreadLocalStorage></a>
+<h4><code>void * (*GetThreadLocalStorage)(JNIEnv *env_id);</code></h4>
+<dl>
+<dd>Called by the profiler to get the value of the JVMPI thread-local
+storage. The JVMPI supplies to the agent a pointer-size thread-local
+storage that can be used to record per-thread profiling information.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>env_id</code>
+	<td> - the <code>JNIEnv *</code> of the thread.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td>the value of the thread local storage
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=GetThreadObject></a>
+<h4><code><a href=#jobjectID>jobjectID</a> (*GetThreadObject)(JNIEnv *env);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to obtain the thread object ID that
+corresponds to a <code>JNIEnv</code> pointer.
+
+<p> The profiler must disable GC before calling this function.
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>env</code>
+	<td> - <code>JNIEnv</code> pointer of the thread.
+</table>
+</blockquote>
+
+<p>
+<b>Returns</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td> the thread object ID.
+</table>
+</blockquote>
+<p>
+</dd>
+</dl>
+
+
+<a name=GetThreadStatus></a>
+<h4><code>jint (*GetThreadStatus)(JNIEnv *env);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to obtain the status of a thread.  
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>env</code>
+	<td> - the <code>JNIEnv *</code> of the thread.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>JVMPI_THREAD_RUNNABLE</code>
+	<td> - thread is runnable.
+<tr><td><code>JVMPI_THREAD_MONITOR_WAIT</code>
+	<td> - thread is waiting on a monitor.
+<tr><td><code>JVMPI_THREAD_CONDVAR_WAIT</code>
+	<td> - thread is waiting on a condition variable.
+</table>
+
+<p> When a thread is suspended (by
+<code>java.lang.Thread.suspend</code>, <code>SuspendThread</code> or 
+<code>SuspendThreadList</code>) or interrupted in any of the
+above states the <code>JVMPI_THREAD_SUSPENDED</code> or the
+<code>JVMPI_THREAD_INTERRUPTED</code> bit is set.
+
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=NotifyEvent></a>
+<h4><code>void (*NotifyEvent)(JVMPI_Event *event);</code></h4>
+<dl>
+<dd>Called by the VM to send an event to the profiling agent. The
+profiler agent registers the types of events it is interested in
+by calling <a href=#EnableEvent><code>EnableEvent</code></a>, or
+requests a specific type of event by calling 
+<a href=#RequestEvent><code>RequestEvent</code></a>.
+
+<p>When an event is enabled by <code>EnableEvent</code>, the thread
+that generates the event is the thread in which the event is sent.
+When an event is requested by <code>RequestEvent</code>, the thread
+that requests the event is the thread in which the event is sent.
+Multiple threads may send multiple events concurrently.
+
+<p> If the event specific information contains a
+<code>jobjectID</code>, this function is called with GC disabled.  GC
+is enabled after the function returns.
+
+<p> The space allocated for the <code>JVMPI_Event</code> structure
+and any event specific information is freed by the virtual machine once 
+this function returns.  The profiler agent must copy any necessary 
+data it needs to retain into its internal buffers.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>event</code>
+	<td> - the JVMPI event sent from the VM to the profiling agent.
+</table>
+</blockquote>
+
+</dd>
+</dl>   
+
+
+
+<a name=ProfilerExit></a>
+<h4><code>void (*ProfilerExit)(jint err_code);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to inform the VM that the profiler
+wants to exit with error code set to <code>err_code</code>.  This
+function causes the VM to also exit with the same
+<code>err_code</code>.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>err_code</code>
+	<td> - exit code
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=RawMonitorCreate></a>
+<h4><code><a href=#raw_mon>JVMPI_RawMonitor</a> (*RawMonitorCreate)(char *lock_name);</code></h4>
+
+<dl>
+<dd>Called by the profiler to create a raw monitor.
+
+<p>Raw monitors are similar to Java monitors. The difference is that
+raw monitors are not associated with Java objects.
+
+<p> It is not safe for the profiler agent to call this function in the
+thread suspended mode because this function may call arbitrary system
+functions such as <code>malloc</code> and block on an internal system
+library lock.
+
+<p>If the raw monitor is created with a name beginning with an
+underscore (<code>'_'</code>), then its monitor contention events are
+not sent to the profiler agent.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>lock_name</code>
+	<td> - name of raw monitor.
+</table>
+</blockquote>
+
+<p>
+<b>Returns</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td> a raw monitor
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=RawMonitorDestroy></a>
+<h4><code>void (*RawMonitorDestroy)(<a href=#raw_mon>JVMPI_RawMonitor</a> lock_id);</code></h4>
+<dl>
+<dd>Called by the profiler agent to destroy a raw monitor and free
+all system resources associated with the monitor.
+
+<p>Raw monitors are similar to Java monitors. The difference is that
+raw monitors are not associated with Java objects.
+
+<p> It is not safe for the profiler agent to call this function in the
+thread suspended mode because this function may call arbitrary system
+functions such as <code>free</code> and block on a internal system
+library lock.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>lock_id</code>
+	<td> - the raw monitor to be destroyed
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=RawMonitorEnter></a>
+<h4><code>void (*RawMonitorEnter)(<a href=#raw_mon>JVMPI_RawMonitor</a> lock_id);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to enter a raw monitor.
+
+<p>Raw monitors are similar to Java monitors. The difference is that
+raw monitors are not associated with Java objects.
+
+<p> It is not safe for the profiler agent to call this function in the
+thread suspended mode because the current thread may block on the raw
+monitor already acquired by one of the suspended threads.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>lock_id</code>
+	<td> - the raw monitor to be entered
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+
+<a name=RawMonitorExit></a>
+<h4><code>void (*RawMonitorExit)(<a href=#raw_mon>JVMPI_RawMonitor</a> lock_id);</code></h4>
+<dl>
+<dd>Called by the profiler agent to exit a raw monitor.
+
+<p>Raw monitors are similar to Java monitors. The difference is that
+raw monitors are not associated with Java objects.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>lock_id</code>
+	<td> - the raw monitor to exit
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+
+<a name=RawMonitorNotifyAll></a>
+<h4><code>void (*RawMonitorNotifyAll)(<a href=#raw_mon>JVMPI_RawMonitor</a> lock_id);</code></h4>
+<dl>
+<dd>Called by the profiler to notify all the threads that are waiting
+on a raw monitor.
+
+<p>Raw monitors are similar to Java monitors. The difference is that
+raw monitors are not associated with Java objects.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>lock_id</code>
+	<td> - the raw monitor to notify
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=RawMonitorWait></a>
+<h4><code>void (*RawMonitorWait)(<a href=#raw_mon>JVMPI_RawMonitor</a> lock_id, jlong ms);</code></h4>
+<dl>
+<dd>Called by the profiler agent to wait on a raw monitor for a
+specified timeout period. Passing 0 as the timeout period causes the
+thread to wait forever.
+
+<p>Raw monitors are similar to Java monitors. The difference is that
+raw monitors are not associated with Java objects.
+
+<p>
+<I>Hotspot note:</i> if the raw monitor is not owned by the thread 
+executing <code>RawMonitorWait</code>, waiting will not occur.
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>lock_id</code>
+	<td> - the raw monitor to wait on
+<tr><td><code>ms</code>
+	<td> - time to wait (in milliseconds). 
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=RequestEvent></a>
+<h4><code>jint (*RequestEvent)(jint event_type, void *arg);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to request a particular type of event
+to be notified. Apart from <TT>event_type</TT>, the profiler agent may
+also pass an argument that provides additional information specific to
+the given event type.
+
+<p>This function can be called to request one-time events such as
+<code>JVMPI_EVENT_HEAP_DUMP</code>,
+<code>JVMPI_EVENT_MONITOR_DUMP</code> and
+<code>JVMPI_EVENT_OBJECT_DUMP</code>.  Notification for these events
+cannot be controlled by the <code><a
+href=#EnableEvent>EnableEvent</a></code> and <code><a
+href=#DisableEvent>DisableEvent</a></code> functions.
+
+<p>In addition, this function can be called to request the
+<em>defining events</em> for a specific class, thread, or object.
+This is useful when the profiler agent needs to resolve an unknown
+class, method, thread, or object ID received in an event, but the
+corresponding defining event was disabled earlier.
+
+<ul>
+<li>
+The profiler agent may receive information about an unknown class ID by
+requesting a <a href=#class_load><code>JVMPI_EVENT_CLASS_LOAD</code></a> event and setting the
+event-specific argument to the class object ID.
+<li>
+The profiler agent may receive information about an unknown thread ID by
+requesting a <a href=#thread_start><code>JVMPI_EVENT_THREAD_START</code></a> event and setting the
+event-specific argument to the thread object ID.
+<li>
+The profiler agent may receive information about an unknown object ID by
+requesting a <a href=#obj_alloc><code>JVMPI_EVENT_OBJECT_ALLOC</code></a> event and setting the
+event-specific argument to the object ID.
+</ul>
+
+<p> Thus the profiler agent can either enable the above three events
+asynchronously by calling <code><a
+href=#EnableEvent>EnableEvent</a></code>, or request these events
+synchronously by calling <code>RequestEvent</code>. The requested
+event is sent in the same thread that issued the
+<code>RequestEvent</code> call, and is sent before the
+<code>RequestEvent</code> function returns.
+
+<p>
+The <code>RequestEvent</code> function cannot be used to request other
+events not listed above.
+
+<p>
+Events requested through <code>RequestEvent</code> will arrive with the
+<code>JVMPI_REQUESTED_EVENT</code> bit set in its <code>event_type</code>.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>event_type</code>
+	<td> - type of event, <code>JVMPI_EVENT_CLASS_LOAD</code> etc.
+<tr><td><code>arg</code>
+        <td> - event specific argument.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>JVMPI_SUCCESS</code>
+        <td> request succeeded.
+<tr><td><code>JVMPI_FAIL</code>
+        <td> request failed.
+<tr><td><code>JVMPI_NOT_AVAILABLE</code>
+        <td> support for issuing the requested <code>event_type</code> is not available.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+
+
+<a name=ResumeThread></a>
+<h4><code>void (*ResumeThread)(JNIEnv *env);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent  to resume a thread.
+<p>
+Note that a thread suspended by the <code>java.lang.Thread.suspend</code> method
+can be resumed by the JVMPI <code>ResumeThread</code> function.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>env</code>
+	<td> - the <code>JNIEnv *</code> of the thread.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=ResumeThreadList></a>
+<h4><code>void (*ResumeThreadList)(jint reqCount, JNIEnv **reqList, jint *results);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to resume reqCount threads specified
+  in the reqList array.
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0 summary="layout">
+<tr><td><code>reqCount</code> - the number of threads to resume
+<tr><td><code>reqList</code> - the list of threads to resume
+<tr><td><code>results</code> - the list of per-thread resume results
+</table>
+</blockquote>
+<p>
+<b>Returns</b>:
+<blockquote>
+<table summary="layout" border=0 summary="layout">
+<tr><td>The results array element for a specific thread contains zero (0)
+      if the resume was successful and non-zero otherwise.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=RunGC></a>
+<h4><code>void (*RunGC)(void);</code></h4>
+<dl>
+
+<dd>Called by the profiler to force a complete garbage
+collection. This function must not be called when GC is disabled.
+
+</dd>
+</dl>
+
+
+<a name=SetThreadLocalStorage></a>
+<h4><code>void (*SetThreadLocalStorage)(JNIEnv *env_id, void *ptr);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to set the value of the JVMPI
+thread-local storage. The JVMPI supplies to the agent a pointer-size
+thread-local storage that can be used to record per-thread profiling
+information.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>env_id</code>
+	<td> - the <code>JNIEnv *</code> of the thread.
+<tr><td><code>ptr</code>
+	<td> - the value to be entered into the thread-local storage.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=SuspendThread></a>
+<h4><code>void (*SuspendThread)(JNIEnv *env);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent  to suspend a thread. The system enters the
+thread suspended mode after this function is called.
+
+<p>
+Note that a thread suspended by the JVMPI <code>SuspendThread</code> function
+can be resumed by the <code>java.lang.Thread.resume</code> method.
+
+<p>
+In the Java 2 SDK implementation, this function must be called when the
+GC is disabled.  GC must remain disabled until all threads have been
+resumed.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>env</code>
+	<td> - the <code>JNIEnv *</code> of the thread.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=SuspendThreadList></a>
+<h4><code>void (*SuspendThreadList)(jint reqCount, JNIEnv **reqList, jint *results);</code></h4>
+
+<dl>
+<dd>Called by the profiler agent to suspend reqCount threads specified
+  in the reqList array. The system enters the thread suspended mode
+  after this function is called.
+<p>
+  In the Java 2 SDK implementation, this function must be called when
+  the GC is disabled. GC must remain disabled until all threads have
+  been resumed.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table border=0 summary="layout">
+<tr><td><code>reqCount</code> - the number of threads to suspend
+<tr><td><code>reqList</code> - the list of threads to suspend
+<tr><td><code>results</code> - the list of per-thread suspend results
+</table>
+</blockquote>
+<p>
+<b>Returns</b>:
+<blockquote>
+<table border=0 summary="layout">
+<tr><td>The results array element for a specific thread contains zero (0)
+      if the suspend was successful and non-zero otherwise.
+</table>
+</blockquote>
+</dd></dl>
+
+<a name=ThreadHasRun></a>
+<h4><code>jboolean (*ThreadHasRun)(JNIEnv *env);</code></h4>
+
+<dl>
+<dd>Called by the profiler to determine if a thread identified by the
+given <code>JNIEnv</code> pointer has consumed CPU time since the last
+time the thread was suspended by <code><a
+href=#SuspendThread>SuspendThread</a></code> or 
+<code><a href=#SuspendThreadList>SuspendThreadList</a></code>. 
+This function must be called when the thread has been resumed by <code><a
+href=#ResumeThread>ResumeThread</a></code> or 
+<code><a href=#ResumeThreadList>ResumeThreadList</a></code> and 
+then suspended again by the
+<code><a href=#SuspendThread>SuspendThread</a></code> or 
+<code><a href=#SuspendThreadList>SuspendThreadList</a></code> function.
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>env</code>
+	<td> - the <code>JNIEnv *</code> of the thread.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>JNI_TRUE</code>
+	<td> - thread got a chance to run.
+<tr><td><code>JNI_FALSE</code>
+	<td> - thread did not get a chance to run.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+
+<a name=jobjectID2jobject></a>
+<h4><code>jobject (*jobjectID2jobject)(jobjectID jid);</code></h4>
+<dl>
+<dd>
+Called by the profiler agent to convert an object ID to JNI Handle.
+
+<p>
+This function is experimental and may be removed from the final JVMPI specification,
+as its usage is very unsafe and can lead to unreliable profilers. See also <a
+href=#convertNote>note</a>.
+
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>jid</code>
+	<td> - the object ID to be converted.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td> JNI handle
+</table>
+</blockquote>
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+
+<a name=jobject2jobjectID></a>
+<h4><code>jobjectID (*jobject2jobjectID)(jobject j);</code></h4>
+<dl>
+<dd>
+Called by the profiler agent to convert a JNI Handle to an object ID.
+
+<p>
+This function is experimental and may be removed from the final JVMPI specification,
+as its usage is very unsafe and can lead to unreliable profilers. 
+
+<p>
+<b>Arguments</b>:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>j</code>
+	<td> - JNI handle.
+</table>
+</blockquote>
+<p>
+<b>Returns:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td> object ID
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<p>
+<a name=convertNote></a>
+<B>Usage Note:</B>
+<p>
+<P>It is not safe to invoke JNI functions in arbirtrary JVMPI event handlers. 
+JVMPI events may be issued in virtual machine states that are not suitable 
+for executing JNI functions. The profiler agent may only invoke JNI functions 
+in multithreaded mode (as defined by the JVMPI specification) and must take 
+extremely care under these circumstances to avoid race conditions, dead locks, 
+and infinite recursions. 
+
+<P>Note that jobjectID2jobject and jobject2jobjectID may only be invoked in 
+GC-disabled mode (as defined by the JVMPI specification) and under this mode 
+it not safe to call JNI functions. Thus you should never call jobjectID2jobject
+ and then use a JNI function to process the resulting jobject in an event handler 
+ running in GC-disabled mode. 
+
+
+</dd>
+</dl>
+
+
+<a name=JVMPI_Events></a>
+<H3>3. Events</H3>
+
+    <ul>
+     <li> <a href=#delete_arena>JVMPI_EVENT_ARENA_DELETE</a>
+     <li> <a href=#new_arena>JVMPI_EVENT_ARENA_NEW</a>
+     <li> <a href=#class_load>JVMPI_EVENT_CLASS_LOAD</a>
+     <li> <a href=#class_hook>JVMPI_EVENT_CLASS_LOAD_HOOK</a>
+     <li> <a href=#class_unload>JVMPI_EVENT_CLASS_UNLOAD</a>
+     <li> <a href=#method_load>JVMPI_EVENT_COMPILED_METHOD_LOAD</a>
+     <li> <a href=#method_unload>JVMPI_EVENT_COMPILED_METHOD_UNLOAD</a>
+     <li> <a href=#dump_data>JVMPI_EVENT_DATA_DUMP_REQUEST</a>
+     <li> <a href=#reset_data>JVMPI_EVENT_DATA_RESET_REQUEST</a>
+     <li> <a href=#gc_finish>JVMPI_EVENT_GC_FINISH</a>
+     <li> <a href=#gc_start>JVMPI_EVENT_GC_START</a>
+     <li> <a href=#heap_dump>JVMPI_EVENT_HEAP_DUMP</a>
+     <li> <a href=#global_ref_alloc>JVMPI_EVENT_JNI_GLOBALREF_ALLOC</a>
+     <li> <a href=#global_ref_free>JVMPI_EVENT_JNI_GLOBALREF_FREE</a>
+     <li> <a href=#weak_alloc>JVMPI_EVENT_JNI_WEAK_GLOBALREF_ALLOC</a>
+     <li> <a href=#weak_free>JVMPI_EVENT_JNI_WEAK_GLOBALREF_FREE</a>
+     <li> <a href=#init_done>JVMPI_EVENT_JVM_INIT_DONE</a>
+     <li> <a href=#shut_down>JVMPI_EVENT_JVM_SHUT_DOWN</a>
+     <li> <a href=#method_entry>JVMPI_EVENT_METHOD_ENTRY</a>
+     <li> <a href=#method_entry2>JVMPI_EVENT_METHOD_ENTRY2</a>
+     <li> <a href=#method_exit>JVMPI_EVENT_METHOD_EXIT</a>
+     <li> <a href=#mon_enter>JVMPI_EVENT_MONITOR_CONTENDED_ENTER</a>
+     <li> <a href=#mon_entered>JVMPI_EVENT_MONITOR_CONTENDED_ENTERED</a>
+     <li> <a href=#mon_exit>JVMPI_EVENT_MONITOR_CONTENDED_EXIT</a>
+     <li> <a href=#mon_dump>JVMPI_EVENT_MONITOR_DUMP</a>
+     <li> <a href=#mon_wait>JVMPI_EVENT_MONITOR_WAIT</a>
+     <li> <a href=#mon_waited>JVMPI_EVENT_MONITOR_WAITED</a>
+     <li> <a href=#obj_alloc>JVMPI_EVENT_OBJECT_ALLOC</a>
+     <li> <a href=#object_dump>JVMPI_EVENT_OBJECT_DUMP</a>
+     <li> <a href=#obj_free>JVMPI_EVENT_OBJECT_FREE</a>
+     <li> <a href=#obj_move>JVMPI_EVENT_OBJECT_MOVE</a>
+     <li> <a href=#raw_enter>JVMPI_EVENT_RAW_MONITOR_CONTENDED_ENTER</a>
+     <li> <a href=#raw_entered>JVMPI_EVENT_RAW_MONITOR_CONTENDED_ENTERED</a>
+     <li> <a href=#raw_exit>JVMPI_EVENT_RAW_MONITOR_CONTENDED_EXIT</a>
+     <li> <a href=#thread_end>JVMPI_EVENT_THREAD_END</a>
+     <li> <a href=#thread_start>JVMPI_EVENT_THREAD_START</a>
+     <li> <a href=#instruction_start>JVMPI_EVENT_INSTRUCTION_START</a>
+    </ul>
+
+<a name=delete_arena></a>
+<h4><code>JVMPI_EVENT_ARENA_DELETE</code></h4>
+<dl>
+<dd>
+Sent when a heap arena is deleted.  
+
+<p>All objects residing in this arena are freed.  An explicit 
+<a href=#obj_free><code>JVMPI_EVENT_OBJECT_FREE</code></a> is not 
+sent for those objects.  The profiler agent can infer all the objects
+currently residing in that arena by keeping track of the object 
+allocations in the arena and all the objects moved in and out of 
+the arena.
+
+<p>
+This event is issued in the thread suspended mode.  The profiler must not
+make any blocking calls such as entering a monitor or allocating from
+the C heap (for example, via <code>malloc</code>).
+
+<p>
+This event is always sent between a pair of 
+<a href=#gc_start><code>JVMPI_EVENT_GC_START</code></a> and
+<a href=#gc_finish><code>JVMPI_EVENT_GC_FINISH</code></a> events.
+The profiler agent should acquire all the locks need for processing this
+event in the event handler for <code>JVMPI_EVENT_GC_START</code>.
+
+
+<blockquote>
+<pre>
+struct {
+    jint arena_id;            
+} delete_arena;
+
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>arena_id</code>
+	<td> - ID of the arena being deleted.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=new_arena></a>
+<h4><code>JVMPI_EVENT_ARENA_NEW</code></h4>
+<dl>
+<dd>
+Sent when a new arena for allocating objects is created.
+<blockquote>
+<pre>
+struct {
+    jint arena_id;            
+    char *arena_name;         
+} new_arena;
+
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>arena_id</code>
+	<td> - ID given to the arena.
+<tr><td><code>arena_name</code>
+	<td> - name of the arena.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=class_load></a>
+<h4><code>JVMPI_EVENT_CLASS_LOAD</code></h4>
+
+<dl><dd>Sent when a class is loaded in the VM, or when the profiler
+agent requests a <code>JVMPI_EVENT_CLASS_LOAD</code> event by issuing
+a <code><a href=#RequestEvent>RequestEvent</a></code> call. In the
+latter case, the <code>JVMPI_REQUESTED_EVENT</code> bit in the event
+type is set.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+
+<blockquote>
+<pre>
+struct {
+    char *class_name;         
+    char *source_name;        
+    jint num_interfaces;      
+    jint num_methods;         
+    <a href=#jvmpi_method>JVMPI_Method</a> *methods;    
+    jint num_static_fields;   
+    <a href=#jvmpi_field>JVMPI_Field</a> *statics;     
+    jint num_instance_fields; 
+    <a href=#jvmpi_field>JVMPI_Field</a> *instances;   
+    <a href=#jobjectID>jobjectID</a> class_id;       
+} class_load;
+</pre>
+</blockquote>
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>class_name</code>
+	<td> - name of class being loaded.
+<tr><td><code>source_name</code>
+	<td> - name of source file that defines the class.
+<tr><td><code>num_interfaces</code>
+	<td> - number of interfaces implemented by this class.
+<tr><td><code>methods</code>
+	<td> - methods defined in the class.
+<tr><td><code>num_static_fields</code>
+	<td> - number of static fields defined in this class.
+<tr><td><code>statics</code>
+	<td> - static fields defined in the class.
+<tr><td><code>num_instance_fields</code>
+	<td> - number of instance fields defined in this class.
+<tr><td><code>instances</code>
+	<td> - instance fields defined in the class.
+<tr><td><code>class_id</code>
+	<td> - class object ID.
+</table>
+</blockquote>
+
+<p> Note: class IDs are IDs of the class objects and are subject to change
+when <code>JVMPI_EVENT_OBJECT_MOVE</code> arrives.
+
+</dd>
+</dl>
+
+<a name=class_hook></a>
+<h4><code>JVMPI_EVENT_CLASS_LOAD_HOOK</code></h4>
+
+<dl><dd>Sent when the VM obtains a class file data, but before it constructs
+the in-memory representation for that class.  The profiler agent can instrument
+the existing class file data sent by the VM to include profiling hooks.
+
+<p>The profiler must allocate the space for the modified class file data buffer
+using the memory allocation function pointer sent in this event, because the
+VM is responsible for freeing the new class file data buffer.  
+
+<blockquote>
+<pre>
+struct {
+    unsigned char *class_data;    
+    jint class_data_len;            
+    unsigned char *new_class_data;  
+    jint new_class_data_len;        
+    void * (*malloc_f)(unsigned int);
+} class_load_hook;
+</pre>
+</blockquote>
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>class_data</code>
+	<td> - pointer to the current class file data buffer.
+<tr><td><code>class_data_len</code>
+        <td> - length of current class file data buffer.
+<tr><td><code>new_class_data</code>
+	<td> - pointer to the instrumented class file data buffer.
+<tr><td><code>new_class_data_len</code>
+	<td> - length of the new class file data buffer.
+<tr><td><code>malloc_f</code>
+	<td> - pointer to a memory allocation function.
+</table>
+</blockquote>
+
+<p> The profiler agent must set <code>new_class_data</code> to point
+to the newly instrumented class file data buffer and set
+<code>new_class_data_len</code> to the length of that buffer before returning
+from <code><a href=#NotifyEvent>NotifyEvent</a></code>.  It must set 
+both <code>new_class_data</code> and <code>new_class_data_len</code> to
+the old values if it chooses not to instrument this class.
+</dd>
+</dl>
+
+<a name=class_unload></a>
+<h4><code>JVMPI_EVENT_CLASS_UNLOAD</code></h4>
+<dl><dd>Sent when a class is unloaded.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> class_id;
+} class_unload;
+</pre>
+</blockquote>
+
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>class_id</code>
+	<td> - class being unloaded.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=method_load></a>
+<h4><code>JVMPI_EVENT_COMPILED_METHOD_LOAD</code></h4>
+
+<dl><dd>Sent when a method is compiled and loaded into memory.
+
+<blockquote>
+<pre>
+struct {
+    jmethodID method_id;        
+    void *code_addr;            
+    jint code_size;             
+    jint lineno_table_size;     
+    <a href=#jvmpi_lineno>JVMPI_Lineno</a> *lineno_table; 
+} compiled_method_load;
+</pre>
+</blockquote>
+
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>method_id</code>
+	<td> - method being compiled and loaded.
+<tr><td><code>code_addr</code>
+	<td> - address where compiled method code is loaded.
+<tr><td><code>code_size</code>
+	<td> - size of compiled code.
+<tr><td><code>lineno_table_size</code>
+	<td> - size of line number table.
+<tr><td><code>lineno_table</code>
+	<td> - table mapping offset from beginning of method to the src file line number.
+
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=method_unload></a>
+<h4><code>JVMPI_EVENT_COMPILED_METHOD_UNLOAD</code></h4>
+
+<dl><dd>Sent when a compiled method is unloaded from memory.
+
+<blockquote>
+<pre>
+struct { 
+    jmethodID method_id;  
+} compiled_method_unload;
+</pre>
+</blockquote>
+
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>method_id</code>
+	<td> - compiled method being unloaded.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=dump_data></a>
+<h4><code>JVMPI_EVENT_DATA_DUMP_REQUEST</code></h4>
+<dl>
+<dd>
+Sent by the VM to request the profiler agent to dump its data.  This
+is just a hint and the profiler agent need not react to this event.
+This is useful for processing command line signals from users.  For
+example, in the Java 2 SDK, a CTRL-Break on Microsoft Windows or 
+a CTRL-\ on Solaris causes the VM to send this event to the profiler agent.
+
+<p> There is no event specific information.
+</dd>
+</dl>
+
+<a name=reset_data></a>
+<h4><code>JVMPI_EVENT_DATA_RESET_REQUEST</code></h4>
+<dl>
+<dd>
+Sent by the VM to request the profiler agent to reset its data.  This
+is just a hint and the profiler agent need not react to this event.
+This is useful for processing command line signals from users.  For
+example, in the Java 2 SDK a CTRL-Break on Microsoft Windows or 
+a CTRL-\ on Solaris causes the VM to send this event to the profiler agent.
+
+<p> There is no event specific information.
+</dd>
+</dl>
+
+<a name=gc_finish></a>
+<h4><code>JVMPI_EVENT_GC_FINISH</code></h4>
+<dl>
+<dd>
+Sent when GC finishes.  The profiler agent can release any locks,
+grabbed during GC start notification for handling object free, object
+move, and arena delete events.  The system gets back into the
+multi-threaded mode after this event.
+
+<p>
+The event-specific data contains Java heap statistics.
+<blockquote>
+<pre>
+struct {
+    jlong used_objects;
+    jlong used_object_space;
+    jlong total_object_space;
+} gc_info;
+
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>used_objects</code>
+     <td> - number of used objects on the heap.
+<tr><td><code>used_object_space</code>
+	<td> - amount of space used by the objects (in bytes).
+<tr><td><code>total_object_space</code>
+	<td> - total amount of object space (in bytes).
+
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=gc_start></a>
+<h4><code>JVMPI_EVENT_GC_START</code></h4>
+<dl>
+<dd>
+Sent when GC is about to start.  The system goes into thread suspended
+mode after this event.  To avoid deadlocks, the profiler agent should
+grab any locks that are needed for handling object free, object
+move, and arena delete events in the event handler for this event.
+
+<p> There is no event specific information.
+</dd>
+</dl>
+
+<a name=heap_dump></a>
+<h4><code>JVMPI_EVENT_HEAP_DUMP</code></h4>
+
+<dl>
+<dd>
+Sent when requested by the <a
+href=#RequestEvent><code>RequestEvent</code></a> function.  The
+profiler agent can specify the level of information to be dumped by
+passing an <code><a
+href=#jvmpi_heap_dump_arg>JVMPI_HeapDumpArg</a></code> structure to
+<code>RequestEvent</code> as the second argument, with the
+<TT>heap_dump_level</TT> field set to the desired dump level.
+<p>
+ The dump level values can be one of the following:
+<ul>
+<li><code>JVMPI_DUMP_LEVEL_0</code>
+<li><code>JVMPI_DUMP_LEVEL_1</code>
+<li><code>JVMPI_DUMP_LEVEL_2</code>
+</ul>
+
+<p>If a NULL value is passed, then the dump level is set to
+<code>JVMPI_DUMP_LEVEL_2</code>.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+
+<p>
+The event-specific data contains a snapshot of all live objects in the Java heap.
+
+<blockquote>
+<pre>
+struct {
+    int dump_level;           
+    char *begin;           
+    char *end;                
+    jint num_traces;          
+    <a href=#jvmpi_calltrace>JVMPI_CallTrace</a> *traces;  
+} heap_dump;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>dump_level</code>
+     <td> - the dump level specified in <code><a href=#RequestEvent>RequestEvent</a></code>
+<tr><td><code>begin</code>
+	<td> - beginning of the heap dump
+<tr><td><code>end</code>
+	<td> - end of the heap dump
+<tr><td><code>num_traces</code>
+	<td> - number of stack traces in which the GC roots reside, 0 
+	       for JVMPI_DUMP_LEVEL_0
+<tr><td><code>traces</code>
+	<td> - the stack traces in which the GC roots reside
+
+</table>
+</blockquote>
+
+<p>The format of the heap dump between <code>begin</code> and <code>end</code>
+depends on the level of information requested.  The formats are described 
+in detail in the <a href=#JVMPI_Dumps>JVMPI Dump Formats </a>section.
+</dd>
+</dl>
+
+<a name=global_ref_alloc></a>
+<h4><code>JVMPI_EVENT_JNI_GLOBALREF_ALLOC</code></h4>
+
+<dl><dd>Sent when a JNI global reference is created. The event-specific data contains
+the JNI global reference as well as the corresponding object ID.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> obj_id;
+    jobject ref_id;
+} jni_globalref_alloc;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>obj_id</code>
+	<td> - object ID referred to by the global reference.
+<tr><td><code>ref_id</code>
+	<td> - JNI global reference.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=global_ref_free></a>
+<h4><code>JVMPI_EVENT_JNI_GLOBALREF_FREE</code></h4>
+
+<dl><dd>Sent when a JNI global reference is deleted. The event-specific data contains
+the JNI global reference that is being deleted.
+<blockquote>
+<pre>
+struct {
+    jobject ref_id;
+} jni_globalref_free;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>ref_id</code>
+	<td> - JNI global reference.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=weak_alloc></a>
+<h4><code>JVMPI_EVENT_JNI_WEAK_GLOBALREF_ALLOC</code></h4>
+
+<dl><dd>Sent when a JNI weak global reference is created. The event-specific data contains
+the JNI weak global reference as well as the corresponding object ID.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> obj_id;
+    jobject ref_id;
+} jni_globalref_alloc;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>obj_id</code>
+	<td> - object ID referred to by the weak global reference.
+<tr><td><code>ref_id</code>
+	<td> - JNI weak global reference.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=weak_free></a>
+<h4><code>JVMPI_EVENT_JNI_WEAK_GLOBALREF_FREE</code></h4>
+
+<dl><dd>Sent when a JNI weak global reference is deleted. The event-specific data contains
+the JNI weak global reference that is being deleted.
+<blockquote>
+<pre>
+struct {
+    jobject ref_id;
+} jni_globalref_free;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>ref_id</code>
+	<td> - JNI weak global reference.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=init_done></a>
+<h4><code>JVMPI_EVENT_JVM_INIT_DONE</code></h4>
+<dl>
+<dd>
+Sent by the VM when its initialization is done.  It is safe to call
+<code>CreateSystemThread</code> only after this event is notified.
+
+<p> There is no event specific data.
+</dd>
+</dl>
+
+<a name=shut_down></a>
+<h4><code>JVMPI_EVENT_JVM_SHUT_DOWN</code></h4>
+<dl>
+<dd>
+Sent by the VM when it is shutting down.  The profiler 
+typically responds by saving the profiling data.
+
+<p> There is no event specific data.
+</dd>
+</dl>
+
+<a name=method_entry></a>
+<h4><code>JVMPI_EVENT_METHOD_ENTRY</code></h4>
+<dl>
+<dd>
+Sent when a method is entered. Compared with
+<code>JVMPI_EVENT_METHOD_ENTRY2</code>, this event does not send the
+<code><a href=#jobjectID>jobjectID</a></code> of the target object on
+which the method is invoked.
+
+<blockquote>
+<pre>
+struct {
+    jmethodID method_id;      
+} method;
+</pre>
+</blockquote>
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>method_id</code>
+	<td> - the method being entered.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+<a name=method_entry2></a>
+<h4><code>JVMPI_EVENT_METHOD_ENTRY2</code></h4>
+<dl>
+<dd>
+Sent when a method is entered. If the method is an instance method,
+the <code><a href=#jobjectID>jobjectID</a></code> of the target object is sent with the
+event. If the method is a static method, the <code>obj_id</code> field
+in the event is set to <code>NULL</code>.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+
+<blockquote>
+<pre>
+struct {
+    jmethodID method_id;      
+    <a href=#jobjectID>jobjectID</a> obj_id;         
+} method_entry2;
+</pre>
+</blockquote>
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>method_id</code>
+	<td> - the method being entered.
+<tr><td><code>obj_id</code>
+	<td> - the target object, <code>NULL</code> for static methods.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+<a name=method_exit></a>
+<h4><code>JVMPI_EVENT_METHOD_EXIT</code></h4>
+<dl>
+<dd>
+Sent when a method is exited. The method exit may be a normal exit, or
+caused by an unhandled exception.
+
+<blockquote>
+<pre>
+struct {
+    jmethodID method_id;      
+} method;
+</pre>
+</blockquote>
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>method_id</code>
+	<td> - the method being entered.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+<a name=mon_enter></a>
+<h4><code>JVMPI_EVENT_MONITOR_CONTENDED_ENTER</code></h4>
+
+<dl><dd>Sent when a thread is attempting to enter a Java monitor already acquired
+by another thread.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> object;
+} monitor;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>object</code>
+	<td> - object ID associated with the monitor
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=mon_entered></a>
+<h4><code>JVMPI_EVENT_MONITOR_CONTENDED_ENTERED</code></h4>
+
+<dl><dd>Sent when a thread enters a Java monitor after waiting for it to be released
+by another thread.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> object;
+} monitor;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>object</code>
+	<td> - object ID associated with the monitor
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=mon_exit></a>
+<h4><code>JVMPI_EVENT_MONITOR_CONTENDED_EXIT</code></h4>
+
+<dl><dd>Sent when a thread exits a Java monitor, and another thread is waiting
+to acquire the same monitor.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> object;
+} monitor;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>object</code>
+	<td> - object ID associated with the monitor
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=mon_dump></a>
+<h4><code>JVMPI_EVENT_MONITOR_DUMP</code></h4>
+<dl>
+<dd>
+Sent when requested by the 
+<a href=#RequestEvent><code>RequestEvent</code></a> function.  
+<p>
+The event-specific data contains a snapshot of all the threads and monitors in the VM.
+
+<p>
+This event is issued with GC disabled.  GC is re-enabled after
+<code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+<blockquote>
+<pre>
+struct {
+    char *begin;                
+    char *end;                  
+    jint num_traces;            
+    <a href=#jvmpi_calltrace>JVMPI_CallTrace</a> *traces;    
+    jint *threads_status;       
+} monitor_dump;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>begin</code>
+     <td> - start of the monitor dump buffer.
+<tr><td><code>end</code>
+	<td> - end of the dump buffer
+<tr><td><code>num_traces</code>
+	<td> - number of thread traces.
+<tr><td><code>traces</code>
+	<td> - traces of all threads.
+<tr><td><code>thread_status</code>
+	<td> - status of all threads.
+</table>
+</blockquote>
+
+<p>The format of the monitor dump buffer is described in detail in the <a href=#JVMPI_Dumps>JVMPI Dump Formats</a> section.
+</dd>
+</dl>
+
+<a name=mon_wait></a>
+<h4><code>JVMPI_EVENT_MONITOR_WAIT</code></h4>
+
+<dl><dd>Sent when a thread is about to wait on an object.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> object;
+    jlong timeout;
+} monitor_wait;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>object</code>
+	<td> - ID of object on which the current thread is going to wait.
+<tr><td><td> (<code>NULL</code> indicates the thread is in <code>Thread.sleep</code>.)
+<tr><td><code>timeout</code>
+	<td> - the number of milliseconds the thread will wait.
+(0 indicates waiting forever.)
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=mon_waited></a>
+<h4><code>JVMPI_EVENT_MONITOR_WAITED</code></h4>
+
+<dl><dd>Sent when a thread finishes waiting on an object.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> object;
+    jlong timeout;
+} monitor_wait;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>object</code>
+	<td> - ID of object on which the current thread waited.
+<tr><td><td>(<code>NULL</code> indicates the thread is in <code>Thread.sleep</code>.)
+<tr><td><code>timeout</code>
+	<td> - the number of milliseconds the thread waited.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=obj_alloc></a>
+<h4><code>JVMPI_EVENT_OBJECT_ALLOC</code></h4>
+<dl>
+<dd>
+Sent when an object is allocated, or when the profiler agent requests
+a <code>JVMPI_EVENT_OBJECT_ALLOC</code> event by issuing a <code><a
+href=#RequestEvent>RequestEvent</a></code> call. In the latter case,
+the <code>JVMPI_REQUESTED_EVENT</code> bit in the event type is set.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+
+<blockquote>
+<pre>
+struct {
+    jint arena_id;            
+    <a href=#jobjectID>jobjectID</a> class_id;       
+    jint is_array;            
+    jint size;                
+    <a href=#jobjectID>jobjectID</a> obj_id;         
+} obj_alloc;
+</pre>
+</blockquote>
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>arena_id</code>
+	<td> - arena where allocated.
+<tr><td><code>class_id</code>
+	<td> - class to which this object belongs, or the array element class if
+               <code>is_array</code> is <code>JVMPI_CLASS</code>.
+<tr><td><code>is_array</code>
+	<td> - values can be:
+        <tr> <td><td>
+                 <blockquote>
+                 <table summary="layout" border=0>
+                 <tr><td><code>JVMPI_NORMAL_OBJECT</code></td> <td> normal object </td>
+	         <tr><td><code>JVMPI_CLASS</code></td> <td> array of objects </td>
+                 <tr><td><code>JVMPI_BOOLEAN</code></td> <td> array of booleans </td>
+                 <tr><td><code>JVMPI_BYTE</code></td> <td> array of bytes </td>
+                 <tr><td><code>JVMPI_CHAR</code></td> <td> array of chars </td>
+                 <tr><td><code>JVMPI_SHORT</code></td> <td> array of shorts </td>
+                 <tr><td><code>JVMPI_INT</code></td> <td> array of ints </td>
+                 <tr><td><code>JVMPI_LONG</code></td> <td> array of longs </td>
+                 <tr><td><code>JVMPI_FLOAT</code></td> <td> array of floats </td>
+                 <tr><td><code>JVMPI_DOUBLE</code></td> <td> array of doubles </td>
+                 </table>
+                 </blockquote>
+
+<tr><td><code>size</code>
+        <td> - size in number of bytes.
+<tr><td><code>obj_id</code>
+        <td> - unique object ID.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+<a name=object_dump></a>
+<h4><code>JVMPI_EVENT_OBJECT_DUMP</code></h4>
+<dl>
+<dd>
+Sent when requested by the 
+<a href=#RequestEvent><code>RequestEvent</code></a> function.  
+The <code><a href=#jobjectID>jobjectID</a></code> of the object for which a dump is being requested
+should be passed as the second argument to <code>RequestEvent</code>.
+
+<p> The profiler agent should request this event with GC disabled.
+<p>
+The event-specific data contains a snapshot of the object.
+
+<blockquote>
+<pre>
+struct {
+    jint data_len;           
+    char *data;        
+} object_dump;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>data_len</code>
+     <td> - length of the object dump buffer
+<tr><td><code>data</code>
+	<td> - beginning of the object dump
+</table>
+</blockquote>
+
+<p>The format of the object dump buffer is described in detail in the <a href=#JVMPI_Dumps>JVMPI Dump Formats</a> section.
+</dd>
+</dl>
+
+<a name=obj_free></a>
+<h4><code>JVMPI_EVENT_OBJECT_FREE</code></h4>
+<dl>
+<dd>
+Sent when an object is freed. 
+
+<p>
+This event is issued in the thread suspended mode.  The profiler must
+not make any blocking calls such as entering a monitor or allocating
+from the C heap (for example, via <code>malloc</code>).
+
+<p>
+This event is always sent between a pair of <a
+href=#gc_start><code>JVMPI_EVENT_GC_START</code></a> and <a
+href=#gc_finish><code>JVMPI_EVENT_GC_FINISH</code></a> events.  
+The profiler agent should acquire all the locks need for processing this
+event in the event handler for <code>JVMPI_EVENT_GC_START</code>.
+
+<blockquote>
+<pre>
+struct {
+    <a href=#jobjectID>jobjectID</a> obj_id;         
+} obj_free;
+</pre>
+</blockquote>
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>obj_id</code>
+	<td> - object being freed.
+</table>
+</blockquote>
+
+</dd>
+</dl>
+
+<a name=obj_move></a>
+<h4><code>JVMPI_EVENT_OBJECT_MOVE</code></h4>
+<dl><dd>
+Sent when an object is moved in the heap. 
+
+<p>
+This event is issued in the thread suspended mode.  The profiler must
+not make any blocking calls such as entering a monitor or allocating
+from the C heap (for example, via <code>malloc</code>).
+
+<p>
+This event is always sent between a pair of 
+<a href=#gc_start><code>JVMPI_EVENT_GC_START</code></a> and
+<a href=#gc_finish><code>JVMPI_EVENT_GC_FINISH</code></a> events.
+The profiler agent should acquire all the locks need for processing this
+event in the event handler for <code>JVMPI_EVENT_GC_START</code>.
+
+<blockquote>
+<pre>
+ struct {
+     jint arena_id;            
+     <a href=#jobjectID>jobjectID</a> obj_id;         
+     jint new_arena_id;        
+     <a href=#jobjectID>jobjectID</a> new_obj_id;     
+} obj_move;
+</pre>
+</blockquote>
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>arena_id</code>
+	<td> - current arena.
+<tr><td><code>obj_id</code>
+	<td> - current object ID.
+<tr><td><code>new_arena_id</code>
+	<td> - new arena.
+<tr><td><code>new_obj_id</code>
+	<td> - new object ID.
+
+</table>
+</blockquote>
+</dd>
+</dl>
+
+
+<a name=raw_enter></a>
+<h4><code>JVMPI_EVENT_RAW_MONITOR_CONTENDED_ENTER</code></h4>
+
+<dl><dd>Sent when a thread is attempting to enter a raw monitor already acquired
+by another thread.
+
+<blockquote>
+<pre>
+struct {
+    char *name;
+    <a href=#raw_mon>JVMPI_RawMonitor</a> id;
+} raw_monitor;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>name</code>
+	<td> - name of the raw monitor
+<tr><td><code>id</code>
+	<td> - ID of the raw monitor
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=raw_entered></a>
+<h4><code>JVMPI_EVENT_RAW_MONITOR_CONTENDED_ENTERED</code></h4>
+
+<dl><dd>Sent when a thread enters a raw monitor after waiting for it to be released
+by another thread.
+
+<blockquote>
+<pre>
+struct {
+    char *name;
+    <a href=#raw_mon>JVMPI_RawMonitor</a> id;
+} raw_monitor;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>name</code>
+	<td> - name of the raw monitor
+<tr><td><code>id</code>
+	<td> - ID of the raw monitor
+</table>
+</blockquote>
+</dd></dl>
+
+<a name=raw_exit></a>
+<h4><code>JVMPI_EVENT_RAW_MONITOR_CONTENDED_EXIT</code></h4> 
+
+<dl><dd>Sent when a thread exits a raw monitor, and another thread is waiting
+to acquire the same monitor.
+
+<blockquote>
+<pre>
+struct {
+    char *name;
+    <a href=#raw_mon>JVMPI_RawMonitor</a> id;
+} raw_monitor;
+</pre>
+</blockquote>
+
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>name</code>
+	<td> - name of the raw monitor
+<tr><td><code>id</code>
+	<td> - ID of the raw monitor
+</table>
+</blockquote>
+</dd></dl>
+
+<a name=thread_end></a>
+<h4><code>JVMPI_EVENT_THREAD_END</code></h4>
+
+<dl><dd>Sent when a thread ends in the VM.
+
+<p> The <TT>env_id</TT> field of the <code>JVMPI_Event</code> received
+in this event notification is the <code>JNIEnv</code> interface
+pointer of the thread that ended.
+</dd>
+</dl>
+
+<a name=thread_start></a>
+<h4><code>JVMPI_EVENT_THREAD_START</code></h4>
+
+<dl><dd>Sent when a thread is started in the VM, or when the profiler
+agent requests a <code>JVMPI_EVENT_THREAD_START</code> event by
+issuing a <code><a href=#RequestEvent>RequestEvent</a></code> call. In
+the latter case, the <code>JVMPI_REQUESTED_EVENT</code> bit in the
+event type is set.
+
+<p>
+This event is issued with GC disabled.  
+GC is re-enabled after <code><a href=#NotifyEvent>NotifyEvent</a></code> returns.
+
+<blockquote>
+<pre>
+struct {
+    char *thread_name;        
+    char *group_name;         
+    char *parent_name;        
+    <a href=#jobjectID>jobjectID</a> thread_id;      
+    JNIEnv *thread_env_id;
+} thread_start;
+</pre>
+</blockquote>
+
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>thread_name</code>
+	<td> - name of thread being started.
+<tr><td><code>group_name</code>
+	<td> - group to which the thread belongs.
+<tr><td><code>parent_name</code>
+	<td> - name of parent.
+<tr><td><code>thread_id</code>
+	<td> - thread object ID.
+<tr><td><code>thread_env_id</code>
+	<td> - <code>JNIEnv *</code> of the thread.
+</table>
+</blockquote>
+
+Threads are associated with a <code>JNIEnv</code> pointer and a thread
+object ID. The JVMPI uses the <code>JNIEnv</code> pointer as the
+thread ID.
+</dd>
+</dl>
+
+<a name=instruction_start></a>
+<h4><code>JVMPI_EVENT_INSTRUCTION_START</code></h4>
+
+<DL><DD>
+Sent when each instruction (i.e., bytecode operation) is issued by the interpreter.
+
+<p>
+This thread is issued only by interpreter, and not by compiled code.
+
+<blockquote>
+<pre>
+struct {
+    jmethodID method_id;
+    jint      offset;	
+    union {
+	    struct {
+	        jboolean is_true;
+	    } if_info;
+	    struct {
+	        jint key;
+	        jint low;	
+	        jint hi;	
+	    } tableswitch_info;
+	    struct {
+	        jint     chosen_pair_index; /* actually chosen pair index (0-based) */
+	        jboolean is_default;        /* whether default branch is taken      */
+	    } lookupswitch_info;
+    } u;
+} instruction;
+</pre>
+</blockquote>
+
+<p>
+<b>Contents:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>method_id</code>
+	<td> - id of method that executes the instruction
+<tr><td><code>offset</code>
+	<td> - instruction offset in the method's bytecode
+<tr><td><code>is_true</code>
+	<td> - whether true or false branch is taken in an if-bytecode
+<tr><td><code>key</code>
+	<td> - top stack value used as an index in <code>tableswitch</code>
+<tr><td><code>low</code>
+	<td> - min value of the index in <code>tableswitch</code>
+<tr><td><code>hi</code>
+	<td> - max value of the index in <code>tableswitch</code>
+<tr><td><code>chosen_pair_index</code>
+	<td> - actually chosen pair index (0-based) in <code>lookupswitch</code>
+<tr><td><code>is_default</code>
+	<td> - whether default branch is taken in <code>lookupswitch</code>
+</table>
+</blockquote>
+
+<p>
+<I>Hotspot note</I>: must run with flag 
+<code>-XX:+EnableJVMPIInstructionStartEvent</code>, otherwise no events will be sent.
+
+
+</dd>
+</dl>
+
+
+
+<a name=JVMPI_Dumps></a>
+<h3>4. Dump Formats</h3>
+    <ul>
+     <li> <a href=#size_and_types>Sizes and Types Used in Dump Format Descriptions</a>
+     <li> <a href=#heap_dump_format>Heap Dump Format</a>
+     <li> <a href=#object_dump_format>Object Dump Format</a>
+     <li> <a href=#mon_dump_format>Monitor Dump Format</a>
+    </ul>
+
+<a name=size_and_types></a>
+<h4>4.1 Sizes and Types Used in Dump Format Descriptions</h4>
+<p>
+<table summary="layout" border=0>
+<tr><td><code>u1:</code></td> <td> 1 byte </td>
+<tr><td><code>u2:</code></td> <td> 2 bytes </td>
+<tr><td><code>u4:</code></td> <td> 4 bytes </td>
+<tr><td><code>u8:</code></td> <td> 8 bytes </td>
+<tr><td><code>ty:</code></td> <td> u1 where:</td>
+<tr><td></td><td>
+                             
+                 <blockquote>
+                 <table summary="layout" border=0>
+                 <tr><td><code>JVMPI_NORMAL_OBJECT</code>&nbsp;&nbsp;</td> <td> normal object </td>
+	         <tr><td><code>JVMPI_CLASS</code></td> <td> array of objects </td>
+                 <tr><td><code>JVMPI_BOOLEAN</code></td> <td> array of booleans </td>
+                 <tr><td><code>JVMPI_BYTE</code></td> <td> array of bytes </td>
+                 <tr><td><code>JVMPI_CHAR</code></td> <td> array of chars </td>
+                 <tr><td><code>JVMPI_SHORT</code></td> <td> array of shorts </td>
+                 <tr><td><code>JVMPI_INT</code></td> <td> array of ints </td>
+                 <tr><td><code>JVMPI_LONG</code></td> <td> array of longs </td>
+                 <tr><td><code>JVMPI_FLOAT</code></td> <td> array of floats </td>
+                 <tr><td><code>JVMPI_DOUBLE</code></td> <td>  array of doubles </td>
+                 </table>
+                 </blockquote></td>
+<tr><td><code>vl:</code></td> <td> values, exact size depends on the type of value:</td>
+<tr><td></td><td>
+                             
+                 <blockquote>
+                 <table summary="layout" border=0>
+                 <tr><td><code>boolean, byte  </code></td> <td> u1 </td>
+	         <tr><td><code>short, char  </code></td> <td> u2 </td>
+                 <tr><td><code>int, float  </code></td> <td> u4 </td>
+                 <tr><td><code>long, double  </code></td> <td> u8 </td>
+                 <tr><td><code>JNIEnv *</code>, <code>jobjectID</code>, and <code>JVMPI_RawMonitor</code>&nbsp;&nbsp;</td> <td><code>sizeof(void *)</code></td>
+                 </table>
+                 </blockquote></td>
+
+
+</table>
+</blockquote>
+
+<a name=heap_dump_format></a>
+<h4>4.2 Heap Dump Format</h4>
+<p>The heap dump format depends on the level of information requested.
+<p><b><code>JVMPI_DUMP_LEVEL_0:</code></b><br>
+The dump consists of a sequence of records of the following format:
+<blockquote>
+<table summary="layout" border=0>
+<tr><td width="150"><code> ty  </code></td><td>  type of object
+<tr><td width="150"><code> jobjectID  </code></td><td>  object
+</table>
+</blockquote>
+<p><b><code>JVMPI_DUMP_LEVEL_1:</code></b><br> The dump format is the same as
+that of <code>JVMPI_DUMP_LEVEL_2</code>, except that the following
+values are excluded from the dump: primitive fields in object instance
+dumps, primitive static fields in class dumps, and primitive array elements.
+<p><b><code>JVMPI_DUMP_LEVEL_2:</code></b><br> The dump consists of a
+sequence of records, where each record includes an 8-bit record type
+followed by data whose format is specific to each record type.
+<blockquote>
+<table summary="record types and data" border=1>
+<thead><tr><th align="center"> <b>Record type</b> <th align="center"> <b>Record data</b>
+</thead>
+<tr><td align="center"><code>JVMPI_GC_ROOT_UNKNOWN</code> <br> (unknown root)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code>jobjectID  </code></td><td> object
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_ROOT_JNI_GLOBAL</code> <br> (JNI global ref root)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code> jobjectID  </code></td><td> object
+<tr><td width="150"><code> jobject    </code></td><td> JNI global reference
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_ROOT_JNI_LOCAL</code>  <br>  (JNI local ref)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code> jobjectID  </code></td><td>  object
+<tr><td width="150"><code> JNIEnv *   </code></td><td>  thread
+<tr><td width="150"><code> u4         </code></td><td>  frame # in stack trace (-1 for empty)
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_ROOT_JAVA_FRAME</code>  <br>  (Java stack frame)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code> jobjectID  </code></td><td>  object
+<tr><td width="150"><code> JNIEnv *   </code></td><td>  thread
+<tr><td width="150"><code> u4         </code></td><td>  frame # in stack trace (-1 for empty)
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_ROOT_NATIVE_STACK</code> <br> (native stack)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code> jobjectID   </code></td><td>  object
+<tr><td width="150"><code> JNIEnv *    </code></td><td>  thread
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_ROOT_STICKY_CLASS</code> <br> (system class)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code> jobjectID   </code></td><td>  class object
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_ROOT_THREAD_BLOCK</code> <br> (reference from thread block)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code> jobjectID   </code></td><td>  thread object
+<tr><td width="150"><code> JNIEnv *    </code></td><td>  thread
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_ROOT_MONITOR_USED</code> <br> (entered monitor)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code>  jobjectID  </code></td><td>  object
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_CLASS_DUMP</code>   <br> (dump of a class object)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code>   jobjectID </code></td><td>  class
+<tr><td width="150"><code>   jobjectID </code></td><td>  super
+<tr><td width="150"><code>   jobjectID </code></td><td>  class loader
+<tr><td width="150"><code>   jobjectID </code></td><td>  signers
+<tr><td width="150"><code>   jobjectID </code></td><td>  protection domain
+<tr><td width="150"><code>   jobjectID </code></td><td>  class name (a <code>String</code> object, may be <code>NULL</code>)
+<tr><td width="150"><code>   void *    </code></td><td>  reserved
+
+<tr><td width="150"><code>   u4        </code></td><td>  instance size (in bytes)
+
+<tr><td width="150"><code>   [jobjectID]*   </code></td><td>  interfaces
+
+<tr><td width="150"><code>   u2        </code></td><td>  size of constant pool
+<tr><td width="150"><code>   [u2,      </code></td><td>  constant pool index,
+<tr><td width="150"><code>   &nbsp;ty,      </code></td><td>  type, 
+<tr><td width="150"><code>   &nbsp;vl]*     </code></td><td>  value
+
+<tr><td width="150"><code>   [vl]*     </code></td><td>  static field values
+
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_INSTANCE_DUMP</code>    <br>  (dump of a normal object)
+<td>
+<table summary="layout" border=0>
+
+<tr><td width="150"><code>   jobjectID</code></td><td>   object
+<tr><td width="150"><code>   jobjectID</code></td><td>   class
+<tr><td width="150"><code>   u4       </code></td><td>   number of bytes that follow
+<tr><td width="150"><code>   [vl]*    </code></td><td>   instance field values (class, followed by super, super's super ...)
+</table>
+</blockquote>
+<tr><td align="center"><code>JVMPI_GC_OBJ_ARRAY_DUMP</code>   <br>  (dump of an object array)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code>   jobjectID </code></td><td>  array object
+<tr><td width="150"><code>   u4        </code></td><td>  number of elements
+<tr><td width="150"><code>   jobjectID </code></td><td>  element class ID (may be <code>NULL</code> in the Java 2 SDK)
+<tr><td width="150"><code>   [jobjectID]*   </code></td><td>    elements
+</table>
+
+<tr><td align="center"><code>JVMPI_GC_PRIM_ARRAY_DUMP</code>  <br>  (dump of a primitive array)
+<td>
+<table summary="layout" border=0> 
+<tr><td width="150"><code> jobjectID    </code></td><td>    array object
+<tr><td width="150"><code> u4           </code></td><td>    number of elements
+<tr><td width="150"><code> ty           </code></td><td>    element type
+<tr><td width="150"><code> [vl]*        </code></td><td>    elements
+</table>
+</table>
+</blockquote>
+
+<a name=object_dump_format></a>
+<h4> 4.3 Object Dump Format</h4>
+The dump buffer consists of a single record which includes an 8-bit record type, followed
+by data specific to the record type.  The record type can be one of the following:
+<ul>
+<li><code>JVMPI_GC_CLASS_DUMP</code>
+<li><code>JVMPI_GC_INSTANCE_DUMP</code>
+<li><code>JVMPI_GC_OBJ_ARRAY_DUMP</code>
+<li><code>JVMPI_GC_PRIM_ARRAY_DUMP</code>
+</ul>
+The format of the data for each record type is the same as described
+above in the heap dump format section.  The level of information is
+the same as <code>JVMPI_DUMP_LEVEL_2</code>, with all of the
+following values included: primitive fields in object instance dumps,
+primitive static fields in class dumps, and primitive arrays elements.
+
+<a name=mon_dump_format></a>
+<h4>4.4 Monitor Dump Format</h4>
+The dump buffer consists of a sequence of records, where each record includes an 8-bit
+record type followed by data whose format is specific to each record type.
+<blockquote>
+<table summary="record types and data" border=1>
+<thead><tr><th align="center"> <b>Record type</b> <th align="center"> <b>Record data</b></thead>
+<tr><td align="center"><code>JVMPI_MONITOR_JAVA</code>  <br>  (Java monitor)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code> jobjectID  </code></td><td>  object ID
+<tr><td width="150"><code> JNIEnv *   </code></td><td>  owner thread
+<tr><td width="150"><code> u4         </code></td><td>  entry count
+<tr><td width="150"><code> u4         </code></td><td>  number of threads waiting to enter
+<tr><td width="150"><code> [JNIEnv *]* </code></td><td>  threads waiting to enter
+<tr><td width="150"><code> u4         </code></td><td>  number of threads waiting to be notified
+<tr><td width="150"><code> [JNIEnv *]* </code></td><td>  threads waiting to be notified
+</table>
+
+<tr><td align="center"><code>JVMPI_MONITOR_RAW</code>  <br>  (Raw monitor)
+<td>
+<table summary="layout" border=0>
+<tr><td width="150"><code> char *  </code></td><td>  raw monitor name
+<tr><td width="150"><code> JVMPI_RawMonitor  </code></td><td>  raw monitor ID
+<tr><td width="150"><code> JNIEnv *   </code></td><td>  owner thread
+<tr><td width="150"><code> u4         </code></td><td>  entry count
+<tr><td width="150"><code> u4         </code></td><td>  number of threads waiting to enter
+<tr><td width="150"><code> [JNIEnv *]* </code></td><td>  threads waiting to enter
+<tr><td width="150"><code> u4         </code></td><td>  number of threads waiting to be notified
+<tr><td width="150"><code> [JNIEnv *]* </code></td><td>  threads waiting to be notified
+</table>
+</table>
+</blockquote>
+
+<a name=JVMPI_Structures></a>
+<h3>5. Data Types</h3>
+    <ul>
+     <li><a href=#jobjectID><code>jobjectID</code></a>
+     <li><a href=#jvmpi_callframe><code>JVMPI_CallFrame</code></a>
+     <li><a href=#jvmpi_calltrace><code>JVMPI_CallTrace</code></a>
+     <li><a href=#jvmpi_field><code>JVMPI_Field</code></a>
+     <li><a href=#jvmpi_heap_dump_arg><code>JVMPI_HeapDumpArg</code></a>
+     <li><a href=#jvmpi_lineno><code>JVMPI_Lineno</code></a>
+     <li><a href=#jvmpi_method><code>JVMPI_Method</code></a>
+     <li><a href=#raw_mon><code>JVMPI_RawMonitor</code></a>
+    </ul>
+
+<p>
+Characters are encoded using the UTF-8 encoding as documented in the Java virtual machine specification.
+
+<a name=jobjectID></a>
+<h4><code>jobjectID</code></h4>
+<dl>
+<dd>
+<p>An opaque pointer representing an object ID.
+<blockquote>
+<pre>
+struct _jobjectID;
+typedef struct _jobjectID * jobjectID;       
+</pre>
+</blockquote>
+</dd>
+</dl>
+
+<a name=jvmpi_callframe></a>
+<h4><code>JVMPI_CallFrame</code></h4>
+<dl>
+<dd>
+<p>A method being executed.
+<blockquote>
+<pre>
+typedef struct {
+    jint lineno;                     
+    jmethodID method_id;              
+} JVMPI_CallFrame;
+</pre>
+</blockquote>
+
+<b>Fields:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>line number</code>
+     <td> - line number in the source file.
+<tr><td><code>method_id</code>
+	<td> - method being executed.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=jvmpi_calltrace></a>
+<h4><code>JVMPI_CallTrace</code></h4>
+<dl>
+<dd>A call trace of method execution.
+<blockquote>
+<pre>
+typedef struct {
+    JNIEnv *env_id;
+    jint num_frames;
+    <a href=#jvmpi_callframe>JVMPI_CallFrame</a> *frames;
+} JVMPI_CallTrace;
+</pre>
+</blockquote>
+
+<b>Fields:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>env_id</code>
+     <td> - ID of thread which executed this trace.
+<tr><td><code>num_frames</code>
+	<td> - number of frames in the trace.
+<tr><td><code>frames</code>
+	<td> -the <code><a href=#jvmpi_callframe>JVMPI_CallFrame</a></code>s that make up this trace. Callee followed by callers.
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=jvmpi_field></a>
+<h4><code>JVMPI_Field</code></h4>
+<dl>
+<dd>A field defined in a class.
+<blockquote>
+<pre>
+typedef struct {
+    char *field_name;  
+    char *field_signature;
+} JVMPI_Field;
+</pre>
+</blockquote>
+
+<b>Fields:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>field_name</code>
+     <td> - name of field
+<tr><td><code>field_signature</code>
+	<td> - signature of field
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=jvmpi_heap_dump_arg></a>
+<h4><code>JVMPI_HeapDumpArg</code></h4>
+<dl>
+<dd>
+<p>Additional info for requesting heap dumps.
+<blockquote>
+<pre>
+typedef struct {
+    jint heap_dump_level;                   
+} JVMPI_HeapDumpArg;
+</pre>
+</blockquote>
+
+<b>Fields:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>heap_dump_level</code>
+     <td> - level of heap dump information, values can be:
+<tr><td><td><table summary="layout" border=0>
+            <tr><td><code>JVMPI_DUMP_LEVEL_0</code>
+            <tr><td><code>JVMPI_DUMP_LEVEL_1</code>
+            <tr><td><code>JVMPI_DUMP_LEVEL_2</code>
+            </table>
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=jvmpi_lineno></a>
+<h4><code>JVMPI_Lineno</code></h4>
+<dl>
+<dd>A mapping between source line number and offset from the beginning of 
+a compiled method.
+<blockquote>
+<pre>
+typedef struct {
+    jint offset;          
+    jint lineno;          
+} JVMPI_Lineno;
+</pre>
+</blockquote>
+
+<b>Fields:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>offset</code>
+     <td> - offset from beginning of method
+<tr><td><code>lineno</code>
+	<td> - lineno from beginning of source file
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=jvmpi_method></a>
+<h4><code>JVMPI_Method</code></h4>
+<dl>
+<dd>A method defined in a class.
+<blockquote>
+<pre>
+typedef struct {
+    char *method_name;              
+    char *method_signature;         
+    jint start_lineno;              
+    jint end_lineno;                
+    jmethodID method_id;            
+} JVMPI_Method;
+</pre>
+</blockquote>
+
+<b>Fields:</b>
+<blockquote>
+<table summary="layout" border=0>
+<tr><td><code>method_name</code>
+     <td> - name of method
+<tr><td><code>method_signature</code>
+	<td> - signature of method
+<tr><td><code>start_lineno</code>
+	<td> - start line number in the source file
+<tr><td><code>end_lineno</code>
+	<td> - end line number in the source file
+<tr><td><code>method_id</code>
+	<td> - ID given to this method
+</table>
+</blockquote>
+</dd>
+</dl>
+
+<a name=raw_mon></a>
+<h4><code>JVMPI_RawMonitor</code></h4>
+<dl>
+<dd>
+<p>An opaque pointer representing a raw monitor.
+<blockquote>
+<pre>
+struct _JVMPI_RawMonitor;
+typedef struct _JVMPI_RawMonitor * JVMPI_RawMonitor;
+</pre>
+</blockquote>
+</dd>
+</dl>
+
+<a name=impl_notes></a>
+<h3>6. Notes on Changes Since Java 2 SDK, v1.2</h3>
+<a name=whatsnew></a>
+<h4>6.1 What's new?</h4>
+<p><ul>
+<li> On Microsoft Windows,
+the following events are now supported in the presence of the JIT compiler: 
+<dl><dd><code>JVMPI_EVENT_METHOD_ENTRY</code>, <br><code>JVMPI_EVENT_METHOD_ENTRY2</code>, <br> <code>JVMPI_EVENT_METHOD_EXIT</code>, <br>
+<code>JVMPI_EVENT_COMPILED_METHOD_LOAD</code>, and <br><code>JVMPI_EVENT_COMPILED_METHOD_UNLOAD</code> 
+</dd></dl>
+<li> The <code>JVMPI_GC_CLASS_DUMP</code> dump record now includes a 
+<code>jobjectID</code>
+denoting the class name string object. This field was reserved in version 1.2 
+of the Java 2 SDK.
+The field is maintained by the VM as a class name cache, and thus may or may 
+not be set for a given class.
+</ul>
+
+<a name=limitations></a>
+<h4>6.2 Limitations</h4>
+<ul>
+<p><li> <code>JVMPI_EVENT_OBJECT_ALLOC</code> events for object arrays are issued 
+with unknown element class IDs (i.e., the <code>class_id</code> 
+field is always <code>NULL</code>).
+
+<p><li> <code>SuspendThread</code> or <code>SuspendThreadList</code> must be called 
+with the GC is disabled.  GC must remain disabled until all threads have been resumed.
+
+<p><li> The thread start event for the main thread (first thread the
+VM creates) may arrive after some other events that refer to its
+<code>JNIEnv</code> interface pointer.
+
+<p><li><code>JVMPI_EVENT_ARENA_NEW</code> and <code>JVMPI_EVENT_ARENA_DELETE</code> events are never issued.  Arena IDs in other events are always set to 1.
+
+</ul>
+
+<a name=changes1.3></a>
+<h4>6.3 Changes in VERSION_1_1</h4>
+<ul>
+<LI>The changes in this section are applicable when the
+  JVMPI_Interface.version field is JVMPI_VERSION_1_1 or newer.
+<LI>New event JVMPI_EVENT_INSTRUCTION_START which is issued in interpreter mode only. </LI>
+<LI>Added two functions to JVMPI_Interface: <code>jobjectID2jobject</code> and 
+<code>jobject2jobjectID. </code>Their usage is very restricted (see note). 
+</ul>
+
+
+<a name=changes_1_2></a>
+<h4>6.4 Changes in VERSION_1_2</h4>
+<ul>
+<li>The changes in this section are applicable when the
+  JVMPI_Interface.version field is JVMPI_VERSION_1_2 or newer.
+<li>Added two functions to JVMPI_Interface: SuspendThreadList and
+  ResumeThreadList.
+</ul>
+
+
+<a name=hprof></a>
+<H3>7. The HPROF Profiler Agent </H3>
+
+<a name=hprof-overview></a>
+<H4>7.1 Overview</H4>
+<p>
+HPROF is a simple profiler agent shipped with the Java 2 SDK.  It is a dynamically-linked
+library that interacts with the <a href=jvmpi.html>JVMPI</a> and writes out profiling
+information either to a file or to a socket in ascii or binary format.  This information can
+be further processed by a profiler front-end tool.
+
+<p> It is capable of presenting CPU usage, heap allocation statistics and monitor contention
+profiles.  In addition it can also report complete heap dumps and states of 
+all the monitors and threads in the Java virtual machine.
+
+<p>
+HPROF can be invoked by:
+
+<PRE>java -X<B>runhprof</B> ToBeProfiledClass</PRE>
+
+Depending on the type of profiling requested, HPROF instructs the
+virtual machine to send it the relevant JVMPI events and processes
+the event data into profiling information.  For example, the following
+command obtains the heap allocation profile:
+
+<PRE>java -Xrunhprof:heap=sites ToBeProfiledClass</PRE>
+
+Following is the complete list of options that can passed to hprof :
+<blockquote>
+<pre>
+Hprof usage: -Xrunhprof[:help]|[:<option>=<value>, ...]
+
+Option Name and Value  Description                Default
+---------------------  ----------------------     -------
+heap=dump|sites|all    heap profiling             all
+cpu=samples|times|old  CPU usage                  off
+monitor=y|n            monitor contention         n
+format=a|b             ascii or binary output     a
+file=&lt;file&gt;            write data to file         java.hprof(.txt for ascii)
+net=&lt;host&gt;:&lt;port&gt;      send data over a socket    write to file
+depth=&lt;size&gt;           stack trace depth          4
+cutoff=&lt;value&gt;         output cutoff point        0.0001
+lineno=y|n             line number in traces?     y
+thread=y|n             thread in traces?          n
+doe=y|n                dump on exit?              y
+gc_okay=y|n            GC okay during sampling    y
+
+Example: java -Xrunhprof:cpu=samples,file=log.txt,depth=3 FooClass
+</pre>
+</blockquote>
+<p>
+Note: format=b cannot be used with cpu=old|times
+<p>
+By default, heap profiling information (sites and dump) is written out to java.hprof.txt (ascii).
+<br>
+<a name=hprof-heap></a>
+<H4>7.2 Heap Allocation Profiles</H4>
+Following is the heap allocation profile generated by running the Java compiler
+(<code>javac</code>) on a set of input files. Only parts of the profiler output are shown here.
+
+<p>
+<PRE>Command used: javac -J-Xrunhprof:heap=sites foo.java ...</PRE>
+
+<BLOCKQUOTE>
+<PRE>
+SITES BEGIN (ordered by live bytes) Wed Oct  7 11:38:10 1998
+        percent        live       alloc'ed    stack class
+rank  self  accum   bytes objs   bytes   objs trace name
+   1 9.18%  9.18%  149224 5916 1984600 129884  1073 char []
+   2 7.28% 16.45%  118320 5916  118320   5916  1090 sun/tools/java/Identifier
+   3 7.28% 23.73%  118320 5916  118320   5916  1091 java/util/Hashtable$Entry
+   ...
+   7 3.39% 41.42%   55180 2759   55180   2759  1264 java/util/Hashtable$Entry
+   ...
+SITES END
+</pre>
+</BLOCKQUOTE>
+
+A crucial piece of information in heap profile is the amount of allocation that occurs
+in various parts of the program. The <code>SITES</code> record above tells us that 9.18% of live
+objects are character arrays.  Note that the amount of live data is only a fraction
+of the total allocation that has occurred at a given site; the rest has been garbage collected.
+
+<p>
+A good way to relate allocation sites to the source code is to record
+the dynamic stack traces that led to the heap allocation.  Following is 
+another part of the profiler output that illustrates the stack traces 
+referred to by the four allocation sites in output shown above.
+
+<BLOCKQUOTE>
+<PRE>
+THREAD START (obj=1d6b20, id = 1, name="main", group="main")
+...
+TRACE 1073: (thread=1)
+        java/lang/String.<init>(String.java:244)
+        sun/tools/java/Scanner.bufferString(Scanner.java:143)
+        sun/tools/java/Scanner.scanIdentifier(Scanner.java:942)
+        sun/tools/java/Scanner.xscan(Scanner.java:1281)
+
+TRACE 1090: (thread=1)
+        sun/tools/java/Identifier.lookup(Identifier.java:106)
+        sun/tools/java/Scanner.scanIdentifier(Scanner.java:942)
+        sun/tools/java/Scanner.xscan(Scanner.java:1281)
+        sun/tools/java/Scanner.scan(Scanner.java:971)
+
+TRACE 1091: (thread=1)
+        java/util/Hashtable.put(Hashtable.java:405)
+        sun/tools/java/Identifier.lookup(Identifier.java:106)
+        sun/tools/java/Scanner.scanIdentifier(Scanner.java:942)
+        sun/tools/java/Scanner.xscan(Scanner.java:1281)
+
+TRACE 1264: (thread=1)
+        java/util/Hashtable.put(Hashtable.java:405)
+        sun/tools/java/Type.<init>(Type.java:90)
+        sun/tools/java/MethodType.<init>(MethodType.java:42)
+        sun/tools/java/Type.tMethod(Type.java:274)
+
+</pre>
+</BLOCKQUOTE>
+
+<p>
+Each frame in the stack trace contains class name, method name, source
+file name, and the line number.  The user can set the maximum number
+of frames collected by the HPROF agent. The default limit is 4. Stack
+traces reveal not only which methods performed heap allocation, but
+also which methods were ultimately responsible for making calls that
+resulted in memory allocation. For example, in the heap profile above,
+instances of the same <code>java/util/Hashtable$Entry</code> class are
+allocated in traces 1091 and 1264, each originated from different
+methods.
+
+<a name=hprof-cpu></a>
+<H4>7.3 CPU Usage Profiles</H4>
+HPROF collects CPU usage information by sampling-based CPU time
+profiling.  Following is part of the output collected from a run
+of the <code>javac</code> compiler.
+
+<p>
+<PRE>Command used: javac -J-Xrunhprof:cpu=samples foo.java ...</PRE>
+
+<blockquote>
+<pre>
+
+CPU SAMPLES BEGIN (total = 252378) Wed Oct 07 13:30:10 1998
+rank   self  accum   count trace method
+   1  4.96%  4.96%   12514   303 sun/io/ByteToCharSingleByte.convert
+   2  3.18%  8.14%    8022   306 java/lang/String.charAt
+   3  1.91% 10.05%    4828   301 sun/tools/java/ScannerInputReader.<init>
+   4  1.80% 11.85%    4545   305 sun/io/ByteToCharSingleByte.getUnicode
+   5  1.50% 13.35%    3783   304 sun/io/ByteToCharSingleByte.getUnicode
+   6  1.30% 14.65%    3280   336 sun/tools/java/ScannerInputReader.read
+   7  1.13% 15.78%    2864   404 sun/io/ByteToCharSingleByte.convert
+   8  1.11% 16.89%    2800   307 java/lang/String.length
+   9  1.00% 17.89%    2516  4028 java/lang/Integer.toString
+  10  0.95% 18.84%    2403   162 java/lang/System.arraycopy
+...
+CPU SAMPLES END
+</pre>
+</BLOCKQUOTE>
+
+<p>
+The HPROF agent periodically samples the stack of all running threads
+to record the most frequently active stack traces. The <code>count</code>
+field above indicates how many times a particular stack trace was found
+to be active. These stack traces correspond to the CPU usage hot spots
+in the application.
+
+
+<a name=example></a>
+<h3>8. Code Examples</h3>
+
+<a name=simple-example></a>
+<h4>8.1 A Simple Class Load Tracer</h4>
+
+The <a href=jvmpi_example.zip>jvmpi_example.zip</a> file
+contains an example profiler agent for
+tracing all the classes loaded by a Java program.  Both Solaris and 
+Microsoft Windows versions are included.  
+
+<a name=hprof-example></a>
+<h4>8.2 The HPROF Profiling Agent</h4>
+
+The <a href=hprof.zip>hprof.zip</a> file contains the implementation
+of the HPROF profiling agent in the Java 2 SDK. Both Solaris and 
+Microsoft Windows versions are included.  
+
+<P>
+<FONT SIZE="-1"><B>*As used on this web site, the terms "Java Virtual Machine" 
+or "JVM" mean a virtual machine for the Java platform.</B></FONT>
+<P>
+
+<hr>
+<!-- hhmts start -->
+Last modified: Mon Nov  4 15:24:04 PST 
+<!-- hhmts end -->
+</BODY>
+</HTML>
+

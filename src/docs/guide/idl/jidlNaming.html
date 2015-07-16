@@ -1,0 +1,727 @@
+
+<HTML>
+<HEAD>
+<!--changed by dcarson 6/2001 -->
+   <TITLE>Java IDL and RMI-IIOP: Naming Services</TITLE>
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1 ALIGN=CENTER>Naming Service</H1>
+<P>
+<HR>
+
+<P>Topics in this section include:
+<UL>
+<LI><A href="#nameserver">COS Naming Service: an Overview</A>
+<LI><A href="#using">Using the Naming Service</A>
+</UL>
+
+
+
+<!-- *******************************************************-->
+<A NAME="nameserver">
+<H2>COS Naming Service: an Overview</H2></A>
+
+<P>The CORBA COS (Common Object Services) Naming
+Service</A> provides a tree-like directory for object references much like a
+filesystem provides a directory structure for files. 
+The Naming Service provided with Java IDL is an
+implementation of the <a href="ftp://ftp.omg.org/pub/docs/ptc/00-08-07.pdf">
+COS Naming Service specification</a>.  The following overview is taken from
+that document.
+
+<BLOCKQUOTE>
+
+<P>A name-to-object association is called a <em>name binding</em>. A name binding is always defined relative to a <em>naming context</em>. A naming context is an object that contains a set of name bindings in which each name is unique. Different names can be bound to an object in the same or different contexts at the same time. 
+
+<P>To <em><a href="#example2">resolve a name</a></em> is to determine the object associated with the name in a given context. To <em><a href="#example1">bind a name</a></em> is to create a name binding in a given context. A name is always resolved relative to a context - there are no absolute names. 
+
+<P>Because a context is like any other object, it can also be bound to a name in a naming context. Binding contexts in other contexts creates a <em>naming graph</em> - a directed graph with nodes and labeled edges where the nodes are contexts. A naming graph allows more complex names to reference an object. Given a context in a naming graph, a sequence of names can reference an object. This sequence of names (called a <em>compound name</em>) defines a path in the naming graph to navigate the resolution process. 
+
+</BLOCKQUOTE>
+
+<P>The following figure shows an example of a naming graph.  A <a href="#example1">sample program</a>
+that illustrates how to add names to the namespace uses this same model.
+
+<center><IMAGE SRC="images/NameClienttree.gif"></center>
+
+
+
+
+<P>For an application to use the COS Naming Service,
+its ORB must know the port of a host running a naming
+service or have access to a stringified initial naming context for that
+naming service. The naming service can either be the Java&nbsp;IDL naming service 
+or another COS-compliant naming service. 
+
+
+<a name="persistenttransient"></a>
+<P>Prior to running a client or a server, you will start ORBD.  ORBD includes a persistent Naming Service and a transient Naming Service, both of which are an implementation of the COS Naming Service.  
+
+<P>
+<UL>
+<LI>The <strong><em>Persistent</em> Naming Service</strong> provides persistence
+ for naming contexts.  This means that this information is persistent across service shutdowns and startups, and is recoverable in the event of a service failure. If ORBD is restarted, the Persistent Naming Service will restore the naming context 
+graph, so that the binding of all clients' and servers' names remains intact (persistent).  
+
+<P>
+<LI>For backward compatibility, 
+<tt>tnameserv</tt>, a <strong><em>Transient</em> Naming Service</strong> shipped with older versions of the JDK, 
+ is also included in J2SE v.1.4.  A transient naming service  retains naming contexts as
+long as it is running.  If there is a service interruption, the naming context graph
+is lost.   
+
+</UL>
+
+<P>Both client and server should agree on which root naming context to use.  The <tt>orb.resolve_initial_references(String <em>name_of_service</em>)</tt> method is used to obtain the root naming context.   If you get a handle on a Naming Service by providing  <tt>"NameService"</tt>  as the <em>name_of_service</em>, you will get a persistent naming service, meaning that the naming context graph will be restored after a service failure.  If you get the handle using <tt>"TNameService"</tt>, you will get a transient naming service, meaning that you will need to re-obtain the root naming context using <tt>orb.resolve_initial_references(String <em>name_of_service</em>)</tt> if there is a service interruption.
+
+<P>For example, 
+<P>
+<PRE>
+      // get the root naming context
+      org.omg.CORBA.Object objRef =
+          orb.resolve_initial_references("NameService");
+      NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+</PRE>
+
+
+
+<P>The string "NameService" is defined for all CORBA ORBs. When you 
+pass in this string, the ORB returns a naming context object that is an object 
+reference for:
+<P>
+<UL>
+<LI>The persistent name service if you are using the Naming Service
+that is part of ORBD. 
+<LI>The transient name service if you are using <tt>tnameserv</tt>.
+</UL>
+
+<P>To specify that you want to use the transient naming service with ORBD,
+pass in the string "TNameService".  The string "TNameService" is a 
+proprietary name. When you 
+pass in this string, the ORB returns a naming context object that is an object 
+reference for ORBD's transient name service.
+
+<P>As with all CORBA object references, <TT>objRef</TT> is a generic CORBA 
+object. To use it as a <TT>NamingContextExt</TT> object, you must <a 
+href="../../api/org/omg/CosNaming/NamingContextExtHelper.html#narrow(org.omg.CORBA.Object)">narrow</a> it to its proper type. 
+
+<P><TT>NamingContextExtHelper</TT> is an <TT>idlj</TT>-generated helper class, similar in
+function to <TT>HelloHelper</TT>.  The <TT>ncRef</TT> object is now an 
+<TT>org.omg.CosNaming.NamingContextExt</TT> and you can use it to access the naming 
+service and register the server.
+
+<P><TT>NamingContextExt</TT> and <TT>NamingContextExtHelper</TT> are new to this release
+of J2SE.  <tt><a href="../../api/org/omg/CosNaming/NamingContextExt.html">NamingContextExt</a></tt> is the extension of <tt>NamingContext</tt>.  It contains a set of name bindings in which each name is unique and is part of the <a href="#INS">Interoperable Naming Service</a>. Different names can be bound to an object in the same or different 
+contexts at
+the same time. Using <tt>NamingContextExt</tt>, you can use URL-based names to bind and resolve. <TT>NamingContextExtHelper</TT> provides additional
+helper methods like <tt>narrow()</tt> that are type-specific but don't deal with business
+logic.
+
+
+<a name="INS"><H3>Interoperable Naming Service</H3></a>
+
+<P>The Interoperable Naming Service (INS) is a URL-based naming system on top
+ of the CORBA Naming Service, as well as a common bootstrap mechanism that lets 
+ applications share a common initial naming context. 
+ 
+<P>The Interoperable Naming Service (INS) provides the following features:<P>
+	<UL>
+	<LI>Capability to resolve using <a href="#string">stringified names</a>
+	 (e.g., a/b.c/d)
+	<LI>URLs for CORBA object references (<a href="#corbaloc">corbaloc:</a> and <a href="#corbaname">corbaname:</a> formats)
+	<LI>Standard APIs in <tt>NamingContextExt</tt> for converting between CosNames,
+	URLs,   and Strings
+	<LI>ORB arguments for <a href="#bootstrap">bootstrapping</a> 
+	(<tt>ORBInitRef</tt> and
+	<tt>ORBDefaultInitRef</tt>)
+	</UL>
+	
+	<P>An example application that demonstrates how to use the INS can be found
+	at <a href="INStutorial.html"><em>Interoperable Naming Service Example</em></a>.
+	
+<P>The following diagram shows how INS fits into ORBD:
+ 
+<P>
+<P>
+<center><IMAGE SRC="images/ORBDNS.gif" ALT="ORBD"></center>
+<P><P>
+<BR>
+<BR><P>
+<P>
+<P>
+An object reference contains at least three pieces of information: an address, the name of the POA that created an object reference, and an Object ID.
+
+<a name="string"></a>
+<P>Using INS, you can provide a URL to access the CORBA object, which is more readable
+than a stringified IOR. The following stringified object reference
+ formats are allowed:
+ <P>
+ <UL>
+ <LI>Interoperable Object References (IOR)
+ <P>An IOR is an object reference that is understood by ORBs that can interoperate
+ using the OMG-defined protocols GIOP and IIOP.  A client can obtain an object reference using <tt>orb.object_to_string(objRef)</tt>, as shown in the <a href="#example3"><em>
+ Browsing the Namespace</em></a> example, or as a result of an invocation on another object reference.
+ <P>
+ <STRONG>Note: </STRONG> If an IOR contains multiple profiles, the J2SE v.1.4 ORB always uses
+	the first one.
+ <P>
+ <LI>Human-Readable URL Formats for CORBA Object References
+ <P>
+ 	<UL>
+ 	<a name="corbaloc"></a>
+ 	<LI>corbaloc:
+ 	<P>The <tt>corbaloc:</tt> format is useful for CORBA client programs, 
+ 	and is typically used to resolve the
+ 	reference using the GIOP <tt>LocateRequest</tt> or <tt>Request</tt>
+ 	 message.  For example,
+ 	a <tt>corbaloc:</tt> object reference might look like this:
+ 	<PRE>
+ 	corbaloc:iiop:1.2@MyBank.com:2050/TraderService
+ 	</PRE>
+ 	<P>This example show how to get an object reference for
+ 	 <tt>TraderService</tt> from
+ 	host  <tt>myBank.com</tt> on port <tt>2050</tt>.
+ 	<P>
+ 	<a name="corbaname"></a>
+ 	<LI>corbaname:
+ 	<P>The <tt>corbaname:</tt> format provides a mechanism for a client to
+ 	bootstrap directly, and is typically used to resolve the stringified 
+ 	name from the
+ 	root naming context.  For example, a <tt>corbaname:</tt> object 
+ 	reference might look like this:
+ 	<PRE>
+ 	corbaname::myBank.com:2050#Personal/schedule
+ 	</PRE>
+ 	<P>where <tt>myBank.com</tt> is the host, <tt>2050</tt> is the port. The
+ 	portion of the reference up to the hash mark (<tt>corbaname::myBank.com:2050
+ 	</tt>) is the URL that returns the root naming context.
+ 	This example provides the URL to use to: a) locate the Naming Service,
+ 	and, b) resolve the name 
+ 	 <tt>Personal/schedule</tt> from the Naming Service.
+ 	<P>
+ 	</UL>
+ </UL>
+
+<a name="bootstrap"></a>
+<H4>Bootstrap Options for the ORB</H4>
+<P>INS provides ORB options for bootstrapping.  To bootstrap a CORBA system,
+you must give it an object reference.  The ORB can be configured to return 
+the handle of a customized CORBA service from <tt>resolve_initial_references()</tt>
+using either <tt>ORBInitRef</tt> and/or <tt>ORBDefaultInitRef</tt>.  For example,
+<P>
+<UL>
+<PRE>
+-ORBInitRef TraderService=corbaloc::myBank.com:2050/TraderService
+-ORBDefaultInitRef corbaloc:iiop:1.2:myBank.com:2050
+</PRE>
+</UL>
+
+<P>The order of resolution when these options are used is as follows:
+<P>
+<OL>
+<LI>Objects registered with <tt>register_initial_references</tt>
+<LI><tt>-ORBInitRef</tt>
+<LI><tt>-ORBDefaultInitRef</tt>
+<LI>Proprietary Bootstrap (Sun ORBs only)
+</OL>
+
+
+<P>
+	
+<P>For more information about INS, refer to the OMG specification at (<a 
+href="http://cgi.omg.org/cgi-bin/doc?ptc/00-08-07">ptc/00-08-07</a>).
+
+
+
+
+
+
+
+<!--   ************H2 - Using the Naming Service **********-->
+
+<a name="using">
+<H2>Using the Naming Service</H2></a>
+
+<P>To use the Naming Service,
+ you must first write the server and client code that finds and/or creates the namespace and/or the
+ objects in the namespace.  Before running the client and 
+ server, you must <a href="#startingnameserver">start the Naming Service</a> and tell the client and server where to 
+ find it.  The following steps loosely suggest what happens when the client and server
+ attempt to access the Naming Service:
+ 
+ <P>
+ <UL>
+
+ <LI>The server invokes the <tt>bind</tt> or <tt>rebind</tt> method to associate a logical
+ name with an object reference.
+ <LI>The Naming Service adds this object reference/name binding to its namespace database.
+ <LI>A client application invokes the <tt>resolve</tt> method to obtain an object reference
+ with this name.
+ <LI>The client uses an object reference to invoke methods on the target object.
+ </UL>
+ 
+<P>The following topics are covered in this section:
+ <P>
+<ul>
+<LI><A href="#example1">Sample Client: Adding Objects to the Namespace</A>
+<LI><A href="#example2">Sample Client: Resolving Objects from the Namespace</A>
+<LI><A href="#example3">Sample Client: Browsing the Namespace</A>
+<LI><A href="#startingnameserver">Starting the 	Naming Service</A>
+<LI><A href="#stoppingnameserver">Stopping the 	Naming Service</A>
+</ul>
+
+<!-- ******** Adding Objects to the Namespace ****** -->
+
+<A name="example1"><H3>Sample Client: Adding Objects to the Namespace</H3>
+<P>
+The following sample program illustrates how to add names to the namespace.  It 
+is a self-contained
+Naming Service client that creates the following simple tree. Naming contexts are
+in <em>italics</em> and object references are in <code>normal</code> font.
+
+<center><IMAGE SRC="images/NameClienttree.gif"></center>
+
+<P>
+In this example,
+<strong>plans</strong> is an object reference and <strong>Personal</strong> is a 
+naming context 
+that contains two object references:
+<strong>calendar</strong> and <strong>schedule</strong>.
+
+<P>
+
+<OL>
+<P>
+<LI>Create the <tt>NameClient.java</tt> file and import the proper libraries:
+<P>
+<pre>
+import java.util.Properties;
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class NameClient
+{
+   public static void main(String args[])
+   {
+      try {
+</pre>
+<P>
+<LI>Set Port and Host properties.
+<P>
+In the section, 
+<a href="#startingnameserver"><em>Starting the Naming Service</em></a>, 
+the name server is started on port 1050 and host <em>localhost</em>. The following
+ code ensures that the 
+client
+program is aware of this port number and host name.
+<pre>
+        Properties props = new Properties();
+        props.put("org.omg.CORBA.ORBInitialPort", "1050");
+        props.put("org.omg.CORBA.ORBInitialHost", "localhost");
+        ORB orb = ORB.init(args, props);
+</pre>
+<P>
+<LI>Obtain the initial naming context.
+<P>
+The following code obtains the initial naming context and assigns it to 
+<strong>ctx</strong>. The
+second line copies <strong>ctx</strong> into a dummy object reference 
+<strong>objref</strong>
+that we'll attach to various names and add into the namespace.
+<pre> 
+        NamingContextExt ctx =
+          NamingContextExtHelper.narrow(orb.resolve_initial_references(
+            "NameService"));
+        org.omg.CORBA.Object objref = ctx;
+</pre>
+<P>
+<LI>Bind the name "plans" to the object reference.
+<P>
+This code binds the name "plans" to our dummy object 
+reference. The object reference, "plans",
+is then added under the initial naming context using <code>rebind</code>. The 
+<code>rebind</code> method allows us to run this program over and over again 
+without getting
+the exceptions we'd get from using <code>bind</code>.
+<pre>
+        NameComponent name1[] = ctx.to_name("plans");
+        ctx.rebind(name1, objref);
+        System.out.println("plans rebind successful!");
+</pre>
+<P>
+<LI>Create a new naming context named "Personal".
+<P>
+This code creates a new naming context called "Personal". The 
+resulting 
+object reference, <strong>ctx2</strong>, is bound to the name and added under the 
+initial
+naming context.
+<pre>
+        NameComponent name2[] = ctx.to_name("Personal");
+        NamingContextExt ctx2 = (NamingContextExt)ctx.bind_new_context(name2);
+        System.out.println("New naming context, Personal, added!");
+</pre>
+<P>
+<LI>Bind "schedule" and "calendar" to a dummy object reference. To <em>bind a name</em> is to create a name binding in a given context. A name is always resolved relative to a context - there are no absolute names. 
+<P>
+This code binds the dummy object reference using the names 
+"schedule" and
+"calendar" under the "Personal" naming context (<strong>ctx2</strong>).
+<pre>
+        NameComponent name3[] = ctx.to_name("schedule");
+        ctx2.rebind(name3, objref);
+        System.out.println("schedule rebind successful!");
+
+        NameComponent name4[] = ctx.to_name("calendar");
+        ctx2.rebind(name4, objref);
+        System.out.println("calendar rebind successful!");
+
+
+    } catch (Exception e) {
+        e.printStackTrace(System.err);
+    }
+  }  
+}
+</pre>
+<P><LI>Save NameClient.java, and compile the file as follows:
+<P>
+<PRE>
+     javac NameClient.java
+</PRE>
+<P>Correct any syntax errors before proceeding.
+<P>
+<LI>Run the Object Request Broker Daemon as shown in <a href="#startingnameserver"><em>Starting the Naming Service</em></a>.
+<P>
+<LI>Run <tt>NameClient</tt>, as follows:
+<P>
+<PRE>
+     java NameClient -ORBInitialPort 1050
+</PRE>
+</OL>
+<P>
+The output in the terminal window looks like this:
+<P>
+<center><IMAGE SRC="images/NameClient.gif"></center>
+<P>
+
+<P>We now have a namespace that to the Naming Service looks like the above diagram.
+
+
+<!-- ******** Resolving Objects from the Namespace ****** -->
+
+<A name="example2"><H3>Sample Client: Resolving Objects from the Namespace</H3>
+<P>
+The following sample program illustrates how to resolve names from the namespace.  
+To <em>resolve a name</em> is to determine the object associated with the name in a given context. When using the persistent Naming Service, you do not need to re-resolve if the Naming Service goes down.  If you use a transient Naming Service, you do need to re-resolve in the Naming Service goes down.
+
+<P>
+In this example,
+<strong>plans</strong> is an object reference and <strong>Personal</strong> is a 
+naming context 
+that contains two object references:
+<strong>calendar</strong> and <strong>schedule</strong>.
+
+<P>
+
+<OL>
+<P>
+<LI>Create the <tt>NameClientResolve.java</tt> file and import the proper libraries:
+<P>
+<pre>
+import java.util.Properties;
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class NameClientResolve
+{
+   public static void main(String args[])
+   {
+      try {
+</pre>
+<P>
+<LI>Set Port and Host properties.
+<P>
+In the section, 
+<a href="#startingnameserver"><em>Starting the Naming Service</em></a>, 
+the name server is started on port 1050 and host <em>localhost</em>. The following
+ code ensures that the 
+client
+program is aware of this port number and host name.
+<pre>
+        Properties props = new Properties();
+        props.put("org.omg.CORBA.ORBInitialPort", "1050");
+        props.put("org.omg.CORBA.ORBInitialHost", "localhost");
+        ORB orb = ORB.init(args, props);
+
+</pre>
+<P>
+<LI>Obtain the initial naming context.
+<P>
+The following code obtains the initial naming context and assigns it to 
+<strong>nc</strong>. 
+<P>
+<pre> 
+        NamingContextExt nc =
+          NamingContextExtHelper.narrow(orb.resolve_initial_references(
+            "NameService"));
+</pre>
+<P>
+<LI>Resolve each namespace.
+<P>
+The following code resolves each namespace.
+<P>
+<pre>   org.omg.CORBA.Object sched = nc.resolve_str("Personal/schedule");
+        org.omg.CORBA.Object cal = nc.resolve_str("Personal/calendar");
+        org.omg.CORBA.Object plan = nc.resolve_str("plans");
+
+      //finish the try-catch block
+      } catch (Exception e) {
+        e.printStackTrace(System.err);
+        } 
+}
+</pre>
+<P><LI>Save NameClientResolve.java, and compile the file as follows:
+<P>
+<PRE>
+     javac NameClientResolve.java
+</PRE>
+<P>Correct any syntax errors before proceeding.
+<P>
+<LI>Make sure the Object Request Broker Daemon is running and the
+ client application illustrated in <a href="#example1"><em>Sample Client: Adding Objects to the Namespace</em></a> has been run.
+<P>
+<LI>Run <tt>NameClientResolve</tt>, as follows:
+<P>
+<PRE>
+     java NameClientResolve -ORBInitialPort 1050
+</PRE>
+
+</OL>
+<P>There is no output to the terminal window when you run this client application.  If you want verification that the object references have been resolved, you could add code such as the following for testing purposes:
+<P>
+<PRE>
+	if (sched == null){
+	  System.out.println("Schedule is null");
+	}
+		
+	if (cal == null){
+	  System.out.println("Calendar is null");
+	}
+	 
+	if (plan == null){
+	  System.out.println("Plans is null");
+	}
+</PRE>
+
+
+
+<!--  *********** Example 3 ******************* -->
+
+<A name="example3"><H3>Sample Client: Browsing the Namespace</H3>
+<P>
+The following sample program illustrates how to browse the namespace. 
+
+<P>
+<OL>
+<LI>Create the <tt>NameClientList.java</tt> file and import the proper libraries:
+<P>
+<pre>
+import java.util.Properties;
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class NameClientList
+{
+   public static void main(String args[])
+   {
+      try {
+</pre>
+<P>
+<LI>
+<P>
+In the section,
+<a href="#startingnameserver"><em>Starting the Naming Service</em></a>,
+the nameserver is started on port 1050 and host localhost. The following code ensures that the 
+client
+program is aware of this port number and host name.
+<pre>
+
+        Properties props = new Properties();
+        props.put("org.omg.CORBA.ORBInitialPort", "1050");
+        props.put("org.omg.CORBA.ORBInitialHost", "localhost");
+        ORB orb = ORB.init(args, props);
+
+
+</pre>
+<P>
+<LI>Obtain the initial naming context.
+<P>
+<pre>
+        NamingContextExt nc = 
+          NamingContextExtHelper.narrow(orb.resolve_initial_references(
+            "NameService"));
+
+</pre>
+<P>
+<LI>List all bindings in the naming context.
+<P>
+The <code>list</code> method lists the bindings in the naming context. In this 
+case, 
+up to 1000 bindings from the initial naming
+context will be returned in the <code>BindingListHolder</code>; any remaining bindings are 
+returned
+in the <code>BindingIteratorHolder</code>.
+<pre> 
+        BindingListHolder bl = new BindingListHolder();
+        BindingIteratorHolder blIt= new BindingIteratorHolder();
+        nc.list(1000, bl, blIt);
+
+</pre>
+<P>
+<LI>Get the array of bindings.
+<P>
+This code gets the array of bindings out of the returned BindingListHolder. 
+<pre>
+        Binding bindings[] = bl.value;
+
+
+</pre>
+<P>
+<LI>This code loops through the bindings and prints the names out.
+<pre>
+        for (int i=0; i < bindings.length; i++) {
+
+            int lastIx = bindings[i].binding_name.length-1;
+
+            // check to see if this is a naming context
+            if (bindings[i].binding_type == BindingType.ncontext) {
+              System.out.println( "Context: " + 
+                bindings[i].binding_name[lastIx].id);
+            } else {
+                System.out.println("Object: " + 
+                  bindings[i].binding_name[lastIx].id);
+            }
+        }
+
+       } catch (Exception e) {
+        e.printStackTrace(System.err);
+       } 
+   }
+}
+</pre>
+<P><LI>Save NameClientList.java, and compile the file as follows:
+<P>
+<PRE>
+     javac NameClientList.java
+</PRE>
+<P>Correct any syntax errors before proceeding.
+<P>
+<LI>Make sure the Object Request Broker Daemon is running, the
+ client application illustrated in <a href="#example1"><em>Sample Client: Adding Objects to the Namespace</em></a> has been run, and the client application illustrated in <a href="#example2"><em>Sample Client: Resolving Objects from the Namespace</em></a> has been run.
+<P>
+<LI>Run <tt>NameClientList</tt>, as follows:
+<P>
+<PRE>
+     java NameClientList -ORBInitialPort 1050
+</PRE>
+</OL>
+<P>
+The output in the terminal window looks like this:
+<P>
+<center><IMAGE SRC="images/NameClientList.gif"></center>
+<P>
+
+
+</OL>
+<P>
+
+<!--  ************  STARTING AND STOPPING NAMING SERVICE ***** -->
+<A name="startingnameserver">
+<H3>Starting the Naming Service</H3></A>
+
+In all of the tutorials we use the Object Request Broker Daemon, <code>orbd</code>, 
+which includes both a
+Persistent and a Transient Naming Service, and is available with every download 
+of J2SE 1.4 and higher.   
+
+<P>For a caller (client, peer, or client application) to be able to invoke a method
+on a remote object, that caller must first obtain a reference to the remote
+object.
+
+	
+<P>Once a remote object is registered on the server, callers can look up
+the object by name, obtain a remote object reference, and then remotely
+invoke methods on the object.
+
+<P>To learn how to start the Naming Service, see the topic <a href="orbd.html#starting">
+<em>Starting the Naming Service</em></a> in the ORBD documentation.
+
+
+<A name="stoppingnameserver">
+<H3>Stopping the Naming Service</H3></A>
+
+<P>To stop the naming service, use the relevant operating
+system command, such as <TT>kill</TT> on Solaris, or <kbd>Ctrl+C</kbd> in the 
+DOS window in which <tt>orbd</tt> is running. Note that names registered
+with the naming service may disappear when the service is
+terminated if the naming service is transient.  The Java IDL naming service will 
+run until it is explicitly
+stopped.</P>
+
+<A name="FAQ"></a>
+<H2>Naming Service FAQ</H2>
+
+<H3>How do I connect to a 3rd-party Naming Service from Sun's ORB?</H3>
+
+<BLOCKQUOTE>
+The recommended way is to use the <a href="INStutorial.html">Inter-Operable 
+Naming Service (INS)</a>, if this option is supported by the 3rd-party 
+Naming Service.
+<P>
+   To use the Sun ORB with another vendor's Naming Service,
+   <OL>
+   <LI>Start the 3rd-party name server on Host <H> and Port. <P>
+   <LI>Pass the following argument to <tt>ORB.init()</tt>:
+   <PRE>
+        -ORBInitRef NameService=corbaloc:iiop:1.2@<H>:<P>/NameService
+        </PRE>
+        <P>
+   </OL>
+ <P>When you do <tt>orb.resolve_initial_references( "NameService" )</tt>, 
+   you should be able to connect to 3rd-party Name Service.  If you are 
+   still not able to connect, try these troubleshooting hints:
+      <UL>
+      <LI>Verify that the 3rd-party Name Service supports INS.
+      <LI>Verify that the host and port information is accurate.
+      <LI>Verify that the 3rd-party Name Service has been started successfully.
+      <LI>Verify that the 3rd-party Name Service supports GIOP 1.2.  If not,
+      refer to the Name Server's documentation for the correct the GIOP
+       version, and modify the <tt>corbaloc:</tt> URL accordingly.
+      <LI>Determine if the 3rd-party Name Service has a different object
+       key it uses to contact <tt>NameService</tt>.  If so, refer to 
+       the Name Server's documentation.
+         </UL>
+    
+</BLOCKQUOTE>
+
+<HR>
+<CENTER>
+
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html">Java IDL Home</A></TD>
+</TR></TABLE>
+
+<HR>
+<!-- server side include for page footer -->
+
+  <!--#include virtual="/share/include/normal.footer.v4.0.html"-->
+
+<!-- end server side include for footer -->
+
+</CENTER>
+</BODY>
+</HTML>

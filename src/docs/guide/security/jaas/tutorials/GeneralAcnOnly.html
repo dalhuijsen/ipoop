@@ -1,0 +1,1140 @@
+<html>
+
+<head>
+    <title>JAAS Authentication Tutorial</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#000077" alink="#FF0000">
+
+
+<center>
+<H1>JAAS Authentication Tutorial</H1>
+</center>
+
+<br>
+<br>
+
+<p> The Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Authentication
+and Authorization Service (JAAS) was introduced as an optional package to the
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition (J2SDK), v 1.3.
+JAAS has now been integrated into the J2SDK, v 1.4.
+
+<p> JAAS can be used for two purposes:
+
+<ul>
+
+<li>for <i>authentication</i> of users, to reliably
+and securely determine who is currently executing Java code,
+regardless of whether the code is running as an application, an applet,
+a bean, or a servlet; and<p>
+
+<li>for <i>authorization</i> of users to ensure they have the 
+access control rights (permissions) required to do the actions performed.
+
+</ul>
+
+<p>This section provides a basic tutorial for the authentication component.
+The authorization component will be
+described in the <a href="GeneralAcnAndAzn.html">JAAS Authorization 
+Tutorial</a>.
+
+<p> JAAS authentication is performed in a <i>pluggable</i> fashion.
+This permits Java applications to remain independent from underlying
+authentication technologies.  New or updated 
+technologies can be plugged in without requiring
+modifications to the application itself. An implementation for a
+particular authentication technology to be used
+is determined at runtime. The implementation is 
+specified in a login configuration file.
+The authentication technology used for this tutorial is
+very basic, just ensuring that the user specifies a particular
+name and password.
+
+<p>The rest of this tutorial consists of the
+following sections:
+
+<ol>
+
+<li><a href="#AcCode">The Authentication Tutorial Code</a> <p>
+
+<li><a href="#ConfigFile">The Login Configuration</a> <p>
+
+<li><a href="#RunAc">Running the Code</a><p>
+
+<li><a href="#RunAcWSM">Running the Code with a Security Manager</a>
+
+</ol>
+
+<p>If you want to first see the tutorial code in action,
+you can skip directly to 
+<a href="#RunAc">Running the Code</a>
+and then go back to the other sections to learn about
+coding and configuration file details.
+
+
+<a name="AcCode">
+<H1>The Authentication Tutorial Code</H1></a>
+
+<blockquote>
+
+<p>The code for this tutorial consists of three files:
+
+<ul>
+
+<li><a href = "#SampleAcn">SampleAcn.java</a> contains the
+sample application class (SampleAcn) and another class used to handle
+user input (MyCallbackHandler). <b>The code in this file is the only code you 
+need to understand for this tutorial. Your application will only
+indirectly use the other source files.</b> <p>
+
+<li><a href = "#SampleLMPrincipal">SampleLoginModule.java</a> is 
+the class specified by the tutorial's 
+<a href="#ConfigFile">login configuration file</a> as the
+class implementing the desired underlying authentication.
+SampleLoginModule's user authentication consists of simply verifying
+that the name and password specified by the user have specific
+values. <p>
+
+<li><a href = "#SampleLMPrincipal">SamplePrincipal.java</a> is 
+a sample class implementing
+the <a href="../../../../api/java/security/Principal.html">
+java.security.Principal</a> interface. It is used by 
+SampleLoginModule.
+
+</ul>
+
+
+<a name="SampleAcn"></a>
+<H2>SampleAcn.java</H2>
+
+<blockquote>
+
+<p>Our authentication tutorial application code is contained in a single source
+file, <a href = "SampleAcn.java">SampleAcn.java</a>. That file contains
+two classes:
+
+<ul>
+
+<li><a href="#SampleAcnClass">The SampleAcn Class</a> <p>
+
+<li><a href="#MyCallbackHandler">The MyCallbackHandler Class</a> <p>
+
+</ul>
+
+
+<a name="SampleAcnClass"></a>
+<H2>The SampleAcn Class</H2>
+
+<blockquote>
+
+The <code>main</code> method of the SampleAcn class
+performs the authentication and then reports whether or not 
+authentication succeeded.
+
+<p>The code for authenticating the user is
+very simple, consisting of just two steps:
+
+<ol>
+
+<li><a href="#ClientLC">Instantiate a LoginContext.</a> <p>
+<li><a href="#ClientLogin">Call the LoginContext's <code>login</code> 
+method.</a>
+
+</ol> 
+
+<p>First the basic code is shown, followed by a 
+<a href="#AcnFullCode">complete listing</a> 
+of the <code>SampleAcn</code> class, complete with the import statement
+it requires and error handling.
+
+<H3><a name="ClientLC">Instantiating a LoginContext</H3></a>
+
+<blockquote>
+
+<p>In order to authenticate a user, you first need a 
+<code>javax.security.auth.login.LoginContext</code>.
+Here is the basic way to instantiate a LoginContext:
+
+<blockquote>
+<pre>
+import javax.security.auth.login.*;
+. . .
+LoginContext lc = 
+    new LoginContext(&lt;config file entry name&gt;,
+           &lt;CallbackHandler to be used for user interaction&gt;); 
+</pre>
+</blockquote>
+
+and here is the specific way our tutorial code does
+the instantiation:
+
+<blockquote>
+<pre>
+import javax.security.auth.login.*;
+. . .
+<b>LoginContext lc = 
+    new LoginContext("Sample", 
+          new MyCallbackHandler());</b>
+</pre>
+</blockquote>
+
+<p>The arguments are the following: 
+
+<ol>
+
+<li><b>The name of an entry in the JAAS login configuration file</b>
+
+<p>This is the name for the LoginContext to use to look up an entry 
+for this application in the JAAS login configuration file, described 
+<a href="#ConfigFile">here</a>. Such an entry specifies the class(es)
+that implement the desired underlying authentication technology(ies).
+The class(es) must implement the LoginModule interface, which is in the
+<code>javax.security.auth.spi</code> package.
+
+<p>In our sample code, we use the <code>SampleLoginModule</code> 
+supplied with this tutorial. The SampleLoginModule 
+performs authentication by ensuring that the user types a particular
+name and password.
+
+<p>The entry in the login configuration file we 
+use for this tutorial (see 
+<a href = "sample_jaas.config">sample_jaas.config</a>)
+has the name "Sample", so that is the name we specify
+as the first argument to the LoginContext constructor.
+
+<p>
+
+<li><b>A CallbackHandler instance.</b>
+
+<p>When a LoginModule needs to communicate with the user, for example
+to ask for a user name and password, it does not do so directly.
+That is because there are various ways of communicating with a
+user, and it is desirable for LoginModules to remain independent of the
+different types of user interaction. Rather, the LoginModule invokes
+a <a href="../../../../api/javax/security/auth/callback/CallbackHandler.html">
+<code>javax.security.auth.callback.CallbackHandler</code></a> to perform the 
+user interaction and obtain the requested
+information, such as the user name and password. 
+
+<p>An instance of the particular
+CallbackHandler to be used is specified as the second argument to
+the LoginContext constructor. 
+The LoginContext forwards that instance to the underlying LoginModule
+(in our case SampleLoginModule). 
+An application typically provides its own CallbackHandler implementation.
+Two simple CallbackHandlers, TextCallbackHandler and DialogCallbackHandler,
+are provided in the <code>com.sun.security.auth.callback</code> package
+as sample implementations. For this tutorial we could use the 
+TextCallbackHandler, which outputs information to and reads input from the 
+command line. However, we instead demonstrate the more typical case of
+an application providing its own CallbackHandler implementation,
+described in 
+<a href="#MyCallbackHandler">The MyCallbackHandler Class</a>.
+
+</ol>
+
+</blockquote>
+
+
+<H3><a name="ClientLogin">Calling the LoginContext's <code>login</code> 
+Method</a></H3>
+
+<blockquote>
+
+<p>Once we have a LoginContext <code>lc</code>, 
+we can call its <code>login</code> method to
+carry out the authentication process:
+
+<blockquote>
+<pre>
+<b>lc.login();</b>
+</pre>
+</blockquote>
+
+<p>The LoginContext instantiates a new empty 
+<a href="../../../../api/javax/security/auth/Subject.html">
+<code>javax.security.auth.Subject</code></a> object (which
+represents the user or service being authenticated).
+The LoginContext constructs the configured LoginModule 
+(in our case SampleLoginModule) and initializes it with
+this new Subject and MyCallbackHandler.
+
+<p>The LoginContext's <code>login</code> method then
+calls methods in the SampleLoginModule to
+perform the login and authentication. 
+The SampleLoginModule will utilize the MyCallbackHandler
+to obtain the user name and password.
+Then the SampleLoginModule will check that the name and password
+are the ones it expects.
+
+<p>If authentication is successful, the SampleLoginModule 
+populates the Subject with a Principal representing the user. 
+The Principal the SampleLoginModule places in the Subject
+is an instance of SamplePrincipal, which is a sample class implementing
+the <a href="../../../../api/java/security/Principal.html">
+java.security.Principal</a> interface.
+
+<p>See <a href="glossary.html">Subjects, Principals, Authentication, and
+Credentials</a> for information on these terms.
+
+<p>The calling application can subsequently retrieve the
+authenticated Subject by calling the
+LoginContext's <code>getSubject</code> method, although doing so is not 
+necessary for this tutorial.
+
+
+</blockquote>
+
+
+<a name="AcnFullCode">
+<H3>The Complete <code>SampleAcn</code> Class Code</H3></a>
+
+<blockquote>
+
+<p>Now that you have seen the basic code required to authenticate the
+user, we can put it all together into the full class in 
+<a href = "SampleAcn.java">SampleAcn.java</a>, which includes relevant
+import statements and error handling:
+
+<blockquote>
+<pre>
+package sample;
+
+import javax.security.auth.login.*;
+// . . . other import statements needed by MyCallbackHandler . . .
+
+/**
+ * This Sample application attempts to authenticate a user
+ * and reports whether or not the authentication was 
+ * successful.
+ */
+public class <b>SampleAcn</b> {
+
+   /**
+    * Attempt to authenticate the user.
+    *
+    * @param args input arguments for this application.  
+    * These are ignored.
+    */
+    public static void main(String[] args) {
+
+      // Obtain a LoginContext, needed for authentication. 
+      // Tell it to use the LoginModule implementation 
+      // specified by the entry named "Sample" in the 
+      // JAAS login configuration file and to also use the 
+      // specified CallbackHandler.
+      LoginContext lc = null;
+      try {
+          <b>lc = new LoginContext("Sample", 
+                          new MyCallbackHandler());</b>
+      } catch (LoginException le) {
+          System.err.println("Cannot create LoginContext. "
+              + le.getMessage());
+          System.exit(-1);
+      } catch (SecurityException se) {
+          System.err.println("Cannot create LoginContext. "
+              + se.getMessage());
+          System.exit(-1);
+      } 
+
+      // the user has 3 attempts to authenticate successfully
+      int i;
+      for (i = 0; i < 3; i++) {
+          try {
+
+              // attempt authentication
+              <b>lc.login();</b>
+
+              // if we return with no exception, 
+              // authentication succeeded
+              break;
+
+          } catch (LoginException le) {
+
+              System.err.println("Authentication failed:");
+              System.err.println("  " + le.getMessage());
+              try {
+                  Thread.currentThread().sleep(3000);
+              } catch (Exception e) {
+                  // ignore
+              } 
+      
+          }
+      }
+
+      // did they fail three times?
+      if (i == 3) {
+          System.out.println("Sorry");
+          System.exit(-1);
+      }
+
+      System.out.println("Authentication succeeded!");
+
+    }
+}
+</pre>
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+
+<a name="MyCallbackHandler"></a>
+<H2>The MyCallbackHandler Class</H2>
+
+<blockquote>
+
+<p>In some cases a LoginModule must communicate with the
+user to obtain authentication information.  LoginModules use a
+<a href="../../../../api/javax/security/auth/callback/CallbackHandler.html">
+<code>javax.security.auth.callback.CallbackHandler</code></a> for this purpose. 
+An application can either use one of the sample implementations provided in
+the <code>com.sun.security.auth.callback</code> package or, more typically, 
+write a CallbackHandler implementation.
+The application passes the CallbackHandler as an argument to the 
+LoginContext instantiation. The LoginContext 
+forwards the CallbackHandler directly to the 
+underlying LoginModules.
+
+<p>The tutorial sample code supplies its own CallbackHandler implementation,
+the MyCallbackHandler class in <a href = "SampleAcn.java">SampleAcn.java</a>. 
+
+<p>CallbackHandler is an interface with one method to implement:
+
+<pre>
+     void handle(Callback[] callbacks)
+         throws java.io.IOException, UnsupportedCallbackException;
+</pre>
+
+<p>The LoginModule passes the CallbackHandler handle 
+method an array 
+of appropriate 
+<a href="../../../../api/javax/security/auth/callback/Callback.html">
+<code>javax.security.auth.callback.Callback</code>s</a>,
+for example a 
+<a href="../../../../api/javax/security/auth/callback/NameCallback.html">
+NameCallback</a> for the user name and
+a <a href="../../../../api/javax/security/auth/callback/PasswordCallback.html">
+PasswordCallback</a> for the password, and the CallbackHandler 
+performs the requested user interaction and sets appropriate values in the
+Callbacks.
+
+<p>The MyCallbackHandler <code>handle</code> method is structured as follows:
+
+<blockquote>
+<pre>
+public void handle(Callback[] callbacks)
+  throws IOException, UnsupportedCallbackException {
+      
+  for (int i = 0; i < callbacks.length; i++) {
+    if (callbacks[i] instanceof TextOutputCallback) {
+      
+      // display a message according to a specified type
+      . . .
+
+    } else if (callbacks[i] instanceof NameCallback) {
+  
+      // prompt the user for a username
+      . . .
+ 
+    } else if (callbacks[i] instanceof PasswordCallback) {
+  
+      // prompt the user for a password
+      . . .
+
+    } else {
+        throw new UnsupportedCallbackException
+         (callbacks[i], "Unrecognized Callback");
+    }
+  }
+}
+</pre>
+</blockquote>
+
+<p>A CallbackHandler <code>handle</code> method is passed an array of 
+Callback instances, each of a particular type (NameCallback, 
+PasswordCallback, etc.). It must handle each Callback, performing
+user interaction in a way that is appropriate for the executing
+application.
+
+<p>MyCallbackHandler handles three types of Callbacks: <b>NameCallback</b> 
+to prompt the user for a user name, 
+<b>PasswordCallback</b> to prompt for a password, and 
+<b>TextOutputCallback</b> to report any error, warning, or other
+messages the SampleLoginModule wishes to send to the user.
+
+<p>The <code>handle</code> method handles a <b>TextOutputCallback</b> by
+extracting the message to be reported and then printing it to
+<code>System.out</code>, optionally preceded by additional wording that
+depends on the message type. The message to be reported is
+determined by calling the TextOutputCallback's <code>getMessage</code> method
+and the type by calling its <code>getMessageType</code> method.
+Here is the code for handling a TextOutputCallback:
+
+<blockquote>
+<pre>
+if (callbacks[i] instanceof TextOutputCallback) {
+      
+  // display the message according to the specified type
+  TextOutputCallback toc = (TextOutputCallback)callbacks[i];
+  switch (toc.getMessageType()) {
+     case TextOutputCallback.INFORMATION:
+        System.out.println(toc.getMessage());
+        break;
+     case TextOutputCallback.ERROR:
+        System.out.println("ERROR: " + toc.getMessage());
+        break;
+     case TextOutputCallback.WARNING:
+        System.out.println("WARNING: " + toc.getMessage());
+        break;
+     default:
+        throw new IOException("Unsupported message type: " +
+            toc.getMessageType());
+   }
+</pre>
+</blockquote>
+
+<p>The <code>handle</code> method handles a <b>NameCallback</b> by
+prompting the user for a user name. It does this by printing
+the prompt to <code>System.err</code>. It then sets the name for use by
+the SampleLoginModule by calling the NameCallback's <code>setName</code> 
+method, passing it the name typed by the user:
+
+<blockquote>
+<pre>
+} else if (callbacks[i] instanceof NameCallback) {
+  
+  // prompt the user for a username
+  NameCallback nc = (NameCallback)callbacks[i];
+
+  System.err.print(nc.getPrompt());
+  System.err.flush();
+  nc.setName((new BufferedReader
+      (new InputStreamReader(System.in))).readLine());
+</pre>
+</blockquote>
+
+<p>Similarly, the <code>handle</code> method handles a <b>PasswordCallback</b> by
+printing a prompt to <code>System.err</code> to
+prompt the user for a password. It then sets the password for use by
+the SampleLoginModule by calling the PasswordCallback's 
+<code>setPassword</code> method, passing it the password typed by the user,
+which it reads by calling the <code>readPassword</code> method
+(shown below):
+
+<blockquote>
+<pre>
+} else if (callbacks[i] instanceof PasswordCallback) {
+  
+  // prompt the user for sensitive information
+  PasswordCallback pc = (PasswordCallback)callbacks[i];
+
+  System.err.print(pc.getPrompt());
+  System.err.flush();
+  pc.setPassword(readPassword(System.in));
+</pre>
+</blockquote>
+
+<p>The <code>readPassword</code> method is a basic method for reading a
+password from an InputStream:
+
+<blockquote>
+<pre>
+private char[] readPassword(InputStream in) throws IOException {
+    
+    char[] lineBuffer;
+    char[] buf;
+    int i;
+
+    buf = lineBuffer = new char[128];
+
+    int room = buf.length;
+    int offset = 0;
+    int c;
+
+  loop:    
+    while (true) {
+      switch (c = in.read()) {
+         case -1:
+         case '\n':
+            break loop;
+
+         case '\r':
+             int c2 = in.read();
+             if ((c2 != '\n') && (c2 != -1)) {
+                 if (!(in instanceof PushbackInputStream)) {
+                     in = new PushbackInputStream(in);
+                 }
+                 ((PushbackInputStream)in).unread(c2);
+             } else
+                 break loop;
+
+         default:
+             if (--room < 0) {
+                 buf = new char[offset + 128];
+                 room = buf.length - offset - 1;
+                 System.arraycopy(lineBuffer, 0, buf, 0, offset);
+                 Arrays.fill(lineBuffer, ' ');
+                 lineBuffer = buf;
+             }
+             buf[offset++] = (char) c;
+             break;
+        }
+    }
+
+    if (offset == 0) {
+        return null;
+    }
+
+    char[] ret = new char[offset];
+    System.arraycopy(buf, 0, ret, 0, offset);
+    Arrays.fill(buf, ' ');
+
+    return ret;
+  }
+}
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+</blockquote>
+
+
+
+<a name="SampleLMPrincipal"></a>
+<H2>SampleLoginModule.java and SamplePrincipal.java</H2>
+
+<blockquote>
+
+<p><a href = "SampleLoginModule.java">SampleLoginModule.java</a> 
+implements the 
+<a href="../../../../api/javax/security/auth/spi/LoginModule.html">
+<code>LoginModule</code></a> interface. SampleLoginModule is 
+the class specified by the tutorial's 
+<a href="#ConfigFile">login configuration file</a> as the
+class implementing the desired underlying authentication.
+SampleLoginModule's user authentication consists of simply verifying
+that the name and password specified by the user have specific
+values. This SampleLoginModule is specified by the tutorial's
+login configuration file as the LoginModule to use because (1)
+It performs a basic type of authentication suitable for any environment
+and thus is appropriate for a tutorial for all users, and (2) It 
+provides an example LoginModule implementation for experienced programmers 
+who require the ability to write a LoginModule implementing an authentication 
+technology.
+
+<p><a href = "SamplePrincipal.java">SamplePrincipal.java</a> is a
+sample class implementing
+the <a href="../../../../api/java/security/Principal.html">
+java.security.Principal</a> interface. If authentication is successful, 
+the SampleLoginModule populates a
+<a href="../../../../api/javax/security/auth/Subject.html">
+Subject</a> with a SamplePrincipal representing the user.
+
+<p><b>Important: If you are an application writer, you do not need to
+know how to write a LoginModule or a Principal implementation.
+You do not need to examine the SampleLoginModule or
+SamplePrincipal code.</b>
+All you have to know is how to write your application and specify
+configuration information (such as in a
+login configuration file) such that the application will be able to
+utilize the LoginModule specified by the configuration to
+authenticate the user. You need to determine which LoginModule(s)
+you want to use and read the LoginModule's documentation to learn
+about what options you can specify values for (in the configuration)
+to control the LoginModule's behavior.
+
+<p>Any vendor can provide a LoginModule implementation that you can use.
+Some implementations are supplied with the JRE from Sun Microsystems,
+as listed in the
+<a href="LoginConfigFile.html">JAAS Login Configuration File</a> document.
+
+<p>Information for programmers who want to write a LoginModule can be
+found in the <a href="../JAASLMDevGuide.html">JAAS <code>LoginModule</code> 
+Developer's Guide</a>. 
+  
+</blockquote>
+
+
+</blockquote>
+
+
+<a name="ConfigFile">
+<H1>The Login Configuration</H1></a>
+
+<blockquote>
+
+<p> JAAS authentication is performed in a pluggable fashion, so
+applications can remain independent from underlying
+authentication technologies. A system administrator determines
+the authentication technologies, or LoginModules, to be used
+for each application and configures them in a login Configuration.
+The source of the configuration information 
+(for example, a file or a database) is up to the current 
+<a href="../../../../api/javax/security/auth/login/Configuration.html">
+javax.security.auth.login.Configuration</a> implementation.
+The default <code>Configuration</code> implementation from Sun Microsystems 
+reads configuration information from configuration files, as described in
+<a href="../../jaas/spec/com/sun/security/auth/login/ConfigFile.html">
+com.sun.security.auth.login.ConfigFile.html</a>.
+
+<p>See <a href="LoginConfigFile.html">JAAS Login Configuration 
+File</a> for information as to what a login configuration file is, what it 
+contains, and how to specify which login configuration file should be used.
+
+
+
+<a name="AcLCF">
+<H3>The Login Configuration File for This Tutorial</H3></a>
+
+<blockquote>
+
+<p>As noted, the login configuration file we use for this tutorial, 
+<a href = "sample_jaas.config">sample_jaas.config</a>, contains just one
+entry, which is
+
+<blockquote>
+<pre>
+<b>Sample {
+  sample.module.SampleLoginModule required debug=true;
+};</b>
+</pre>
+</blockquote>
+
+<p>This entry is named "Sample" and that is the name that our
+tutorial application, <code>SampleAcn</code>, uses to refer to this entry.
+The entry specifies that the LoginModule to be used to do the
+user authentication is the SampleLoginModule in the 
+<code>sample.module</code> package 
+and that this SampleLoginModule is required to "succeed" in order for
+authentication to be considered successful.
+The SampleLoginModule succeeds only if the name and password supplied
+by the user are the one it expects ("testUser" and "testPassword",
+respectively).
+
+<p>The SampleLoginModule also defines a "debug" option that can be
+set to <code>true</code> as shown. If this option is set to <code>true,</code>
+SampleLoginModule outputs extra information about the progress of 
+authentication.
+A LoginModule can define as many options as it wants.
+The LoginModule documentation should specify the possible option names
+and values you can set in your configuration file.
+
+</blockquote>
+
+
+</blockquote>
+
+
+<a name="RunAc">
+<H1>Running the Code</H1></a>
+
+<blockquote>
+
+<p>To execute our JAAS authentication tutorial code, all you
+have to do is 
+
+<ol>
+
+<li>Place the following file into a directory:
+<p>
+
+<ul>
+<li>the
+<a href = "sample_jaas.config">sample_jaas.config</a> login configuration file 
+</ul>
+<p>
+
+<li>Create a subdirectory named "sample" of that top-level directory, and
+place the following into it (note the SampleAcn and
+MyCallbackHandler classes, both in <code>SampleAcn.java</code>,
+are in a package named <code>sample</code>):
+<p>
+
+<ul>
+<li>the <a href = "SampleAcn.java">SampleAcn.java</a> application 
+source file 
+</ul>
+<p>
+
+<li>Create a subdirectory of the "sample" directory and name it "module".
+Place the following into it (note the SampleLoginModule class is 
+in a package named <code>sample.module</code>):
+<p>
+
+<ul>
+<li>the <a href = "SampleLoginModule.java">SampleLoginModule.java</a> 
+source file 
+</ul>
+<p>
+
+<li>Create another subdirectory of the "sample" directory and name it 
+"principal". Place the following into it (note the 
+SamplePrincipal class is in a package named <code>sample.principal</code>):
+<p>
+
+<ul>
+<li>the <a href = "SamplePrincipal.java">SamplePrincipal.java</a> 
+source file 
+</ul>
+<p>
+
+<li>While in the top-level directory,
+compile <code>SampleAcn.java</code>, <code>SampleLoginModule.java</code>, 
+and <code>SamplePrincipal.java</code>:
+
+<blockquote>
+<pre>
+javac sample/SampleAcn.java sample/module/SampleLoginModule.java 
+sample/principal/SamplePrincipal.java 
+</pre>
+</blockquote>
+
+(Type all that on one line.)
+<p>
+
+<li>Execute the <code>SampleAcn</code> application, specifying <p>
+
+<ul>
+
+<li>by <code>-Djava.security.auth.login.config==sample_jaas.config</code> that 
+the login configuration file to be used is <code>sample_jaas.config</code>.
+
+</ul>
+
+</ol>
+
+<p>The full command is below.
+
+<blockquote>
+<pre>
+java -Djava.security.auth.login.config==sample_jaas.config sample.SampleAcn
+</pre>
+</blockquote>
+
+<p>You will be prompted for your user name and password,
+and the SampleLoginModule specified in the login configuration file will 
+check to ensure these are correct. The SampleLoginModule expects 
+"testUser" for the user name and "testPassword" for the password.
+
+<p>You will see some messages output by SampleLoginModule as a
+result of the <code>debug</code> option being set to <code>true</code> in 
+the login configuration file.
+Then, if your login is successful, you will see the following
+message output by SampleAcn:
+
+<blockquote>
+<pre>
+Authentication succeeded!
+</pre>
+</blockquote>
+
+If the login is not successful (for example, if you misspell the
+password), you will see
+
+<blockquote>
+<pre>
+Authentication failed:
+</pre>
+</blockquote>
+
+followed by a reason for the failure. For example, if you mistype
+the password, you may see a message like the following:
+
+<blockquote>
+<pre>
+Authentication failed:
+  Password Incorrect 
+</pre>
+</blockquote>
+
+<p>SampleAcn gives you three chances to successfully log in.
+
+</blockquote>
+
+
+
+<a name="RunAcWSM">
+<H1>Running the Code with a Security Manager</H1></a>
+
+<blockquote>
+
+<p>When a Java program is run with a security manager installed,
+the program is not allowed to access resources or otherwise perform
+security-sensitive operations unless it is explicitly granted
+<a href = "../../permissions.html">
+permission</a> to do so by the security policy in effect. In Java 
+platforms that are compatible with J2SE v 1.2 and later, the
+permission must be granted by an entry in a 
+<a href = "../../PolicyFiles.html">
+policy file</a>.
+
+<p>Most browsers install a security manager, so <i>applets</i> typically run
+under the scrutiny of a security manager. <i>Applications</i>, on the 
+other hand, do not, since a security manager is not automatically
+installed when an application is running. Thus an application, like our
+<code>SampleAcn</code> application, by default has full access to resources.
+
+<p><b>To run an application with a security manager</b>, simply invoke the
+interpreter with a <code>-Djava.security.manager</code> argument included 
+on the command line. 
+
+<p>If you try invoking <code>SampleAcn</code> with a security manager but 
+without specifying any policy file, you will get the following (unless
+you have a default policy setup elsewhere that grants the required
+permissions or grants <code>AllPermission</code>):
+
+<pre>
+% java -Djava.security.manager \
+ -Djava.security.auth.login.config==sample_jaas.config sample.SampleAcn
+Exception in thread "main" java.security.AccessControlException: 
+  access denied (
+  javax.security.auth.AuthPermission createLoginContext.Sample)
+</pre>
+
+<p>As you can see, you get an AccessControlException, because 
+we haven't created and used a policy file granting our code the permission that
+is required in order to be allowed to create a LoginContext.
+
+<p>Here are the complete steps required in order to be able to run our
+<code>SampleAcn</code> application with a security manager installed. 
+You can skip the
+first five steps if you have already done them, as described in
+<a href="#RunAc">Running the Code</a>. 
+
+<ol>
+
+<li>Place the following file into a directory:
+<p>
+
+<ul>
+<li>the
+<a href = "sample_jaas.config">sample_jaas.config</a> login configuration file 
+</ul>
+<p>
+
+<li>Create a subdirectory named "sample" of that top-level directory, and
+place the following into it (note the SampleAcn and
+MyCallbackHandler classes, both in <code>SampleAcn.java</code>,
+are in a package named <code>sample</code>):
+<p>
+
+<ul>
+<li>the <a href = "SampleAcn.java">SampleAcn.java</a> application 
+source file 
+</ul>
+<p>
+
+<li>Create a subdirectory of the "sample" directory and name it "module".
+Place the following into it (note the SampleLoginModule class is 
+in a package named <code>sample.module</code>):
+<p>
+
+<ul>
+<li>the <a href = "SampleLoginModule.java">SampleLoginModule.java</a> 
+source file 
+</ul>
+<p>
+
+<li>Create another subdirectory of the "sample" directory and name it 
+"principal". Place the following into it (note the 
+SamplePrincipal class is in a package named <code>sample.principal</code>):
+<p>
+
+<ul>
+<li>the <a href = "SamplePrincipal.java">SamplePrincipal.java</a> 
+source file 
+</ul>
+<p>
+
+<li>While in the top-level directory,
+compile <code>SampleAcn.java</code>, <code>SampleLoginModule.java</code>, 
+and <code>SamplePrincipal.java</code>:
+
+<blockquote>
+<pre>
+javac sample/SampleAcn.java sample/module/SampleLoginModule.java 
+sample/principal/SamplePrincipal.java 
+</pre>
+</blockquote>
+
+(Type all that on one line.)
+<p>
+
+<li>Create a JAR file containing <code>SampleAcn.class</code> and
+<code>MyCallbackHandler.class</code>:
+
+<blockquote>
+<pre>
+jar -cvf SampleAcn.jar sample/SampleAcn.class 
+sample/MyCallbackHandler.class
+</pre>
+</blockquote>
+
+<p>(Type all that on one line.)
+This command creates a JAR file, <code>SampleAcn.jar</code>, and
+places the <code>SampleAcn.class</code> and <code>MyCallbackHandler.class</code> 
+files inside it.
+
+<p>
+
+<li>Create a JAR file containing <code>SampleLoginModule.class</code>
+and <code>SamplePrincipal.class</code>:
+
+<blockquote>
+<pre>
+jar -cvf SampleLM.jar sample/module/SampleLoginModule.class 
+sample/principal/SamplePrincipal.class
+</pre>
+</blockquote>
+
+<p>
+
+<li>Create a policy file granting the required permissions.
+
+<p>The permission that is needed by code attempting to instantiate
+a LoginContext is a <code>javax.security.auth.AuthPermission</code> with target 
+"createLoginContext.&lt;entry name&gt;". Here, &lt;entry name&gt;
+refers to the name of the login configuration file entry that
+the application references in its instantiation of LoginContext.
+The name used by our <code>SampleAcn</code> application's LoginContext 
+instantiation is "Sample", as you can see in the code:
+
+<blockquote>
+<pre>
+LoginContext lc = 
+    new LoginContext("Sample", 
+          new MyCallbackHandler());
+</pre>
+</blockquote>
+
+<p>Thus, the permission that needs to be granted to <code>SampleAcn.jar</code> 
+is
+
+<blockquote>
+<pre>
+permission javax.security.auth.AuthPermission 
+  "createLoginContext.Sample";
+</pre>
+</blockquote>
+
+<p>The <code>SampleLM.jar</code> file also needs to be granted a permission.
+The documentation for a LoginModule should tell you what permissions it
+needs to be granted. In the case of SampleLoginModule, it needs 
+a <code>javax.security.auth.AuthPermission</code> with target
+"modifyPrincipals" in order to populate a Subject with a Principal:
+
+<blockquote>
+<pre>
+permission javax.security.auth.AuthPermission 
+  "modifyPrincipals";
+</pre>
+</blockquote>
+ 
+<p>Copy the policy file <a href = "sampleacn.policy">sampleacn.policy</a>
+to the same directory as that in which you stored <code>SampleAcn.java</code>, 
+etc. The policy file contains the following <code>grant</code> statement to
+grant <code>SampleAcn.jar</code> (in the current directory) 
+its required permission:
+
+<blockquote>
+<pre>
+grant codebase "file:./SampleAcn.jar" {
+   permission javax.security.auth.AuthPermission 
+                    "createLoginContext.Sample";
+};
+</pre>
+</blockquote>
+
+<p>The policy file also contains the following <code>grant</code> statement to
+grant <code>SampleLM.jar</code> (also in the current directory) 
+its required permission:
+
+<blockquote>
+<pre>
+grant codebase "file:./SampleAcn.jar" {
+   permission javax.security.auth.AuthPermission 
+                    "modifyPrincipals";
+};</pre>
+</blockquote>
+
+<p>Note: Policy files and the structure of entries within them
+are described in <a href = "../../PolicyFiles.html">
+Default Policy Implementation and Policy File Syntax</a>.
+Permissions are described 
+<a href = "../../permissions.html">here</a>.<p>
+
+<li>Execute the <code>SampleAcn</code> application, specifying <p>
+
+<ol>
+
+<li>by an appropriate <code>-classpath</code> clause that classes should be 
+searched for in the <code>SampleAcn.jar</code> and
+<code>SampleLM.jar</code> JAR files, <p>
+
+<li>by <code>-Djava.security.manager</code> that a
+security manager should be installed, <p>
+
+<li>by <code>-Djava.security.policy==sampleacn.policy</code> that
+the policy file to be used is <code>sampleacn.policy</code>, and <p>
+
+<li>by <code>-Djava.security.auth.login.config==sample_jaas.config</code> that 
+the login configuration file to be used is <code>sample_jaas.config</code>.
+
+</ol>
+
+<p>Below are the full commands to use for both Microsoft Windows and Unix systems.
+The only difference is that on Microsoft Windows systems you use semicolons to
+separate classpath items, while you use colons for that purpose on
+Unix systems. 
+
+<p>Here is the full command for Microsoft Windows systems:
+
+<blockquote>
+<pre>
+java -classpath SampleAcn.jar;SampleLM.jar 
+ -Djava.security.manager 
+ -Djava.security.policy==sampleacn.policy \
+ -Djava.security.auth.login.config==sample_jaas.config \
+ sample.SampleAcn
+</pre>
+</blockquote>
+
+<p>Here is the full command for UNIX systems:
+
+<blockquote>
+<pre>
+java -classpath SampleAcn.jar:SampleLM.jar 
+ -Djava.security.manager 
+ -Djava.security.policy==sampleacn.policy \
+ -Djava.security.auth.login.config==sample_jaas.config \
+ sample.SampleAcn
+</pre>
+</blockquote>
+
+<p>Type all that on one line. Multiple lines are used here for legibility.
+If the command is too long for your system, you may
+need to place it in a .bat file (for Microsoft Windows) or a .sh file
+(for UNIX) and then run that file to execute the command.
+
+<p>Since the specified policy file contains an entry granting the
+code the required permissions, execution should proceed without any
+exceptions indicating a required permission was not granted.
+You will be prompted for a user name and password
+(use  "testUser" and "testPassword"), and the SampleLoginModule  
+specified in the login configuration file will check the
+name and password. If your login is successful, you will see the 
+message "Authentication succeeded!" and if not, you will see
+"Authentication failed:" followed by a reason for the failure.
+
+
+</blockquote>
+
+
+</body>
+
+</html>
+

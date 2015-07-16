@@ -1,0 +1,126 @@
+<html>
+<head>
+<title>NIO Examples</title>
+</head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+
+
+<table summary="layout" width=100%>
+<tr>
+<td width=60>
+	<img src=../../../images/javalogo52x88.gif alt="Java logo">
+</td>
+<td align=center>
+
+           <h1>NIO Examples</h1>
+</td>
+<td align=right valign=top>
+    <font size=-1><a href="../../../index.html">Documentation Contents</a>
+    <br>
+    <a href="../index.html">NIO</a></font>
+</td>
+</tr>
+</table>
+
+<blockquote>
+
+The examples in the following table
+show how to use the NIO APIs.
+
+<p>
+<table summary="source files and descriptions" cellspacing=10>
+<tr>
+<th valign=top>
+<b>Source File</b>
+</th>
+<th valign=top>
+<b>Description</b>
+</th>
+</tr>
+
+<tr>
+<td valign=top>
+<code><a href="Grep.java">Grep.java</a></code>
+</td>
+<td valign=top>
+Searches a list of files for lines that match a given
+regular-expression pattern.
+Demonstrates NIO mapped byte buffers, charsets,
+and regular expressions.
+</td>
+</tr>
+
+<tr>
+<td valign=top>
+<code><a href="Sum.java">Sum.java</a></code>
+</td>
+<td valign=top>
+Computes 16-bit checksums for a list of files.
+Uses NIO mapped byte buffers for speed.
+</td>
+</tr>
+
+<tr>
+<td valign=top>
+<code><a href="TimeQuery.java">TimeQuery.java</a></code>
+</td>
+<td valign=top>
+Asks a list of hosts what time it is.
+Is a simple, blocking program that
+demonstrates NIO socket channels (connection and reading),
+buffer handling, charsets, and regular expressions.
+</td>
+</tr>
+
+<tr>
+<td valign=top>
+<code><a href="TimeServer.java">TimeServer.java</a></code>
+</td>
+<td valign=top>
+Listens for connections and tells callers what time it is.
+Is a simple, blocking program that
+demonstrates NIO socket channels (accepting and writing),
+buffer handling, charsets, and regular expressions.
+</td>
+</tr>
+
+<tr>
+<td valign=top>
+<code><a href="Ping.java">Ping.java</a></code>
+</td>
+<td valign=top>
+Connects to each of a list of hosts
+and measures the time required to complete the connection.
+Uses a selector and two additional threads
+to demonstrate non-blocking connects and
+the multithreaded use of a selector.
+</td>
+</tr>
+
+<tr>
+<td valign=top>
+<code><a href="NBTimeServer.java">NBTimeServer.java</a></code>
+</td>
+<td valign=top>
+Implements a non-blocking Internet time server.
+</td>
+</tr>
+
+</table>
+
+</blockquote>
+<p>
+<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<HR SIZE=3 NOSHADE>
+
+<IMG SRC="../../../images/javalogo52x88.gif" alt="Java logo" ALIGN=RIGHT>
+
+<FONT SIZE=-2>
+<A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 2001
+<A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+All Rights Reserved.</FONT>
+
+
+</BODY>
+</HTML>

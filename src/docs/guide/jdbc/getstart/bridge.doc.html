@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title></title>
+</head>
+<body bgcolor=#ffffff>
+
+
+<GettingStartedTOC.fm.html">[Top]</a> <a href="mapping.html">[Prev]</a> <a href="appendixA.html">[Next]</a> 
+<hr>
+<br>
+ 
+<a name="996747"></a>
+<h1> 9 - JDBC-ODBC Bridge Driver </h1>
+
+<h2>9.1	 &nbsp;&nbsp; Obtaining a JDBC Driver</h2>
+It is recommended that you obtain a commercial JDBC driver from a vendor
+such as your database vendor or your database middleware vendor. Check the 
+<a href="http://industry.java.sun.com/products/jdbc/drivers">list of 
+drivers currently available</a>.
+<P>The JDBC-ODBC Bridge driver is recommended only for experimental use or
+when no other alternative is available.
+
+<a name="997135"></a>
+<h2>9.2	 &nbsp;&nbsp; JDBC-ODBC Bridge</h2>
+<a name="996910"></a>
+ If possible, use a Pure Java JDBC driver instead of the Bridge and an ODBC driver. 
+This completely eliminates the client configuration required by ODBC. It also eliminates the potential that the Java VM could be corrupted by an error in the native 
+code brought in by the Bridge (that is, the Bridge native library, the ODBC driver 
+manager library, the ODBC driver library, and the database client library). 
+<P>The JDBC-ODBC Bridge driver is recommended for use in prototyping efforts
+and for cases where no other JDBC technology-based driver exists. If a
+commercial, all-Java JDBC driver is available, we recommend that it be
+used instead of the Bridge.
+<p>
+<a name="996913"></a>
+<h3>9.2.1	 &nbsp; &nbsp; What Is the JDBC-ODBC Bridge?  </h3>
+<a name="997016"></a>
+The JDBC-ODBC Bridge is a JDBC driver that implements JDBC operations by 
+translating them into ODBC operations. To ODBC it appears as a normal application program. The Bridge implements JDBC for any database for which an ODBC 
+driver is available. The Bridge is implemented as the <code>sun.jdbc.odbc</code> Java package 
+and contains a native library used to access ODBC. The Bridge is a joint 
+development of <a href="http://www.merant.com">Merant</a> and Java Software. 
+<p>
+<a name="996914"></a>
+<h3>9.2.2	 &nbsp; &nbsp; ODBC Compatibility and ODBC Versions Supported</h3>
+<a name="997019"></a>
+<P>
+On Solaris, the JDBC 2.0 bridge must be used with an ODBC 3.x driver manager. 
+The bridge supports both ODBC 2.x and ODBC 3.x drivers, but has been tested
+with only ODBC 3.x drivers.
+<P>
+On NT, the JDBC 2.0 bridge supports the ODBC 2.x and ODBC 3.x driver manager and
+drivers.  The JDBC 2.0 bridge has been tested only with an ODBC 3.x driver
+manager and with both ODBC 2.x and 3.x drivers.
+<P>
+Merant recommends that the JDBC 2.0 bridge be used with version 3.5 or
+higher of Merant's DataDirect ODBC drivers.
+
+<p>
+<a name="996915"></a>
+<h3>9.2.3	 &nbsp; &nbsp; The Bridge Implementation</h3>
+<a name="997026"></a>
+The Bridge is implemented in Java and uses Java native methods to call ODBC. 
+<p>
+<a name="996916"></a>
+<h3>9.2.4	 &nbsp; &nbsp; Installation</h3>
+<a name="997033"></a>
+The Bridge is installed automatically with the Java 2 SDK, Standard Edition,
+as package <code>sun.jdbc.odbc</code>.  See 
+your ODBC driver vendor for information on installing and configuring ODBC. No 
+special configuration is required for the Bridge. See your database vendor for client 
+installation and configuration information. On Solaris, some ODBC driver managers name their libs <code>libodbcinst.so</code> and <code>libodbc.so</code>. The Bridge expects these 
+libraries to be named <code>libodbcinst.so.1</code> and <code>libodbc.so.1</code>, so symbolic links for 
+these names must be created. 
+<p>
+<a name="996917"></a>
+<h2>9.3	 &nbsp;&nbsp; Using the Bridge </h2>
+<a name="997040"></a>
+The Bridge is used by opening a JDBC connection using a URL with the <code>odbc</code> subprotocol. See below for URL examples. Before a connection can be established, the 
+bridge driver class, <code>sun.jdbc.odbc.JdbcOdbcDriver</code>, must either be added to the 
+<code>java.lang.System</code> property named <code>jdbc.drivers</code>, or it must be explicitly loaded 
+using the Java class loader.  Explicit loading is done with the following line of code:     
+<p><pre><a name="996978"></a>    Class.forName("sun.jdbc.odbc.JdbcOdbcDriver"); 
+</pre><a name="996979"></a>
+When loaded, the ODBC driver (like all good JDBC drivers) creates an 
+instance of itself and registers this with the JDBC driver manager. 
+<p>
+
+<a name="996918"></a>
+<h3>9.3.1	 &nbsp; &nbsp; Using the Bridge from an Applet</h3>
+<a name="997093"></a>
+JDBC used with a Pure Java JDBC driver works well with applets. The Bridge 
+driver does not work well with applets. 
+<p>
+<a name="996919"></a>
+<h3>9.3.2	 &nbsp; &nbsp; Most Browsers Do Not Support the Bridge</h3>
+<a name="997100"></a>
+Since the Bridge is an optional component of the Java 2 SDK, Standard Edition,
+it may not be provided by a 
+browser. Even if it is provided, only trusted applets (those allowed to write to files) 
+will be able to use the Bridge. This is required in order to preserve the security of the 
+applet sandbox. Finally, even if the applet is trusted, ODBC and the DBMS client 
+library must be configured on each client. 
+<p>
+<a name="996920"></a>
+<h3>9.3.3	 &nbsp; &nbsp; Tested Configurations </h3>
+<a name="997107"></a>
+From Solaris, we have used the Bridge to access Oracle 8.1.5 using version
+3.5 of Merant's ODBC drivers.
+From NT, we have used the Bridge to access SQL Server 6.x using the latest
+ODBC driver from Microsoft. 
+<p>
+<a name="996921"></a>
+<h3>9.3.4	 &nbsp; &nbsp; ODBC Drivers Known to Work with the Bridge</h3>
+<a name="997114"></a>
+ODBC drivers are available for Oracle, Sybase, Informix, Microsoft SQL
+Server, and Ingres.  The MERANT ODBC driver suite 
+should be completely compatible with the JDBC-ODBC Bridge. 
+To evaluate or purchase 
+MERANT ODBC drivers, please contact MERANT DataDirect Sales at
+1-800-547-4000 Option 2 or via the World Wide Web at
+<code>http:\\www.merant.com</code>. 
+The MS SQL Server driver has also been used successfully on NT. Many other 
+ODBC drivers will likely work. 
+<p>
+<a name="996922"></a>
+<a name="996923"></a>
+<h3>9.3.5	 &nbsp; &nbsp; What Is the JDBC URL Supported by the Bridge? </h3>
+<a name="997123"></a>
+The Bridge driver uses the <code>odbc</code> subprotocol. URLs for this subprotocol are of the 
+form: 
+<p><pre><a name="997124"></a>    <code>jdbc:odbc:&lt;data-source-name&gt;[&lt;attribute-name&gt;=&lt;attribute-value&gt;]*
+</code></pre><a name="997125"></a>
+For example: 
+<p>
+<pre><a name="997006"></a>    jdbc:odbc:sybase
+<a name="997007"></a>    jdbc:odbc:mydb;UID=me;PWD=secret
+<a name="997013"></a>    jdbc:odbc:ora123;Cachesize=300
+</pre>
+<a name="996924"></a>
+<h3>9.3.6	 &nbsp; &nbsp; Debugging</h3>
+<a name="997077"></a>
+The Bridge provides extensive tracing when <code>DriverManager</code> tracing is enabled. The 
+following line of code enables tracing and sends it to standard out:    
+<p><pre><a name="997072"></a>     java.sql.DriverManager.setLogStream(java.lang.System.out);
+</pre>
+<a name="996927"></a>
+<p><a name="996877"></a>
+
+<p>
+<h2>9.4	 &nbsp;&nbsp; New JDBC 2.0 API Features Supported by the Bridge</h2>
+<P>
+The JDBC-ODBC Bridge driver in this release supports the following new features
+in the JDBC 2.0 API:
+<UL>
+<LI>batch updates
+<LI>updatable result sets
+<LI>scrollable result sets
+<LI>the new <code>BigDecimal</code> methods
+<LI>the new <code>Date</code>, <code>Time</code>, and
+<code>Timestamp</code> methods
+</UL>
+<P> The current release of the Bridge supports multi-threaded ODBC drivers
+and contains numerous bug fixes.
+
+
+
+<br>
+<hr> 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="mapping.html">[Prev]</a> <a href="appendixA.html">[Next]</a> 
+<p>
+
+<address>
+<a href="mailto:jdbc@wombat.eng.sun.com">jdbc@wombat.eng.sun.com</a>
+or
+<a href="mailto:jdbc-odbc@wombat.eng.sun.com">jdbc-odbc@wombat.eng.sun.com</a>
+</address>
+
+<font size="-1"><i><a href="../../../relnotes/SMICopyright.html">Copyright</a> &#169; 1996 - 1999 Sun Microsystems, Inc.   All rights reserved.</i></font>
+
+</body>
+</html>

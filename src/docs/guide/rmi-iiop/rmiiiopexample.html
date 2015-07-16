@@ -1,0 +1,1035 @@
+<HTML>
+<HEAD>
+   <TITLE>Getting Started Using RMI-IIOP: POA Model</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<!-- created by dcarson for j2se 1.4 -->
+
+<CENTER><H1>Getting Started Using RMI-IIOP:<BR>
+     Example Using POA-based server-side model</H1></CENTER>
+
+<HR>
+
+<P>This tutorial shows you the steps to follow to create a distributed
+version of the classic "Hello World" program using Java<sup><font
+size=-2>TM</font></sup> Remote Method Invocation (RMI) over Internet Inter-ORB Protocol 
+(IIOP). RMI-IIOP adds CORBA (Common Object Request Broker Architecture) 
+   capability to  Java RMI, providing standards-based interoperability and 
+   connectivity to many other programming languages and platforms. RMI-IIOP enables 
+   distributed Web-enabled Java applications to transparently invoke operations on 
+   remote network services using the industry standard IIOP  defined by the Object
+   Management Group.
+   Runtime components include a Java ORB for distributed
+   computing using IIOP communication.
+   
+
+
+<P><a href="index.html">RMI-IIOP</a> is for 
+Java programmers who want to program to the RMI interfaces, but use IIOP as the 
+underlying transport.  RMI-IIOP provides interoperability with other CORBA 
+objects implemented in various languages - but only if all the remote interfaces 
+are originally defined as Java RMI interfaces.  It is of particular interest to 
+programmers using Enterprise JavaBeans (EJB), since the remote object model for 
+EJBs is RMI-based.   
+
+ <P>Another option for creating distributed applications is <a 
+href="../idl/index.html">Java<sup><font
+size=-2>TM</font></sup> IDL</a>.  Java IDL is for CORBA programmers who want to 
+program in the Java programming 
+language based on interfaces defined in CORBA Interface Definition Language 
+(IDL).  This is "business as usual" CORBA programming, supporting Java in exactly 
+the same way as other languages like C++ or COBOL.
+<p>
+<hr>
+<h1>Tutorial: The Hello World Application</h1>
+
+<P>The distributed Hello World example uses a client application to make a remote
+method call via IIOP to a server, running on the host from which the client
+was downloaded. When the client runs, "Hello World!" is displayed.
+
+<P>This tutorial is organized as follows:
+<OL>
+	<LI>
+	<A HREF="#7738">The steps to write the source files</A>
+
+	<LI>
+	<A HREF="#7437">The steps to compile the class files</A>
+
+	<LI>
+	<A HREF="#7445">The steps to start the Naming Service, server,
+	and client</A>
+</OL>
+
+
+
+
+
+<HR>
+
+<A NAME="7738"></A>
+<H1>Write the Source Files</H1>
+
+
+
+<P>There are three tasks to complete in this section:
+<OL>
+	<LI>
+	<A HREF="#5174">Define the functions of the remote class as an
+	interface written in the Java programming language</A>
+
+	<LI>
+	<A HREF="#5182">Write the implementation class</A>
+	
+	<LI>
+	<A HREF="#server">Write the server class</A>
+
+	<LI>
+	<A HREF="#5228">Write a client program that uses the remote
+	service</A>
+</OL>
+
+The source files created in this tutorial are:
+<UL>
+	<LI> <A HREF="#5180"> <code>HelloInterface.java</code></A> -  a remote
+	interface
+
+	<LI> <code><A HREF="#5192">HelloImpl.java</A></code> -  a
+	remote object implementation that implements
+	<code>HelloInterface</code>
+	
+	<LI> <code><a href="#helloserver">HelloServer.java</a></code> - an RMI server
+	 that creates an instance of the remote object implementation and binds that
+	 instance to a name in the Naming Service
+
+	<LI><code><A HREF="#5235">HelloClient.java</A></code> -  a
+	client application that invokes the remote method, <code>sayHello()</code>
+
+	
+</UL>
+
+
+<A NAME="5174"></A><h2>Define the functions of the remote
+class as an interface written in the Java programming language</h2>
+
+In the Java programming language, a remote object is an instance of a
+class that implements a <code>Remote</code> interface. Your remote
+interface will declare each of the methods that you would like to call
+from other machines.  Remote interfaces have the following characteristics:
+<UL>
+	<LI>
+	The remote interface must be declared <code>public</code>.
+	Otherwise, a client will get an error when attempting to load a
+	remote object that implements the remote interface, unless that
+	client is in the same package as the remote interface.
+
+	<LI>
+	The remote interface extends the <code>java.rmi.Remote</code>
+	interface.
+
+	<LI>
+	Each method must declare <code>java.rmi.RemoteException</code>
+	(or a superclass of <code>RemoteException</code>) in its
+	<code>throws</code> clause, in addition to any
+	application-specific exceptions.
+	
+	<LI>
+	The data type of any <i>remote</i> object that is passed as an
+	argument or return value (either directly or embedded within a
+	local object) must be declared as the <i>remote interface
+	type</i> (for example, <code>HelloInterface</code>) not the
+	implementation class (<code>HelloImpl</code>).
+
+</ul>
+
+<P>For this example, create all of the source files in the same directory, for example,
+<code>$HOME/mysrc/helloWorld</code>.  Here is the interface definition for the remote 
+interface,
+<code>HelloInterface</code>.  The interface contains just one
+method, <code>sayHello</code>:
+
+<ul>
+<pre><A NAME="5180"></A>
+//<b>HelloInterface.java</b>
+import java.rmi.Remote;
+
+public interface HelloInterface extends java.rmi.Remote {
+  public void sayHello() throws java.rmi.RemoteException;
+}
+</pre>
+</ul>
+
+Because remote method invocations can fail in very different ways from
+local method invocations (due to network-related communication problems
+and server problems), remote methods will report communication failures
+by throwing a <code>java.rmi.RemoteException</code>.
+If you want
+more information on failure and recovery in distributed systems, you
+may wish to read <I> <A
+HREF="http://research.sun.com/techrep/1994/abstract-29.html"> A Note on
+Distributed Computing</A></I>.
+
+<a name="5182">
+<h2>Write The Implementation Class</h2>
+
+<P>At a minimum, a remote object implementation class, <code>HelloImpl.java</code>
+ must:
+
+<UL>
+	<LI>
+	<A HREF="#5193">Declare that it implements at least one remote
+	interface</A>
+
+	<LI>
+	<A HREF="#5864">Define the constructor for the remote object</A>
+
+	<LI>
+	<A HREF="#5866">Provide implementations for the methods that
+	can be invoked remotely</A>
+</UL>
+
+
+An explanation of each of the preceding steps follows the source
+for <code>HelloImpl.java:</code>
+<A NAME="5192"></A>
+<ul><pre>
+//<b>HelloImpl.java</b>
+import javax.rmi.PortableRemoteObject;
+
+public class HelloImpl extends PortableRemoteObject implements HelloInterface {
+  public HelloImpl() throws java.rmi.RemoteException {
+    super();     // invoke rmi linking and remote object initialization
+  }
+
+  public void sayHello() throws java.rmi.RemoteException {
+    System.out.println( "It works!  Hello World!!" );
+  }
+}
+</pre></ul>
+
+
+<A NAME="5193"></A><h3>Implement a remote interface</h3>
+
+<p>In the Java programming language, when a class declares that it
+implements an interface, a contract is formed between the class and the
+compiler. By entering into this contract, the class is promising that
+it will provide method bodies, or definitions, for each of the method
+signatures declared in that interface. Interface methods are implicitly
+<code>public </code>and <code>abstract</code>, so if the implementation
+class doesn't fulfill its contract, it becomes <I>by definition</I> an
+<code>abstract</code> class, and the compiler will point out this fact
+if the class was not declared <code>abstract</code>.
+
+<P>The implementation class in this example is
+<code>HelloImpl</code>.  The implementation class
+declares which remote interface(s) it is implementing.  Here is the
+<code>HelloImpl</code> class declaration:
+
+<A NAME="5194"></A>
+<pre>
+  public class HelloImpl extends PortableRemoteObject
+    implements HelloInterface{
+</pre>
+
+As a convenience, the implementation class can extend a remote class,
+which in this example is
+<code>javax.rmi.PortableRemoteObject</code>. By extending
+<code>PortableRemoteObject</code>, the <code>HelloImpl</code> class can
+be used to create a remote object that  uses IIOP-based transport for communication.  
+
+<!-- 
+<P>Another option is to extend <tt>UnicastRemoteObject</tt>.  Extending <tt>UnicastRemoteObject</tt> without using the Portable Object Adapter enables you to use either JRMP or IIOP for the transport protocol.  You can use a runtime switch to determine which transport protocol is used.
+-->
+
+
+
+
+<P><A NAME="5864"></A><h3>Define the constructor for the remote
+object</h3>
+
+The constructor for a remote class provides the same functionality as
+the constructor for a non-remote class: it initializes the variables of
+each newly created instance of the class, and returns an instance of
+the class to the program which called the constructor.
+
+<P>In addition, the remote object instance will need to be "exported".
+Exporting a remote object makes it available to accept incoming remote
+method requests, by listening for incoming calls to the remote object
+on an anonymous port. When you extend
+<code>javax.rmi.PortableRemoteObject</code>, your class will be
+exported automatically upon creation.
+
+
+<P>Because the object export could potentially throw a
+<code>java.rmi.RemoteException</code>, you <I>must</I> define a
+constructor that throws a <code>RemoteException</code>, even if the
+constructor does nothing else. If you forget the constructor,
+<code>javac</code> will produce the following error message:
+
+<pre>
+	HelloImpl.java:3: unreported exception java.rmi.RemoteException; must be
+	caught or declared to be thrown. 
+        
+        public class HelloImpl extends PortableRemoteObject implements HelloInterface{
+               ^ 
+        1 error
+</pre>
+
+<B>To review:</B><I> The implementation class for a remote object needs
+to:</I>
+<UL>
+	<LI>
+	<I>Implement a remote interface</I>
+	
+	<LI>
+	<I>Export the object so that it can accept incoming remote
+	method calls</I>
+	
+	<LI>
+	<I>Declare its constructor(s) to throw at least a
+	</I><code>java.rmi.RemoteException</code>
+</UL>
+
+Here is the constructor for the <code>HelloImpl</code>
+class:
+<pre>
+  public HelloImpl() throws java.rmi.RemoteException { 
+    super(); 
+  }</pre>
+
+Note the following:
+<UL>
+	<LI>
+	The <code>super</code> method call invokes the no-argument
+	constructor of
+	<code>javax.rmi.PortableRemoteObject</code>, which exports
+	the remote object.
+	
+	<LI>
+	The constructor must throw
+	<code>java.rmi.RemoteException</code>, because RMI's attempt to
+	export a remote object during construction might fail if
+	communication resources are not available.
+</UL>
+<p> If you are interested in why <code>java.rmi.RemoteException</code>
+is a checked exception rather than runtime exception, please refer to
+the archives of the rmi-users email list:<P><a 
+href="http://java.sun.com/products/jdk/rmi/archives/3490.html"><code>
+http://java.sun.com/products/jdk/rmi/archives/3490.html</code></a>
+<p>
+Although the call to the superclass's no-argument constructor,
+<code>super()</code>, occurs by default (even if omitted), it is
+included in this example to make clear the fact that the superclass 
+will be constructed before the class.
+
+<P><A NAME="5866"></A>
+<h3>Provide an implementation for each remote method</h3>
+
+The implementation class for a remote object contains the code that
+implements each of the remote methods specified in the remote
+interface.  For example, here is the implementation for the
+<code>sayHello()</code> method, which returns the string "It works! Hello World!!"
+to the caller:
+
+<pre>
+  public void sayHello() throws java.rmi.RemoteException {
+    System.out.println( "It works!  Hello World!!" );
+  }
+</pre>
+
+Arguments to, or return values from, remote methods can be any data
+type for the Java platform, including objects, as long as those objects
+implement the interface <code>java.io.Serializable</code>. Most of the
+core classes in <code>java.lang</code> and <code>java.util</code>
+implement the <code>Serializable</code> interface.  In RMI:
+<UL>
+	<LI>
+	By default, local objects are passed by copy, which means that
+	all data members (or fields) of an object are copied, except
+	those marked as <code>static</code> or <code>transient</code>.
+	Please refer to the <A
+	HREF="../serialization/spec/serialTOC.doc.html"><i>Java Object
+	Serialization Specification</i></A> for information on how to alter
+	the default serialization behavior.
+	
+	<LI>
+	Remote objects are passed by reference. A reference to a remote
+	object is actually a reference to a stub, which is a
+	client-side proxy for the remote object. Stubs are described
+	fully in the <A HREF="../rmi/spec/rmiTOC.html "><i>Java Remote
+	Method Invocation Specification</i></A>. We'll create them
+	later in this tutorial in the section:<A HREF="#5287"><i> Use
+	<code>rmic</code> to generate stubs and skeletons</i></A>.
+
+</UL>
+
+
+<A NAME="server"></A>
+<H2>Write The Server Class</H2>
+
+<P>A server class is the class which has a
+<code>main</code> method that creates an instance of the remote object
+implementation, and binds that instance to a name in the
+Naming Service. The class that contains this
+<code>main</code> method could be the implementation class itself, or
+another class entirely.
+
+<P>In this example, the <code>main</code> method is part of
+<code>HelloServer.java</code>, which does the following:
+<UL>
+	<LI>
+	<A HREF="#5872">Creates a Portable Object Adapter (POA) with the
+	appropriate policies</A>
+	
+	<LI>
+	<A HREF="#poamanager">Activates the POA Managers</A>
+	
+	<LI>
+	<A HREF="#instantiate">Creates an instance of the servant and
+	activates the Tie, creates an instance of a remote object</A>
+		
+	<LI>
+	<A HREF="#5908">Publishes the object reference</A>
+
+	<LI>
+	<A HREF="#5912">Prepares to accept requests from the client
+	</A>
+</UL>
+
+An explanation of each of the preceding steps follows the source
+for <code>HelloServer.java:</code>
+<a name="helloserver"></a>
+<P>
+<UL><PRE>
+//<b>HelloServer.java</b>
+import javax.naming.InitialContext;
+import javax.naming.Context;
+import javax.rmi.PortableRemoteObject ;
+import com.sun.corba.se.internal.POA.POAORB;
+import org.omg.PortableServer.*;
+import java.util.*;
+import org.omg.CORBA.*;
+import javax.rmi.CORBA.Stub;
+import javax.rmi.CORBA.Util;
+
+public class HelloServer {
+  public HelloServer(String[] args) {
+    try {
+      Properties p = System.getProperties();
+      // add runtime properties here
+      p.put("org.omg.CORBA.ORBClass", 
+          "com.sun.corba.se.internal.POA.POAORB");
+      p.put("org.omg.CORBA.ORBSingletonClass", 
+          "com.sun.corba.se.internal.corba.ORBSingleton");
+
+      ORB orb = ORB.init( args, p );
+
+      POA rootPOA = (POA)orb.resolve_initial_references("RootPOA");
+
+      // STEP 1: Create a POA with the appropriate policies
+      Policy[] tpolicy = new Policy[3];
+      tpolicy[0] = rootPOA.create_lifespan_policy(
+        LifespanPolicyValue.TRANSIENT );
+      tpolicy[1] = rootPOA.create_request_processing_policy(
+        RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY );
+      tpolicy[2] = rootPOA.create_servant_retention_policy(
+        ServantRetentionPolicyValue.RETAIN);
+      POA tPOA = rootPOA.create_POA("MyTransientPOA", null, tpolicy);
+          
+      // STEP 2: Activate the POA Manager, otherwise all calls to the
+      // servant hang because, by default, POAManager will be in the 
+      // HOLD state.
+      tPOA.the_POAManager().activate();
+
+      // STEP 3: Instantiate the Servant and activate the Tie, If the
+      // POA policy is USE_ACTIVE_OBJECT_MAP_ONLY
+      HelloImpl helloImpl = new HelloImpl();
+      _HelloImpl_Tie tie = (_HelloImpl_Tie)Util.getTie( helloImpl );
+      String helloId = "hello";
+      byte[] id = helloId.getBytes();
+      tPOA.activate_object_with_id( id, tie );
+
+
+      // STEP 4: Publish the object reference using the same object id
+      // used to activate the Tie object.
+      Context initialNamingContext = new InitialContext();
+      initialNamingContext.rebind("HelloService", 
+        tPOA.create_reference_with_id(id, 
+          tie._all_interfaces(tPOA,id)[0]) );
+      System.out.println("Hello Server: Ready...");
+      
+      // STEP 5: Get ready to accept requests from the client
+      orb.run();
+    } 
+      catch (Exception e) {
+        System.out.println("Problem running HelloServer: " + e);
+        e.printStackTrace();
+      } 
+  }
+
+
+  public static void main(String args[]) {
+    new HelloServer( args );
+  }
+}
+</PRE></UL>
+<P>
+
+
+
+
+
+
+<A NAME="5872"></A><h3>Create a Portable Object Adapter (POA) with the
+	appropriate policies</h3>
+
+The <code>main</code> method of the server first needs to create a <a href="../idl/POA.html">Portable 
+Object Adapter (POA)</a> with the appropriate policies. For example:
+
+<pre>
+      Policy[] tpolicy = new Policy[3];
+      tpolicy[0] = rootPOA.create_lifespan_policy(
+        LifespanPolicyValue.TRANSIENT );
+      tpolicy[1] = rootPOA.create_request_processing_policy(
+        RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY );
+      tpolicy[2] = rootPOA.create_servant_retention_policy(
+        ServantRetentionPolicyValue.RETAIN);
+      POA tPOA = rootPOA.create_POA("MyTransientPOA", null, tpolicy);
+</pre>
+
+<P>The Portable Object Adaptor (POA) is designed to provide an object adapter that can be used with multiple ORB implementations with a minimum of rewriting needed to deal with different vendors' implementations.  POA support is new in J2SE version 1.4.
+
+<P>The POA is also intended to allow persistent objects -- at least, from the client's perspective. That is, as far as the client is concerned, these objects are always alive, and maintain data values stored in them, even though physically, the server
+ may have been restarted many times, or the implementation may be provided by many different object implementations. 
+
+<P>The POA allows the object implementor a lot more control. Previously, the implementation of the object was responsible only for the code that is executed in response to method requests. Now, additionally, the implementor has more control
+over the object's identity, state, storage, and lifecycle.
+
+
+<P>In this example, the policy values include:
+
+<P>
+<UL>
+<LI>The <code>LifespanPolicyValue</code> can have the following values:
+	<UL>
+	 <LI><code>TRANSIENT</code> - The objects implemented in the POA 
+	  cannot outlive the POA instance in which they are 
+	  first created. 
+	 <LI><code>PERSISTENT</code> - The objects implemented in the POA can 
+	  outlive the process in which they are first created.
+	 </UL>
+	 <P>
+	 
+<LI>The  <code>RequestProcessingPolicyValue</code> can have the following
+	  values:  
+	  <UL>
+	  <LI><code>USE_ACTIVE_OBJECT_MAP_ONLY</code> - If the object ID 
+	  is not found in the Active Object Map, 
+	  an <code>OBJECT_NOT_EXIST</code> exception is returned to the 
+	  client. The <code>RETAIN</code> policy is also required.
+	  <LI><code>USE_DEFAULT_SERVANT</code> - If the object ID is not found in 
+	  the Active Object Map or the <code>NON_RETAIN</code> policy is 
+	  present, and a default servant has been registered 
+	  with the POA using the <code>set_servant</code> operation, 
+	  the request is dispatched to the default servant. 
+	  <LI><code>USE_SERVANT_MANAGER</code> - If the object ID is not found 
+	  in the Active Object Map or the <code>NON_RETAIN</code> policy 
+	  is present, and a servant manager has been registered 
+	  with the POA using the <code>set_servant_manager</code> operation, 
+	  the servant manager is given the opportunity to 
+	  locate a servant or raise an exception. 
+	  </UL><P>
+	  
+<LI>The <code>ServantRetentionPolicyValue</code> can have the following 
+	  values. 
+	  <UL>
+	  <LI><code>RETAIN</code> - to indicate that the POA will retain 
+	  active servants in its Active Object Map. If no
+	  <code>ServantRetentionPolicy</code> is specified at 
+	  POA creation, the default is <code>RETAIN</code>.
+	  <LI><code>NON_RETAIN</code> - to indicate Servants are not retained by 
+	  the POA. 
+	  </UL>
+</UL>
+
+<P>For more information on POA policies, refer to Chapter 11, <em>Portable Object Adapter</em> of the CORBA/IIOP 2.3.1 Specification at <a href="http://www.omg.org/cgi-bin/doc?formal/99-10-07">http://www.omg.org/cgi-bin/doc?formal/99-10-07</a>
+
+
+<P><A NAME="poamanager"></A>
+<h3>Activate the POA Managers</H3>
+
+<P>Each POA object has an associated <code>POAManager</code> object. 
+ A POA Manager may be associated with one or more 
+ POA objects. A POA Manager encapsulates the processing 
+ state of the POAs it is associated with.  In this step, the POA Manager
+ is activated.  If this step is missing, all calls to the <code>Servant</code> would
+ hang because, by default, the POA Manager will be in the <code>HOLD</code> state.
+<P>
+<PRE>
+      tPOA.the_POAManager().activate();
+</PRE>
+
+<P><A NAME="instantiate"></A>
+<h3>Create an instance of a remote object and activate the Tie</h3>
+
+The <code>main</code> method of the server needs to create an
+instance of the remote object implementation, or <em>Servant</em>.  For example:
+<pre>
+    HelloImpl helloImpl = new HelloImpl();</pre>
+
+The constructor exports the remote object, which means that once created,
+the remote object is ready to accept incoming calls.
+
+<P>When using RMI-IIOP technology, your implementations use delegation (known as the Tie 
+model) to associate your implementation with the interface.  When you create an instance
+of your implementation, as above, you also need to create a Tie object to associate it 
+with a CORBA interface.  The next few lines of code activate the Tie, but only if the POA 
+policy is <code>USE_ACTIVE_OBJECT_MAP_ONLY</code>.
+<P>
+<pre>
+      _HelloImpl_Tie tie = (_HelloImpl_Tie)Util.getTie( helloImpl );
+      String helloId = "hello";
+      byte[] id = helloId.getBytes();
+      tPOA.activate_object_with_id( id, tie );
+</pre>
+
+<P>
+
+<a name="5908">
+<h3>Publish the object reference using the same object id used to activate the Tie 
+object</h3>
+
+For a caller (client, peer, or client application) to be able to invoke a method
+on a remote object, that caller must first obtain a reference to the remote
+object.
+
+<P>Once a remote object is registered on the server, callers can look up
+the object by name (using a naming service), obtain a remote object reference, and then remotely invoke methods on the object.  In this example, we use the <a href="../idl/orbd.html">Object Request Broker Daemon</a> (<code>orbd</code>), which is a daemon process containing a Bootstrap Service, a Transient Naming Service, a Persistent Naming Service, and a Server Manager. 
+
+
+<P>For example, the following code binds the name "HelloService" to a reference
+for the remote object:
+<P>
+<pre>
+      Context initialNamingContext = new InitialContext();
+      initialNamingContext.rebind("HelloService", 
+        tPOA.create_reference_with_id(id, 
+          tie._all_interfaces(tPOA,id)[0]) );
+      System.out.println("Hello Server: Ready...");
+</pre>
+<p>
+Note the following about the arguments to the <code>rebind </code>method call:
+<UL>
+	<LI>
+	The first argument, <code>"HelloService"</code>, is a 
+	<code>java.lang.String</code>, representing the name of the remote object to bind
+	
+	<p>
+	<LI>The second argument, <code>tPOA.create_reference_with_id(id, 
+          tie._all_interfaces(tPOA,id)[0]</code> is the object id of the remote object
+           to bind
+</UL>
+
+<a name="5912">
+<h3>Prepare to accept requests from the client</h3>
+
+The following line of code, when called by
+the main thread, enables the ORB to perform work using the
+ main thread. 
+
+<P>
+<pre>
+      orb.run();
+</pre>
+
+
+<p>
+<A NAME="5228"></A>
+<h2>Write a client program that uses the remote service</h2>
+
+<P>The client application in this example remotely invokes the
+<code>sayHello</code> method in order to get the string "Hello World!"
+to display when the client application runs. Here is the code for the client application:
+
+<ul><A NAME="5235"></A>
+<pre>
+//<b>HelloClient.java</b>
+import java.rmi.RemoteException;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import javax.rmi.*;
+import java.util.Vector;
+import javax.naming.NamingException;
+import javax.naming.InitialContext;
+import javax.naming.Context;
+
+public class HelloClient {
+
+  public static void  main( String args[] ) {
+    Context ic;
+    Object objref;
+    HelloInterface hi;
+
+    try {
+      ic = new InitialContext();
+    } catch (NamingException e) {
+        System.out.println("failed to obtain context" + e);
+        e.printStackTrace();
+        return;
+    }
+        
+    // STEP 1: Get the Object reference from the Name Service
+    // using JNDI call.
+    try {
+      objref = ic.lookup("HelloService");
+      System.out.println("Client: Obtained a ref. to Hello server.");
+    } catch (NamingException e) {
+        System.out.println("failed to lookup object reference");
+        e.printStackTrace();
+        return;
+    }
+
+    // STEP 2: Narrow the object reference to the concrete type and
+    // invoke the method.
+    try {
+      hi = (HelloInterface) PortableRemoteObject.narrow(
+        objref, HelloInterface.class);
+      hi.sayHello();
+    } catch (ClassCastException e) {
+        System.out.println("narrow failed");
+        e.printStackTrace();
+        return;
+      } catch( Exception e ) {
+            System.err.println( "Exception " + e + "Caught" );
+            e.printStackTrace( );
+            return;
+        }
+  }
+}
+</pre></ul>
+
+<P>
+	First, the client application gets a reference to the remote object 
+	implementation (advertised as "HelloService") from the Name Service using Java
+	Naming and Directory Interface [TM] (JNDI) 
+	calls. Like the <code>Naming.rebind</code> method, 
+	the <code>Naming.lookup</code> method takes <code>java.lang.String</code>
+	value representing the name of the object to look up. 
+	You supply <tt>Naming.lookup()</tt> the name of the object you want
+	to look up, and it returns the object bound to that name.  
+	<UL>
+	<LI><tt>Naming.lookup()</tt> takes care of these tasks:
+		<UL>
+			<LI>
+			The Name Service returns the
+			<code>_HelloImpl_Stub</code> instance bound to
+			that name
+
+			<LI>
+			The <code>lookup</code> method receives the
+			remote object's
+			(<code>HelloImpl</code>) stub instance and
+			loads the stub class
+			(<code>_HelloImpl_Stub</code>)
+			<LI> <code>Naming.lookup </code>returns the stub 
+			to its caller (<code>HelloClient</code>)
+	</UL>
+	<p>
+
+	<LI>
+	The client application invokes the remote <code>sayHello()</code> method on
+	the server's remote object, causing the
+	string "It works! Hello World!!" to be displayed on the command line.
+</UL>
+
+
+
+
+
+
+<HR>
+<A NAME="7437"></A>
+<H1>Compile Class Files</H1>
+
+The source code for this example is now complete and the
+ directory contains four files:
+<UL>
+	<LI>
+	<code>HelloInterface.java</code> contains the source code for the
+	remote interface
+
+	<LI>
+	<code>HelloImpl.java</code> contains the source code for the
+	 remote object implementation 
+	 
+	 <LI><code>HelloServer.java</code> contains the source code for the 
+	server 
+
+	<LI>
+	<code>HelloClient.java</code> contains the source code for the client
+	 application
+
+	
+</UL>
+
+In this section, you compile the remote object implementation file, 
+<code>HelloImpl.java</code>, in order to
+create the <code>.class</code> files needed to run <code>rmic</code>.
+ You then run the <code>rmic</code>
+compiler to create stubs and skeletons. A stub is a client-side proxy
+for a remote object which forwards RMI-IIOP calls to the server-side
+dispatcher, which in turn forwards the call to the actual remote object
+implementation. The last task is to compile the remaining <code>.java</code> source files to create <code>.class</code> files.
+
+<P>The following tasks will be completed in this section:
+<P><OL>
+	<LI>
+	<A HREF="#compileimpl">Compile the remote object implementation</A>
+	
+	<LI>
+	<A HREF="#5287">Use <code>rmic</code> to generate stubs and
+	skeletons</A>
+	
+	<LI>
+	<A HREF="#5284">Compile the source files</A>
+</OL>
+
+
+<A NAME="compileimpl"></A>
+<H2>Compile the remote object implementation</H2>
+
+<P>To create stub and skeleton files, the <code>rmic</code> compiler must be
+run on the fully-qualified package names of compiled class files that contain
+remote object implementations.  In this example, the file that contains the remote
+object implementations is <code>HelloImpl.java</code>.  In order to generate the
+stubs and skeletons, we must first compile <code>HelloImpl.java</code>, as follows:
+
+<P>
+<pre>
+    javac -d . -classpath . HelloImpl.java
+</pre>
+
+<P>The "<code>-d .</code>" option indicates that the generated files should be 
+placed in the directory from which you are running the compiler.  The "<code>-classpath .</code>" option indicates that files on which <code>HelloImpl.java</code> is dependent can be found in this directory.
+
+<A NAME="5287"></A>
+<H2>Use <code>rmic </code>to generate skeletons and stubs</H2>
+
+To create CORBA-compatible stub and skeleton files, run the <code>rmic</code>
+ compiler  with the <code>-poa -iiop</code> option. The <code>rmic&nbsp;-poa&nbsp;-iiop</code> 
+ command takes one
+or more class names as an argument and produces class files of the form
+<code>_MyImpl_Tie.class</code> and <code>_MyInterface_Stub.class</code>.  The remote
+implementation file, <code>HelloImpl.class</code>, is the class name to pass in 
+this example.
+
+
+<P>For an explanation of
+<code>rmic</code> options, refer to the <A
+HREF="../../tooldocs/solaris/rmic.html">Solaris Operating Environment
+ <code>rmic</code>&nbsp; manual page</A> or the <A
+ HREF="../../tooldocs/windows/rmic.html"> Microsoft Windows <code>rmic</code> manual
+page</A>.
+
+<P>To create the stub and skeleton for the
+<code>HelloImpl</code> remote object implementation, run
+<code>rmic</code> like this:
+<p>
+<pre>
+    rmic -poa -iiop HelloImpl
+</pre>
+<p>
+The preceding
+command creates the following files:
+<UL>
+	<LI>
+	<code>_HelloInterface_Stub.class</code> - the client stub
+
+
+	<LI>
+	<code>_HelloImpl_Tie.class</code> - the server skeleton
+
+</UL>
+
+
+
+<A NAME="5284"></A>
+
+<H2>Compile the source files</H2>
+
+
+<P>To compile the source files, run the <code>javac</code> command
+as follows:
+<P>
+<pre>
+    javac -d . -classpath . HelloInterface.java HelloServer.java HelloClient.java
+</pre>
+<p>
+This command creates the class files <code>HelloInterface.class</code>,
+<code>HelloServer.class</code>, and <code>HelloClient.class</code>. These
+are the remote interface, the server, and the client application
+respectively.  For an explanation of <code>javac</code> options, you
+can refer to the <A HREF="../../tooldocs/solaris/javac.html">Solaris
+<code>javac</code> manual page</A> or the <A
+HREF="../../tooldocs/windows/javac.html"> Microsoft Windows <code>javac</code> manual
+page</A>.
+
+
+
+
+<hr>
+
+
+<A NAME="7445"></A>
+<H1>Start the Naming Service, server, and client application</H1>
+
+The following tasks will be completed in this section:
+<OL>
+	<LI>
+	<A HREF="#5522">Start the Naming Service</A>
+
+	<LI>
+	<A HREF="#5321">Start the server</A>
+
+	<LI>
+	<A HREF="#5326">Run the client application</A>
+</OL>
+
+
+
+<A NAME="5522"></A>
+<H2>Start the Naming Service</H2>
+
+For this example, we will use the Object Request Broker Daemon, <code>orbd</code>, which includes both a
+Transient and a Persistent Naming Service, and is available with every download of J2SE 1.4 and higher.   
+
+<P>For a caller (client, peer, or client application) to be able to invoke a method
+on a remote object, that caller must first obtain a reference to the remote
+object.
+
+	
+<P>Once a remote object is registered on the server, callers can look up
+the object by name, obtain a remote object reference, and then remotely
+invoke methods on the object.
+
+<P>To start the Naming Service, run 
+<code>orbd</code> from the command line. This command produces no output and
+is typically run in the background.  For more on the
+<code>orbd</code> tool, you can refer to the <A
+HREF="../idl/orbd.html"><code>orbd</code>  manual page</A>.
+
+<P>For this example, on the Solaris operating system:
+<P>
+<pre>
+    orbd -ORBInitialPort 1060&
+</pre>
+
+<P>or, on the Microsoft Windows operating system:
+<P>
+<pre>
+    start orbd -ORBInitialPort 1060
+</pre>
+
+<P>You must specify a port on which to run <code>orbd</code>. 
+For this example the port of <code>1060</code> is chosen because in the
+Solaris operating environment, a user must become root to start a process
+on a port under 1024.  
+
+<p>
+<I>You must stop and restart the server any time you modify a remote
+interface or use modified/additional remote interfaces in a remote object
+implementation. Otherwise, the type of the object reference bound in the
+Naming Service will not match the modified class.</I>
+
+<A NAME="5321"></A>
+<H2> Start the server</H2>
+
+<P>Open another terminal window and change to the directory containing the
+source files for this example. The command for running
+the client has been spread out below to make it easier to read, but should be typed without returns between the lines. The following command shows how to start the <code>HelloServer</code> server. Of course, if you used a port other than 1060 or
+a host other than localhost when starting the <code>orbd</code> tool, replace those 
+values in the command below with the actual values used to start <code>orbd</code>.
+
+<p>
+<pre>
+    java 
+      -classpath . 
+      -Djava.naming.factory.initial=com.sun.jndi.cosnaming.CNCtxFactory
+      -Djava.naming.provider.url=iiop://localhost:1060 
+      HelloServer &
+</pre>
+
+<P>For an explanation of <code>java</code> options, you can refer to the
+<A HREF="../../tooldocs/solaris/java.html"> Solaris
+<code>java</code> manual page </A> or the <A
+HREF="../../tooldocs/windows/java.html"> Microsoft Windows <code>java</code>
+manual page</A>.
+
+
+<P>The output should look like this:
+
+<P>
+<pre>
+Hello Server: Ready ...
+</pre>
+
+
+<A NAME="5326"></A>
+<H2>Run the client application</H2>
+Once the Naming Service and server are running, the client application can be run. 
+From a new terminal window, go to the source code directory, and run the
+client application from the command line, as shown below.  The command for running
+the client has been spread out below to make it easier to read, but should be typed without returns between the lines.  Of course, if you used a port other than 1060 or
+a host other than localhost when starting the <code>orbd</code> tool, replace those 
+values in the command below with the actual values used to start <code>orbd</code>.
+
+<pre>
+    java 
+      -classpath . 
+      -Djava.naming.factory.initial=com.sun.jndi.cosnaming.CNCtxFactory
+      -Djava.naming.provider.url=iiop://localhost:1060 
+      HelloClient &
+</pre>
+
+After running the client application, you will see output similar to the following
+on your display:
+
+<pre>
+Client: Obtained a ref. to Hello server.
+It works! Hello World!!
+</pre>
+
+
+<P>This completes the tutorial.  If you are ready to move on to more complicated applications, here are some sources that may help:
+<P>
+<UL>
+<LI><a href="http://forum.java.sun.com/forum.jsp?forum=59">
+http://forum.java.sun.com/forum.jsp?forum=59</a>, The Sun Developer's Forum for RMI-IIOP.  You must register with the Java Developer Connection to access this site.
+<P>
+<LI>EJB clients interact with the J2EE EJB tier using the RMI-IIOP protocol. For more information on using RMI-IIOP in this way, see the Java&nbsp;2 Platform, Enterprise Edition <a href="../../../../../blueprints/enterprise/index.html">Blueprints</a> or the <a href="http://java.sun.com/j2ee/tutorial/index.html">EJB Tutorials</a>.
+<P>
+<LI>The Java IDL tutorial includes
+an example for running the client and server on different machines.  The 
+concepts of <a href="../idl/tutorial/jidl2machines.html"><em>Running the Hello
+World Example on Two Machines</em></a> apply to this example as well.
+<!--<LI><a href="http://www-106.ibm.com/developerworks/java/rmi-iiop/">IBM DeveloperWorks</a> RMI-IIOP page-->
+</UL>
+
+
+<!-- Body text ends here --><!-- 
+============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../relnotes/SMICopyright.html">Copyright 
+&copy;</A>
+2001 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send questions or comments to: <A 
+HREF="mailto:rmi-iiop@sun.com">rmi-iiop@sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 
+HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+</BODY>
+</HTML>

@@ -1,0 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>JPDA Enhancements</title>
+  </head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+
+<TD>
+<center>
+           <h1>JPDA Enhancements</h1>
+</center>
+</TD>
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="index.html">Back to JPDA Guide</a></font>
+
+</TD>
+</TR>
+</TABLE>
+
+<blockquote>
+The version 1.4 family of the Java 2 SDK includes the following 
+JPDA enhancements:
+<blockquote>
+    <a href="#fsd">Full Speed Debugging</a><br>
+    <a href=#hotswap>Enable "HotSwap" Class File Replacement</a><br>
+    <a href=#instancefilters>Instance Filters</a><br>
+    <a href=#debugotherlanguages>Support For Debugging Other Languages</a><br>
+    <a href="#vmdeathrequests">VMDeathRequests</a>
+</blockquote>
+<hr>
+
+<p>
+<a name=fsd>
+<b>Full Speed Debugging</b>
+<blockquote>
+
+    The 
+    <a href="http://java.sun.com/products/hotspot/">
+        Java HotSpot[TM] virtual machine 
+    </a>
+    now uses "full-speed debugging". In the previous version of HotSpot, when
+    debugging was enabled, the program executed using only the interpreter. Now,
+    the full performance advantage of HotSpot
+    Technology is available to programs running with debugging enabled.
+    The improved performance allows long running programs to
+    be more easily debugged.  It also allows testing to proceed
+    at full speed and the launch of a debugger to occur on an exception:
+    <blockquote>
+        -Xrunjdwp:transport=dt_socket,server=y,onuncaught=y,launch=myDebuggerLaunchScript
+    </blockquote>
+    For details on launch "onthrow" and launch "onuncaught", see
+        <a href="http://java.sun.com/j2se/1.4.2/docs/guide/jpda/conninv.html">
+            Connection and Invocation Details
+        </a>.
+    Setting a breakpoint only inhibits compilation (full speed execution) for
+    the method containing the breakpoint.  Execution reverts to the interpreter
+    during some debug operations such as single-stepping and when method
+    entry/exit or watchpoints are set.
+    <p>
+    As of version 1.4.1, full-speed debugging is available with both the 
+    Java HotSpot Client Vm (default) and Java HotSpot Server VM (invoked 
+    with the <tt>-server</tt> command-line flag).  In the Java 2 SDK 
+    v1.4.0, full-speed debugging was available only with the Java HotSpot 
+    Client VM.
+</blockquote>
+
+<a name=hotswap>
+<b>Enable "HotSwap" Class File Replacement</b>
+<blockquote>
+<p>
+    This new feature encapsulates the ability to substitute modified code in a running application
+through the debugger
+APIs.  For example, one can recompile a single class and replace the old instance with the new
+instance.
+<p>
+This change was made to address these issues:
+<ul>
+<li>Tool (IDE) vendors want the ability to do fix-and-continue 
+        debugging.  That is, while debugging, identify a problem,
+        fix it, and continue debugging with fixed code.
+
+<li>Organizations deploying long running servers wish to be
+        able to fix bugs without taking down the server.
+</ul>
+<p>
+    HotSwap adds functionality to the Java<sup><font size="-2">TM</font></sup>
+Platform Debugger Architecture (JPDA) to allow a class to be updated
+while under the control of a debugger. The two central components of this 
+functionality are RedefineClasses which replaces the class definitions
+and PopFrame which pops frames off the stack allowing a method which has
+been redefined to be re-executed.
+<P>
+In the reference implementation,
+this functionality is implemented at the Java Virtual Machine Debug Interface
+(JVMDI) layer and made available through the higher layers of JPDA -
+the Java Debug Wire Protocol (JDWP) and the Java Debug Interface (JDI).
+<P>
+<b>Redefinition Functionality</b><br>
+<table summary="layout" cellpadding=3 border=2>
+<tr>
+<td>JDI</td><td><a
+href="jdi/com/sun/jdi/VirtualMachine.html#redefineClasses(java.util.Map)">VirtualMachine.redefineClasses(Map
+classToBytes)</a></td>
+</tr>
+<tr><td>JDWP</td><td><a
+href="jdwp/jdwp-protocol.html#JDWP_VirtualMachine_RedefineClasses">RedefineClasses (Cmd 18)
+in VirtualMachine (CmdSet 1)</a></td>
+</tr>
+<tr><td>JVMDI</td><td><a href="jvmdi-spec.html#RedefineClasses">RedefineClasses(jint
+classCount, JVMDI_class_definition *classDefs)</a></td></tr>
+</table>
+<p>
+<b>Pop Frame Functionality</b><br>
+<table summary="layout" cellpadding=3 border=2>
+<tr>
+<td>JDI</td><td><a
+href="jdi/com/sun/jdi/ThreadReference.html#popFrames(com.sun.jdi.StackFrame)">ThreadReference.popFrames(StackFrame
+frame)</a></td>
+</tr>
+<tr><td>JDWP</td><td><a href="jdwp/jdwp-protocol.html#JDWP_StackFrame_PopFrames">PopFrames
+(Cmd 4) in StackFrame (CmdSet 16)</a></td>
+</tr>
+<tr><td>JVMDI</td><td><a href="jvmdi-spec.html#PopFrame">PopFrame(jthread
+thread)</a></td></tr>
+</table>
+<p>
+All functionality at each layer is independently optional.  The
+<tt><a href="jvmdi-spec.html#GetCapabilities">GetCapabilities</a></tt> function at the
+JVMDI layer; 
+the <tt><a
+href="jdwp/jdwp-protocol.html#JDWP_VirtualMachine_CapabilitiesNew">CapabilitiesNew</a></tt>
+command at the JDWP layer; and the <tt><a
+href="jdi/com/sun/jdi/VirtualMachine.html#canRedefineClasses()">canRedefineClasses</a></tt>, 
+<tt><a
+href="jdi/com/sun/jdi/VirtualMachine.html#canAddMethod()">canAddMethod</a></tt>, 
+<tt><a
+href="jdi/com/sun/jdi/VirtualMachine.html#canUnrestrictedlyRedefineClasses()">canUnrestrictedlyRedefineClasses</a></tt>,
+and 
+<tt><a
+href="jdi/com/sun/jdi/VirtualMachine.html#canPopFrames()">canPopFrames</a></tt>, 
+methods at the JDI layer describe what functionality is implemented.
+<P>
+The bug report associated with this change is <A
+HREF="http://developer.java.sun.com/developer/bugParade/bugs/4287595.html">4287595</A>.
+</P>
+</blockquote>
+	
+<a name=instancefilters>
+<b>Instance Filters</b>
+<blockquote>
+<p>
+<a href="jdi/com/sun/jdi/request/BreakpointRequest.html">BreakpointRequest</a>,
+<a href="jdi/com/sun/jdi/request/MethodExitRequest.html">MethodExitRequest</a>,
+<a href="jdi/com/sun/jdi/request/ExceptionRequest.html">ExceptionRequest</a>,
+<a href="jdi/com/sun/jdi/request/StepRequest.html">StepRequest</a>,
+<a href="jdi/com/sun/jdi/request/WatchpointRequest.html">WatchpointRequest</a>
+and
+<a href="jdi/com/sun/jdi/request/MethodEntryRequest.html">MethodEntryRequest</a> 
+classes now have the capability of adding instance filters by using the 
+<code>addInstanceFilter</code> method.  Instance filters restrict the
+events generated by a request to those in which the currently executing
+instance is the object specified. 
+
+</blockquote>
+
+<a name=debugotherlanguages>
+<b>Support For Debugging Other Languages</b>
+<blockquote>
+  The Java Platform Debugger Architecture has been extended so
+  that non-Java programming language source, which is translated to Java programming language
+  source, can be debugged in the future.  The table below describes the new APIs
+  and APIs with comments that have changed.  This information is based on the 
+  <a href="SourceDebugExtension_attribute.html">SourceDebugExtension</a>.
+<p>
+<table summary="new APIS and APIS with changed comments" border=1 align="center">
+<thead>
+<th bgcolor="#CCCCFF">New APIs</th>
+<th bgcolor="#CCCCFF">APIs with Changed Comments</th>
+</thead>
+<tr>
+<th colspan=2 bgcolor="#EEEEFF"><a href="jvmdi-spec.html">JVMDI</a></th>
+</tr>
+<tr>
+<td><code><a href="jvmdi-spec.html#GetSourceDebugExtension">GetSourceDebugExtension</a></code></td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<th colspan=2 bgcolor="#EEEEFF"><a href="jdwp-spec.html">JDWP</a> - <code>ReferenceType</code> (2)
+Command Set</th>
+</tr>
+<tr>
+<td><code><a
+href="jdwp/jdwp-protocol.html#JDWP_ReferenceType_SourceDebugExtension">SourceDebugExtension</a></code>
+Command (12)</td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<th colspan=2 bgcolor="#EEEEFF"><a href="jdwp-spec.html">JDWP</a> - <code>VirtualMachine</code> (1)
+Command Set</th>
+</tr>
+<tr>
+<td><code><a
+href="jdwp/jdwp-protocol.html#JDWP_VirtualMachine_SetDefaultStratum">SetDefaultStratum</a></code>
+Command (19)</td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<th colspan=2 bgcolor="#EEEEFF"><a href="jdi/index.html">JDI</A> - <code><a
+href="jdi/com/sun/jdi/VirtualMachine.html">VirtualMachine</a></code> interface</th>
+</tr>
+<tr>
+<td><code>void <a
+href="jdi/com/sun/jdi/VirtualMachine.html#setDefaultStratum(java.lang.String)">setDefaultStratum(String
+stratum)</a></code></td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<td><code>String <a
+href="jdi/com/sun/jdi/VirtualMachine.html#getDefaultStratum()">getDefaultStratum()</a></code></td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<th colspan=2 bgcolor="#EEEEFF"><a href="jdi/index.html">JDI</A> - <code><a
+href="jdi/com/sun/jdi/ReferenceType.html">ReferenceType</a></code> interface</th>
+</tr>
+<tr>
+<td><code>String <a
+href="jdi/com/sun/jdi/ReferenceType.html#sourceNames(java.lang.String)">sourceNames(String
+stratum)</a></code></td>
+<td><code>String <a
+href="jdi/com/sun/jdi/ReferenceType.html#sourceName()">sourceName()</a></code></td>
+</tr>
+<tr>
+<td><code>String <a
+href="jdi/com/sun/jdi/ReferenceType.html#sourcePaths(java.lang.String)">sourcePaths(String
+stratum)</a></code></td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td><code>List <a href="jdi/com/sun/jdi/ReferenceType.html#allLineLocations(java.lang.String, java.lang.String)">allLineLocations(String stratum, String sourceName)</a></code></td>
+<td><code>List <a
+href="jdi/com/sun/jdi/ReferenceType.html#allLineLocations()">allLineLocations()</a></code></td>
+</tr>
+<tr>
+<td><code>List <a href="jdi/com/sun/jdi/ReferenceType.html#locationsOfLine(java.lang.String, java.lang.String, int)">locationsOfLine(String stratum, String sourceName, int lineNumber)</a></code></td>
+<td><code>List <a
+href="jdi/com/sun/jdi/ReferenceType.html#locationsOfLine(int)">locationsOfLine(int
+lineNumber)</a></code></td>
+</tr>
+<tr>
+<td><code>List <a
+href="jdi/com/sun/jdi/ReferenceType.html#availableStrata()">availableStrata()</a></code></td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<td><code>String <a
+href="jdi/com/sun/jdi/ReferenceType.html#defaultStratum()">defaultStratum()</a></code></td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<td><code>String <a
+href="jdi/com/sun/jdi/ReferenceType.html#sourceDebugExtension()">sourceDebugExtension()</a></code></td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<th colspan=2 bgcolor="#EEEEFF"><a href="jdi/index.html">JDI</A> - <code><a
+href="jdi/com/sun/jdi/Method.html">Method</a></code> interface</th>
+</tr>
+<tr>
+<td><code>List <a href="jdi/com/sun/jdi/Method.html#allLineLocations(java.lang.String, java.lang.String)">allLineLocations(String stratum, String sourceName)</a></code></td>
+<td><code>List <a
+href="jdi/com/sun/jdi/Method.html#allLineLocations()">allLineLocations()</a></code></td>
+</tr>
+<tr>
+<td><code>List <a href="jdi/com/sun/jdi/Method.html#locationsOfLine(java.lang.String, java.lang.String, int)">locationsOfLine(String stratum, String sourceName, int lineNumber)</a></code></td>
+<td><code>List <a href="jdi/com/sun/jdi/Method.html#locationsOfLine(int)">locationsOfLine(int
+lineNumber)</a></code></td>
+</tr>
+<tr>
+<th colspan=2 bgcolor="#EEEEFF"><a href="jdi/index.html">JDI</A> - <code><a
+href="jdi/com/sun/jdi/Location.html">Location</a></code> interface</th>
+</tr>
+<tr>
+<td><code>&nbsp;</code></td>
+<td><a href="jdi/com/sun/jdi/Location.html">class comment</a> (strata defined)</td>
+</tr>
+<tr>
+<td><code>int <a
+href="jdi/com/sun/jdi/Location.html#lineNumber(java.lang.String)">lineNumber(String
+stratum)</a></code></td>
+<td><code>int <a href="jdi/com/sun/jdi/Location.html#lineNumber()">lineNumber()</a></code></td>
+</tr>
+<tr>
+<td><code>String <a
+href="jdi/com/sun/jdi/Location.html#sourceName(java.lang.String)">sourceName(String
+stratum)</a></code></td>
+<td><code>String <a href="jdi/com/sun/jdi/Location.html#sourceName()">sourceName()</a></code></td>
+</tr>
+<tr>
+<td><code>String <a
+href="jdi/com/sun/jdi/Location.html#sourcePath(java.lang.String)">sourcePath(String
+stratum)</a></code></td>
+<td><code>&nbsp;</code></td>
+</tr>
+<tr>
+<td><code>String <a href="jdi/com/sun/jdi/Location.html#sourcePath()">sourcePath()</a></code></td>
+<td><code>&nbsp;</code></td>
+</tr>
+</table>
+
+
+</blockquote>
+
+<a name=vmdeathrequests>
+<b>VMDeathRequests</b>
+<blockquote>
+ Using class <a href="jdi/com/sun/jdi/request/VMDeathRequest.html">VMDeathRequest</a>, 
+ a request can be made for notification when the target VM terminates.  When an enabled 
+ VMDeathRequest is satisfied, an
+ <A HREF="jdi/com/sun/jdi/event/EventSet.html"><CODE>EventSet</CODE></A> containing a
+ <A HREF="jdi/com/sun/jdi/event/VMDeathEvent.html"><CODE>VMDeathEvent</CODE></A>
+ will be placed on the
+ <A HREF="jdi/com/sun/jdi/event/EventQueue.html"><CODE>EventQueue</CODE></A>.
+ <P>
+ Even without creating a VMDeathRequest, a single 
+ unsolicited VMDeathEvent will be sent with a 
+ <A HREF="jdi/com/sun/jdi/request/EventRequest.html#suspendPolicy()"><CODE>suspend policy</CODE></A> 
+ of <A HREF="jdi/com/sun/jdi/request/EventRequest.html#SUSPEND_NONE"><CODE>SUSPEND_NONE</CODE></A>.
+ This request would typically be created so that a
+ VMDeathEvent with a suspend policy of
+ <A HREF="jdi/com/sun/jdi/request/EventRequest.html#SUSPEND_ALL"><CODE>SUSPEND_ALL</CODE></A>
+ will be sent.  This event can be used to assure
+ completion of any processing which requires the VM
+ to be alive (e.g. event processing).  Note: the 
+ unsolicited VMDeathEvent will still be sent. 
+</blockquote>
+
+</blockquote>
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2001
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+<FONT SIZE="-1">
+Please send comments to:
+<a href="mailto:java-debugger@sun.com">java-debugger@sun.com</a>
+</FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </body>
+</html>

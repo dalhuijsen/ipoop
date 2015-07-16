@@ -1,0 +1,379 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table summary="JDBC types mapped to database-specific SQL types" width="70%" border="1">
+  <thead> 
+  <tr> 
+    <th width="22%"> 
+      <div align="left">JDBC Type Name</div>
+    </th>
+    <th width="8%">Oracle 8.1</th>
+    <th width="9%">Sybase 11.9</th>
+    <th width="10%">Informix 9.2</th>
+    <th width="16%">IBM DB2 5.2 (Unix, NT)</th>
+    <th width="3%">Microsoft SQL Server 7.0</th>
+    <th width="11%">Microsoft Access 7.0</th>
+    <th width="21%">Sybase SQL Anywhere 6.0</th>
+  </tr>
+  </thead> 
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">BIT</div>
+    </th>
+    <td width="8%">&nbsp;</td>
+    <td width="9%">BIT</td>
+    <td width="10%">&nbsp;</td>
+    <td width="16%">&nbsp;</td>
+    <td width="3%">BIT</td>
+    <td width="11%">BIT</td>
+    <td width="21%">BIT</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">TINYINT</div>
+    </th>
+    <td width="8%">&nbsp;</td>
+    <td width="9%">TINYINT</td>
+    <td width="10%">SMALLINT</td>
+    <td width="16%">&nbsp;</td>
+    <td width="3%">TINYINT</td>
+    <td width="11%">BYTE</td>
+    <td width="21%">TINYINT</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">SMALLINT</div>
+    </th>
+    <td width="8%">SMALLINT, NUMBER(38,0)</td>
+    <td width="9%">SMALLINT</td>
+    <td width="10%">SMALLINT</td>
+    <td width="16%">SMALLINT</td>
+    <td width="3%">SMALLINT</td>
+    <td width="11%">SMALLINT</td>
+    <td width="21%">SMALLINT</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">INTEGER</div>
+    </th>
+    <td width="8%">INTEGER, NUMBER(38,0)</td>
+    <td width="9%">INTEGER</td>
+    <td width="10%">INTEGER, SERIAL</td>
+    <td width="16%">INTEGER</td>
+    <td width="3%">INTEGER</td>
+    <td width="11%">INTEGER, COUNTER</td>
+    <td width="21%">INTEGER</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">BIGINT</div>
+    </th>
+    <td width="8%">&nbsp;</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">INT8, SERIAL8</td>
+    <td width="16%">BIGINT</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">REAL</div>
+    </th>
+    <td width="8%">REAL, NUMBER</td>
+    <td width="9%">REAL</td>
+    <td width="10%">REAL</td>
+    <td width="16%">REAL</td>
+    <td width="3%">REAL</td>
+    <td width="11%">REAL</td>
+    <td width="21%">REAL</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">FLOAT</div>
+    </th>
+    <td width="8%">FLOAT, NUMBER</td>
+    <td width="9%">FLOAT</td>
+    <td width="10%">FLOAT</td>
+    <td width="16%">FLOAT</td>
+    <td width="3%">FLOAT</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">FLOAT</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">DOUBLE</div>
+    </th>
+    <td width="8%">DOUBLE PRECISION, NUMBER</td>
+    <td width="9%">DOUBLE PRECISION</td>
+    <td width="10%">DOUBLE PRECISION</td>
+    <td width="16%">FLOAT</td>
+    <td width="3%">DOUBLE PRECISION</td>
+    <td width="11%">DOUBLE</td>
+    <td width="21%">DOUBLE PRECISION</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">NUMERIC(p,s)</div>
+    </th>
+    <td width="8%">NUMERIC(p,s), NUMBER(p,s)</td>
+    <td width="9%">NUMERIC(p,s)</td>
+    <td width="10%">NUMERIC(p,s)</td>
+    <td width="16%">NUMERIC(p,s)</td>
+    <td width="3%">NUMERIC(p,s)</td>
+    <td width="11%">CURRENCY</td>
+    <td width="21%">NUMERIC(p,s)</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">DECIMAL(p,s)</div>
+    </th>
+    <td width="8%">DECIMAL(p,s), NUMBER(p,s)</td>
+    <td width="9%">DECIMAL(p,s), MONEY</td>
+    <td width="10%">DECIMAL(p,s)</td>
+    <td width="16%">DECIMAL(p,s)</td>
+    <td width="3%">DECIMAL(p,s), MONEY</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">DECIMAL(p,s)</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">CHAR(n)</div>
+    </th>
+    <td width="8%"> 
+      <p>CHAR(n)<br>
+        n &lt;= 2000</p>
+      </td>
+    <td width="9%">CHAR(n)<br>
+      n &lt;= 255</td>
+    <td width="10%">CHAR(n)<br>
+      n &lt;= 32767</td>
+    <td width="16%">CHAR(n)<br>
+      n &lt;= 254</td>
+    <td width="3%">CHAR(n)<br>
+      n &lt;= 8000</td>
+    <td width="11%">CHAR(n)<br>
+      n &lt;= 255</td>
+    <td width="21%">CHAR(n)<br>
+      n &lt;= 32,767</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">VARCHAR(n)</div>
+    </th>
+    <td width="8%">VARCHAR(n)<br>
+      n &lt;= 4000</td>
+    <td width="9%">VARCHAR(n)<br>
+      n &lt;= 255</td>
+    <td width="10%">VARCHAR(n)<br>
+      n &lt;= 255</td>
+    <td width="16%">VARCHAR(n)<br>
+      n &lt;= 4000</td>
+    <td width="3%">VARCHAR(n)<br>
+      n &lt;= 8000</td>
+    <td width="11%">VARCHAR(n)<br>
+      n &lt;= 255</td>
+    <td width="21%">VARCHAR(n)<br>
+      n &lt;= 32,767</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">LONGVARCHAR</div>
+    </th>
+    <td width="8%">LONG<br>
+      limit is 2 Gigabytes</td>
+    <td width="9%">TEXT<br>
+      limit is 2 Gigabytes</td>
+    <td width="10%">TEXT<br>
+      limit is 2 Gigabytes</td>
+    <td width="16%">LONG VARCHAR<br>
+      limit is 32,700 bytes</td>
+    <td width="3%">TEXT<br>
+      limit is 2 Gigabytes</td>
+    <td width="11%">LONGCHAR<br>
+      limit is 2.0 Gigabytes</td>
+    <td width="21%">LONG VARCHAR<br>
+      limit is 2 Gigabytes</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">BINARY(n)</div>
+    </th>
+    <td width="8%">&nbsp;</td>
+    <td width="9%">BINARY(n)<br>
+      n &lt;= 255</td>
+    <td width="10%">BYTE</td>
+    <td width="16%">CHAR(n) FOR BIT DATA<br>
+      n &lt;= 254</td>
+    <td width="3%">BINARY(n)<br>
+      n &lt;= 8000</td>
+    <td width="11%">BINARY(n)<br>
+      n &lt;= 255</td>
+    <td width="21%">BINARY<br>
+      n &lt;= 32,767</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">VARBINARY</div>
+    </th>
+    <td width="8%">RAW(n)<br>
+      n &lt;= 2000</td>
+    <td width="9%">VARBINARY(n)<br>
+      n &lt;= 255</td>
+    <td width="10%">BYTE</td>
+    <td width="16%">VARCHAR(n) FOR BIT DATA<br>
+      n &lt;= 4000</td>
+    <td width="3%">VARBINARY(n)<br>
+      n &lt;= 8000</td>
+    <td width="11%">VARBINARY(n)<br>
+      n &lt;= 255</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">LONGVARBINARY</div>
+    </th>
+    <td width="8%">LONG RAW<br>
+      limit is 2 Gigabyts</td>
+    <td width="9%">IMAGE<br>
+      limit is 2 Gigabytes</td>
+    <td width="10%">BYTE<br>
+      limit is 2 Gigabytes</td>
+    <td width="16%">LONG VARCHAR FOR BIT DATA<br>
+      limit is 32,700 bytes</td>
+    <td width="3%">IMAGE<br>
+      limit is 2 Gigabytes</td>
+    <td width="11%">LONGBINARY<br>
+      limit is 1.0 Gigabytes</td>
+    <td width="21%">IMAGE<br>
+      limit is 2 Gigabytes</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">DATE</div>
+    </th>
+    <td width="8%">&nbsp;</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">DATE</td>
+    <td width="16%">DATE</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">DATE</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">TIME</div>
+    </th>
+    <td width="8%">&nbsp;</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">DATETIME HOUR TO SECOND</td>
+    <td width="16%">TIME</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">TIME</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">TIMESTAMP</div>
+    </th>
+    <td width="8%">DATE</td>
+    <td width="9%">DATETIME, SMALLDATETIME</td>
+    <td width="10%">DATETIME YEAR TO FRACTION(S)</td>
+    <td width="16%">TIMESTAMP</td>
+    <td width="3%">DATETIME</td>
+    <td width="11%">DATETIME</td>
+    <td width="21%">TIMESTAMP</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">CLOB</div>
+    </th>
+    <td width="8%">CLOB</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">CLOB</td>
+    <td width="16%">CLOB(n)<br>
+      n &lt;= 2,147,483,647 bytes</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">BLOB</div>
+    </th>
+    <td width="8%">BLOB, BFILE</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">BLOB</td>
+    <td width="16%">BLOB(n)<br>
+      n &lt;= 15,000,000 bytes</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">ARRAY</div>
+    </th>
+    <td width="8%">VARRAY</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">LIST, SET, MULTISET</td>
+    <td width="16%">&nbsp;</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">STRUCT</div>
+    </th>
+    <td width="8%">OBJECT</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">ROW</td>
+    <td width="16%">&nbsp;</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">DISTINCT</div>
+    </th>
+    <td width="8%">&nbsp;</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">DISTINCT</td>
+    <td width="16%">&nbsp;</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">REF</div>
+    </th>
+    <td width="8%">REF</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">&nbsp;</td>
+    <td width="16%">&nbsp;</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <th scope="row" width="22%"> 
+      <div align="left">JAVA_OBJECT</div>
+    </th>
+    <td width="8%">&nbsp;</td>
+    <td width="9%">&nbsp;</td>
+    <td width="10%">OPAQUE</td>
+    <td width="16%">&nbsp;</td>
+    <td width="3%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="21%">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

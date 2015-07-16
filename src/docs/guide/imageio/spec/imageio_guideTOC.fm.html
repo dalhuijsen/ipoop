@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Image I/O API Guide
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="title.fm.html">PREV</a>
+ | <a href="intro.fm1.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right>
+<i>Java<sup><font size="-1">TM</font></sup> Image I/O API Guide</i></td>
+</tr></table>
+<br>
+ 
+<b>
+	1.	
+<a href="intro.fm1.html#5529">Introduction</a>
+</b>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="intro.fm1.html">
+<b>
+ 
+1.1	The Java Image I/O API</b></a>
+
+<dd>
+<a href="intro.fm2.html">
+<b>
+ 
+1.2	About This Document</b></a>
+
+<dd>
+<a href="intro.fm3.html">
+<b>
+ 
+1.3	Platforms</b></a>
+
+<dd>
+<a href="intro.fm4.html">
+<b>
+ 
+1.4	Target Audience</b></a>
+
+<dd>
+<a href="intro.fm5.html">
+<b>
+ 
+1.5	Acknowledgements</b></a>
+
+</dl>
+<b>
+	2.	
+<a href="goals.fm1.html#5529">Goals</a>
+</b>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="goals.fm1.html">
+<b>
+ 
+2.1	API Goals</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="goals.fm1.html#997066">2.1.1	Client-Side Application Goals</a>
+</b>
+
+<dd>
+<b> 
+<a href="goals.fm1.html#997020">2.1.2	Server Use Cases</a>
+</b>
+
+</dl>
+<dd>
+<a href="goals.fm2.html">
+<b>
+ 
+2.2	Non-Goals</b></a>
+
+</dl>
+<b>
+	3.	
+<a href="apps.fm1.html">Writing Image I/O Applications</a>
+</b>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="apps.fm1.html">
+<b>
+ 
+3.1	Reading and Writing Images</b></a>
+
+<dd>
+<a href="apps.fm2.html">
+<b>
+ 
+3.2	Going Further</b></a>
+
+<dd>
+<a href="apps.fm3.html">
+<b>
+ 
+3.3	ImageReader</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="apps.fm3.html#998328">3.3.1 <code>ImageReadParam</code></a>
+</b>
+
+<dd>
+<b> 
+<a href="apps.fm3.html#998349">3.3.2 <code>IIOParamController</code></a>
+</b>
+
+<dd>
+<b> 
+<a href="apps.fm3.html#998353">3.3.3	Reading From Multi-Image Files</a>
+</b>
+
+<dd>
+<b> 
+<a href="apps.fm3.html#997104">3.3.4	Reading &#34;Thumbnail&#34; Images</a>
+</b>
+
+</dl>
+<dd>
+<a href="apps.fm4.html">
+<b>
+ 
+3.4	The ImageWriter Class</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="apps.fm4.html#997015">3.4.1	Writing Multiple Images</a>
+</b>
+
+</dl>
+<dd>
+<a href="apps.fm5.html">
+<b>
+ 
+3.5	Handling Metadata</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="apps.fm5.html#997442">3.5.1	The <code>IIOMetadataFormat</code> Interface</a>
+</b>
+
+</dl>
+<dd>
+<a href="apps.fm6.html">
+<b>
+ 
+3.6	Transcoding</b></a>
+
+<dd>
+<a href="apps.fm7.html">
+<b>
+ 
+3.7	Listening for Events</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="apps.fm7.html#997167">3.7.1	The <code>IIOReadProgressListener</code> Interface</a>
+</b>
+
+<dd>
+<b> 
+<a href="apps.fm7.html#997193">3.7.2	The <code>IIOReadUpdateListener</code> Interface</a>
+</b>
+
+<dd>
+<b> 
+<a href="apps.fm7.html#997169">3.7.3	The <code>IIOReadWarningListener</code> Interface</a>
+</b>
+
+<dd>
+<b> 
+<a href="apps.fm7.html#997342">3.7.4	The <code>IIOWriteProgressListener</code> and <code>IIOWriteWarningListener</code> Interfaces</a>
+</b>
+
+</dl>
+<dd>
+<a href="apps.fm8.html">
+<b>
+ 
+3.8	Handling Errors using IIOException</b></a>
+
+</dl>
+<b>
+	4.	
+<a href="extending.fm1.html">Writing Image I/O Plug-ins</a>
+</b>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="extending.fm1.html">
+<b>
+ 
+4.1	The Plug-in Concept</b></a>
+
+<dd>
+<a href="extending.fm2.html">
+<b>
+ 
+4.2	Embedding Plug-ins in JAR Files</b></a>
+
+<dd>
+<a href="extending.fm3.html">
+<b>
+ 
+4.3	Writing Reader Plug-Ins</b></a>
+
+<dd>
+<a href="extending.fm4.html">
+<b>
+ 
+4.4	Writing Writer Plug-ins</b></a>
+
+<dd>
+<a href="extending.fm5.html">
+<b>
+ 
+4.5	Writing Transcoder Plug-ins</b></a>
+
+<dd>
+<a href="extending.fm6.html">
+<b>
+ 
+4.6	Writing Stream Plug-ins</b></a>
+
+</dl>
+<blockquote>
+<a name="390476"><!-- --></a>
+<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="title.fm.html">PREV</a>
+ | <a href="intro.fm1.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="copyright.fm.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Suzette Pelouch -->
+<!-- Last updated: Fri Apr 27 10:57:44 2001 -->
+ 
+
+
+</body>
+</html>

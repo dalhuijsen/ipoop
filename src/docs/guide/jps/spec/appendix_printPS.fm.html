@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide:  - Example: PrintPS.java
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="printing2d.fm2.html">PREV</a>
+ | <a href="appendix_printGIFStream.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+<a name="7081"><!-- --></a>
+<hr size="8" width="35%" align="left" noshade>
+
+<table summary="layout" border=0>
+<tr valign=bottom>
+<td valign=bottom>
+<U><h1><FONT FACE="ARIAL,HELVETICA,TIMES ROMAN" SIZE=-1>APPENDIX</FONT>
+A 	
+</h1></U>
+</td>
+</tr>
+</table>
+
+<a name="7083"><!-- --></a>
+<h1>
+Example: PrintPS.java
+</h1>
+<blockquote><pre>
+import java.io.*;
+import javax.print.*;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
+import javax.print.event.*;
+
+public class PrintPS {
+
+	public static void main(String args[]) {
+		PrintPS ps = new PrintPS();
+	}
+	public PrintPS() {
+		/* Construct the print request specification.
+		 * The print data is Postscript which will be 
+	 	 * supplied as a stream.  The media size 
+	 	 * required is A4, and 2 copies are to be printed
+		 */
+		DocFlavor flavor = DocFlavor.INPUT_STREAM.POSTSCRIPT;
+		PrintRequestAttributeSet aset = 
+			new HashPrintRequestAttributeSet();
+		aset.add(MediaSizeName.ISO_A4);
+		aset.add(new Copies(2));
+		aset.add(Sides.TWO_SIDED_LONG_EDGE);
+		aset.add(Finishings.STAPLE);
+
+		/* locate a print service that can handle it */
+		PrintService[] pservices =
+			PrintServiceLookup.lookupPrintServices(flavor, aset);
+		if (pservices.length &gt; 0) {
+			System.out.println("selected printer " + pservices[0].getName());
+
+			/* create a print job for the chosen service */
+			DocPrintJob pj = pservices[0].createPrintJob();
+			try {
+				/* 
+				* Create a Doc object to hold the print data.
+				* Since the data is postscript located in a disk file,
+				* an input stream needs to be obtained
+				* BasicDoc is a useful implementation that will if requested
+				* close the stream when printing is completed.
+				*/
+				FileInputStream fis = new FileInputStream("example.ps");
+				Doc doc = new SimpleDoc(fis, flavor, null);
+
+				/* print the doc as specified */
+				pj.print(doc, aset);
+
+				/*
+				* Do not explicitly call System.exit() when print returns.
+				* Printing can be asynchronous so may be executing in a
+				* separate thread.
+				* If you want to explicitly exit the VM, use a print job 
+				* listener to be notified when it is safe to do so.
+				*/
+
+			} catch (IOException ie) { 
+				System.err.println(ie);
+			} catch (PrintException e) { 
+				System.err.println(e);
+			}
+		}
+	}
+}
+</pre></blockquote>
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="printing2d.fm2.html">PREV</a>
+ | <a href="appendix_printGIFStream.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

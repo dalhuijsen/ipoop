@@ -1,0 +1,1705 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<HEAD>
+
+<TITLE>
+JAAS Reference Guide
+</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="#ffffff">
+<HR>
+
+<center>
+<H1>Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Authentication
+and Authorization Service (JAAS)</h1>
+
+<H1>Reference Guide</H1>
+
+<H2>for the Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition, 
+v 1.4</H2>
+
+</center>
+
+<br>
+
+<HR>
+
+<p>
+<dl>
+  <dt><dd><a href="#Introduction"><font size="+1"><b>Introduction</b></font></a>
+  <dl>
+    <dt><dd><a href="#Who"><b>Who Should Read This Document</b></a>
+    <dt><dd><a href="#RelatedDocs"><b>Related Documentation</b></a>
+  </dl><br>
+
+  <dt><dd><a href="#WhatsNew">
+    <font size="+1"><b>What's New in JAAS in the J2SDK, v 1.4</b></font>
+    </a>
+  <br>
+  <br>
+
+  <dt><dd><a href="#Core"><font size="+1"><b>Core Classes and
+Interfaces</b></font></a>
+    <dl>
+      <dt><dd><a href="#Common"><b>Common Classes</b></a>
+      <dl>
+        <dt><dd><a href="#Subject"><b>Subject</b></a>
+        <dt><dd><a href="#Principals"><b>Principals</b></a>
+        <dt><dd><a href="#Credentials"><b>Credentials</b></a>
+      </dl>
+      <dt><dd><a href="#Authentication"><b>Authentication Classes and
+Interfaces</b></a>
+      <dl>
+        <dt><dd><a href="#LoginContext"><b>LoginContext</b></a>
+        <dt><dd><a href="#LoginModule"><b>LoginModule</b></a>
+        <dt><dd><a href="#CallbackHandler"><b>CallbackHandler</b></a>
+        <dt><dd><a href="#Callback"><b>Callback</b></a>
+      </dl>
+      <dt><dd><a href="#Authorization"><b>Authorization Classes</b></a>
+      <dl>
+        <dt><dd><a href="#Policy"><b>Policy</b></a>
+        <dt><dd><a href="#AuthPermission"><b>AuthPermission</b></a>
+        <dt><dd><a href="#PrivateCredentialPermission"><b>PrivateCredentialPermission</b></a>
+      </dl>
+    </dl><br>
+
+  <dt><dd><a href="#Sample"><font size="+1"><b>JAAS Tutorials and 
+Sample Programs</b></font></a><br><br>
+
+  <dt><dd><a href="#AppendixA"><font size="+1">
+    <b>Appendix A:  JAAS Settings in the java.security Security Properties File</b></font></a><br><br>
+
+  <dt><dd><a href="#AppendixB"><font size="+1">
+    <b>Appendix B:  Example Login Configurations</b></font></a><br><br>
+
+</dl>
+
+<!------------------------------------------------------------------------>
+<HR>
+<H1><a name="Introduction">Introduction</a></H1>
+
+<blockquote>
+
+<p> The Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Authentication
+and Authorization Service (JAAS) was introduced as an optional package
+(extension) to the
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition (J2SDK), v 1.3.
+JAAS has now been integrated into the J2SDK, v 1.4.
+
+<p> JAAS can be used for two purposes:
+
+<ul>
+
+<li>for <i>authentication</i> of users, to reliably
+and securely determine who is currently executing Java code,
+regardless of whether the code is running as an application, an applet,
+a bean, or a servlet; and<p>
+
+<li>for <i>authorization</i> of users to ensure they have the 
+access control rights (permissions) required to do the actions performed.
+
+</ul>
+
+<p>JAAS implements a Java version of the standard Pluggable
+Authentication Module (PAM) framework. See 
+<a href="http://java.sun.com/security/jaas/doc/pam.html">
+Making Login Services Independent from Authentication Technologies</a>
+for further information.
+
+<p>Traditionally Java 2 provided codesource-based access controls
+(access controls based on <i>where</i> the code originated from and
+<i>who signed</i> the code).  It lacked, however, the ability to additionally
+enforce access controls based on <i>who runs</i> the code.  JAAS provides a
+framework that augments the Java 2 security architecture with such support.
+
+<p> JAAS authentication is performed in a <i>pluggable</i> fashion.
+This permits applications to remain independent from underlying
+authentication technologies.  New or updated authentication
+technologies can be plugged under an application without requiring
+modifications to the application itself.  Applications enable the
+authentication process by instantiating a 
+<a href="../../../api/javax/security/auth/login/LoginContext.html">
+<code>LoginContext</code></a> object,
+which in turn references a 
+<a href="../../../api/javax/security/auth/login/Configuration.html">
+<code>Configuration</code></a> to determine the
+authentication technology(ies), or 
+<a href="../../../api/javax/security/auth/spi/LoginModule.html">
+<code>LoginModule</code></a>(s),
+to be used in performing the authentication.  Typical <code>LoginModule</code>s
+may prompt for and verify a username and password.  Others may
+read and verify a voice or fingerprint sample.
+
+<p> Once the user or service executing the code has been authenticated,
+the JAAS authorization component works in conjunction with the core Java 2
+access control model to protect access to sensitive resources.
+Unlike in the J2SDK, v 1.3 and earlier, where access control decisions
+are based solely on code location and code signers (a 
+<a href="../../../api/java/security/CodeSource.html">
+<code>CodeSource</code></a>),
+in the J2SDK, v 1.4 access control decisions are based both on the executing
+code's <code>CodeSource</code> <i>and</i> on the user or service 
+running the code, who is represented by a 
+<a href="../../../api/javax/security/auth/Subject.html">
+<code>Subject</code></a> object.  
+The <code>Subject</code> is updated by a <code>LoginModule</code> with relevant 
+<a href="../../../api/java/security/Principal.html">
+<code>Principal</code>s</a> and credentials if authentication succeeds.
+
+<H2><a name="Who">Who Should Read This Document</a></H2>
+
+<blockquote>
+
+<p> This document is intended for experienced developers who require
+the ability to design applications constrained by a 
+<code>CodeSource</code>-based and <code>Subject</code>-based security model.
+It is also intended to be read by LoginModule developers (developers 
+implementing an authentication technology) prior to reading the
+<a href="JAASLMDevGuide.html">JAAS LoginModule Developer's Guide</a>.
+
+<p>You may wish to first read the 
+<a href="tutorials/GeneralAcnOnly.html">JAAS Authentication</a> and
+<a href="tutorials/GeneralAcnAndAzn.html">JAAS Authorization</a>
+tutorials to get an overview of how to use JAAS and to see sample
+code in action, and then return to this document for further information. 
+
+</blockquote>
+
+
+<H2><a name="RelatedDocs">Related Documentation</a></H2>
+
+<blockquote>
+
+<p> This document assumes you have already read the following:
+
+<ul>
+  <li><a href="../spec/security-spec.doc.html">
+  Java 2 Security Architecture</a> <p>
+
+  <li><a href="http://java.sun.com/security/jaas/doc/acsac.html">
+        JAAS white paper</a> <p>
+
+  <li><a href="http://java.sun.com/docs/books/tutorial/security1.2/index.html">
+  Java 2 Security Tutorial</a> 
+</ul>
+
+<p>A supplement to this guide is the
+<a href="JAASLMDevGuide.html">JAAS LoginModule Developer's Guide</a>,
+intended for experienced programmers who require the ability to write a 
+<a href="../../../api/javax/security/auth/spi/LoginModule.html">
+<code>LoginModule</code></a> implementing an authentication technology.
+
+<p>If you wish to learn more about the standard Pluggable
+Authentication Module (PAM) framework (JAAS
+implements a Java version of PAM), see 
+<a href="http://java.sun.com/security/jaas/doc/pam.html">
+Making Login Services Independent from Authentication Technologies</a>.
+
+<p>The following <b>tutorials</b> for JAAS authentication and authorization 
+can be run by everyone:
+
+<ul>
+<li><a href="tutorials/GeneralAcnOnly.html">JAAS Authentication Tutorial</a>
+<li><a href="tutorials/GeneralAcnAndAzn.html">JAAS Authorization Tutorial</a> 
+</ul>
+
+<p>Similar tutorials for JAAS authentication and authorization, but
+which demonstrate the use of a Kerberos LoginModule and thus which
+require a Kerberos installation, can be found at 
+
+<ul>
+<li><a href="../jgss/tutorials/AcnOnly.html">JAAS Authentication</a>
+<li><a href="../jgss/tutorials/AcnAndAzn.html">JAAS Authorization</a>
+</ul>
+
+<p>These two tutorials are a part of the 
+<a href="../jgss/tutorials/index.html">
+Java GSS-API and JAAS sequence of tutorials</a>
+that utilize Kerberos as the underlying technology
+for authentication and secure communication.
+
+</blockquote>
+
+</blockquote>
+
+
+<H1><a name="WhatsNew">What's New in JAAS in the J2SDK, v 1.4</a></H1>
+
+<blockquote>
+
+<P> Below are listed the differences between the previous version
+of JAAS (JAAS 1.0) and the JAAS within the J2SDK, v 1.4.
+
+<ul>
+<li><a href="#InJ2">JAAS Is Now in J2SDK</a><P>
+<li><a href="#NewMethods">New Classes/Interfaces</a><P>
+<li><a href="#Deprecated">Deprecated Items</a><P>
+</ul>
+
+
+<H3><a name="InJ2">JAAS Is Now in J2SDK</a></H3>
+
+<blockquote>
+
+<p>JAAS was previously an optional package (extension) to the
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition (J2SDK), 
+versions 1.3.x. JAAS has now been integrated into 
+the J2SDK, v 1.4. 
+JAAS augments the core Java 2 platform with the means to
+authenticate and enforce access controls upon users.
+
+<p> The major ramification of this integration
+stems around the system security policy.
+The J2SDK, versions 1.3 and earlier, has its own security policy class
+(<a href="../../../api/java/security/Policy.html"><code>java.security.Policy</code>
+</a>).
+JAAS 1.0, as an optional package, provided an additional
+<code>Principal</code>-based security policy
+(<code>javax.security.auth.Policy</code>).
+Upon integration into the core SDK, the JAAS policy
+has been deprecated in favor of the SDK policy.
+
+<p> The SDK <code>Policy</code> API was upgraded to support
+<a href="../../../api/java/security/Principal.html">
+<code>Principal</code></a>-based queries, and the <code>Policy</code> 
+reference implementation was upgraded to support <code>Principal</code>-based 
+<code>grant</code> entries in policy files, 
+where such an entry may include a <code>Principal</code> field indicating that 
+the user or other entity represented by the specified <code>Principal</code>, 
+executing the specified code, has the designated permissions.
+In addition, the graphical
+<a href="../SecurityToolsSummary.html">Policy Tool</a> utility
+used to create policy files 
+was enhanced to support inclusion of <code>Principal</code> fields.
+Appropriately, the JAAS 1.0 <code>Policy</code> reference implementation
+and its supporting classes in the <code>com.sun.security.auth</code>
+package have been deprecated.
+
+<p> Please reference the
+<a href="../PolicyFiles.html">Policy Document</a> for more information
+on the <code>Policy</code> reference implementation and
+a list of the relevant API changes.
+
+</blockquote>
+
+
+
+<H3><a name="NewMethods">New Classes/Interfaces</a></H3>
+
+<blockquote>
+
+<p>Additions include
+
+<ul>
+
+<li> Two default <code>CallbackHandler</code> implementations:
+<ul>
+<li> <a href="spec/com/sun/security/auth/callback/DialogCallbackHandler.html">
+<code>com.sun.security.auth.callback.DialogCallbackHandler</code></a>
+<li> <a href="spec/com/sun/security/auth/callback/TextCallbackHandler.html">
+<code>com.sun.security.auth.callback.TextCallbackHandler</code></a>
+</ul>
+<p>
+
+<li> New
+<a href="spec/com/sun/security/auth/module/Krb5LoginModule.html">
+<code>com.sun.security.auth.module.Krb5LoginModule</code></a>
+<p>
+
+<li> New
+<a href="spec/com/sun/security/auth/module/KeyStoreLoginModule.html">
+<code>com.sun.security.auth.module.KeyStoreLoginModule</code></a>
+
+</ul>
+
+</blockquote>
+
+
+<H3><a name="Deprecated">Deprecated Items</a></H3>
+
+<blockquote>
+
+<p>Deprecated items include:
+
+<ul>
+
+<li> Deprecation of
+<ul>
+<li> <a href="spec/com/sun/security/auth/module/SolarisLoginModule.html">
+<code>com.sun.security.auth.module.SolarisLoginModule</code></a>
+</ul>
+     in favor of
+<ul>
+<li> <a href="spec/com/sun/security/auth/module/UnixLoginModule.html">
+<code>com.sun.security.auth.module.UnixLoginModule</code></a>
+</ul>
+     The new UnixLoginModule can be used on both Solaris
+     and Linux.
+<p>
+<li> Deprecation of
+<ul>
+<li> <a href="spec/com/sun/security/auth/SolarisPrincipal.html">
+<code>com.sun.security.auth.SolarisPrincipal</code></a>
+</ul>
+     in favor of
+<ul>
+<li> <a href="spec/com/sun/security/auth/UnixPrincipal.html">
+<code>com.sun.security.auth.UnixPrincipal</code></a>
+</ul>
+<p>
+<li> Deprecation of
+<ul>
+<li> <a href="spec/com/sun/security/auth/SolarisNumericUserPrincipal.html">
+<code>com.sun.security.auth.SolarisNumericUserPrincipal</code></a>
+</ul>
+     in favor of
+<ul>
+<li> <a href="spec/com/sun/security/auth/UnixNumericUserPrincipal.html">
+<code>com.sun.security.auth.UnixNumericUserPrincipal</code></a>
+</ul>
+<p>
+<li> Deprecation of
+<ul>
+<li> <a href="spec/com/sun/security/auth/SolarisNumericGroupPrincipal.html">
+<code>com.sun.security.auth.SolarisNumericGroupPrincipal</code></a>
+</ul>
+     in favor of
+<ul>
+<li> <a href="spec/com/sun/security/auth/UnixNumericGroupPrincipal.html">
+<code>com.sun.security.auth.UnixNumericGroupPrincipal</code></a>
+</ul>
+<p>
+<li> Deprecation of
+<ul>
+<li> <a href="spec/com/sun/security/auth/X500Principal.html">
+<code>com.sun.security.auth.X500Principal</code></a>
+</ul>
+     in favor of
+<ul>
+<li><a href="../../../api/javax/security/auth/x500/X500Principal.html">
+<code>javax.security.auth.x500.X500Principal</code></a>
+</ul>
+<p>
+<li> Deprecation of the 
+<a href="../../../api/javax/security/auth/AuthPermission.html">
+<code>javax.security.auth.AuthPermission</code></a> target name
+<ul>
+<li> "createLoginContext"
+</ul>
+     in favor of
+<ul>
+<li> "createLoginContext.{configuration entry name}"
+</ul>
+
+</ul>
+
+</blockquote>
+
+
+
+
+</blockquote>
+
+
+</blockquote>
+
+
+
+<!------------------------------------------------------------------------>
+<hr>
+<H1><a name="Core">Core Classes and Interfaces</a></H1>
+
+<blockquote>
+The JAAS-related core classes and interfaces can be broken into 3 categories: 
+Common, Authentication, and Authorization.
+<ul>
+<li><a href="#Common">Common Classes</a> 
+  <ul>
+  <li><a href="#Subject">Subject</a>, <a href = "#Principals">Principal</a>, 
+<a href="#Credentials">Credential</a> (actually, any Object)
+  </ul>
+<li><a href="#Authentication">Authentication Classes and Interfaces</a> 
+  <ul>
+  <li><a href = "#LoginContext">LoginContext</a>, 
+<a href = "#LoginModule">LoginModule</a>, 
+<a href = "#CallbackHandler">CallbackHandler</a>, 
+<a href = "#Callback">Callback</a>
+  </ul>
+<li><a href="#Authorization">Authorization Classes</a>
+  <ul>
+  <li><a href = "#Policy">Policy</a>, 
+<a href = "#AuthPermission">AuthPermission</a>, 
+<a href = "#PrivateCredentialPermission">PrivateCredentialPermission</a>
+  </ul>
+</ul>
+
+
+<h2><a name="Common">Common Classes</h2>
+
+<blockquote>
+
+Common classes are those shared by both the JAAS authentication and
+authorization components.
+
+<p>The key JAAS class is 
+<a href="../../../api/javax/security/auth/Subject.html">
+<code>javax.security.auth.Subject</code></a>, 
+which represents a grouping of
+related information for a single entity such as a person.  It encompasses the
+entity's <a href = "#Principals">Principals</a>, public credentials, 
+and private credentials.
+
+<p> Note that the 
+<code>java.security.Principal</code> interface is used to represent a
+Principal.  Also note that a credential, as defined by JAAS,
+may be any Object.
+
+
+<h3><a name="Subject">Subject</a></h3>
+
+<blockquote>
+
+To authorize access to resources, applications first need to
+authenticate the source of the request.  The JAAS framework defines the term
+<i>subject</i> to represent the source of a request.
+A subject may be any entity, such as a person or a service.
+Once the subject is authenticated, a 
+<a href="../../../api/javax/security/auth/Subject.html">
+<code>javax.security.auth.Subject</code></a> is 
+populated with associated identities, or
+<a href = "#Principals"><code>Principal</code>s</a>. 
+A <code>Subject</code> may have many <code>Principal</code>s.
+For example, a person may have a name <code>Principal</code>
+("John Doe") and a SSN <code>Principal</code> ("123-45-6789"),
+which distinguish it from other subjects.
+
+<p> A <code>Subject</code> may also own security-related attributes,
+which are referred to as <i>credentials</i>.
+Sensitive credentials that require special protection, such as
+private cryptographic keys, are stored within a private credential
+<code>Set</code>.  Credentials intended to be shared, such as
+public key certificates, are stored
+within a public credential <code>Set</code>.  Different permissions
+(described below) are required to access and modify the different 
+credential <code>Set</code>s.
+
+<p>Subjects are created using these constructors:
+<pre>
+    public Subject();
+
+    public Subject(boolean readOnly, Set principals,
+                   Set pubCredentials, Set privCredentials);
+</pre>
+
+The first constructor creates a <code>Subject</code> with empty (non-null) 
+<code>Set</code>s of <code>Principal</code>s and credentials.  The second 
+constructor creates a <code>Subject</code> with the specified 
+<code>Set</code>s of <code>Principal</code>s and credentials.  
+It also has a boolean argument which can be used to
+make the <code>Subject</code> read-only. In a read-only <code>Subject</code>,
+the <code>Principal</code> and credential <code>Set</code>s are immutable.
+
+<p>An application writer does not have to instantiate a <code>Subject</code>.
+If the application instantiates a <code>LoginContext</code> and does not pass a 
+<code>Subject</code> to the <code>LoginContext</code> constructor, the 
+<code>LoginContext</code> instantiates a new empty <code>Subject</code>.
+See the <a href="#LoginContext">LoginContext section</a>.
+
+<p> If a <code>Subject</code> was not instantiated to be in a read-only state,
+it can be set read-only by calling the following method:
+<pre>
+    public void setReadOnly();
+</pre>
+
+A <code>javax.security.auth.AuthPermission</code> with target "setReadOnly" 
+is required to invoke this method.  Once in a read-only state, any attempt to
+add or remove <code>Principal</code>s or credentials will result in an
+<code>IllegalStateException</code> being thrown.
+
+<p>The following method may be called to test a <code>Subject</code>'s
+read-only state:
+<pre>
+    public boolean isReadOnly();
+</pre>
+
+<p>To retrieve the <code>Principal</code>s associated with a Subject,
+two methods are available:
+<pre>
+    public Set getPrincipals();
+    public Set getPrincipals(Class c);
+</pre>
+
+<p>The first method returns all <code>Principal</code>s contained in the 
+<code>Subject</code>,
+while the second method only returns those <code>Principal</code>s that are an
+instance of the specified Class <code>c</code>, or an instance of a subclass 
+of Class <code>c</code>.
+An empty set will be returned if the <code>Subject</code> does not have any
+associated <code>Principal</code>s.
+
+<p>To retrieve the public credentials associated with a <code>Subject</code>,
+these methods are available:
+<pre>
+    public Set getPublicCredentials();
+    public Set getPublicCredentials(Class c);
+</pre>
+
+<p>The behavior of these methods is similar to that for
+the <code>getPrincipals</code> methods, except in this case the
+public credentials are being obtained.
+
+<p>To access private credentials associated with a <code>Subject</code>,
+the following methods are available:
+<pre>
+    public Set getPrivateCredentials();
+    public Set getPrivateCredentials(Class c);
+</pre>
+
+<p>The behavior of these methods is similar to that for
+the <code>getPrincipals</code> and <code>getPublicCredentials</code> methods.
+
+<p> To modify or operate upon a <code>Subject</code>'s <code>Principal</code>
+<code>Set</code>, public credential <code>Set</code>,
+or private credential <code>Set</code>, callers use the methods defined in the
+<a href="../../../api/java/util/Set.html"><code>java.util.Set</code></a> class. 
+The following example demonstrates this:
+<pre>
+    Subject subject;
+    Principal principal;
+    Object credential;
+
+    . . .
+
+    // add a Principal and credential to the Subject
+    subject.getPrincipals().add(principal);
+    subject.getPublicCredentials().add(credential);
+</pre>
+
+<p> Note: An <code>AuthPermission</code> with target "modifyPrincipals",
+"modifyPublicCredentials", or "modifyPrivateCredentials"
+is required to modify the respective <code>Set</code>s.
+Also note that only the sets returned via the <code>getPrincipals()</code>,
+<code>getPublicCredentials()</code>, and <code>getPrivateCredentials()</code> 
+methods with no arguments are backed by the <code>Subject</code>'s respective 
+internal sets.  Therefore any
+modification to the returned set affects the internal sets as well.
+The sets returned via the <code>getPrincipals(Class c)</code>,
+<code>getPublicCredentials(Class c)</code>, and 
+<code>getPrivateCredentials(Class c)</code>
+methods are not backed by the <code>Subject</code>'s respective internal sets.
+A new set is created and returned for each such method invocation.
+Modifications to these sets will not affect the <code>Subject</code>'s
+internal sets.
+
+<p>In order to iterate through a Set of private credentials, you need a
+<code>javax.security.auth.PrivateCredentialPermission</code> to access each
+credential. See the 
+<a href="../../../api/javax/security/auth/PrivateCredentialPermission.html">
+<code>PrivateCredentialPermission</code></a> API 
+documentation for further information.
+
+<p> A <code>Subject</code> may be associated with an 
+<code>AccessControlContext</code> (see the <code>doAs</code> and 
+<code>doAsPrivileged</code> method descriptions below).
+The following method returns the <code>Subject</code> associated with the 
+specified <code>AccessControlContext</code>, or <code>null</code> if no 
+<code>Subject</code> is associated with the specified 
+<code>AccessControlContext</code>.
+<pre>
+    public static Subject getSubject(final AccessControlContext acc);
+</pre>
+
+<p> An <code>AuthPermission</code> with target "getSubject" is required to
+call <code>Subject.getSubject</code>.
+<p>
+The <code>Subject</code> class also includes the following methods inherited 
+from <code>java.lang.Object</code>.
+<pre>
+    public boolean equals(Object o);
+    public String toString();
+    public int hashCode();
+</pre>
+
+
+<H4>The doAs methods for performing an action as a particular Subject</H4>
+
+<blockquote>
+
+The following static methods may be called to perform an action as a
+particular <code>Subject</code>:
+<pre>
+    public static Object 
+        doAs(final Subject subject,
+             final java.security.PrivilegedAction action);
+
+    public static Object 
+        doAs(final Subject subject,
+             final java.security.PrivilegedExceptionAction action)
+             throws java.security.PrivilegedActionException;
+</pre>
+
+<p>Both methods first associate the specified <code>subject</code> with the
+current Thread's <code>AccessControlContext</code>,
+and then execute the <code>action</code>.  This achieves the effect of
+having the <code>action</code> run as the <code>subject</code>.
+The first method can throw runtime exceptions but normal execution
+has it returning an Object from the <code>run</code> method of its 
+<code>action</code> argument.
+The second method behaves similarly except that it can throw a checked exception
+from its <code>PrivilegedExceptionAction run</code> method.
+An <code>AuthPermission</code> with target "doAs" is required to call
+the <code>doAs</code> methods.
+
+<p> <a name="Subject.doAs Example"><b>Subject.doAs Example</b></a>
+
+<p> Here is an example utilizing the first <code>doAs</code> method.  Assume
+that someone named "Bob" has been authenticated by a <code>LoginContext</code>
+(see the <a href="#LoginContext">LoginContext</a> section)
+and as a result a <code>Subject</code> was populated with a 
+<code>Principal</code> of class
+<code>com.ibm.security.Principal</code>, and that <code>Principal</code> has 
+the name "BOB". Also assume that a SecurityManager
+has been installed, and that the following exists in the
+access control policy
+(see the <a href="#Policy">Policy section</a>
+for more details on the policy file).
+
+<pre>
+    // grant "BOB" permission to read the file "foo.txt"
+    grant Principal com.ibm.security.Principal "BOB" {
+        permission java.io.FilePermission "foo.txt", "read";
+    };
+</pre>
+
+<p>Here is the sample application code:
+
+<pre>
+    class ExampleAction implements java.security.PrivilegedAction {
+        public Object run() {
+            java.io.File f = new java.io.File("foo.txt");
+
+            // the following call invokes a security check
+            if (f.exists()) {
+                System.out.println("File foo.txt exists");
+            }
+            return null;
+        }
+    }
+
+    public class Example1 {
+        public static void main(String[] args) {
+
+            // Authenticate the subject, "BOB".
+            // This process is described in the
+            // <a href="#LoginContext">LoginContext</a> section.
+            
+            Subject bob;
+            // Set bob to the Subject created during the 
+            // authentication process
+
+            // perform "ExampleAction" as "BOB"
+            Subject.doAs(bob, new ExampleAction());
+        }
+    }
+</pre>
+
+<p>During execution, <code>ExampleAction</code> will encounter
+a security check when it makes a call to <code>f.exists()</code>.
+However, since <code>ExampleAction</code> is running as "BOB",
+and the policy (above) grants the necessary
+<code>FilePermission</code> to "BOB",
+the <code>ExampleAction</code> will pass the security check.
+If the <code>grant</code> statement in the policy is altered
+(adding an incorrect <code>CodeBase</code> or changing the 
+<code>Principal</code> to "MOE", for example),
+then a <code>SecurityException</code> will be thrown.
+
+</blockquote>
+
+
+<H4>The doAsPrivileged methods </H4>
+
+<blockquote>
+
+<p> The following methods also perform an action as a particular 
+<code>Subject</code>.
+<pre>
+    public static Object doAsPrivileged(
+        final Subject subject,
+        final java.security.PrivilegedAction action,
+        final java.security.AccessControlContext acc);
+
+    public static Object doAsPrivileged(
+        final Subject subject,
+        final java.security.PrivilegedExceptionAction action,
+        final java.security.AccessControlContext acc)
+        throws java.security.PrivilegedActionException;
+</pre>
+
+<p>An <code>AuthPermission</code> with target "doAsPrivileged" is required
+to call the <code>doAsPrivileged</code> methods.
+
+</blockquote>
+
+
+<a name="doAsComp">
+<H4>doAs vs. doAsPrivileged</H4></a>
+
+<blockquote>
+
+<p>The <code>doAsPrivileged</code> methods behave exactly the same as the
+<code>doAs</code> methods, except that instead of associating
+the provided <code>Subject</code> with the current
+Thread's <code>AccessControlContext</code>, they use the provided
+<code>AccessControlContext</code>. In this way, actions can be
+restricted by <code>AccessControlContext</code>s different from 
+the current one.
+
+<p>An <code>AccessControlContext</code>
+contains information about all the code executed since the 
+<code>AccessControlContext</code> was instantiated, including the code location
+and the permissions the code is granted by the policy.
+In order for an access control check to succeed, the 
+policy must grant each code item referenced by the 
+<code>AccessControlContext</code> the required permissions. 
+
+<p>If the <code>AccessControlContext</code> provided to 
+<code>doAsPrivileged</code>
+is <code>null</code>, then the action is not restricted by a separate 
+<code>AccessControlContext</code>. One example where this may be
+useful is in a server environment. A server may authenticate 
+multiple incoming requests and perform a separate
+<code>doAs</code> operation for each request. To start each <code>doAs</code>
+action "fresh," and without the restrictions of the current
+server <code>AccessControlContext</code>, the server can call 
+<code>doAsPrivileged</code> and pass in a <code>null</code>
+<code>AccessControlContext</code>.
+
+</blockquote>
+
+</blockquote>
+
+
+<h3><a name="Principals">Principals</h3></a>
+
+<blockquote>
+
+As mentioned previously, <code>Principal</code>s may be associated with a 
+<code>Subject</code> if authentication is successful. 
+<code>Principal</code>s represent <code>Subject</code> 
+identities, and must implement the
+<a href="../../../api/java/security/Principal.html">
+<code>java.security.Principal</code></a>
+and <a href="../../../api/java/io/Serializable.html">
+<code>java.io.Serializable</code></a>
+interfaces.  The <a href="#Subject">Subject section</a> describes
+ways to update the <code>Principal</code>s associated with a 
+<code>Subject</code>.
+
+</blockquote>
+
+
+<h3><a name="Credentials">Credentials</h3></a>
+
+<blockquote>
+
+Public and private credential classes are not part of the core JAAS class
+library.  Any class can represent a credential.
+Developers, however, may elect to have their credential classes
+implement two interfaces related to credentials:  <code>Refreshable</code>
+and <code>Destroyable</code>.
+
+
+<h4>Refreshable</h4>
+
+<blockquote>
+
+<p>The
+<a href="../../../api/javax/security/auth/Refreshable.html">
+<code>javax.security.auth.Refreshable</code></a>
+<b>interface</b> provides the capability for a credential to refresh
+itself.  For example, a credential with a particular time-restricted lifespan
+may implement this interface to allow callers to refresh the time period
+for which it is valid.  The interface has two abstract methods:
+<pre>
+    boolean isCurrent();
+</pre>
+This method determines whether the credential is current or valid.
+<pre>
+    void refresh() throws RefreshFailedException;
+</pre>
+This method updates or extends the validity of the credential.
+The method implementation should perform an
+<code>AuthPermission("refreshCredential")</code>
+security check to ensure the caller has permission to refresh the credential.
+
+</blockquote>
+
+
+<h4>Destroyable</h4>
+
+<blockquote>
+
+<p>The
+<a href="../../../api/javax/security/auth/Destroyable.html">
+<code>javax.security.auth.Destroyable</code></a>
+<b>interface</b> provides the capability of destroying the contents
+within a credential.  The interface has two abstract methods:
+<pre>
+    boolean isDestroyed();
+</pre>
+Determines whether the credential has been destroyed.
+<pre>
+    void destroy() throws DestroyFailedException;
+</pre>
+Destroys and clears the information associated with this credential.
+Subsequent calls to certain methods on this credential will result in an
+<code>IllegalStateException</code> being thrown.
+The method implementation should perform an
+<code>AuthPermission("destroyCredential")</code>
+security check to ensure the caller has permission to destroy the credential.
+</ul>
+
+</blockquote>
+
+</blockquote>
+
+
+<h2><a name="Authentication">Authentication Classes and Interfaces</h2></a>
+
+<blockquote>
+
+To authenticate a subject (user or service), the following steps are performed:
+
+<ol>
+<li> An application instantiates a <code>LoginContext</code>. <p>
+
+<li> The <code>LoginContext</code> consults a
+     <a href="../../../api/javax/security/auth/login/Configuration.html">
+     <code>Configuration</code></a>
+     to load all of the <code>LoginModule</code>s configured for that 
+     application. <p>
+
+<li> The application invokes the <code>LoginContext</code>'s 
+     <code>login</code> method. <p>
+
+<li> The <code>login</code> method invokes all of the loaded 
+     <code>LoginModule</code>s.
+     Each <code>LoginModule</code> attempts to authenticate the
+     subject.  Upon success, <code>LoginModule</code>s associate
+     relevant <code>Principal</code>s and credentials with a 
+     <code>Subject</code> object that
+     represents the subject being authenticated. <p>
+
+<li> The <code>LoginContext</code> returns the authentication status to the
+     application.<p>
+
+<li> If authentication succeeded, the application retrieves the
+     <code>Subject</code> from the <code>LoginContext</code>.<p>
+
+</ol>
+
+<p>The authentication classes are described below.
+
+
+<h3><a name="LoginContext">LoginContext</h3></a>
+
+<blockquote>
+
+<p> The 
+<a href="../../../api/javax/security/auth/login/LoginContext.html">
+<code>javax.security.auth.login.LoginContext</code></a> class provides 
+the basic methods used
+to authenticate subjects, and provides a way to develop an
+application independent of the underlying authentication technology.
+The <code>LoginContext</code> consults a
+<a href="../../../api/javax/security/auth/login/Configuration.html">
+<code>Configuration</code></a>
+to determine the authentication services, or
+<a href="../../../api/javax/security/auth/spi/LoginModule.html">
+<code>LoginModule</code>(s)</a>,
+configured for a particular application. Therefore, different 
+<code>LoginModule</code>s can
+be plugged in under an application without requiring any modifications
+to the application itself.
+
+<p><code>LoginContext</code> offers four constructors from which to choose:
+<pre>
+    public LoginContext(String name) throws LoginException;
+
+    public LoginContext(String name, Subject subject) throws LoginException;
+
+    public LoginContext(String name, CallbackHandler callbackHandler)
+           throws LoginException
+
+    public LoginContext(String name, Subject subject,
+           CallbackHandler callbackHandler) throws LoginException
+</pre>
+All of the constructors share a common parameter: <code>name</code>.
+This argument is used by the <code>LoginContext</code>
+as an index into the login Configuration to determine which
+<code>LoginModule</code>s are configured for the application instantiating
+the <code>LoginContext</code>.
+Constructors that do not take a <code>Subject</code> as an
+input parameter instantiate a new <code>Subject</code>.
+Null inputs are disallowed for all constructors.
+Callers require an <code>AuthPermission</code> with target 
+"createLoginContext.&lt;name&gt;"
+to instantiate a <code>LoginContext</code>. Here, &lt;name&gt;
+refers to the name of the login configuration entry that
+the application references in the <code>name</code> parameter for
+the <code>LoginContext</code> instantiation.
+
+<p>See the <a href="#CallbackHandler">CallbackHandler</a> section for 
+information on what a <code>CallbackHandler</code> is and when you may
+need one.
+
+<p> Actual authentication occurs with a call to the following method:
+<pre>
+    public void login() throws LoginException;
+</pre>
+
+<p>When <code>login</code> is invoked, all of the configured 
+<code>LoginModule</code>s are invoked to perform
+the authentication.  If the authentication succeeded, the <code>Subject</code>
+(which may now hold <code>Principal</code>s, public credentials, and 
+private credentials) can be retrieved by using the following method:
+<pre>
+     public Subject getSubject();
+</pre>
+
+<p> To logout a <code>Subject</code> and remove its authenticated 
+<code>Principals</code> and credentials, the following method is provided:
+<pre>
+    public void logout() throws LoginException;
+</pre>
+
+<p> The following code sample demonstrates the calls
+necessary to authenticate and logout a Subject:
+<pre>
+    // let the LoginContext instantiate a new Subject
+    LoginContext lc = new LoginContext("entryFoo");
+    try {
+        // authenticate the Subject
+        lc.login();
+        System.out.println("authentication successful");
+
+        // get the authenticated Subject
+        Subject subject = lc.getSubject();
+
+        ...
+
+        // all finished -- logout
+        lc.logout();
+    } catch (LoginException le) {
+        System.err.println("authentication unsuccessful: " +  
+            le.getMessage());
+    }
+</pre>
+
+</blockquote>
+
+
+<h3><a name="LoginModule">LoginModule</a></h3>
+
+<blockquote>
+
+<p>The <a href="../../../api/javax/security/auth/spi/LoginModule.html">
+<code>LoginModule</code></a>
+<b>interface</b> gives developers the ability to implement
+different kinds of authentication technologies that can be plugged in under
+an application.  For example, one type of <code>LoginModule</code>
+may perform a username/password-based form of authentication.
+Other <code>LoginModule</code>s may interface to hardware devices such as 
+smart cards or biometric devices.
+
+<p>Note: If you are an application writer, you do not need to 
+understand the workings of <code>LoginModule</code>s. 
+All you have to know is how to write your application and specify
+configuration information (such as in a
+login configuration file) such that the application will be able to
+utilize the LoginModule specified by the configuration to
+authenticate the user. 
+
+<p>If, on the other hand, you are a programmer who wishes to
+write a LoginModule implementing an authentication technology,
+see the 
+<a href="JAASLMDevGuide.html">
+JAAS <code>LoginModule</code> Developer's Guide</a>
+for detailed step-by-step instructions.
+
+</blockquote>
+
+
+<h3><a name="CallbackHandler">CallbackHandler</a></h3>
+
+<blockquote>
+
+<p>In some cases a <code>LoginModule</code> must communicate with the
+user to obtain authentication information.  <code>LoginModule</code>s use a
+<a href="../../../api/javax/security/auth/callback/CallbackHandler.html">
+javax.security.auth.callback.CallbackHandler</a> for this purpose.  
+Applications implement the <code>CallbackHandler</code> <b>interface</b> and
+pass it to the <code>LoginContext</code>, which forwards it directly to the 
+underlying <code>LoginModule</code>s. A <code>LoginModule</code> uses the 
+<code>CallbackHandler</code> both to gather input
+from users (such as a password or smart card pin number) or to supply
+information to users (such as status information). By allowing the application
+to specify the <code>CallbackHandler</code>, underlying 
+<code>LoginModules</code> can remain independent
+of the different ways applications interact with users.
+For example, the implementation of a <code>CallbackHandler</code> for a GUI 
+application might display a window to solicit input from a user. On the other 
+hand, the implementation of a <code>CallbackHandler</code> for a non-GUI tool 
+might simply prompt the user for input directly from the command line.
+</p>
+
+<code>CallbackHandler</code> is an interface with one method to
+implement:
+<pre>
+     void handle(Callback[] callbacks)
+         throws java.io.IOException, UnsupportedCallbackException;
+</pre>
+
+<p>The <code>LoginModule</code> passes the <code>CallbackHandler handle</code> 
+method an array 
+of appropriate <code>Callback</code>s, for example a 
+<a href="../../../api/javax/security/auth/callback/NameCallback.html">
+NameCallback</a> for the user name and
+a <a href="../../../api/javax/security/auth/callback/PasswordCallback.html">
+PasswordCallback</a> for the password, and the <code>CallbackHandler</code> 
+performs the requested user interaction and sets appropriate values in the
+<code>Callback</code>s. For example, to process a <code>NameCallback</code>, the <code>CallbackHandler</code> may prompt for a name, retrieve the value from 
+the user, and call the <code>NameCallback</code>'s <code>setName</code> 
+method to store the name.
+
+<p>The 
+<a href="../../../api/javax/security/auth/callback/CallbackHandler.html">
+<code>CallbackHandler</code></a> documentation
+has a lengthy example not included in this document that
+readers may want to examine.
+
+</blockquote>
+
+
+<h3><a name="Callback">Callback</a></h3>
+
+<blockquote>
+
+The <a href="../../../api/javax/security/auth/callback/package-summary.html">javax.security.auth.callback</a>
+package contains the <code>Callback</code> <b>interface</b> as well
+as several implementations.  <code>LoginModule</code>s may pass an array of 
+<code>Callback</code>s directly to the <code>handle</code> method of a
+<a href="#CallbackHandler">CallbackHandler.</a>
+
+<p>Please consult the various <code>Callback</code> APIs for more information 
+on their use.
+
+</blockquote>
+
+
+</blockquote>
+
+
+<h2><a name="Authorization">Authorization Classes</a></h2>
+
+<blockquote>
+
+<p>To make JAAS authorization take place, granting access control
+permissions based not just on what code is running but also on who
+is running it, the following is required:
+
+<ul>
+
+<li>The user must be authenticated, as described in the
+<a href="#LoginContext">LoginContext</a> section. <p>
+
+<li>The Subject that is the result of authentication must be
+associated with an access control context, as described
+in the <a href="#Subject">Subject</a> section. <p>
+
+<li>Principal-based entries must be configured in the security policy,
+as described below. <p>
+
+</ul>
+
+<p>The <code>Policy</code> abstract class and the authorization-specific 
+classes <code>AuthPermission</code> and <code>PrivateCredentialPermission</code>
+are described below.
+
+
+<h3><u><a name="Policy">Policy</u></h3></a>
+
+<blockquote>
+
+<p>
+<p>The <a href="../../../api/java/security/Policy.html">
+<code>java.security.Policy</code></a> class is an <b>abstract</b> class for 
+representing the system-wide access control policy. The 
+<code>Policy</code> API was upgraded in the J2SDK, v 1.4 to support
+<a href="../../../api/java/security/Principal.html">
+<code>Principal</code></a>-based queries.
+
+<p>As a default, the J2SDK provides a file-based
+subclass implementation, which was upgraded to support 
+<code>Principal</code>-based 
+<code>grant</code> entries in policy files.
+
+<p>Policy files and the structure of entries within them
+are described in <a href = "../PolicyFiles.html">
+Default Policy Implementation and Policy File Syntax</a>.
+
+</blockquote>
+
+
+<h3><a name="AuthPermission">AuthPermission</a></h3>
+
+<blockquote>
+
+<p>The <a href="../../../api/javax/security/auth/AuthPermission.html">
+<code>javax.security.auth.AuthPermission</code></a>
+class encapsulates the basic permissions required for JAAS.
+An <code>AuthPermission</code> contains a name (also referred to as a 
+"target name") but no actions list; you either have the named permission 
+or you don't.
+
+<p> In addition to its inherited methods
+(from the <a href="../../../api/java/security/Permission.html">
+<code>java.security.Permission</code></a> class),
+an <code>AuthPermission</code> has two public constructors:
+<pre>
+    public AuthPermission(String name);
+    public AuthPermission(String name, String actions);
+</pre>
+The first constructor creates a new <code>AuthPermission</code> with the 
+specified name. The second constructor also creates a new 
+<code>AuthPermission</code> object with the
+specified name, but has an additional <code>actions</code> argument which is
+currently unused and should be null.
+This constructor exists solely for the <code>Policy</code> object
+to instantiate new <code>Permission</code> objects.
+For most other code, the first constructor is appropriate.
+
+<p>Currently the <code>AuthPermission</code> object is used to
+guard access to the <code>Policy</code>, <code>Subject</code>, 
+<code>LoginContext</code>, and <code>Configuration</code> objects.  
+Please refer to the
+<a href="../../../api/javax/security/auth/AuthPermission.html">
+AuthPermission</a> javadocs for the list of valid names that
+are supported.
+
+</blockquote>
+
+
+<h3><a name="PrivateCredentialPermission">PrivateCredentialPermission</a></h3>
+
+<blockquote>
+
+<p>The  <code>javax.security.auth.PrivateCredentialPermission</code>
+class protects access to a <code>Subject</code>'s private credentials
+and provides one public constructor:
+
+<pre>
+     public PrivateCredentialPermission(String name, String actions);
+</pre>
+
+Please refer to the
+<a href="../../../api/javax/security/auth/PrivateCredentialPermission.html">PrivateCredentialPermission</a> javadocs for
+more detailed information on this class.
+
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+<p>
+
+
+<!------------------------------------------------------------------------>
+
+<hr>
+<H1><a name="Sample">JAAS Tutorials and Sample Programs</a></H1>
+
+<blockquote>
+
+<p>The <a href="tutorials/GeneralAcnOnly.html">JAAS Authentication</a> and 
+<a href="tutorials/GeneralAcnAndAzn.html">JAAS Authorization</a>
+tutorials contain the following samples:
+
+<ul>
+
+<li><a href = "tutorials/SampleAcn.java">SampleAcn.java</a> is a
+sample application demonstrating JAAS authentication. <p>
+
+<li><a href = "tutorials/SampleAzn.java">SampleAzn.java</a> is a
+sample application used by the authorization tutorial. It demonstrates
+both authentication and authorization. <p>
+
+<li><a href = "tutorials/sample_jaas.config">sample_jaas.config</a> is a
+sample login configuration file used by both tutorials. <p>
+
+<li><a href = "tutorials/sampleacn.policy">sampleacn.policy</a> is a
+sample policy file granting permissions required by the code for
+the authentication tutorial. <p>
+
+<li><a href = "tutorials/sampleazn.policy">sampleazn.policy</a> is a
+sample policy file granting permissions required by the code for
+the authorization tutorial. <p>
+
+<li><a href = "tutorials/SampleLoginModule.java">SampleLoginModule.java</a> is 
+the class specified by the tutorials' 
+login configuration file (<code>sample_jaas.config</code>) as the
+class implementing the desired underlying authentication.
+SampleLoginModule's user authentication consists of simply verifying
+that the name and password specified by the user have specific
+values. <p>
+
+<li><a href = "tutorials/SamplePrincipal.java">SamplePrincipal.java</a> is 
+a sample class implementing
+the <a href="../../../api/java/security/Principal.html">
+<code>Principal</code></a> interface. It is used by 
+SampleLoginModule.
+
+</ul>
+
+<p>See the tutorials for detailed information about the applications,
+the policy files, and the login configuration file.
+
+<p>Application writers do not need to understand the code for
+SampleLoginModule.java or SamplePrincipal.java, as explained in the
+tutorials. Programmers who wish to write LoginModules 
+can learn how to do so by reading the 
+<a href="JAASLMDevGuide.html">JAAS LoginModule Developer's Guide</a>.
+
+</blockquote>
+
+<p>
+
+
+<!------------------------------------------------------------------------>
+<hr>
+<H1><a name="AppendixA">Appendix A:  JAAS Settings in the java.security Security Properties File</a></H1>
+
+<blockquote>
+
+<p> A number of JAAS-related settings can be configured in the 
+<code>java.security</code> master security 
+properties file, which is located in the <b>lib/security</b> directory
+of the Java 2 runtime.
+
+<p> JAAS adds two new security properties to <code>java.security</code>:
+<ul>
+  <li><code>login.configuration.provider</code>
+  <li><code>login.config.url.<i>n</i></code>
+</ul>
+
+<p>The following pre-existing properties are also relevant for JAAS
+users:
+<ul>
+  <li><code>policy.provider</code>
+  <li><code>policy.url.<i>n</i></code>
+</ul>
+
+
+<H3>Login Configuration Provider</H3>
+
+<blockquote>
+
+<p> The default JAAS login configuration implementation provided by
+Sun Microsystems gets its
+configuration information from files and expects the information to
+be provided in a specific format shown in the tutorials.
+
+<p>The default JAAS login configuration implementation can be replaced
+by specifying the alternative provider class implementation in the
+<code>login.configuration.provider</code> property.
+
+<p> For example:
+<pre>
+  login.configuration.provider=com.foo.Config
+</pre>
+
+If the Security property <code>login.configuration.provider</code>
+is not found, or is left unspecified, then it is set to the default value:
+<pre>
+  login.configuration.provider=com.sun.security.auth.login.ConfigFile
+</pre>
+
+<p> Note that there is no means to dynamically set the login configuration
+provider from the command line.
+
+</blockquote>
+
+
+<H3>Login Configuration URLs</H3>
+
+<blockquote>
+
+<p> If you are using a login configuration implementation that expects
+the configuration information to be specified in files (as does the default
+implementation from Sun Microsystems), the location of the login 
+configuration file(s) can be statically set
+by specifying their respective URLs in the
+<code>login.config.url.<i>n</i></code> property.
+'<i>n</i>' is a consecutively numbered integer starting with 1.
+If multiple configuration files are specified (if <i>n</i> >= 2),
+they will be read and unioned into one single configuration.
+
+<p> For example:
+<pre>
+  login.config.url.1=file:C:/config/.java.login.config
+  login.config.url.2=file:C:/users/foo/.foo.login.config
+</pre>
+
+<p> If the location of the configuration files is not set in the
+<code>java.security</code> properties file, and also is not specified 
+dynamically from the command line (via the 
+<code>-Djava.security.auth.login.config</code> 
+option), JAAS attempts to load a default configuration 
+from
+
+<blockquote>
+<pre>
+<i>file:${user.home}</i>/.java.login.config
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+<a name="policyprovider"></a>
+<H3>Policy Provider</H3>
+
+<blockquote>
+
+<p> The default policy implementation can be replaced
+by specifying the alternative provider class implementation in the
+<code>policy.provider</code> property.
+
+<p> For example:
+<pre>
+  policy.provider=com.foo.Policy
+</pre>
+
+If the Security property <code>policy.provider</code>
+is not found, or is left unspecified, then the <code>Policy</code>
+is set to the default value:
+<pre>
+  policy.provider=sun.security.provider.PolicyFile
+</pre>
+
+<p> Note that there is no means to dynamically set the policy
+provider from the command line.
+
+</blockquote>
+
+
+<H3>Policy File URLs</H3>
+
+<blockquote>
+
+<p> The location of the access control policy files can be statically set
+by specifying their respective URLs in the
+<code>auth.policy.url.<i>n</i></code> property.
+'<i>n</i>' is a consecutively numbered integer starting with 1.
+If multiple policies are specified (if <i>n</i> >= 2),
+they will be read and unioned into one single policy.
+
+<p> For example:
+<pre>
+  policy.url.1=file:C:/policy/.java.policy
+  policy.url.2=file:C:/users/foo/.foo.policy
+</pre>
+
+<p> If the location of the policy file(s) is not set in the
+<code>java.security</code> properties file, and is not specified dynamically
+from the command line (via the <code>-Djava.security.policy</code> 
+option), the access control policy
+defaults to the same policy as that of the system policy file installed
+with the the J2SDK. That policy file 
+
+<ul>
+
+<li>grants all permissions to standard extensions <p>
+
+<li>allows anyone to listen on un-privileged ports <p>
+
+<li>allows any code to read certain "standard" properties that 
+are not security-sensitive, such as
+the "os.name" and "file.separator" properties. 
+
+</ul>
+
+</blockquote>
+
+
+<H3>Sample Master Security Properties File</H3>
+
+<blockquote>
+
+<p> Below is a modified copy of the <code>java.security</code> file
+provided with the Java 2 runtime, v 1.4. 
+Example settings for JAAS-related properties
+are shown in bold. In this example, we leave the values provided
+in the default <code>java.security</code> file for the 
+<code>policy.provider</code>, <code>policy.url.<i>n</i></code>, and
+<code>login.configuration.provider</code> 
+properties. The default <code>java.security</code> file also
+lists a value for the <code>login.config.url.<i>n</i></code> property,
+but it is commented out. In the example below, it is not commented.
+
+<pre>
+#
+# This is the "master security properties file".
+#
+# In this file, various security properties are set for use by
+# java.security classes. This is where users can statically register
+# Cryptography Package Providers ("providers" for short). The term
+# "provider" refers to a package or set of packages that supply a
+# concrete implementation of a subset of the cryptography aspects of
+# the Java Security API. A provider may, for example, implement one or
+# more digital signature algorithms or message digest algorithms.
+#
+# Each provider must implement a subclass of the Provider class.
+# To register a provider in this master security properties file,
+# specify the Provider subclass name and priority in the format
+#
+#    security.provider.&lt;n&gt;=&lt;className&gt;  
+#
+# This declares a provider, and specifies its preference
+# order &lt;n&gt;. The preference order is the order in which providers are
+# searched for requested algorithms (when no specific provider is
+# requested). The order is 1-based; 1 is the most preferred, followed
+# by 2, and so on.
+#
+# &lt;className&gt; must specify the subclass of the Provider class whose
+# constructor sets the values of various properties that are required
+# for the Java Security API to look up the algorithms or other
+# facilities implemented by the provider.
+#
+# There must be at least one provider specification in java.security.
+# There is a default provider that comes standard with the JDK. It
+# is called the "SUN" provider, and its Provider subclass
+# named Sun appears in the sun.security.provider package. Thus, the
+# "SUN" provider is registered via the following:
+#
+#    security.provider.1=sun.security.provider.Sun
+#
+# (The number 1 is used for the default provider.)
+#
+# Note: Statically registered Provider subclasses are instantiated
+# when the system is initialized. Providers can be dynamically
+# registered instead by calls to either the addProvider or
+# insertProviderAt method in the Security class.
+
+#
+# List of providers and their preference orders (see above):
+#
+security.provider.1=sun.security.provider.Sun
+security.provider.2=com.sun.net.ssl.internal.ssl.Provider
+security.provider.3=com.sun.rsajca.Provider
+security.provider.4=com.sun.crypto.provider.SunJCE
+security.provider.5=sun.security.jgss.SunProvider
+
+#
+# Select the source of seed data for SecureRandom. By default it uses
+# a system/thread activity algorithm. Optionally, if the platform supports
+# it an entropy gathering device can be selected. 
+#
+#securerandom.source=file:/dev/random
+#
+# The entropy gathering device is described as a URL and can 
+# also be specified with the property "java.security.egd". For example,
+#   -Djava.security.egd=file:/dev/urandom
+# Specifying this property will override the securerandom.source setting.
+
+#
+# Class to instantiate as the javax.security.auth.login.Configuration
+# provider.
+#
+<b>login.configuration.provider=com.sun.security.auth.login.ConfigFile</b>
+
+#
+# Default login configuration file
+#
+<b>login.config.url.1=file:${user.home}/.java.login.config</b>
+
+#
+# Class to instantiate as the system Policy. This is the name of the class
+# that will be used as the Policy object.
+#
+<b>policy.provider=sun.security.provider.PolicyFile</b>
+
+# The default is to have a single system-wide policy file,
+# and a policy file in the user's home directory.
+<b>policy.url.1=file:${java.home}/lib/security/java.policy
+policy.url.2=file:${user.home}/.java.policy</b>
+
+# whether or not we expand properties in the policy file
+# if this is set to false, properties (${...}) will not be expanded in policy
+# files.
+policy.expandProperties=true
+
+# whether or not we allow an extra policy to be passed on the command line
+# with -Djava.security.policy=somefile. Comment out this line to disable
+# this feature.
+policy.allowSystemProperty=true
+
+# whether or not we look into the IdentityScope for trusted Identities
+# when encountering a 1.1 signed JAR file. If the identity is found
+# and is trusted, we grant it AllPermission.
+policy.ignoreIdentityScope=false
+
+#
+# Default keystore type.
+#
+keystore.type=jks
+
+#
+# Class to instantiate as the system scope:
+#
+system.scope=sun.security.provider.IdentityDatabase
+
+#
+# List of comma-separated packages that start with or equal this string
+# will cause a security exception to be thrown when
+# passed to checkPackageAccess unless the
+# corresponding RuntimePermission ("accessClassInPackage."+package) has
+# been granted.
+package.access=sun.
+
+#
+# List of comma-separated packages that start with or equal this string
+# will cause a security exception to be thrown when
+# passed to checkPackageDefinition unless the
+# corresponding RuntimePermission ("defineClassInPackage."+package) has
+# been granted.
+#
+# by default, no packages are restricted for definition, and none of
+# the class loaders supplied with the JDK call checkPackageDefinition.
+#
+#package.definition=
+
+#
+# Determines whether this properties file can be appended to
+# or overridden on the command line via -Djava.security.properties
+#
+security.overridePropertiesFile=true
+
+#
+# Determines the default key and trust manager factory algorithms for 
+# the javax.net.ssl package.
+#
+ssl.KeyManagerFactory.algorithm=SunX509
+ssl.TrustManagerFactory.algorithm=SunX509
+
+#
+# Determines the default SSLSocketFactory and SSLServerSocketFactory
+# provider implementations for the javax.net.ssl package.  If, due to
+# export and/or import regulations, the providers are not allowed to be
+# replaced, changing these values will produce non-functional
+# SocketFactory or ServerSocketFactory implementations.
+#
+#ssl.SocketFactory.provider=
+#ssl.ServerSocketFactory.provider=
+</pre>
+
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+<p>
+
+
+<!------------------------------------------------------------------------>
+<hr>
+<H1><a name="AppendixB">Appendix B:  Example Login Configurations</a></H1>
+
+<blockquote>
+
+<p>Login configurations are located using the <code>login.config.url.n</code>
+security properties found in the <code>java.security</code> file.  For more
+information about this property and the location of the
+<code>java.security</code> file, see
+<a href="#AppendixA">Appendix A</a>.
+
+<p> The default Configuration implementation, <code>ConfigFile</code>, 
+gets its configuration information from login configuration files.
+For details about the default login Configuration implementation
+provided with JAAS, please consult the javadocs for the
+<a href="spec/com/sun/security/auth/login/ConfigFile.html">
+<code>com.sun.security.auth.login.ConfigFile</code></a>
+class.
+
+<p>The following is a sample login configuration file. 
+
+<pre>
+    Login1 {
+       sample.SampleLoginModule required debug=true;
+    };
+
+    Login2 {
+       sample.SampleLoginModule required;
+       com.sun.security.auth.module.NTLoginModule sufficient;
+       com.foo.SmartCard requisite debug=true;
+       com.foo.Kerberos optional debug=true;
+    };
+</pre>
+
+<p> The application <b>Login1</b> only has one configured LoginModule,
+<code>SampleLoginModule</code>.
+Therefore, an attempt by <b>Login1</b> to authenticate a subject
+(user or service)
+will be successful if and only if the <code>SampleLoginModule</code>
+succeeds.
+
+<p> The authentication logic for the application <b>Login2</b>
+is easier to explain with the table below. Note: the
+<code>required</code>, <code>sufficient</code>, <code>requisite</code>, 
+and <code>optional</code> flags are described in the 
+<a href="../../../api/javax/security/auth/login/Configuration.html">
+<code>Configuration</code></a> javadocs.
+
+<p>
+<table summary="Login2 Authentication Status" BORDER="1" CELLPADDING="3" CELLSPACING="0">
+<thead>
+ <th colspan=10><font size="+2"><b>Login2 Authentication Status</b></font>
+</thead>
+<tr>
+ <td>SampleLoginModule</td><td>required</td><td>pass</td><td>pass</td><td>pass</td><td>pass</td><td>fail</td><td>fail</td><td>fail</td><td>fail</td>
+</tr>
+<tr>
+ <td>NTLoginModule</td><td>sufficient</td>  <td>pass</td><td>fail</td><td>fail</td><td>fail</td><td>pass</td><td>fail</td><td>fail</td><td>fail</td>
+</tr>
+<tr>
+ <td>SmartCard</td><td>requisite</td>       <td>*</td>   <td>pass</td><td>pass</td><td>fail</td><td>*</td>   <td>pass</td><td>pass</td><td>fail</td>
+</tr>
+<tr>
+ <td>Kerberos</td><td>optional</td>         <td>*</td>   <td>pass</td><td>fail</td><td>*</td>   <td>*</td>   <td>pass</td><td>fail</td><td>*</td>
+</tr>
+<tr>
+ <td colspan=2>Overall Authentication</td>  <td>pass</td><td>pass</td><td>pass</td><td>fail</td><td>fail</td><td>fail</td><td>fail</td><td>fail</td>
+</tr>
+
+</table>
+* = trivial value due to control returning to the application because
+a previous <i>requisite</i> module failed or a previous <i>sufficient</i>
+module succeeded.
+
+</blockquote>
+
+<!------------------------------------------------------------------------>
+
+<p>
+<i>
+Last update: August 8, 2001
+</i>
+<p>
+</body>
+</HTML>

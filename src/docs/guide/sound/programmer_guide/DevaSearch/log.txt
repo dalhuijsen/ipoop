@@ -1,0 +1,174 @@
+INDEXER SETTINGS:
+ Minimum term length: 2
+ Maximum term length: 20
+ Index files with extensions: htm html 
+ Ignore files and directories: 
+
+Starting indexer at "C:\Dreamweaver\Projects\javasound\programmer_guide"
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\appendix1.html"
+  Last updated: 
+  File Size: 3 KB
+  Title: Code Overview: AudioSystem.java KB
+  Description: ... the benefit of service providers and API implementers, a brief overview of the JavaSound KB
+  Total terms in file: 156
+  Total terms indexed: 105
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter1.html"
+  Last updated: 
+  File Size: 15 KB
+  Title:  KB
+  Description: ... Sound API &nbsp; Design Goals The Java TM Sound API is a low-level API KB
+  Total terms in file: 569
+  Total terms indexed: 468
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter10.html"
+  Last updated: 
+  File Size: 20 KB
+  Title:  KB
+  Description: ... Messages &nbsp; Understanding Devices, Transmitters, and Receivers The Java TM Sound API specifies a KB
+  Total terms in file: 662
+  Total terms indexed: 503
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter11.html"
+  Last updated: 
+  File Size: 45 KB
+  Title:  KB
+  Description: ... MIDI Sequences &nbsp; In the world of MIDI, a sequencer is any hardware or KB
+  Total terms in file: 1099
+  Total terms indexed: 896
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter12.html"
+  Last updated: 
+  File Size: 28 KB
+  Title:  KB
+  Description: ... programs that avail themselves of the Java TM Sound API's MIDI package do so KB
+  Total terms in file: 846
+  Total terms indexed: 679
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter13.html"
+  Last updated: 
+  File Size: 12 KB
+  Title:  KB
+  Description: ... Provider Interfaces &nbsp; What Are Services? Services are units of sound-handling functionality that are KB
+  Total terms in file: 432
+  Total terms indexed: 319
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter14.html"
+  Last updated: 
+  File Size: 19 KB
+  Title:  KB
+  Description: ... As discussed in Chapter 13, ' Introduction to the Service Provider Interfaces ,' the KB
+  Total terms in file: 527
+  Total terms indexed: 398
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter15.html"
+  Last updated: 
+  File Size: 17 KB
+  Title:  KB
+  Description: ... Chapter 13, ' Introduction to the Service Provider Interfaces ,' explained that the javax.sound.sampled.spi KB
+  Total terms in file: 493
+  Total terms indexed: 378
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter2.html"
+  Last updated: 
+  File Size: 29 KB
+  Title:  KB
+  Description: ... Package &nbsp; This chapter provides an introduction to the Java TM Sound API's digital KB
+  Total terms in file: 845
+  Total terms indexed: 706
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter3.html"
+  Last updated: 
+  File Size: 18 KB
+  Title:  KB
+  Description: ... Notes: Port is currently not implemented in the Sun reference implementation of JavaSound. (See KB
+  Total terms in file: 537
+  Total terms indexed: 397
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter4.html"
+  Last updated: 
+  File Size: 23 KB
+  Title:  KB
+  Description: ... Playback is sometimes referred to as presentation or rendering . These are general terms KB
+  Total terms in file: 726
+  Total terms indexed: 562
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter5.html"
+  Last updated: 
+  File Size: 11 KB
+  Title:  KB
+  Description: ... refers to the process of obtaining a signal from outside the computer. A common KB
+  Total terms in file: 428
+  Total terms indexed: 296
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter6.html"
+  Last updated: 
+  File Size: 22 KB
+  Title:  KB
+  Description: ... &nbsp; Previous chapters have discussed how to play or capture audio samples. The implicit KB
+  Total terms in file: 633
+  Total terms indexed: 494
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter7.html"
+  Last updated: 
+  File Size: 28 KB
+  Title:  KB
+  Description: ... Converters &nbsp; Most application programs that deal with sound need to read sound files KB
+  Total terms in file: 725
+  Total terms indexed: 553
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter8.html"
+  Last updated: 
+  File Size: 19 KB
+  Title:  KB
+  Description: ... Package &nbsp; Chapter 1,' Introduction to Java Sound ,' gave a glimpse into the KB
+  Total terms in file: 631
+  Total terms indexed: 499
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\chapter9.html"
+  Last updated: 
+  File Size: 11 KB
+  Title:  KB
+  Description: ... &nbsp; The Java TM Sound API offers a flexible model for MIDI system configuration, KB
+  Total terms in file: 389
+  Total terms indexed: 283
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\contents.html"
+  Last updated: 
+  File Size: 12 KB
+  Title:  KB
+  Description: ... Is Intended What this Guide Describes For More Information Chapter: 1 Introduction to the KB
+  Total terms in file: 251
+  Total terms indexed: 208
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\index.html"
+  Last updated: 
+  File Size: 0 KB
+  Title:  KB
+  Description: ... &nbsp; JavaSound API Programmer's Guide &nbsp; Last Updated October14, 2001 &nbsp; KB
+  Total terms in file: 8
+  Total terms indexed: 7
+
+Indexed "C:\Dreamweaver\Projects\javasound\programmer_guide\preface.html"
+  Last updated: 
+  File Size: 4 KB
+  Title:  KB
+  Description: ... Is Intended This guide is intended for three groups of readers: Application developers: software KB
+  Total terms in file: 212
+  Total terms indexed: 154
+
+Enter directory: "C:\Dreamweaver\Projects\javasound\programmer_guide\DevaConfig"
+Enter directory: "C:\Dreamweaver\Projects\javasound\programmer_guide\DevaConfig\_notes"
+Enter directory: "C:\Dreamweaver\Projects\javasound\programmer_guide\DevaSearch"
+Enter directory: "C:\Dreamweaver\Projects\javasound\programmer_guide\images"
+Enter directory: "C:\Dreamweaver\Projects\javasound\programmer_guide\images\_notes"
+Enter directory: "C:\Dreamweaver\Projects\javasound\programmer_guide\Library"
+Enter directory: "C:\Dreamweaver\Projects\javasound\programmer_guide\_notes"
+Saved index file: C:\Dreamweaver\Projects\javasound\programmer_guide\DevaSearch\devasearch.js (91KB)
+Write output file: "searchtopframe.html".
+Write output file: "C:\Dreamweaver\Projects\javasound\programmer_guide\DevaSearch\help.html".
+Write output file: "C:\Dreamweaver\Projects\javasound\programmer_guide\DevaSearch\search.html".
+Write output file: "C:\Dreamweaver\Projects\javasound\programmer_guide\DevaSearch\searchalt.html".
+Write output file: "C:\Dreamweaver\Projects\javasound\programmer_guide\DevaSearch\searchresults.html".
+Write output file: "C:\Dreamweaver\Projects\javasound\programmer_guide\DevaSearch\style.css".
+Finished: Indexed 2862 terms from 19 files (337KB) with 10169 total terms.

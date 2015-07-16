@@ -1,0 +1,157 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Fri Oct 25 14:14:59 2002" />
+    <title>1.0	Requirements	2</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="dnd1TOC.html" />
+    <link rel="Previous" href="" />
+    <link rel="Next" href="dnd1.html" />
+    <link rel="Index" href="dnd1.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table summary="layout" id="layout" width="100%">
+      <tr> 
+	<td align="center">
+              <p>&#160;</p>
+	      <h1>Drag and Drop subsystem for the Java Foundation Classes</h1>
+	      <h2><br />
+	        </h2>
+	      <h4></h4>
+    <hr class="pHr" />
+	</td>
+      </tr>
+      <tr>
+      </tr>
+        <td align="left">
+		  Contents | Previous | <a accesskey="n" href="dnd1.html">Next</a>
+        </td>
+    </table>
+<a name="skip"></a>
+<a name="wp457"> </a><p class="pTOC2">
+<a href="dnd1.html#wp921295">1.0 Requirements</a>
+</p>
+<a name="wp459"> </a><p class="pTOC2">
+<a href="dnd1.html#wp919329">2.0 API</a>
+</p>
+<a name="wp461"> </a><p class="pTOC3">
+<a href="dnd1.html#wp919335">2.1 Overview</a>
+</p>
+<a name="wp463"> </a><p class="pTOC3">
+<a href="dnd1.html#wp923911">2.2 Drag Gesture Recognition</a>
+</p>
+<a name="wp465"> </a><p class="pTOC4">
+<a href="dnd1.html#wp923922">2.2.1 DragGestureRecognizer</a>
+</p>
+<a name="wp467"> </a><p class="pTOC3">
+<a href="dnd1.html#wp923985">2.3 Drag Source</a>
+</p>
+<a name="wp469"> </a><p class="pTOC4">
+<a href="dnd1.html#wp921901">2.3.1 The DragSource definition</a>
+</p>
+<a name="wp471"> </a><p class="pTOC4">
+<a href="dnd1.html#wp920428">2.3.2 The DragSourceContext Definition</a>
+</p>
+<a name="wp473"> </a><p class="pTOC4">
+<a href="dnd1.html#wp920315">2.3.3 The DragSourceListener Definition</a>
+</p>
+<a name="wp475"> </a><p class="pTOC4">
+<a href="dnd1.html#wp922136">2.3.4 The DragSourceEvent Definition</a>
+</p>
+<a name="wp477"> </a><p class="pTOC4">
+<a href="dnd1.html#wp922137">2.3.5 The DragSourceDragEvent Definition</a>
+</p>
+<a name="wp479"> </a><p class="pTOC4">
+<a href="dnd1.html#wp920366">2.3.6 The DragSourceDropEvent Definition</a>
+</p>
+<a name="wp481"> </a><p class="pTOC3">
+<a href="dnd1.html#wp919284">2.4 Drop Target</a>
+</p>
+<a name="wp483"> </a><p class="pTOC4">
+<a href="dnd1.html#wp921389">2.4.1 java.awt.Component additions for DropTarget (de)registration.</a>
+</p>
+<a name="wp485"> </a><p class="pTOC4">
+<a href="dnd1.html#wp920326">2.4.2 The DropTarget Definition</a>
+</p>
+<a name="wp487"> </a><p class="pTOC4">
+<a href="dnd1.html#wp922407">2.4.3 The DropTargetContext Definition</a>
+</p>
+<a name="wp489"> </a><p class="pTOC4">
+<a href="dnd1.html#wp920526">2.4.4 The DropTargetListener Definition</a>
+</p>
+<a name="wp491"> </a><p class="pTOC4">
+<a href="dnd1.html#wp920622">2.4.5 The DropTargetDragEvent and DropTargetDropEvent Definitions</a>
+</p>
+<a name="wp493"> </a><p class="pTOC4">
+<a href="dnd1.html#wp922449">2.4.6 Autoscrolling support</a>
+</p>
+<a name="wp495"> </a><p class="pTOC3">
+<a href="dnd1.html#wp919804">2.5 Data Transfer Phase</a>
+</p>
+<a name="wp497"> </a><p class="pTOC4">
+<a href="dnd1.html#wp923066">2.5.1 FlavorMap and SystemFlavorMap</a>
+</p>
+<a name="wp499"> </a><p class="pTOC4">
+<a href="dnd1.html#wp924198">2.5.2 Transferring Data across the JVM boundary</a>
+</p>
+<a name="wp501"> </a><p class="pTOC4">
+<a href="dnd1.html#wp924199">2.5.3 Transferring lists of files across the JVM boundary.</a>
+</p>
+<a name="wp503"> </a><p class="pTOC4">
+<a href="dnd1.html#wp924336">2.5.4 Transferring java.rmi.Remote references across the JVM boundary.</a>
+</p>
+<a name="wp505"> </a><p class="pTOC2">
+<a href="dnd1.html#wp921691">3.0 Issues</a>
+</p>
+<a name="wp507"> </a><p class="pTOC4">
+<a href="dnd1.html#wp919822">3.0.1 What are the implications of the various platform protocol engines?</a>
+</p>
+<a name="wp509"> </a><p class="pTOC4">
+<a href="dnd1.html#wp919656">3.0.2 Inter/Intra VM transfers?</a>
+</p>
+<a name="wp511"> </a><p class="pTOC4">
+<a href="dnd1.html#wp919768">3.0.3 Lifetime of the Transferable(s)?</a>
+</p>
+<a name="wp513"> </a><p class="pTOC4">
+<a href="dnd1.html#wp920248">3.0.4 Implications of ACTION_MOVE semantics on source objects exposed via Transferable?</a>
+</p>
+<a name="wp515"> </a><p class="pTOC4">
+<a href="dnd1.html#wp921474">3.0.5 Semantics of ACTION_REFERENCE operation.</a>
+</p>
+<a name="wp517"> </a><p class="pTOC2">
+<a href="dnd1.html#wp922647">Appendix A :  DropTargetPeer definition</a>
+</p>
+<a name="wp519"> </a><p class="pTOC2">
+<a href="dnd1.html#wp922676">Appendix B :  DragSourceContextPeer definition</a>
+</p>
+<a name="wp521"> </a><p class="pTOC2">
+<a href="dnd1.html#wp922753">Appendix C :  DropTargetContextPeer definition</a>
+</p>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+
+    <table summary="layout">
+      <tr>
+        <td align="left">
+ 	  Contents | Previous | <a href="dnd1.html">Next</a>
+        </td>
+      </tr>
+      <tr>
+	<td>
+	  <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+        </td>
+      </tr>
+    </table>
+
+  </body>
+</html>

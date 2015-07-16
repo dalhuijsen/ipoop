@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+<HEAD>
+     <TITLE>Troubleshooting</TITLE>
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Troubleshooting</h1>
+
+</center>
+
+</TD>
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Java<sup><font size=-2>TM</font></sup> 2 SDK Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+<blockquote>
+
+<ul>
+
+    <li> A <tt><a href="../../api/java/io/File.html">File</a></tt>
+    object represents a file name, not an actual file.  Such objects are,
+    moreover, immutable.  Thus the code
+
+    <pre>
+    File f1 = new File("foo");
+    File f2 = new File("bar");
+    f1.renameTo(f2); </pre>
+
+    will rename the file named <tt>"foo"</tt> (if it exists) to <tt>"bar"</tt>.
+    It will not change the value of the <tt>File</tt> object referred to by
+    <tt>f1</tt>; in particular, the expression <tt>f1.getPath()</tt> will still
+    evaluate to <tt>"foo"</tt>.
+
+
+    <p><li> The <tt><a href="../../api/java/io/InputStream.html#available()">available</a></tt>
+    method of the <tt>
+    <a href="../../api/java/io/InputStream.html">InputStream</a></tt>
+    class and its subclasses does not necessarily return the maximum number of
+    bytes that can be read without blocking.  In particular, code of the form
+
+    <pre>
+    int n = in.available();
+    byte buf = new byte[n];
+    in.read(buf); </pre>
+
+    is not guaranteed to read all of the remaining bytes from the given input
+    stream. Similarly, the <tt><a href="../../api/java/io/Reader.html#ready()">ready</a></tt>
+    method of <tt>
+    <a href="../../api/java/io/Reader.html">Reader</a></tt>
+    and its subclasses may return <tt>false</tt> even if the stream is ready to
+    be read.
+
+
+    <p><li> The <tt><a href="../../api/java/io/InputStream.html#read(byte[])">read(byte[])</a></tt>
+    and <tt><a href="../../api/java/io/InputStream.html#read(byte[], int, int)">read(byte[],&nbsp;int,&nbsp;int)</a></tt>
+    methods of <tt>
+<a href="../../api/java/io/InputStream.html">InputStream</a></tt>
+    and its subclasses are not guaranteed to read all available bytes.  A loop
+    may be required, for example, in order to read a large file into an array:
+
+    <pre>
+    for (int off = 0; off &lt; size;) {
+        int r = in.read(buf, off, buf.length - off);
+        if (r == -1) break;
+        off += r;
+    } </pre>
+
+    Alternatively, a <tt>
+<a href="../../api/java/io/BufferedInputStream.html">BufferedInputStream</a></tt>
+    may be used.  Similar remarks apply to the <tt>
+<a href="../../api/java/io/Reader.html#read(char[])">read(char[])</a></tt>
+    and <tt>
+<a href="../../api/java/io/Reader.html#read(char[], int, int)">read(char[],&nbsp;int,&nbsp;int)</a></tt> methods of <tt>
+<a href="../../api/java/io/Reader.html">Reader</a></tt>
+    and its subclasses.
+
+
+    <p><li> The <tt>
+<a href="../../api/java/io/PrintStream.html">PrintStream</a></tt>
+    and <tt>
+<a href="../../api/java/io/PrintWriter.html">PrintWriter</a></tt>
+    classes suppress all I/O errors.  To see whether an error has occurred,
+    invoke the <tt>checkError</tt> method.
+
+
+    <p><li> <tt>
+<a href="../../api/java/io/PrintStream.html">PrintStream</a></tt>
+    and <tt>
+<a href="../../api/java/io/PrintWriter.html">PrintWriter</a></tt>
+    objects do not always flush their output.  To arrange for automatic
+    flushing, use the two-argument constructors of these classes and specify
+    <tt>true</tt> for the second argument.
+</ul>
+
+
+</blockquote>
+
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,97 @@
+<html>
+<head>
+     <title>Java Virtual Machine Profiler Interface</title>
+</head>
+
+<body bgcolor=white>
+
+<!-- document header is table row with 3 cells-->
+<table summary="layout" border=0 width=100%>
+<tr>
+    <!-- Left cell: Java logo -->
+    <td width=60>
+       <img src="../../images/javalogo52x88.gif" alt="Java (tm)" width=52 height=88>
+    </td>
+
+
+    <!-- Center cell: Title -->
+    <td align=center>
+       <h1>Java<sup><font size="-2">TM</font></sup> Virtual Machine Profiler
+       Interface (JVMPI)</h1>
+    </td>
+
+
+    <!-- Right cell: Up references -->
+    <td align=right valign=top>
+       <font size=-1><a href="../../index.html">Documentation Contents</a></font>
+    </td>
+</tr>
+</table>
+
+<!-- ====================== Body text begins here ====================== -->
+
+<blockquote>
+The Java<sup><font size="-2">TM</font></sup> Virtual Machine<B>*</B> Profiling 
+Interface (JVMPI) is an experimental interface for profiling. The JVMPI
+is not yet a standard profiling interface. This feature is provided
+for the benefit of tools vendors who have an immediate need for
+profiling hooks in the Java virtual machine. The JVMPI will continue
+to evolve, based on feedback from customers and tools vendors.
+<p>
+
+JVMPI is a two-way 
+function call interface between the Java virtual machine and an 
+in-process profiler agent. On the one hand, the virtual machine 
+notifies the profiler agent of various events, corresponding to, 
+for example, heap allocation, method calls, etc. On the other 
+hand, the profiler agent issues control requests through the
+JVMPI. For example, the profiler agent can turn on/off a specific
+event notification, based on the needs of the profiler front-end.
+
+</blockquote>
+
+<h2>JVMPI Reference</h2>
+<ul>
+   <li><b><a href="jvmpi.html">JVMPI Reference</a></b><br>
+</ul>
+<P>
+<FONT SIZE="-1"><B>*As used on this web site, the terms "Java Virtual Machine" 
+or "JVM" mean a virtual machine for the Java platform.</B></FONT>
+<P>
+
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+
+<TD>
+<FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT>
+   <br>
+   <br>
+
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:jvmpi@eng.sun.com">jvmpi@eng.sun.com</a> 
+   </FONT>
+</TD>
+
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
+

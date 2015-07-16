@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Java(TM) Remote Method Invocation (RMI)</TITLE>
+<!-- Changed by: Ann Wollrath - JavaSoft East, 17-Dec-2001 -->
+<!-- Changed by: Susan Snyder - SMI Software Development, 23-June-2003 -->
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+<TABLE BORDER="0" WIDTH="100%" SUMMARY="layout">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Java<SUP><FONT SIZE="-2">TM</FONT></SUP> Remote Method Invocation (RMI)</h1>
+</center>
+
+</TD>
+
+
+
+<TD width=15% ALIGN=center>
+   <font size="-1"><a href="../../index.html">
+	Documentation Contents
+   </font>
+</TD>
+
+</TR>
+
+</TABLE>
+
+<p>
+
+<!-- Body text begins here -->
+<h2>Enhancements since version 1.3 of the 
+Java<sup><font size=-2>TM</font></sup> 2 SDK</h2>
+<ul><li>
+   <a href="relnotes.html">RMI Release Notes</a><br>
+The RMI Release notes contain changes to the RMI and serialization
+APIs, as well as changes to the RMI tools, <code>rmic</code> and
+<code>rmid</code>.
+</li>
+</ul>
+
+<blockquote>
+
+</blockquote>
+
+<font size=+2><b>RMI Tutorials</b></font>
+<ul>
+   <LI><b><a href="getstart.doc.html">Getting Started</a></b><br>
+The Getting Started Tutorial shows you the steps to follow to create a distributed version of the classic Hello World program using Java<SUP><FONT SIZE="-2">TM</FONT></SUP> Remote Method Invocation (RMI).
+The Hello World applet makes a remote method call to the server from which it was downloaded to retrieve the message "Hello World!"
+<BR>&nbsp;
+<LI><b><a href="socketfactory/index.html">
+<b>The Custom Socket Factory Tutorial</b>
+</a></b><br> 
+The Custom Socket Factory Tutorial shows you how to create a version of the distributed Hello World program in which the RMI runtime uses sockets of a type chosen by the programmer.  This tutorial also includes a discussion of how RMI can be used over SSL sockets.
+<BR>&nbsp;
+<LI>
+<B><A HREF="activation.html">The Activation Tutorials</A></B></LI>
+
+The Activation Tutorials take you through the steps of creating a new
+class that defines an activatable object, migrating a <code>UnicastRemoteObject</code>
+to be an activatable object, activating classes that do not extend from
+<code>java.rmi.activation.Activatable</code>, and using a <code>MarshalledObject</code>
+to create persistent data.
+</ul>
+
+<br>
+
+<font size="+2"><b>RMI Architecture and Functional Specification</b></font><br>
+
+<ul>
+
+   <LI><a href="spec/rmiTOC.html">RMI Specification</a> (also in
+      <a href="ftp://ftp.java.sun.com/docs/j2se1.4/rmi-spec-1.4.pdf">PDF</a>)
+</ul>
+
+
+
+<br>
+
+<font size="+2"><b>RMI API Specification</b></font><br>
+
+<font size="-1">(javadoc)</font>
+
+<ul>
+
+   <LI><b><a href="../../api/java/rmi/package-summary.html">java.rmi Package</a></b> 
+
+   <LI><b><a href="../../api/java/rmi/dgc/package-summary.html">java.rmi.dgc Package</a></b>
+
+   <LI><b><a href="../../api/java/rmi/registry/package-summary.html">java.rmi.registry Package</a></b>
+
+   <LI><b><a href="../../api/java/rmi/server/package-summary.html">java.rmi.server Package</a></b>
+
+   <LI><b><a href="../../api/java/rmi/activation/package-summary.html">java.rmi.activation Package</a></b>
+
+</ul>
+<br>
+
+<font size=+2><b>RMI Tools</b></font>
+<ul>
+   <LI><b>rmic</b> - Java RMI stub compiler - (<a href="../../tooldocs/windows/rmic.html">for Microsoft Windows</a>) (<a href="../../tooldocs/solaris/rmic.html">for the Solaris<SUP><FONT SIZE="-2">TM</FONT></SUP> operating environment</a>)
+   <LI><b>rmiregistry</b> - Java remote object registry - (<a href="../../tooldocs/windows/rmiregistry.html">for Microsoft Windows</a>) (<a href="../../tooldocs/solaris/rmiregistry.html">for the Solaris operating environment</a>)
+   <LI><b>rmid</b> - Java RMI activation system daemon - (<a href="../../tooldocs/windows/rmid.html">for Microsoft Windows</a>) (<a href="../../tooldocs/solaris/rmid.html">for the Solaris operating environment</a>)
+
+</ul>
+
+
+<br>
+
+<font size="+2"><b>For More Information</b></font><br>
+
+<p>
+
+<ul>
+
+
+<li><a href="faq.html"><b>The RMI and Object Serialization FAQ</b></a>
+<p>
+<li><a href="http://archives.java.sun.com/archives/rmi-users.html">
+<b>Search the archives of the RMI-USERS list</b></a>
+<p>
+<li><a href="subscribe.html"><b>Subscribe to the RMI-USERS list</b></a>
+<p>
+<li><a href="codebase.html"><b>Dynamic code downloading using RMI <br>
+(Using the java.rmi.server.codebase Property)</b></a>
+<p>
+<li><A HREF="javarmiproperties.html"><b>Useful java.rmi Properties</b></A>
+<p>
+<li><A HREF="sunrmiproperties.html"><b>Useful sun.rmi Properties</b></A>
+<p>
+<li><a href="Factory.html"><b>Applying the Factory Pattern to RMI</b></a>
+<p>
+<li><a href="http://java.sun.com/docs/books/tutorial/rmi/index.html">
+<b>The RMI trail of The Java<sup><font size=-2>TM</font></sup> Tutorial <i>Continued</i></b></a>
+<p>
+<li><a href="socketfactory/SSLInfo.html"><b>Using RMI with SSL</b></a>
+<p>
+<li><a href="http://java.sun.com/products/jdk/rmi/">
+<b>The Java Remote Method Invocation (RMI) Home Page</b></a>
+
+</ul>
+
+<p>
+
+
+
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../relnotes/SMICopyright.html">Copyright &copy;</A>
+2003 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:rmi-comments@java.sun.com">rmi-comments@java.sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+</BODY>
+</HTML>
+
+
+

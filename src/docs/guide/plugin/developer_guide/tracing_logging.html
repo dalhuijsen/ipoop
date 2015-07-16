@@ -1,0 +1,87 @@
+<html>
+<head>
+<title>Tracing and Logging</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Tracing and Logging</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>This section includes the following topics:</p>
+<ul>
+  <li><a href="tracing_logging.html#tracing">Tracing</a></li>
+  <li><a href="tracing_logging.html#logging">Logging</a></li>
+  <li><a href="#other">Other Options</a></li>
+</ul>
+<h2><a name="tracing"></a>Tracing</h2>
+<p>Tracing is a facility to redirect any output in the JavaConsole to a trace 
+  file. </p>
+<p>Tracing can be turned on by enabling the property <code>javaplugin.trace</code>. 
+  However, it turns on all tracing facilities inside Java Plug-in. To enable more 
+  fine-grained tracing,<code> javaplugin.trace.option</code> may be used. You 
+  can set trace-level options (0-5) in the <a href="console.html#console">Java 
+  Console</a>, shown in the previous chapter, with the following meanings:</p>
+<ul>
+  <li>0 &#151; off</li>
+  <li>1 &#151; basic</li>
+  <li>2 &#151; network and basic</li>
+  <li>3 &#151; security, network and basic</li>
+  <li>4 &#151; extension, security, network and basic</li>
+  <li>5 &#151; LiveConnect, extension, security, network and basic</li>
+</ul>
+<p>This enables tracing on the fly.</p>
+<p>Another way to set fine-grained tracing is through the <a href="control_panel.html">Java 
+  Plug-in Control Panel</a>. For instance, to enable tracing for everthing (option 
+  5 above), enter the following in the &quot;Java Run Time Parameters&quot; textfield:</p>
+<blockquote> 
+  <p><code>-Djavaplugin.trace=true <br>
+    -Djavaplugin.trace.option=basic|net|security|ext|liveconnect</code></p>
+</blockquote>
+<p>Tracing set through the Control Panel will take effect when the Plug-in is 
+  launched, but changes made through the Control Panel while a Plug-in is running 
+  will have no effect until restart.</p>
+<h2><a name="logging"></a>Logging</h2>
+<p>Similar to tracing, logging is a facility to redirect any output in the Java 
+  Console to a log file using the Java Logging API. Logging can be turned on by 
+  enabling the property <code>javaplugin.logging</code>:</p>
+<blockquote> 
+  <p><code>-D javaplugin.logging = true</code></p>
+</blockquote>
+<h2><a name="other"></a>Other Options</h2>
+<h3>File Names</h3>
+<p>By default the trace and log file names are, respectively:</p>
+<blockquote> 
+  <p><code>.plugin&lt;<i>version</i>&gt;.trace</code> and <code>.plugin&lt;<i>version</i>&gt;.log</code></p>
+</blockquote>
+<p>However, you can give them different names by setting the properties:</p>
+<blockquote> 
+  <p><code>javaplugin.trace.filename</code> and <code>javaplugin.log.filename</code> 
+  </p>
+</blockquote>
+<p>in the Java Plug-in Control Panel.</p>
+<h3>File Location</h3>
+<p>The default location (directory) of Java Plug-in related files is:</p>
+<ul>
+  <li><code>/usr/home</code> on Unix/Linux</li>
+  <li><code>\Winnt\Profiles\&lt;<i>user</i>&gt;</code> on Window</li>
+</ul>
+<p>However, the location can be set with the environment variable <code>USER_JPI_PROFILE</code>.</p>
+<h3>Overwrite Option</h3>
+<p>Furthermore, if you do not want to overwrite trace and log files each session, 
+  you can set the property <code>javaplugin.outputfiles.overwrite=false</code>. 
+  If the property is set <code>false</code>, then trace and log files will be 
+  uniquely named for each session. E.g., if default trace and log file names are 
+  used as shown above, then date information would be included as follows:</p>
+<blockquote> 
+  <p><code>.plugin&lt;<i>username</i>&gt;&lt;<i>date hash code</i>&gt;.trace</code> 
+    and <code>.plugin&lt;<i>username</i>&gt;&lt;<i>date hash code</i>&gt;.log</code></p>
+</blockquote>
+<p align="left">&nbsp;</p>
+</body>
+</html>

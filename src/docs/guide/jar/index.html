@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+     <TITLE>JAR Features</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>	
+
+<TD>
+<center>
+           <h1>Java<sup><font size=-2>TM</font></sup> Archive (JAR) Features</h1>
+</center>
+</TD>
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+</TD>
+</TR>
+</TABLE>
+
+<!-- Body text begins here -->
+
+<blockquote>
+JAR (Java Archive) is a platform-independent file format that aggregates many 
+files into one. Multiple Java applets and their requisite components 
+(.class files, images and sounds) can be bundled in a JAR file and
+subsequently downloaded to a browser in a single HTTP transaction,
+greatly improving the download speed. The JAR format also supports 
+compression, which reduces the file size, further improving the download 
+time. In addition, the applet author can digitally sign individual entries 
+in a JAR file to authenticate their origin. It is fully backward-compatible 
+with existing applet code and is fully extensible. 
+<p>
+This version of the Java platform extends 
+the utility of the JAR
+format. Enhancements include added functionality for the 
+command-line JAR tool for creating Jar-file indexes for faster 
+access to Jar-file contents. 
+There are also new standard APIs for a "delete-on-close" mode for 
+opening Jar files.
+</blockquote>
+
+<font size="+2"><b>JAR File Specification and Overview</b></font>
+<ul>
+    <li><a href=jar.html>JAR File Specification</a>
+    <li><a href=jarGuide.html>JAR File Overview</a>
+</ul>
+
+<font size="+2"><b>JAR Files and the Extensions Framework</b></font>
+<ul>
+   <LI>The new extensions mechanism in the Java platform uses the 
+JAR file format to package extension classes. Manifest attributes 
+are available to support the extension mechanism and related 
+features such as package sealing and package versioning. See the 
+<b><a href="../extensions/spec.html">extensions specification</a></b> 
+for details.
+
+</ul>
+
+<font size="+2"><b>Enhanced Jar Tool</b></font>
+<ul>
+   <LI>The Jar tool has the new <tt>-i</tt> option for 
+creating JAR file indexes. See the Jar tool reference pages:<br>
+<blockquote>
+<a href="../../tooldocs/solaris/jar.html">Jar tool reference page for Solaris</a><br>
+<a href="../../tooldocs/windows/jar.html">Jar tool reference page for Windows</a><br>
+</blockquote>
+</ul>
+
+
+<font size="+2"><b>Reading and Writing JAR Files: API Specification</b></font>
+<ul>
+   <LI>Package <a href="../../api/java/util/jar/package-summary.html">
+       <b>java.util.jar</b></a>: classes for creating and reading JAR files
+   <LI>Class <a href="../../api/java/net/JarURLConnection.html">
+       <b>java.net.JarURLConnection</b></a>: Abstract class for URL 
+        connections to JAR files using the jar protocol.
+</ul>
+<p>
+<blockquote>
+The API of classes <tt>java.util.zip</tt> and <tt>java.util.jar</tt> 
+have been enhanced with the addition of the following:
+<ul>
+<li><b><a href=../../api/java/util/zip/ZipFile.html#OPEN_READ>java.util.zip.OPEN_READ</a></b>
+<li><b><a href=../../api/java/util/zip/ZipFile.html#OPEN_DELETE>java.util.zip.OPEN_DELETE</a></b>
+<li><b><a href="../../api/java/util/zip/ZipFile.html#ZipFile(java.io.File, int)">java.util.zip.ZipFile(File file, int mode)</a></b>
+<li><b><a href="../../api/java/util/jar/JarFile.html#JarFile(java.io.File, boolean, int)">java.util.jar.JarFile(File file, boolean verify, int mode)</a></b>
+</ul>
+The previous implementation of caching downloaded Jar files 
+created problems for long-running server application and for RMI. 
+Each open JarURLConnection creates a temporary local file that 
+holds Jar-file date, and a JarFile object is created on top of the 
+temporary file.  Because the open file handle/descriptor on 
+each temporary file was never closed, the files could quickly 
+take up disk space for long-running server applications.  The 
+new API provides a solution for this problem by supporting 
+a new "delete-on-close" mode for opening Zip and Jar files.
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+<font size="+2"><b>Tutorial</b></font>
+<p><blockquote><b>On the Java Software website:</b></blockquote>
+<ul>
+   <LI><a href="http://java.sun.com/docs/books/tutorial/jar/"><b>The 
+       Java Archive (JAR) File Format</b></a> trail in the Java Tutorial.  
+</ul>
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+
+<TD>
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+</TD>
+
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
+

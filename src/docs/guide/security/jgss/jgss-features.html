@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>Security</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+</HEAD>
+<BODY text=#000000 vLink=#000077 aLink=#ff0000 link=#0000ff bgColor=#ffffff>
+<TABLE width="100%" border=0>
+  <TBODY>
+  <TR>
+    <TD width=60><IMG height=88 alt=Java src="../../../images/javalogo52x88.gif" width=52 border=0> </TD>
+    <TD>
+      <CENTER>
+      <H1>Java GSS</H1></CENTER></TD>
+    <TD vAlign=top align=right width="15%"><FONT size=-1> <A 
+      href="../index.html">Security Contents</A></FONT> 
+  </TD></TR></TBODY></TABLE><!-- Body text begins here -->
+<BLOCKQUOTE><B><FONT size=+1>
+New Features in Java<SUP><FONT size=-2>TM</FONT></SUP> GSS
+for Java <SUP><FONT size=-2>TM</FONT></SUP> 2 SDK, Standard Edition, v 1.4.2 include the 
+  following:</FONT></B> 
+  <UL>
+    <LI><B>Configurable Kerberos Settings</B> <BR>The Kerberos Key Distribution 
+    Center (KDC) name and realm settings are provided in the Kerberos 
+    configuration file or via the system properties 
+    <CODE>java.security.krb5.kdc</CODE> and 
+    <CODE>java.security.krb5.realm</CODE>. In previous releases, changes to the 
+    Kerberos configuration values would only take effect when an application was 
+    restarted. 
+    <P>In the 1.4.2 release of the Java platform, a new boolean option 
+    <CODE>refreshKrb5Config</CODE> can be specified in the entry for 
+    <CODE>Krb5LoginModule</CODE> in the JAAS configuration file. If this option 
+    is set to <CODE>true</CODE>, the configuration values will be refreshed 
+    before the <CODE>login</CODE> method of the <CODE>Krb5LoginModule</CODE> is 
+    called. 
+    <P></P>
+    <LI><B>Support for Slave Kerberos Key Distribution Center</B> <BR>Kerberos 
+    allows the use of slave KDCs so that if the master KDC is unavailable, the 
+    slave KDCs will respond to user requests. In earlier releases of the J2SE, 
+    Sun's implementation of Kerberos tried only the master KDC and would give up 
+    if there was no response within the default KDC timeout specified in the 
+    Kerberos configuration file, or 30 seconds if no timeout had been specified. 
+
+    <P>With this 1.4.2 release, Sun's implementation of Kerberos will retry with 
+    the slave KDC(s), if they are specified. The slave KDCs can be specified in 
+    the Kerberos configuration file or via a list of KDCs separated by a colon 
+    (<CODE>:</CODE>) in the system property <CODE>java.security.krb5.kdc</CODE>. 
+
+    <P></P>
+    <LI><B>Support TCP for Kerberos Key Distribution Center Transport</B> 
+    <BR>
+    Sun's implementation of Kerberos implements Kerberos version 5 according to 
+    <A href="http://www.ietf.org/rfc/rfc1510.txt">RFC 1510</A> and uses 
+    UDP transport for ticket requests. A new Internet draft updates this 
+    RFC. One of the added features is required support for TCP as a 
+    transport in addition to UDP. As a result, in cases where Kerberos 
+    tickets exceed the UDP packet size limit, the KDC would return an 
+    error code indicating that the request should be resent over TCP. 
+    <P>
+    In the current 1.4.2 release, Sun's implementation of Kerberos 
+    now supports automatic fallback to TCP. Therefore, if the Kerberos 
+    ticket request using UDP fails and the KDC returns the error code 
+    <code>KRB_ERR_RESPONSE_TOO_BIG</code>, TCP is automatically the 
+    default transport.
+    <P>
+    The current draft which updates RFC 1510, is available online: 
+<A href="http://www.ietf.org/internet-drafts/draft-ietf-krb-wg-kerberos-clarifications-04.txt">http://www.ietf.org/internet-drafts/draft-ietf-krb-wg-kerberos-clarifications-04.txt</A>. 
+    </P></LI>
+
+<P></P>
+<LI>
+<B>Kerberos Service Ticket in the Subject's Private Credentials</b>
+<BR>
+
+The Kerberos service ticket is now stored in the Subject's 
+private credentials. 
+This change allows application developers access 
+to the service ticket so that it can be used outside 
+the JGSS (for example, in native applications or 
+for proprietary uses). In addition, the service ticket 
+can now be reused if the application tries to establish 
+a security context to the same service again. The 
+service ticket should be valid for it to be reusable.
+<P>
+Previously, when using Java Generic Security 
+Services (JGSS) over Kerberos V5, if the <code> 
+<a href="/j2se/1.4.2/docs/api/org/ietf/jgss/package-summary.html">useSubjectCredsOnly</A></code> 
+property was set to true, the Ticket Granting Ticket 
+(TGT) was retrieved from the Subject and used to 
+establish a GSS Security context. The service ticket 
+obtained was not stored in the Subject. 
+
+Now the service ticket is also stored in the 
+Subject if <code>useSubjectCredsOnly</code> is true. 
+
+<P>If a client 
+application searches through the Subject's private 
+credentials, in previous releases it would find only the 
+TGT. As of this release, it also will find any Service 
+ticket(s) obtained. 
+<P>
+The bug report associated with this change is 4688866.
+
+<P>
+
+</LI>
+</UL>
+
+
+</BLOCKQUOTE>
+
+<P>
+<!-- Body text ends here --><!-- ============================================================== -->
+
+<HR noShade SIZE=3>
+
+<TABLE width="100%" border=0>
+  <TBODY>
+  <TR vAlign=top>
+    <TD>
+      <P><FONT size=-2><A href="../../../relnotes/SMICopyright.html">Copyright 
+      ©</A> 1995-2003 <A href="http://www.sun.com/">Sun Microsystems, Inc.</A> 
+      All Rights Reserved.</FONT></P><FONT size=-1>Please send comments to: <A 
+      href="mailto:java-security@sun.com">java-security@sun.com</A>. This is not 
+      a subscription list. </FONT></TD>
+    <TD align=right><IMG height=30 alt=Sun src="../../../images/sunlogo64x30.gif" width=64 border=0> <BR><FONT 
+      size=+1><I>Java Software</I> </FONT></TD></TR></TBODY></TABLE></BODY></HTML>
+
+

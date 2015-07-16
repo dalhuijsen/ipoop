@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>JSplitPane</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>JSplitPane</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+
+  <h2>New JSplitPane resizeWeight Property</h2>
+
+      When the size of a JSplitPane changes, the extra space is added to the 
+      right/bottom component. This gives the effect of the left/top component 
+      being fixed. 
+
+    <p>
+      The methods get/setResizeWeight(double) have been added. The 
+      resizeWeight property indicates how to distribute extra space. The 
+      left/top component will get resizeWeight * delta extra space, with the 
+      right/bottom component getting (1 - resizeWeight) * delta extra space.
+
+<P>
+See: 
+<tt>
+<ul>
+<li><a href="../../../api/javax/swing/JSplitPane.html#RESIZE_WEIGHT_PROPERTY">public final static String RESIZE_WEIGHT_PROPERTY</a>
+<li><a href="../../../api/javax/swing/JSplitPane.html#setResizeWeight(double)">public void setResizeWeight(double value)</a>
+<li><a href="../../../api/javax/swing/JSplitPane.html#getResizeWeight()">public double getResizeWeight()</a>
+</tt>
+</ul>
+
+
+
+ 
+    <h2>JSplitPane dividerLocation Property Now Bound</h2>
+
+      The dividerLocation property is  bound in JSplitPane.
+<P>
+See:
+<tt>
+<ul>
+<li><a href="../../../api/javax/swing/JSplitPane.html#DIVIDER_LOCATION_PROPERTY">
+public static final String DIVIDER_LOCATION_PROPERTY</a>
+</ul>
+</tt>
+
+    <h2>BasicSplitPaneDivider Border</h2>
+
+   
+      JSplitPane has a unique border. That is, the border is drawn around both 
+      the components, and then drawn around the divider. Previously, one 
+      Border was responsible for all this. The problem with this approach is 
+      that there is no way to specify the border size drawn around the 
+      divider. It also made laying the components out rather tricky.
+
+    <p>
+      There is now a Border on the Divider (BasicSplitPaneDivider). As a 
+      result, setDividerSize now needs to take into account the border size, 
+      which is usually an extra 2 pixels, that is developers used to do 
+      setDividerSize(5), but now it will need to be setDividerSize(7) (unless 
+      a developer installs a new UI with a different border size).
+
+    <p>
+      The javadoc for JSplitPane also mentioned if the size of one the 
+      components was changed, an attempt would be made to position the divider 
+      correctly. This lead to all sorts of problems, and is no longer 
+      supported. Instead, setDividerLocation should be used.
+<P>
+See:
+<h4>In BasicSplitPaneUI</h4>
+<ul>
+<li><code><a href="../../../api/javax/swing/plaf/basic/BasicSplitPaneUI.html#getDividerBorderSize()">protected int getDividerBorderSize()</a></code> //deprecated
+</ul>
+
+<h4>In BasicSplitPaneDivider</h4>
+<tt>
+<ul>
+<li><a href="../../../api/javax/swing/plaf/basic/BasicSplitPaneDivider.html#setBorder(javax.swing.border.Border)">public void setBorder(Border border)</a>
+<li><a href="../../../api/javax/swing/plaf/basic/BasicSplitPaneDivider.html#getBorder()">public Border getBorder()</a>
+</ul>
+</tt>
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+
+
+
+

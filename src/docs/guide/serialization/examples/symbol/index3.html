@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//SoftQuad//DTD HoTMetaL PRO 4.0::19971010::extensions to HTML 4.0//EN"
+ "hmpro4.dtd">
+
+<HTML>
+  
+  <HEAD>
+    <TITLE>Substitution by Serializable Classes</TITLE>
+  </HEAD>
+  
+  <BODY BGCOLOR="ffffff"><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" 
+    HEIGHT="4">
+    
+    <H2>Serialization and the writeReplace/readResolve Methods </H2>
+    
+    <IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+    
+    <H3>Abstract</H3>
+    
+    <BLOCKQUOTE>
+      
+      <P>This example demonstrates how to use the <TT>writeReplace/readResolve</TT>
+        methods. The <TT>readResolve</TT> method resolves the object read from
+        the stream before it is returned to the caller. The <TT>writeReplace</TT>
+        method allows a <TT>Serializable</TT> class of an object to nominate
+        its own replacement in the stream before the object is written.</P>
+      
+      <P>This example creates a symbol class for which only one instance of
+        each each symbol binding exists. The <TT>Symbol</TT> class defines the
+        <TT>readResolve</TT> method. A symbol is created from outside using the
+        <TT>symbollookup</TT> method. The <TT>symbollookup</TT> method finds
+        and returns a symbol if one already and, if one does not already exist,
+        creates one. This assures uniqueness within one VM. Then, when the <TT>readResolve</TT>
+        method is called as the symbol is being read, a preexisting equivalent
+        Symbol object is substituted from the hashtable to maintain the unique
+        identity constraint, if such a symbol exists. If the symbol does not
+        exist, the new symbol is added to the hashtable and returned. This
+        assures uniqueness when dealing with more than one VM.</P> </BLOCKQUOTE>
+    <IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+    
+    <H3>Additional Information</H3>
+    
+    <DL>
+      <DD><A HREF="./sources.html">Source Files</A> </DD>
+      <DD><A HREF="./torun.html">Running the Example</A> </DD>
+      <DD><A HREF="../index.html">List of Examples</A> </DD>
+    </DL><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+  </BODY>
+</HTML>

@@ -1,0 +1,237 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML><HEAD><TITLE>
+Summary of Security Tools
+
+</TITLE></HEAD>
+<BODY>
+
+<center>
+<H2>
+Summary of Tools for the Java<sup><font size=-2>TM</font></sup> 2 Platform Security
+</H2>
+
+<b>Last Modified:  <em>14 October, 2002</em></b>
+</center>
+
+<P>Below is a summary of the following security tools, with links to
+the more detailed documentation:  
+<A HREF="#keytool">keytool</A>, 
+<A HREF="#jar">jar</A>, <A HREF="#jarsigner">jarsigner</A>, 
+<A HREF="#policytool">Policy Tool</A>, <A HREF="#kinit">kinit</A>, 
+<A HREF="#klist">klist</A>, and <A HREF="#ktab">ktab</A>. 
+All of these tools are command-line tools with the exception of
+<b>Policy Tool</b>, which has a graphical user interface.
+
+<H2>The Tools</H2>
+
+<blockquote>
+
+<A NAME="keytool"></A>
+<H3><b>keytool</b> 
+(<a href="../../tooldocs/solaris/keytool.html">Solaris or Linux</a>) (<a href="../../tooldocs/windows/keytool.html">Windows</a>)</H3>
+
+<blockquote>
+
+<p>Use <b>keytool</b> to manage your keystore, for example to
+
+<ul>
+<li>create public/private key pairs
+<li>issue certificate
+requests (which you send to the appropriate Certification Authority)
+<li>import certificate replies (obtained from the Certification Authority
+you contacted)
+<li>designate public keys belonging to other parties as
+trusted 
+</ul>
+
+<p>Keys and certificates are 
+used to digitally sign your applications and applets (see
+<b>jarsigner</b> below).  A <i>keystore</i> is
+a protected database that holds keys and certificates for an enterprise.
+Access to a keystore is guarded by a password (defined at the time
+the keystore is created, by the person who creates the keystore, and
+changeable only when providing the current password).  In
+addition, each private key in a keystore can be guarded by
+its own password.
+
+</blockquote>
+
+
+<A NAME="jar"></A>
+<H3><b>jar</b> 
+(<a href="../../tooldocs/solaris/jar.html">Solaris or Linux</a>) (<a href="../../tooldocs/windows/jar.html">Windows</a>)</H3>
+
+<blockquote>
+
+<p>Use the <b>jar</b> tool to create JAR files. 
+
+<p>The Java ARchive (JAR) file format enables you to bundle multiple files 
+into a single archive file. Typically a JAR file will contain the class files
+and auxiliary resources associated with applets and applications. When you 
+want to "digitally sign" code, you use the <b>jar</b> tool to place it 
+in a JAR file and the <b>jarsigner</b> tool to sign the JAR file 
+(after generating or importing appropriate keys into your keystore using 
+<b>keytool</b>).
+
+</blockquote>
+
+
+<A NAME="jarsigner"></A>
+<H3><b>jarsigner</b> 
+(<a href="../../tooldocs/solaris/jarsigner.html">Solaris or Linux</a>) (<a href="../../tooldocs/windows/jarsigner.html">Windows</a>)</H3>
+
+<blockquote>
+
+<p>Use the <b>jarsigner</b> tool to sign JAR files, or to verify signatures on
+signed JAR files.  
+
+<p>The <b>jarsigner</b> tool accesses a keystore that is created and 
+managed by <b>keytool</b>, when it needs to find
+the private key and its associated certificate chain
+to use when signing a JAR file.  Since accesses to the
+keystore and to private keys are protected by passwords, only 
+people who know the
+passwords will be able to access the key and use it to sign
+a JAR file.  The <b>jarsigner</b> tool prompts for needed passwords.
+
+</blockquote>
+
+
+<A NAME="policytool"></A>
+<H3><b>Policy Tool</b> 
+(<a href="../../tooldocs/solaris/policytool.html">Solaris or Linux</a>) (<a href="../../tooldocs/windows/policytool.html">Windows</a>)</H3>
+
+<blockquote>
+
+<p>Use the <b>Policy Tool</b> (invoked by using the <code>policytool</code> 
+command) to create and modify the external policy
+configuration files that define your installation's security
+policy.
+ 
+<p>The policy is described in the
+<a href="spec/security-spec.doc.html">
+<b>Security Architecture Specification</b></a>. Further
+information is provided in
+<a href="PolicyFiles.html">
+<b>Default Policy Implementation and Policy File Syntax</b></a>.
+
+<p>This tool has a graphical user interface, so you select buttons and
+other options rather than type in commands as for the other tools. 
+
+</blockquote>
+
+<A NAME="kinit"></A> 
+<H3>kinit 
+     (<A HREF="../../tooldocs/linux/kinit.html">Linux</A>) 
+     (<A HREF="../../tooldocs/windows/kinit.html">Windows</A>)</H3>
+  <BLOCKQUOTE>
+    <P>kinit is used to obtain and cache Kerberos ticket-granting tickets.
+       This tool is similar in functionality to the kinit tool 
+       commonly found in other Kerberos implementations, such as SEAM  
+       and MIT Reference implementations.</P>
+    <P>The user must be registered as a principal with the Key Distribution
+       Center (KDC) prior to running kinit.</P>
+    <P><b>Solaris</b> - Equivalent functionality is available for Solaris users via the
+       kinit tool that is part of the Solaris operating environment.  
+       For example, for Solaris 8, see
+       <a href="http://docs.sun.com/?q=kinit&p=/doc/806-0624/6j9vek58d&a=view">kinit reference page</a>.</P>
+
+  </BLOCKQUOTE>
+
+<A NAME="klist"></A>
+  <H3>klist 
+     (<A HREF="../../tooldocs/linux/klist.html">Linux</A>) 
+     (<A HREF="../../tooldocs/windows/klist.html">Windows</A>)</H3>
+  <BLOCKQUOTE>
+    <P>
+     klist is a command-line tool that allows the user to view entries 
+     in the local credentials cache and key table.</P>
+    <P><b>Solaris</b> - Equivalent functionality is available for Solaris users via the
+       klist tool that is part of the Solaris operating environment.  
+       For example, for Solaris 8, see
+       <a href="http://docs.sun.com/?q=kinit&p=/doc/806-0624/6j9vek58e&a=view">klist reference page</a>.</P>
+
+  </BLOCKQUOTE>
+
+<A NAME="ktab"></A>
+  <H3>ktab 
+     (<A HREF="../../tooldocs/linux/ktab.html">Linux</A>) 
+     (<A HREF="../../tooldocs/windows/ktab.html">Windows</A>)</H3>
+  <BLOCKQUOTE>
+    <P>ktab is a command-line tool that allows the user to manage the principal 
+     names and service keys stored in a local key table. Principal and key 
+     pairs listed in the keytab allow services running on a host to authenticate 
+     themselves to the Key Distribution Center (KDC). Before a server can be
+     setup to use Kerberos, the user must setup a keytab on the host running 
+     the server. Note that any updates made to the keytab using ktab do not 
+     affect the Kerberos database. If you change the keys in the keytab, you 
+     must also make the corresponding changes to the Kerberos database. 
+     Also note that the command line options are <I>not</I> case-sensitive.</P>
+    <P><b>Solaris</b> - Equivalent functionality is available for Solaris users via the
+       kadmin tool that is part of Solaris operating environment.  
+       For example, for Solaris 8, see
+       <a href="http://docs.sun.com/?q=kadmin&p=/doc/816-0211/6m6nc66th&a=view">kadmin reference page</a>.</P>
+  </BLOCKQUOTE>
+
+</blockquote>
+
+
+<H2>Examples of Use of the Tools</H2>
+
+<blockquote>
+
+Examples of the use of several of these security tools can be found in the
+<a href="http://java.sun.com/docs/books/tutorial/security1.2/index.html">
+<b>Java<sup><font size=-2>TM</font></sup> 2 Platform Security</b></a> trail of the
+<a href="http://java.sun.com/docs/books/tutorial/trailmap.html">
+<b>Java Tutorial</b></a>.
+
+</blockquote>
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+<TD>
+
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1997-2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:java-security@sun.com">java-security@sun.com</a>. This is not a subscription list.
+   </FONT>
+
+</TD>
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+
+

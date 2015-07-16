@@ -1,0 +1,78 @@
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 10 - RMI Wire Protocol
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a>
+ 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-protocol4.html">PREV</a>
+ | <a href="rmi-protocol6.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	10.4	</i> RMI&#39;s Use of HTTP POST Protocol
+</a></h2>
+
+<blockquote>
+<a name="3279"><!-- --></a>
+In order to invoke remote methods through a firewall, some RMI calls make use of the HTTP protocol, more specifically HTTP POST. The URL specified in the post header can be one of the following:<p>
+<a name="3280"><!-- --></a>
+	<em>http://</em><em>&lt;host&gt;</em><em>:</em><em>&lt;port&gt;</em><em>/ </em><br>
+	<em>http://</em><em>&lt;host&gt;</em><em>:80/cgi-bin/java-rmi?forward=</em><em>&lt;port&gt;</em><p>
+<a name="3281"><!-- --></a>
+The first URL is used for direct communication with an RMI server on the specific <em>host</em> and <em>port</em>. The second URL form is used to invoke a &#34;cgi&#34; script on the server which forwards the invocation to the server on the specified <em>port</em>.<p>
+<a name="3282"><!-- --></a>
+An <em>HttpPostHeader</em> is a standard HTTP header for a POST request. An <em>HttpResponseHeader</em> is a standard HTTP response to a post. If the response status code is not 200, then it is assumed that there is no <em>Return</em>. Note that only a single RMI call is embedded in an HTTP POST request.
+
+<P>
+<DL>
+	<DT><em>HttpMessage:</em>
+		<DD><BR><em>HttpPostHeader Header Message</em>
+		</DD>
+	<DT><BR><em>HttpReturn:</em>
+		<DD><BR><em>HttpResponseHeader Return</em>
+		</DD>
+	</DT>
+</DL>
+<p>
+ 
+<p>
+</blockquote>
+<UL>
+<UL><hr noshade size="1">
+<b><a name="3472">Note - </a></b>Only the <em>SingleOpProtocol</em> appears in the <em>Header</em> of an <em>HttpMessage</em>. An <em>HttpReturn</em> does not contain a protocol acknowledgment byte. 
+<hr noshade size="1">
+</UL>
+</UL>
+
+</ul>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-protocol4.html">PREV</a>
+ | <a href="rmi-protocol6.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Monday, October 7, 2002 -->
+
+
+</body>
+</html>

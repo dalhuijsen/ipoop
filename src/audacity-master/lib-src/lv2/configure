@@ -1,0 +1,89 @@
+#!/bin/bash
+
+srcdir=.
+while [ $# -gt 0 ]
+do
+   if [[ "$1" =~ --srcdir=.* ]]
+   then
+      srcdir=${1#*=}
+      break
+   fi
+   shift
+done
+
+function waf
+{
+   pkg="$1"
+   shift
+   mkdir -p ${pkg}
+   pushd >/dev/null ${pkg}
+
+   if [ ! -e "waflib" ]
+   then
+      cp -a "../${srcdir}/${pkg}"/waflib .
+   fi
+   
+   for f in "../${srcdir}/${pkg}"/*
+   do
+      if [ ! -e "${f##*/}" ]
+      then
+         ln -s "${f}"
+      fi
+   done
+
+   $(which python python2 | tail -1) waf --prefix="." --include="." $@ configure || exit 1
+   popd >/dev/null
+
+   if [ "${pkg}" == "lv2" ]
+   then
+      eval $(sed -e '/^VERSION/!d;s/ //g;s/.*VERSION/version/' ${pkg}/wscript)
+      major=""
+      lib=""
+   else
+      eval $(sed -e '/^[A-Z]*_VERSION/!d;s/ //g;s/.*VERSION/version/' ${pkg}/wscript)
+      major="-${version%%.*}"
+      lib="-l${pkg}${major}"
+   fi
+
+   cat <<EOF >${pkg}/build/${pkg}${major}.pc
+prefix=$(pwd)/${pkg}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=.
+
+Name: ${pkg}
+Version: ${version}
+Description: Temporary fake config file
+Libs: -L\${libdir} ${lib} -ldl -lm
+Cflags: -I\${includedir}/${pkg}${major}
+EOF
+
+   export PKG_CONFIG_PATH="$(pwd)/${pkg}/build:${PKG_CONFIG_PATH}"
+   export CFLAGS="-I$(pwd)/${pkg} -I$(pwd)/${pkg}/build ${CFLAGS}"
+   export LDFLAGS="-L$(pwd)/${pkg}/build ${lib} ${LDFLAGS}"
+
+   ln -s ../${pkg}/${pkg} include
+}
+
+rm -rf include
+mkdir -p include
+
+[ ! -e Makefile ] && ln -s "${srcdir}/Makefile"
+[ ! -e build ] && ln -s "${srcdir}/build"
+echo >srcdir.mk "srcdir = ${srcdir}"
+
+waf lv2    --no-plugins
+waf serd   --static --no-shared --no-utils
+waf sord   --static --no-shared --no-utils
+waf sratom --static --no-shared
+waf lilv   --static --no-shared --no-utils
+waf suil   --static --no-shared --no-qt
+sed -i'' -e "s@suil/lib/suil-0@suil/build@" suil/build/suil_config.h
+
+cat >.buildvars <<EOF
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
+export CFLAGS="${CFLAGS}"
+export LDFLAGS="${LDFLAGS}"
+EOF
+
+exit 0

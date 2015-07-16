@@ -1,0 +1,425 @@
+<html>
+<head>
+<title>More About HTML  Converter</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>More About HTML Converter</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This section includes the following topics:</p>
+<ul>
+  <li><font color="#000000"><a href="#running_gui">Running the GUI Version of 
+    the HTML Converter</a></font> 
+    <ul>
+      <li><font color="#000000"><a href="#choosing_files">Choosing files within 
+        folders to convert</a></font></li>
+      <li><font color="#000000"><a href="#choosing_backup">Choosing a backup folder</a></font></li>
+      <li><font color="#000000"><a href="#generating">Generating a log file</a></font></li>
+      <li><font color="#000000"><a href="#choosing_conversion">Choosing a conversion 
+        template</a></font></li>
+      <li><font color="#000000"><a href="#version">Choosing version scheme</a></font></li>
+      <li><font color="#000000"><a href="#converting">Converting</a></font></li>
+      <li><font color="#000000"><a href="#more">Exit or convert more files</a></font></li>
+      <li><font color="#000000"><a href="#details">Details about templates</a></font></li>
+    </ul>
+  </li>
+  <li><font color="#000000"><a href="#using_command">Running the converter from 
+    the command line</a></font></li>
+</ul>
+<table summary="layout" width="80%" cellpadding="5" border="1" cellspacing="0" bgcolor="#FFFFCC" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <td bgcolor="#FFFFCC"> 
+      <h2 align="left"><b><u>Notes:</u></b><font size="4"><b> </b></font></h2>
+      <ol>
+        <li><font color="#000000">Backup all files before converting them with 
+          this tool.</font></li>
+        <li> 
+          <div align="left">Cancelling a conversion will not rollback the changes.</div>
+        </li>
+        <li><font color="#000000">Comments within the <code>APPLET</code> tag 
+          are ignored.</font></li>
+      </ol>
+    </td>
+  </tr>
+</table>
+<h2><font color="#000000"><a name="running_gui"></a>Running the GUI version of 
+  the HTML Converter</font></h2>
+<p>The HTML Converter is contained in the SDK, not the JRE. To run the converter, 
+  go to the <code>lib</code> subdirectory of your SDK installation directory. 
+  For example, if you installed the SDK on Window on the <code>C</code> drive, 
+  then <code>cd</code> to </p>
+<blockquote> 
+  <p><code>C:\sdk1.4.2\lib\</code></p>
+</blockquote>
+<p>The converter (<code>htmlconverter.jar</code>) is contained in that directory.</p>
+<p>To launch the converter type:</p>
+<blockquote> 
+  <p><code>C:\sdk1.4.2\lib&gt;..\bin\java -jar htmlconverter.jar -gui</code></p>
+</blockquote>
+<p>Launching the converter on UNIX/Linux is analogous.</p>
+<h3>Windows Alternative</h3>
+<p>To launch the converter using Window Explorer, navigate to the following directory:</p>
+<blockquote>
+  <p> <code>C:\j2sdk1.4.2\bin </code></p>
+</blockquote>
+<p> (or to <code>&lt;sdk_location&gt;\bin</code> if it is not located in the directory 
+  shown above) then double-click on the <code>HtmlConverter.exe</code> application. 
+</p>
+<h3>Unix/Linux Alternative</h3>
+<p>cd to <code>&lt;sdk_location&gt;/bin</code>&#151;for example <code>/home/jones/j2sdk1.4.2/bin</code>&#151;then 
+  enter:</p>
+<blockquote>
+  <p><code>HtmlConverter -gui </code></p>
+</blockquote>
+<p>The HTML Converter window will appear:</p>
+<p align="center"><img src="images/htmlconverter_14.gif" alt="sample converter window" width="455" height="646"></p>
+<h3><font color="#000000"><br>
+  <b><a name="choosing_files"></a>Choosing files within folders to convert:</b> 
+  </font></h3>
+<p><font color="#000000">To convert a <i>single file withing a folder</i>, you 
+  may specify the path to the file and include the file name; you may also browse 
+  to the file a select it. To convert <i>all files within a folder</i>, you may 
+  type in the path to the folder, or choose the browse button to select a folder 
+  from a dialog.&nbsp; Once you have chosen a path, you may </font><font color="#000000">supply 
+  any number of file specifiers in "Matching File Names". Each specifier must 
+  be separated by a comma. You may use * 
+  as a wildcard.&nbsp;Finally, if you would like all files in nested 
+  folders matching the file name to be converted, select the checkbox "Include 
+  Subfolders". <br>
+  &nbsp; </font></p>
+<h3><font color="#000000"><b><a name="choosing_backup"></a>Choosing a backup folder:</b> 
+  </font></h3>
+<h4>Windows</h4>
+<p><font color="#000000">The default backup folder path is the source path with 
+  an "<code>_BAK</code>" appended to the name; e.g., if the source path is <code>c:/html</code>, 
+  then the backup path would be <code>c:/html_BAK</code>.&nbsp; The backup path 
+  may be changed by entering a path in the field labeled "Backup Files to Folder:", 
+  or by browsing for a folder. </font></p>
+<h4><font color="#000000">Unix (Solaris):</font></h4>
+<p><font color="#000000">The default backup folder path is the source path with 
+  an "<code>_BAK</code>" appended to the name; e.g., if the source path is <code>/home/user1/html</code>, 
+  then the backup path would be <code>/home/user1/html_BAK</code>. The backup 
+  path may be changed by typing a path in the field labeled "Backup Files to Folder:", 
+  or by browsing for a folder. <br>
+  &nbsp; </font></p>
+<h3><font color="#000000"><b><a name="generating"></a>Generating a log file:</b> 
+  </font></h3>
+<p><font color="#000000">If you would like a log file to be generated, go to the 
+  Advanced Options screen (Edit&gt;Options) and check "Generate Log File". Enter 
+  a path in the text field, including the name of the log file; or use the browse 
+  button to set the path (including log file).&nbsp; The log file may be an existing 
+  one or a new one. The log file contains basic information related to the conversion 
+  process. <br>
+  &nbsp; </font></p>
+<h3><font color="#000000"><b><a name="choosing_conversion"></a>Choosing a conversion 
+  template:</b> </font></h3>
+<p><font color="#000000">A default template will be used if none is chosen.&nbsp; 
+  This template will produce converted html files that will work with IE and Netscape.&nbsp; 
+  If you would like to use a different template, you may choose it from the menu 
+  on the main screen.&nbsp; If you choose &quot;Other Template ...&quot; from 
+  the menu, you will be allowed to choose a file to be used as the template.&nbsp; 
+  If you choose a file, be sure that it is a template.</font></p>
+<h3><font color="#000000"><a name="version"></a>Choosing a version scheme</font></h3>
+<p><b><font size="+1">Note:</font></b> The <i>specified version </i> mentioned 
+  below is the version of the JRE you use to launch the converter; e.g., <code>1.4.2</code>. 
+  The first two numbers in the version indicate the <i>family</i>; e.g., <code>1.4.3_02</code> 
+  is in the <code>1.4</code> family. For an explanation of product version numbers, 
+  see <a href="using_tags.html#note">Note on Version Numbers</a> in the section 
+  called <a href="using_tags.html">Using <code>OBJECT</code>, <code>EMBED</code> 
+  and <code>APPLET</code> Tags in Java Plug-in</a>.</p>
+<p><font color="#000000">There are two choices here: </font></p>
+<table summary="layout" width="95%" align="center" cellpadding="5">
+  <tr> 
+    <td bgcolor="#CCCCCC"> 
+      <div align="left"></div>
+      <ol>
+        <li><font color="#000000">You can choose to have conversion tags that 
+          will require the <i>specified version</i> of Java Plug-in to run your 
+          applets. If the specified version is not installed, then the client 
+          will be asked if he/she wants to install and download it.</font></li>
+        <li><font color="#000000">You can choose conversion tags that will allow 
+          any installed version of Java Plug-in in the <i>family</i>, equal to 
+          or higher than the <i>specified version</i>, to run your applets. If 
+          there is no installed version of Java Plug-in, or no installed version 
+          in the family equal to or higher than the <i>specified version</i>, 
+          then the client will be asked if he/she wants to install and run the 
+          latest version of Java Plug-in in the family.</font></li>
+      </ol>
+    </td>
+  </tr>
+</table>
+<h3><font color="#000000"><b><a name="converting"></a>Converting:</b> </font></h3>
+<p><font color="#000000">Click the "Convert..." button to begin the conversion 
+  process.&nbsp; A dialog will show the files being processed, the number of files 
+  processed, the number of applets found, and number of errors. <br>
+  </font></p>
+<h3><font color="#000000"><b><a name="more"></a>Exit or Convert More Files:</b> 
+  </font></h3>
+<p><font color="#000000">When the conversion is complete, the button in the process 
+  dialog will change from "Cancel" to "Done".&nbsp; You may choose "Done" to close 
+  the dialog.&nbsp; You can then exit the Java Plug-in HTML Converter program, 
+  or select another set of files to convert. <br>
+  </font> </p>
+<h3><font color="#000000"><b><a name="details"></a>Details about templates:</b> 
+  </font></h3>
+<p><font color="#000000">The template file is the basis behind converting applets.&nbsp; 
+  It is simply a text file containing tags that represent parts of the original 
+  applet.&nbsp; By <br>
+  adding/removing/moving the tags in a template file, you can alter the output 
+  of the converted file. </font></p>
+<p><font color="#000000"><b><i>Supported Tags:</i></b></font><font color="#000000"> 
+  </font></p>
+<table summary="layout" width="95%" cellpadding="5" border="1" align="center">
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$OriginalApplet$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This tag is substituted 
+      with the complete text of the original applet. </font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$AppletAttributes$</font></code></td>
+    <td align="left" valign="top"> 
+      <p><font color="#000000">This tag is substituted with all of the applets 
+        attributes (<code>code</code>, <code>codebase</code>, <code>width</code>, 
+        <code>height</code>, etc.). </font></p>
+    </td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$ObjectAttributes$</font></code></td>
+    <td align="left" valign="top"><font color="#000000"> This tag is substituted 
+      with all the attributes required by the <code>object</code> tag.</font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$EmbedAttributes$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This tag is substituted 
+      with all the attributes required by the <code>embed</code> tag.</font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$AppletParams$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This tag is substituted 
+      with all the applet's <code>&lt;param ...></code> tags</font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$ObjectParams$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This tag is substituted 
+      with all the <code>&lt;param...></code> tags required by the object tag. 
+      </font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$EmbedParams$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This tag is substituted 
+      with all the <code>&lt;param...></code> tags required by the <code>embed</code> 
+      tag in the form&nbsp; <code>name=value </code></font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$AlternateHTML$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This tag is substituted 
+      with the text in the no-support-for-applets area of the original applet 
+      </font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$CabFileLocation$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This is the URL of the 
+      <code>cab</code> file that should be used in each template that targets 
+      IE.</font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$NSFileLocation$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This is the URL of the 
+      Netscape plugin to be used in each template that targets Netscape.</font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$SmartUpdate$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This is the URL of the 
+      Netscape SmartUpdate to be used in each template that targets Netscape Navigator 
+      4.0 or later.</font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">$MimeType$</font></code></td>
+    <td align="left" valign="top"><font color="#000000">This is the MIME type 
+      of the Java object. </font></td>
+  </tr>
+</table>
+<p>Below are four templates that come with the HTML Converter. You can make up 
+  others and put them in the <code>template</code> folder to use them.</p>
+<p><font color="#000000"><b><code><font size="+1">default.tpl</font></code></b>&#151; 
+  the default template for the converter. The converted page can be used in IE 
+  and Navigator on Windows to invoke Java Plug-in. This template can also be used 
+  with Netscape on Unix (Solaris) </font></p>
+<p><font color="#000000"><code>&lt;!-- HTML CONVERTER --> <br>
+  &lt;OBJECT classid="clsid:E19F9330-3110-11d4-991C-005004D3B3DB" <br>
+  $ObjectAttributes$ codebase="$CabFileLocation$"> <br>
+  $ObjectParams$ <br>
+  &lt;PARAM NAME="type" VALUE="$MimeType$"> <br>
+  &lt;PARAM NAME="scriptable" VALUE="false"> <br>
+  $AppletParams$<br>
+  &lt;COMMENT> <br>
+  &lt;EMBED type="$MimeType$" $EmbedAttributes$ <br>
+  $EmbedParams$ scriptable=false pluginspage="$NSFileLocation$">&lt;NOEMBED> <br>
+  &lt;/COMMENT> <br>
+  $AlternateHTML$ <br>
+  &nbsp;&lt;/NOEMBED>&lt;/EMBED> <br>
+  &lt;/OBJECT> </code></font></p>
+<p><code><font color="#000000">&lt;!-- <br>
+  $ORIGINALAPPLET$ <br>
+  --> </font></code></p>
+<p><font color="#000000"><b><code><font size="+1">ieonly.tpl</font></code></b> 
+  &#151; the converted page can be used to invoke Java Plug-in in IE on Windows 
+  only. </font></p>
+<p><font color="#000000"><code>&lt;!-- HTML CONVERTER --> <br>
+  &lt;OBJECT classid="clsid:E19F9330-3110-11d4-991C-005004D3B3DB" <br>
+  $ObjectAttributes$ codebase="$CabFileLocation$"> <br>
+  $ObjectParams$ <br>
+  &lt;PARAM NAME="type" VALUE="$MimeType$"> <br>
+  &lt;PARAM NAME="scriptable" VALUE="false"> <br>
+  $AppletParams$ <br>
+  $AlternateHTML$ <br>
+  &lt;/OBJECT> </code></font></p>
+<p><code><font color="#000000">&lt;!-- <br>
+  $ORIGINALAPPLET$ <br>
+  --> </font></code></p>
+<p><font color="#000000"><b><code><font size="+1">nsonly.tpl</font></code></b> 
+  &#151; the converted page can be used to invoke Java Plug-in in Navigator on 
+  Windows and Solaris. </font></p>
+<p><font color="#000000"><code>&lt;!-- HTML CONVERTER --> <br>
+  &lt;EMBED type="$MimeType$" $EmbedAttributes$ <br>
+  $EmbedParams$ scriptable=false pluginspage="$NSFileLocation$">&lt;NOEMBED> <br>
+  $AlternateHTML$ <br>
+  &lt;/NOEMBED>&lt;/EMBED> </code></font></p>
+<p><code><font color="#000000">&lt;!-- <br>
+  $ORIGINALAPPLET$ <br>
+  --> </font></code></p>
+<p><font color="#000000"><b><code><font size="+1">extend.tpl</font></code></b> 
+  &#151; the converted page can be used in any browser and any platform. If the 
+  browser is IE or Navigator on Windows, or Navigator on Solaris, Java(TM) Plug-in 
+  will be invoked. Otherwise, the browser's default JVM is used. <br>
+  &nbsp; <br>
+  <code>&lt;!-- HTML CONVERTER --><br>
+  &lt;SCRIPT LANGUAGE="JavaScript">&lt;!--<br>
+  var _info = navigator.userAgent; var _ns = false; var _ns6 = false;<br>
+  var _ie = (_info.indexOf("MSIE") > 0 &amp;&amp; _info.indexOf("Win") > 0 &amp;&amp;<br>
+  _info.indexOf("Windows 3.1") &lt; 0);<br>
+  //-->&lt;/SCRIPT><br>
+  &lt;COMMENT>&lt;SCRIPT LANGUAGE="JavaScript1.1">&lt;!--<br>
+  var _ns = (navigator.appName.indexOf("Netscape") >= 0 &amp;&amp;<br>
+  ((_info.indexOf("Win") > 0 &amp;&amp; _info.indexOf("Win16") &lt; 0 &amp;&amp;<br>
+  java.lang.System.getProperty("os.version").indexOf("3.5") &lt; 0) ||<br>
+  _info.indexOf("Sun") > 0));<br>
+  var _ns6 = ((_ns == true) &amp;&amp; (_info.indexOf("Mozilla/5") >= 0));<br>
+  //-->&lt;/SCRIPT>&lt;/COMMENT><br>
+  <br>
+  &lt;SCRIPT LANGUAGE="JavaScript">&lt;!--<br>
+  if (_ie == true) document.writeln('&lt;OBJECT<br>
+  classid="clsid:E19F9330-3110-11d4-991C-005004D3B3DB" $ObjectAttributes$<br>
+  codebase="$CabFileLocation$">&lt;NOEMBED>&lt;XMP>');<br>
+  else if (_ns == true &amp;&amp; _ns6 == false) document.writeln('&lt;EMBED<br>
+  type="$MimeType$" $EmbedAttributes$<br>
+  $EmbedParams$ scriptable=false&nbsp;<br>
+  pluginspage="$NSFileLocation$">&lt;NOEMBED>&lt;XMP>');<br>
+  //-->&lt;/SCRIPT><br>
+  &lt;APPLET $AppletAttributes$>&lt;/XMP><br>
+  $ObjectParams$<br>
+  &lt;PARAM NAME="type" VALUE="$MimeType$"><br>
+  &lt;PARAM NAME="scriptable" VALUE="false"><br>
+  $AppletParams$<br>
+  $AlternateHTML$<br>
+  &lt;/APPLET><br>
+  &lt;/NOEMBED>&lt;/EMBED>&lt;/OBJECT><br>
+  <br>
+  &lt;!-- <br>
+  $ORIGINALAPPLET$ <br>
+  --> </code><br>
+  </font></p>
+<h2><font color="#000000"><b><a name="using_command"></a>Running the converter 
+  from the command line:</b></font></h2>
+<h3><font color="#000000"><b>Format:</b> </font> </h3>
+<p><font color="#000000"><code>java -jar htmlconverter.jar [-options1 value1 [-option2 
+  value2 [...]]] </code></font><font color="#000000"><code>[-simulate]</code></font> 
+  <font color="#000000"><code>[filespecs]</code></font> </p>
+<p><font color="#000000">If only "<code>java -jar htmlconverter.jar -gui</code>" 
+  is specified (only <code>-gui</code> option with no <code>filespecs</code>), 
+  the GUI version of the converter will be launched.&nbsp; Otherwise, the GUI 
+  will be suppressed. </font> </p>
+<p><font color="#000000"><code>filespecs</code>:&nbsp; <br>
+  space-delimited list of file specifications which may include wildcard (*), 
+  e.g. <code>*.html</code>, <code>file*.html</code>).</font></p>
+<p><code><font color="#000000">-simulate</font></code><font color="#000000">: 
+  <br>
+  Set to preview a conversion without actually doing the conversion.<font size="4"> 
+  </font>Use this option if you are unsure about a conversion. You will be shown 
+  detail information about the conversion had it been done.</font></p>
+<p><font color="#000000"> </font></p>
+<table summary="layout" width="95%" cellpadding="5" border="1" align="center">
+  <tr align="center" valign="middle" bgcolor="#CCCCCC"> 
+    <td><font color="#000000"><b><font size="4">Options:</font></b></font></td>
+    <td><font size="4"><b>Description</b></font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">-source</font></code></td>
+    <td align="left" valign="top"><font color="#000000">Path to files; e.g., <code>c:\htmldocs</code> 
+      in Windows, <code>/home/user1/htmldocs</code> in Unix. Default is <code>&lt;userdir></code><br>
+      If the path is relative, it is assumed to be relative to the directory from 
+      which the HTMLConverter was launched. </font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>-dest</code></td>
+    <td align="left" valign="top">Path to converter file location. Default: <code>&lt;usrdir&gt;</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">-backup</font></code></td>
+    <td align="left" valign="top"><font color="#000000">Path to the directory 
+      where you want backup files to be stored.&nbsp; Default: <code>&lt;source>_BAK</code><br>
+      If the path is relative, it is assumed to be relative to the directory from 
+      which the HTMLConverter was launched. </font></td>
+  </tr>
+  <tr>
+    <td align="left" valign="top"><code>-f</code></td>
+    <td align="left" valign="top">Force overwritting of backup files.</td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">-subdirs</font></code></td>
+    <td align="left" valign="top"><font color="#000000">Sets whether files in 
+      subdirectories should be converted or not.&nbsp; Default:&nbsp; <code>false</code></font> 
+    </td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">-template</font></code></td>
+    <td align="left" valign="top"> 
+      <p><font color="#000000">Name of template file to use for conversion.&nbsp; 
+        Default:&nbsp; <code>Standard (IE &amp; Navigator) for Windows &amp; Solaris 
+        Only</code>.&nbsp; </font></p>
+      <p><font color="#000000" size="4"><b>Note:</b></font><font color="#000000"> 
+        Use the default if you are unsure.</font> </p>
+    </td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">-log</font></code></td>
+    <td align="left" valign="top"><font color="#000000">Path and filename for 
+      the log.&nbsp; If not provided, no log file is written.</font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code><font color="#000000">-progress</font></code></td>
+    <td align="left" valign="top"><font color="#000000">Set to display standard 
+      out progress during conversion.&nbsp; Default: <code>true</code></font></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>-latest</code></td>
+    <td align="left" valign="top">Use the latest JRE supporting the MIME type.</td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>-gui</code></td>
+    <td align="left" valign="top">Display the graphical user interface for the 
+      converter. </td>
+  </tr>
+</table>
+<p></p>
+      <p>&nbsp;</p>
+</body>
+</html>

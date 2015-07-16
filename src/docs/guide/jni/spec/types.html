@@ -1,0 +1,457 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Tue Nov 12 11:53:36 2002" />
+    <title>JNI Types and Data Structures</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="jniTOC.html" />
+    <link rel="Previous" href="design.html" />
+    <link rel="Next" href="functions.html" />
+    <link rel="Index" href="backcover.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="jniTOC.html">Contents</a> | 
+	<a accesskey="p" href="design.html">Previous</a> | 
+        <a accesskey="n" href="functions.html">Next</a>
+       </td>
+	   <td align="right"><i>Java Native Interface Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp9502"> </a><h2 class="pNewHTMLPage">
+JNI Types and Data Structures
+</h2>
+<hr class="pHr"/>
+<a name="wp15773"> </a><h2 class="pChapNum">
+Chapter &#160; 3
+</h2>
+<a name="wp15901"> </a><p class="pBody">
+This chapter discusses how the JNI maps Java types to native C types. 
+</p>
+<a name="wp428"> </a><h2 class="pHeading1">
+Primitive Types
+</h2>
+<a name="wp16207"> </a><p class="pBody">
+<a  href="types.html#wp198">Table&#160;3-1</a> describes Java primitive types and their machine-dependent native equivalents.
+</p>
+<a name="wp522"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="Primitive Types and Native Equivalents" id="wp198">
+  <caption><a name="wp198"> </a><div class="pTableCaption">
+Table&#160;3-1	Primitive Types and Native Equivalents
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp16285"> </a><div style="text-align: left" class="pTableHead">
+Java Type
+</div>
+
+</th>
+    <th><a name="wp16287"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+    <th><a name="wp16289"> </a><div style="text-align: left" class="pTableHead">
+Description
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16291"> </a><div class="pTableText">
+boolean
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16293"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16295"> </a><div class="pTableText">
+unsigned 8 bits
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16297"> </a><div class="pTableText">
+byte
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16299"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16301"> </a><div class="pTableText">
+signed 8 bits
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16303"> </a><div class="pTableText">
+char
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16305"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16307"> </a><div class="pTableText">
+unsigned 16 bits
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16309"> </a><div class="pTableText">
+short
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16311"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16313"> </a><div class="pTableText">
+signed 16 bits
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16315"> </a><div class="pTableText">
+int
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16317"> </a><div class="pTableText">
+jint
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16319"> </a><div class="pTableText">
+signed 32 bits
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16321"> </a><div class="pTableText">
+long
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16323"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16325"> </a><div class="pTableText">
+signed 64 bits
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16327"> </a><div class="pTableText">
+float
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16329"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16331"> </a><div class="pTableText">
+32 bits
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16344"> </a><div class="pTableText">
+double
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16346"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16348"> </a><div class="pTableText">
+64 bits
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16333"> </a><div class="pTableText">
+void
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16335"> </a><div class="pTableText">
+void
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16337"> </a><div class="pTableText">
+N/A
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp15927"> </a><p class="pBody">
+The following definition is provided for convenience.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+#define JNI_FALSE  0<a name="wp525"> </a>
+#define JNI_TRUE   1<a name="wp526"> </a>
+</pre></div>
+<a name="wp16071"> </a><p class="pBody">
+The <code class="cCode">jsize</code> integer type is used to describe cardinal indices and sizes:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+typedef jint jsize;<a name="wp534"> </a>
+</pre></div>
+<a name="wp15954"> </a><h2 class="pHeading1">
+Reference Types
+</h2>
+<a name="wp970"> </a><p class="pBody">
+The JNI includes a number of reference types that correspond to different kinds of Java objects. JNI reference types are organized in the hierarchy shown in <a  href="types.html#wp914">Figure&#160;3-1</a>.
+</p>
+<a name="wp912"> </a><p class="pBody">
+</p><div align="center"><img src="images/types4.gif" height="226" width="662" alt="The top of the heirarchy is jobject. Subclasses of jobject are jclass, jstring, jarray and jthrowable. Subclasses of jarray are jobjectArray, jbooleanArray, jbyteArray, jcharArray, jshortArray, jintArray, jlongArray, jfloatArray, jdoubleArray." border="0" hspace="0" vspace="0"/></div><p class="pBody">
+</p>
+<a name="wp914"> </a><div class="pFigureCaption">
+Figure&#160;3-1	  Reference Type Hierarchy
+<br /><br />
+</div><a name="wp663"> </a><p class="pBody">
+In C, all other JNI reference types are defined to be the same as jobject. For example:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+typedef jobject jclass;<a name="wp1032"> </a>
+</pre></div>
+<a name="wp1033"> </a><p class="pBody">
+In C++, JNI introduces a set of dummy classes to enforce the subtyping relationship. For example:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+class _jobject {};<a name="wp1041"> </a>
+class _jclass : public _jobject {};<a name="wp1055"> </a>
+...<a name="wp1057"> </a>
+typedef _jobject *jobject;<a name="wp1058"> </a>
+typedef _jclass *jclass;<a name="wp1063"> </a>
+</pre></div>
+<a name="wp1064"> </a><h2 class="pHeading1">
+Field and Method IDs
+</h2>
+<a name="wp1065"> </a><p class="pBody">
+Method and field IDs are regular C pointer types:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+struct _jfieldID;              /* opaque structure */<a name="wp1067"> </a>
+typedef struct _jfieldID *jfieldID;   /* field IDs */<a name="wp1068"> </a>
+<a name="wp1069"> </a>
+struct _jmethodID;              /* opaque structure */<a name="wp1070"> </a>
+typedef struct _jmethodID *jmethodID; /* method IDs */<a name="wp574"> </a>
+</pre></div>
+<a name="wp568"> </a><h2 class="pHeading1">
+The Value Type 
+</h2>
+<a name="wp16107"> </a><p class="pBody">
+The <code class="cCode">jvalue</code> union type is used as the element type in argument arrays. It is declared as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+typedef union jvalue {<a name="wp582"> </a>
+    jboolean z;<a name="wp583"> </a>
+    jbyte    b;<a name="wp584"> </a>
+    jchar    c;<a name="wp585"> </a>
+    jshort   s;<a name="wp586"> </a>
+    jint     i;<a name="wp587"> </a>
+    jlong    j;<a name="wp588"> </a>
+    jfloat   f;<a name="wp589"> </a>
+    jdouble  d;<a name="wp590"> </a>
+    jobject  l;<a name="wp591"> </a>
+} jvalue;<a name="wp592"> </a>
+</pre></div>
+<a name="wp16432"> </a><h2 class="pHeading1">
+Type Signatures
+</h2>
+<a name="wp16437"> </a><p class="pBody">
+The JNI uses the Java VM&#8217;s representation of type signatures. <a  href="types.html#wp276">Table&#160;3-2</a> shows these type signatures.
+</p>
+<a name="wp597"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="Java VM Type Signatures" id="wp276">
+  <caption><a name="wp276"> </a><div class="pTableCaption">
+Table&#160;3-2	Java VM Type Signatures
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp16445"> </a><div style="text-align: left" class="pTableHead">
+Type Signature
+</div>
+
+</th>
+    <th><a name="wp16447"> </a><div style="text-align: left" class="pTableHead">
+Java Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16449"> </a><div class="pTableText">
+Z
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16451"> </a><div class="pTableText">
+boolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16453"> </a><div class="pTableText">
+B
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16455"> </a><div class="pTableText">
+byte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16457"> </a><div class="pTableText">
+C
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16459"> </a><div class="pTableText">
+char
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16461"> </a><div class="pTableText">
+S
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16463"> </a><div class="pTableText">
+short
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16465"> </a><div class="pTableText">
+I
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16467"> </a><div class="pTableText">
+int
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16469"> </a><div class="pTableText">
+J
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16471"> </a><div class="pTableText">
+long
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16473"> </a><div class="pTableText">
+F
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16475"> </a><div class="pTableText">
+float
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16477"> </a><div class="pTableText">
+D
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16479"> </a><div class="pTableText">
+double
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16520"> </a><div class="pTableText">
+L fully-qualified-class ;
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16522"> </a><div class="pTableText">
+fully-qualified-class
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16528"> </a><div class="pTableText">
+[ type
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16530"> </a><div class="pTableText">
+type[]
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp16534"> </a><div class="pTableText">
+( arg-types ) ret-type
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp16536"> </a><div class="pTableText">
+method type
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp16537"> </a><p class="pBody">
+For example, the Java method:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+long f (int n, String s, int[] arr);<a name="wp600"> </a>
+</pre></div>
+<a name="wp16540"> </a><p class="pBody">
+has the following type signature:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+(ILjava/lang/String;[I)J<a name="wp607"> </a>
+</pre></div>
+<a name="wp16542"> </a><h2 class="pHeading1">
+UTF-8 Strings
+</h2>
+<a name="wp477"> </a><p class="pBody">
+The JNI uses UTF-8 strings to represent various string types. UTF-8 strings are the same as those used by the Java VM. UTF-8 strings are encoded so that character sequences that contain only nonnull ASCII characters can be represented using only one byte per character, but characters of up to 16 bits can be represented. All characters in the range <code class="cCode">\u0001</code> to <code class="cCode">\u007F</code> are represented by a single byte, as follows:
+</p>
+<a name="wp483"> </a><p class="pBody">
+</p><div align="right"><img src="images/typesa.gif" height="31" width="672" alt="Byte consisting of 0 in the first position followed by bits 0 through 6 of the bits representing the value of the character." border="0" hspace="0" vspace="0"/></div><p class="pBody">
+</p>
+<a name="wp486"> </a><p class="pBody">
+The seven bits of data in the byte give the value of the character that is represented. The null character (<code class="cCode">\u000</code>) and characters in the range <code class="cCode">\u0080 to \u07FF</code> are represented by a pair of bytes, <em class="cEmphasis">x</em> and <em class="cEmphasis">y</em>, as follows:
+</p>
+<a name="wp501"> </a><p class="pBody">
+</p><div align="right"><img src="images/types2.gif" height="35" width="672" alt="The x byte with 110 in the first 3 positions followed by bits 6 through 10 of the bits representing the value of the character. The y byte with 10 in the first 2 positions followed by bits 0 through 5 representing the value of the character." border="0" hspace="0" vspace="0"/></div><p class="pBody">
+</p>
+<a name="wp545"> </a><p class="pBody">
+The bytes represent the character with the value <code class="cCode">((x&amp;0x1f)&lt;&lt;6)+(y&amp;0x3f)</code>.
+</p>
+<a name="wp546"> </a><p class="pBody">
+Characters in the range <code class="cCode">\u0800</code> to <code class="cCode">\uFFFF</code> are represented by three bytes, <em class="cEmphasis">x</em>, <em class="cEmphasis">y</em>, and <em class="cEmphasis">z</em>:
+</p>
+<a name="wp547"> </a><p class="pBody">
+</p><div align="right"><img src="images/types3.gif" height="37" width="492" alt="The x byte with 1110 followed by bits 12 through 15 of the bits representing the character. The y byte with 10 followed by bits 6 through 11. The z byte with 10 followed by bits 0 through 5." border="0" hspace="0" vspace="0"/></div><p class="pBody">
+</p>
+<a name="wp548"> </a><p class="pBody">
+The character with the value <code class="cCode">((x&amp;0xf)&lt;&lt;12)+(y&amp;0x3f)&lt;&lt;6)+(z&amp;0x3f)</code> is represented by the three bytes.
+</p>
+<a name="wp608"> </a><p class="pBody">
+There are two differences between this format and the &#8220;standard&#8221; UTF-8 format. First, the null byte <code class="cCode">(byte)0</code> is encoded using the two-byte format rather than the one-byte format. This means that Java VM UTF-8 strings never have embedded nulls. Second, only the one-byte, two-byte, and three-byte formats are used. The Java VM does not recognize the longer UTF-8 formats.
+</p>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="jniTOC.html">Contents</a> | 
+	<a accesskey="p" href="design.html">Previous</a> | 
+        <a accesskey="n" href="functions.html">Next</a>
+       </td>
+        <td align="right">
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

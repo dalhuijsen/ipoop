@@ -1,0 +1,96 @@
+<HTML>
+<HEAD>
+  <TITLE>1 Introduction</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="jndiTOC.html">PREV</A>
+    | <A HREF="jndi.2.html">NEXT</A></TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><BR>
+<HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<H2 CLASS="chapter"><A NAME="pgfId=997832"></A>1. <A NAME="38451"></A>Introduction</H2>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=997833"></A>Directory services
+  play a vital role in Intranets and Internets by providing access
+  to a variety of information about users, machines, networks,
+  services, and applications. By its very nature, a directory service
+  incorporates a naming facility for providing human understandable
+  namespaces that characterize the arrangement and identification
+  of the various entities.</P>
+  <P CLASS="body"><A NAME="pgfId=997834"></A>The computing environment
+  of an enterprise typically consists of several naming facilities
+  often representing different parts of a composite namespace.
+  For example, the Internet Domain Name System (DNS) might be used
+  as the top-level naming facility for different organizations
+  within an enterprise. The organizations themselves might use
+  a directory service such as LDAP or NDS or NIS. From a user's
+  perspective, there is one namespace consisting of composite names.
+  URLs are examples of composite names because they span namespaces
+  of multiple naming facilities. Applications which use directory
+  services must support this user perspective.</P>
+  <P CLASS="body"><A NAME="pgfId=997835"></A>Many Java<SUP><FONT
+   SIZE="-1">TM</FONT></SUP> application developers can benefit
+  from a directory service API that is not only independent of
+  the particular directory or naming service implementation, but
+  also enables seamless access to directory objects through multiple
+  naming facilities. In fact, any application can attach its own
+  objects to the namespace. Such a facility enables any Java application
+  to discover and retrieve objects of any type.</P>
+  <P CLASS="body"><A NAME="pgfId=997836"></A>End users can benefit
+  from logical namespaces that allow easier discovery and identification
+  of the objects in the network.</P>
+  <P CLASS="body"><A NAME="pgfId=997837"></A>Directory service
+  developers can benefit from a service-provider capability that
+  enables them to incorporate their respective implementations
+  without requiring changes to the client.</P>
+  <P CLASS="body"><A NAME="pgfId=997838"></A>Java Naming and Directory
+  Interface<SUP><FONT SIZE="-1">TM</FONT></SUP> (JNDI) is an API
+  that provides directory and naming functionality to Java applications.
+  It is defined to be independent of any specific directory service
+  implementation. Thus, a variety of directories can be accessed
+  in a common way.</P>
+  <P CLASS="body"><A NAME="pgfId=997839"></A>Here are two examples
+  to briefly illustrate some of the more commonly used features
+  of JNDI.</P>
+  <P CLASS="body"><A NAME="pgfId=997840"></A>An application that
+  wants to access a printer needs the corresponding printer object.
+  This is simply done as follows:</P>
+  <BLOCKQUOTE>
+    <PRE>prt = (Printer) building7.lookup(&quot;puffin&quot;);
+prt.print(document);</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=997843"></A>JNDI does all the
+  work of locating the information needed to construct the printer
+  object.</P>
+  <P CLASS="body"><A NAME="pgfId=997844"></A>An application that
+  wants to find a person's phone numbers, which are stored in the
+  organization's directory, can simply do:</P>
+  <BLOCKQUOTE>
+    <PRE>String[] attrs = {&quot;workPhone&quot;, &quot;cellPhone&quot;, &quot;faxNumber&quot;};
+bobsPhones = directory.getAttributes(&quot;cn=Bob, o=Widget, c=US&quot;, attrs);</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=997847"></A>If there may be several
+  Bobs in the Widget organization, the application can search the
+  organization's directory to find the right Bob as follows:</P>
+  <BLOCKQUOTE>
+    <PRE>bob = directory.search(&quot;o=Widget, c=US&quot;, &quot;(cn=Bob)&quot;, searchctls);</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=997849"></A>This document describes
+  the architecture and interfaces of JNDI.</P>
+</BLOCKQUOTE>
+
+<P CLASS="body"><HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A>
+| <A HREF="jndiTOC.html">PREV</A> | <A HREF="jndi.2.html">NEXT</A><HR ALIGN=LEFT><I><FONT
+ SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

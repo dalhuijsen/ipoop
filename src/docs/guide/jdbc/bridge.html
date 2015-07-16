@@ -1,0 +1,264 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html">
+   <title>JDBC-ODBC Bridge Enhancements</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000FF" vlink="#000077" alink="#FF0000">
+&nbsp;
+<table summary="layout" WIDTH="100%" >
+<tr>
+<td WIDTH="60"><img alt="Java logo" SRC="../../images/javalogo52x88.gif" ></td>
+
+<td ALIGN=CENTER>
+<h1>
+JDBC<sup><font size=-1>TM</font></sup>-ODBC Bridge Enhancements</h1>
+</td>
+
+<td ALIGN=RIGHT VALIGN=TOP><font size=-1><a href="http://java.sun.com/j2se/1.4.2/docs/index.html">Documentation
+Contents</a></font>
+<br><font size=-1><a href="http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/">JDBC</a></font></td>
+</tr>
+</table>
+
+<p>The JDBC-ODBC Bridge allows applications written in the Java<sup><font size=-2>TM</font></sup>
+programming language to use the JDBC<sup><font size=-2>TM</font></sup>
+API with many existing ODBC drivers. The Bridge is itself a driver based
+on JDBC technology ("JDBC driver") that is defined in the class
+<tt>sun.jdbc.odbc.JdbcOdbcDriver</tt>.
+The Bridge defines the JDBC sub protocol <tt>odbc</tt>.
+<h2>
+Status of the JDBC-ODBC Bridge</h2>
+The JDBC-ODBC Bridge should be considered a transitional solution. Sun
+Microsystems and DataDirect Technologies are working to make the Bridge
+more reliable and robust, but they do not consider it a supported product.
+With the development of pure Java JDBC drivers, the JDBC-ODBC Bridge should
+become unnecessary.
+<h2>
+Why not just use ODBC?</h2>
+The JDBC-ODBC Bridge offers several advantages over "naked" ODBC.
+<ul>
+<li>
+The ODBC API is strongly oriented toward C/C++ programmers. The JDBC-ODBC
+Bridge makes it unnecessary for programmers using the Java programming
+language to deal with non-Java language concepts.</li>
+
+<li>
+The ODBC API is extremely complex and intermingles high level and low level
+functions. The JDBC-ODBC Bridge allows the programmer to rely on the JDBC
+API, which is relatively simple and easy to learn.</li>
+
+<li>
+The JDBC-ODBC Bridge lets a program deal with ODBC through a standardized
+JDBC interface. That helps a program avoid being tied to ODBC when a better
+solution comes along.</li>
+</ul>
+
+<h2>
+Why use ODBC at all?</h2>
+The ideal is "Pure Java": no native code, no platform dependent features.
+But you may need to begin your development effort right away, without waiting
+for your DBMS to offer a Java only JDBC driver. Partly native drivers,
+such as the JDBC-ODBC Bridge, let you create programs that easily adapt
+to Pure Java drivers as they become available.
+<h2>
+What's New with the JDBC-ODBC Bridge?</h2>
+
+<ul>
+<li>
+A <tt>jdbc:odbc:</tt> connection can now have a <tt>charSet</tt> property,
+to specify a Character Encoding Scheme other than the client default. For
+possible values, see the <a href="../intl/index.html">Internationalization specification</a> on the Java Software Web Site.</li>
+
+<br>The following code fragment shows how to set 'Big5' as the character
+set for all character data.
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Load the JDBC-ODBC bridge driver
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class.forName(sun.jdbc.odbc.JdbcOdbcDriver) ;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // setup the properties&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; java.util.Properties prop = new java.util.Properties();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prop.put("charSet", "Big5");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prop.put("user", username);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prop.put("password", password);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Connect to the database
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con = DriverManager.getConnection(url, prop);</pre>
+
+<li>
+The bridge now supports JDBC 2.0 features, which includes batch updates,
+scrollable cursors, and so on.</li>
+
+<li>
+JDBC-ODBC bridge now offers most of the features required for a J2EE compatible
+JDBC driver.</li>
+
+<li>
+Sample implementations of <tt>DataSource</tt> and <tt>ConnectionPoolDataSource</tt>
+are available with the JDBC-ODBC bridge.</li>
+
+<li>
+<tt>CallableStatement</tt> OUT/INOUT parameter handling has been improved.</li>
+
+<li>
+Automatic garbage collection of unclosed <tt>Statement</tt> objects has
+been implemented.</li>
+
+<li>
+Improved support for updatable <tt>Resultset</tt> objects has been implemented.</li>
+
+<li>
+Additional robustness and reliability checking as been introduced.</li>
+</ul>
+
+<h2>
+New DataSource Implementations in the JDBC-ODBC Bridge</h2>
+Implementations of <tt>javax.sql.DataSource</tt> and <tt>javax.sql.ConnectionPoolDataSource</tt>
+are now available. Both are in the <tt>sun.jdbc.odbc.ee</tt> package. The
+following code fragment illustrates how to set <tt>DataSource</tt> properties.
+The last two lines use JNDI API to bind the <tt>DataSource</tt> object
+<i>ds</i>
+to "jdbc/OdbcDB1". Assume that the <tt>DataSource</tt> object is targeting
+an ODBC DSN "dsn1" connecting to an Oracle Database.
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Establish the DataSource object instance</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sun.jdbc.odbc.ee.DataSource ds = new sun.jdbc.odbc.ee.DataSource();</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Provide user credentials and database name</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ds.setUser("scott");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ds.setPassword("tiger");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ds.setDatabaseName("dsn1");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ds.setCharSet("..."); // optional property
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ds.setLoginTimeout(100); // optional property</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Establish initial context and bind to the datasource target</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; InitialContext ic = new InitialContext();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ic.bind("jdbc/OdbcDB1",ds);</pre>
+<font size=+0>In the preceding code, note that some properties are optional
+while some are required. Properties such as port number and role name are
+not implemented in the JDBC-ODBC bridge <tt>DataSource</tt> implementations
+as these properties are not applicable to ODBC paradigm.</font>
+<p><font size=+0>Continuing the previous example, the following code fragment
+demonstrates retrieving the <tt>DataSource</tt> object by looking up the
+JNDI name "jdbc/OdbcDB1". With the <tt>DataSource</tt> object that is obtained,
+the code then activates tracing and creates two connections.</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Get the initial context of JNDI and lookup the datasource.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; InitialContext ic = new InitialContext();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; javax.sql.DataSource ds1 = (javax.sql.DataSource) ic.lookup("jdbc/OdbcDB1");</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Set the optional printwriter where the trace log is to be directed.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ds1.setLogWriter(new PrintWriter(new FileOutputStream("/tmp/datasource.log")));</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con1 = ds1.getConnection();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con2 = ds1.getConnection("system","manager");</pre>
+The implementation of <tt>javax.sql.ConnectionPoolDataSource</tt> uses
+an underlying pool of JDBC-ODBC connections. A <tt>ConnectionPoolDataSource</tt>
+object is used to create
+<tt>PooledConnection</tt> objects, which are in
+turn used to get <tt>Connection</tt> objects. From the user's viewpoint,
+the
+<tt>Connection</tt> object is just like any other connection.
+<p>The following code fragment creates the <tt>ConnectionPoolDataSource</tt>
+object <i>cpds</i> and sets its properties. The final two lines use JNDI
+API to bind <i>cpds</i> to "jdbc/OdbcPool", which can later be supplied
+to the method <tt>InitialContext.lookup</tt> to retrieve <i>cpds</i>.
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Establish ConnectionPoolDataSource instance</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sun.jdbc.odbc.ee.ConnectionPoolDataSource cpds =</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new sun.jdbc.odbc.ee.ConnectionPoolDataSource("jdbc/OdbcPool");</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Provide user credentials and database name
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setUser("scott");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setPassword("tiger");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setDatabaseName("dsn1");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setCharSet("...") // optional property
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setLoginTimeout(100); // optional property</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setMinPoolSize("10");&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setInitialPoolSize("15");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setMaxPoolSize("20");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setMaxIdleTime("300");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setTimeoutFromPool("600");</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Maintenance interval of the pool. A maintenance thread will remove
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // unwanted connections and cleanup the pool at the interval specified.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // This cannot be zero.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cpds.setMaintenanceInterval("900");</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; InitialContext ic = new InitialContext();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ic.bind("jdbc/OdbcPool",cpds);</pre>
+In all cases in order get the <tt>ConnectionPoolDataSource</tt> to function
+as a pooled datasource, it is the responsibility of the application to
+configure the pool as described in the code example above. The default
+behavior of pooled datasource uses a zero minimum, initial and maximum
+pool sizes. Note that the JDBC-ODBC bridge implementation of
+<tt>ConnectionPoolDataSource</tt>
+does not yet include the pooling of <tt>Statement</tt> objects or the property
+<tt>propertyCycle</tt>.
+<p>The following code fragment shows how to use a
+<tt>ConnectionPoolDataSource</tt>
+object as simply a
+<tt>DataSource</tt> object. This is done by doing a
+JNDI&nbsp;lookup of "jdbc/OdbcPool" and casting it to a <tt>DataSource</tt>
+object instead of to a <tt>ConnectionPoolDataSource</tt> object.
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; InitialContext ic = new InitialContext();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; javax.sql.DataSource ds1 = (javax.sql.DataSource) ic.lookup("jdbc/OdbcPool");</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // First getConnection will initializes the pool.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con1 = ds1.getConnection();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con2 = ds1.getConnection("system","manager");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------------
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------------
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // An application need to close the connection explicitly. This will allow the pool to recycle the connection.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con1.close();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con2.close();</pre>
+Using the implementation as a <tt>ConnectionPoolDataSource</tt> object
+is shown in the following line of code. Note that closing a
+<tt>PooledConnection</tt>
+object closes the actual physical connection, whereas closing a connection
+that was created from a <tt>PooledConnection</tt> object just returns it
+to the pool of connections.
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; InitialContext ic = new InitialContext();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; javax.sql.ConnectionPoolDataSource cpds =</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (javax.sql.ConnectionPoolDataSource) ic.lookup("jdbc/OdbcPool");</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PooledConnection pc1 = cpds.getPooledConnection();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con1 = pc1.getConnection();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PooledConnection pc2 = cpds.getPooledConnection("system","manager");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con2 = pc2.getConnection();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------------
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------------
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // An application needs to close the connection explicitly. This will allow the pool to recycle the connection.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con1.close();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con2.close();</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con3 = pc1.getConnection();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection con4 = pc2.getConnection();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------------
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------------
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // This will close the physical connection!
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pc1.close();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pc2.close();</pre>
+A pool of connections can be shut down in two ways. If the method
+<tt>shutDown</tt>
+is given the argument <tt>false</tt>, only those connections that are not
+being used will be closed. If the argument <tt>true</tt> is supplied, all
+connections will be closed immediately, regardless of whether they are
+being used or not.
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Hot shutdown
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ((sun.jdbc.odbc.ee.ConnectionPoolDataSource) cpds).shutDown(true);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Cold shutdown
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ((sun.jdbc.odbc.ee.ConnectionPoolDataSource) cpds).shutDown(false);</pre>
+
+<p><br>
+<hr SIZE=3 NOSHADE><img alt="Java logo" SRC="../../images/javalogo52x88.gif"  align=RIGHT> <font size=-2><a href="http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html">Copyright
+&copy;</a>&nbsp; 2002
+<a href="http://www.sun.com/">Sun Microsystems, Inc.</a>
+All Rights Reserved.</font>
+<p><font size=-1>Please send comments to:&nbsp; <a href="mailto:jdbc-odbc@sun.com">jdbc-odbc@sun.com</a></font>
+</body>
+</html>

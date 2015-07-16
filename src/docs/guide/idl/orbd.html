@@ -1,0 +1,328 @@
+<HTML>
+<HEAD>
+<!-- updated 5/2001 dcarson1 -->
+   <TITLE>orbd - The Object Request Broker Daemon (ORBD)</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>orbd - The Object Request Broker Daemon
+</H1>
+
+<BLOCKQUOTE><B>orbd</B> is used to enable 
+clients to transparently locate and invoke persistent objects on servers in the CORBA 
+environment. </BLOCKQUOTE>
+
+<P><STRONG>See also:</STRONG> <a href="jidlNaming.html"><em>Naming Service</em></a>
+
+<H2>
+SYNOPSIS</H2>
+
+<BLOCKQUOTE>
+<PRE>orbd &lt;<A HREF="orbd.html#Options">options</A>&gt;</PRE>
+</BLOCKQUOTE>
+
+<H2>
+DESCRIPTION</H2>
+
+<BLOCKQUOTE>
+
+<P>The Server Manager included with the <B>orbd</B> tool is used to enable 
+clients to transparently locate and invoke persistent objects on servers in the CORBA 
+environment.  The persistent servers, while publishing the persistent object references 
+in the Naming Service, include the port number of the ORBD in the object reference 
+instead of the port number of the Server.  The inclusion of an ORBD port number in the 
+object reference for persistent object references has the following advantages:
+<P>
+<UL>
+<LI>The object reference in the Naming Service remains independent of the server life 
+cycle.  For example, the object reference could be published by the server in the Naming 
+Service when it is first installed, and then, independent of how many times the server is 
+started or shutdown, the ORBD will always return the correct object reference to the 
+invoking client.
+<P>
+<LI>The client needs to lookup the object reference in the Naming Service only once, and 
+can keep re-using this reference independent of the changes introduced due to server life 
+cycle.
+</UL>
+
+
+<P>To access ORBD's Server Manager, the server must be started using <A HREF="servertool.html"><TT>servertool</TT></A>, which is 
+a command-line interface  for application programmers to register, unregister, startup, and shutdown a persistent server.  
+For more information on the Server
+Manager, see the section in this document titled <em><a href="#sm">Server Manager</a></em>.
+
+<P>When <tt>orbd</tt> starts up, it also starts a naming service.  For more information 
+on the naming service, link to <a href="jidlNaming.html"><em>Naming Service</em></a>.
+
+</BLOCKQUOTE>
+<A NAME="Options"></A>
+<H2>REQUIRED OPTIONS</H2>
+
+<BLOCKQUOTE>
+<DL>
+
+<DT>
+<B>-ORBInitialPort <em>nameserverport</em></B></DT>        
+
+<DD>Specifies the port on which the name server should be started.  Once started, <tt>orbd</tt>  will listen for incoming requests on this port. Note that when 
+using Solaris software, you must become root to start a process on a port under 1024.  
+For this reason, we recommend that you use a port number greater than or equal to 1024. 
+(required)
+</DD></DL>
+<p>
+
+</BLOCKQUOTE>
+<A NAME="OtherOptions"></A>
+<H2>OTHER OPTIONS</H2>
+
+<BLOCKQUOTE>
+<DL>
+<DT>
+<B>-port <em>port</em></B></DT>
+<DD>
+Specifies the activation port where ORBD should be started, and where ORBD will be
+accepting requests for persistent objects. The default value for 
+this port is 1049. This port number is added to the port field of the persistent 
+Interoperable Object References (IOR). (optional)</DD>
+<p>
+<DT>
+<B>-defaultdb <em>directory</em></B></DT>
+
+<DD>
+Specifies the base where the ORBD persistent storage directory <EM>orb.db</EM> is 
+created.  If this option is not specified, the default value is "./orb.db". (optional)
+<p>
+
+<DT>
+<B>-serverPollingTime <em>milliseconds</em></B></DT>
+
+<DD>
+Specifies how often ORBD checks for the health of persistent servers registered via <tt>servertool</tt>. The default value is 1,000 ms. The value specified for <em>milliseconds</em> must be a valid positive integer. (optional)</DD>
+<p>
+<p>
+<DT>
+<B>-serverStartupDelay <em>milliseconds</em></B></DT>
+
+<DD>
+Specifies how long ORBD waits before sending a location forward 
+exception after a persistent server that is registered via <tt>servertool</tt> is restarted.  The default value is 1,000 ms. The 
+value specified for <em>milliseconds</em> must be a valid positive integer. (optional)</DD>
+
+<p>
+
+    <dt><b>-J</b><i>option</i>
+        <dd>Pass <i>option</i> to the Java virtual machine, where 
+        <i>option</i> is one of the options described on the 
+        reference page for the <a href="../../tooldocs/solaris/java.html">java         application 
+        launcher</a>.  For example, <b>-J-Xms48m</b> sets the startup
+        memory to 48 megabytes.  It is a common convention for <b>-J</b> 
+        to pass options to the underlying virtual machine.
+
+
+</DL>
+</BLOCKQUOTE>
+<p>
+
+<a name="starting"><H2>Starting and Stopping the Naming Service</H2></a>
+
+<P>A Naming Service is a CORBA service that allows <A 
+href="jidlGlossary.html#CORBA object">CORBA objects</A>
+to be named by means of binding a name to an object reference.
+The <A HREF="jidlGlossary.html#name binding">name binding</A> may be stored
+in the naming service, and a client may supply the name
+to obtain the desired object reference.  
+
+<P>Prior to running a client or a server, you will start ORBD.  ORBD includes a persistent Naming Service and a transient Naming Service, both of which are an implementation of the COS Naming Service.  
+
+<P>
+<UL>
+<LI>The <strong><em>Persistent</em> Naming Service</strong> provides persistence
+ for naming contexts.  This means that this information is persistent across service shutdowns and startups, and is recoverable in the event of a service failure. If ORBD is restarted, the Persistent Naming Service will restore the naming context 
+graph, so that the binding of all clients' and servers' names remains intact (persistent).  
+
+<P>
+<LI>For backward compatibility, 
+<tt>tnameserv</tt>, a <strong><em>Transient</em> Naming Service</strong> shipped with older versions of the JDK, 
+ is also included in J2SE v.1.4.  A transient naming service  retains naming contexts as
+long as it is running.  If there is a service interruption, the naming context graph
+is lost.   
+
+</UL>
+
+
+<P>The <tt>-ORBInitialPort</tt> argument is a required command-line argument for  <tt>orbd</tt>, and is 
+ used to set the port number on which the Naming Service will run.  The following instructions assume you can use port 1050
+for the Java&nbsp;IDL Object Request Broker Daemon.  When using 
+Solaris  software, you must become root to start a process on a port under 1024.  For 
+this 
+reason, 
+we recommend that you use a port number greater than or equal to 1024. You can substitute 
+a 
+different
+port if necessary.  </P>
+
+
+<P>To start <tt>orbd</tt> from a UNIX command shell, enter:
+   <P>   
+<PRE>
+  orbd -ORBInitialPort 1050&
+</PRE>
+<P>From an MS-DOS system prompt (Windows), enter:
+<PRE>
+  start orbd -ORBInitialPort 1050
+</PRE>
+   
+
+<P>Now that ORBD is running, you can run your server and client applications.  When running the client and server applications, they must be made aware of the port number (and machine name, if applicable) where the Naming Service is running.  One way to do this is to add the following code to your application:
+<P>
+<pre>
+        Properties props = new Properties();
+        props.put("org.omg.CORBA.ORBInitialPort", "1050");
+        props.put("org.omg.CORBA.ORBInitialHost", "MyHost");
+        ORB orb = ORB.init(args, props);
+</pre>
+<P>
+In this example, the Naming Service is running on port 1050 on host "MyHost".  Another way is to specify the port number and/or machine name when running the server or client application from the command line.  For example, you would start your "HelloApplication" with the following command line:
+<P>
+<PRE>
+     java HelloApplication -ORBInitialPort 1050 -ORBInitialHost MyHost
+</PRE>
+<P>
+ 
+<P>To stop the naming service, use the relevant operating
+system command, such as <TT>pkill orbd</TT> on Solaris, or <kbd>Ctrl+C</kbd> in the 
+DOS window in which <tt>orbd</tt> is running. Note that names registered
+with the naming service may disappear when the service is
+terminated if the naming service is transient.  The Java IDL naming service will 
+run until it is explicitly
+stopped.</P>
+
+<P>For more information on the Naming Service included with ORBD, see <a href="jidlNaming.html"><em>Naming Service</em></a>.
+
+<a name="sm">
+<H2>Server Manager</H2></a>
+
+
+<P>To access ORBD's Server Manager and run a persistent server, the server must be started using <A HREF="servertool.html"><TT>servertool</TT></A>, which is 
+a command-line interface  for application programmers to register, unregister, startup, and shutdown a persistent server.  When a server is started using <tt>servertool</tt>, it must be started on the same host and port on which <tt>orbd</tt> is executing.
+ If the server is run on a different port, the information stored in the database for local contexts will be invalid and the service will not work properly.
+
+<H3>Server Manager: an Example</H3>
+<P>Using the <a href="jidlExample.html">sample tutorial</a> for our demonstration, you would run the <tt>idlj</tt> compiler and <tt>javac</tt> compiler as shown in the tutorial.  To run the Server Manager, follow these steps for running the application:
+<P>
+<OL>
+<LI>Start <tt>orbd</tt>.  
+
+<P>To start <tt>orbd</tt> from a UNIX command shell, enter:
+   <P>   
+<PRE>
+  orbd -ORBInitialPort 1050 
+</PRE>
+<P>From an MS-DOS system prompt (Windows), enter:
+<PRE>
+  start orbd -ORBInitialPort 1050
+</PRE>
+   
+ <P>Note that <TT>1050</TT> is the port on which you want the name server to run.   
+<tt>-ORBInitialPort</tt> is a required command-line argument.  When using 
+Solaris  software, you must become root to start a process on a port under 1024.  For 
+this 
+reason, 
+we recommend that you use a port number greater than or equal to 1024.
+
+<P>
+<LI>Start the <tt>servertool</tt>:
+<P>To start the Hello server, enter:
+   <P>   
+<PRE>
+  servertool -ORBInitialPort 1050
+</PRE>
+
+<P>Make sure the name server (<tt>orbd</tt>) port is the same as in the previous step, for 
+example, 
+<TT>-ORBInitialPort  1050</TT>. The <tt>servertool</tt> must be started on the same port as the name server.
+<P>The <tt>servertool</tt> command line interface appears:
+<P>
+<center><IMAGE SRC="images/servertool1.gif"   ALT="Server Tool"></center>
+<P>
+
+<LI>Start the Hello server from the <tt>servertool</tt> prompt:
+<P>
+<PRE>
+  servertool  > register -server HelloServer -classpath . -applicationName
+                HelloServerApName
+</PRE>
+<P>The <tt>servertool</tt> registers the server, assigns it the name of "HelloServerApName",  and displays its server id:
+<P>
+<center><IMAGE SRC="images/servertoolregister.gif" ALT="Server Tool registering Hello Server"></center>
+<P>The graphic above also shows the servertool listing all registered servers.  
+   <P>
+<LI>Run the client application from another terminal window or prompt:<P>
+<PRE>
+  java HelloClient -ORBInitialPort 1050 -ORBInitialHost localhost
+</PRE>
+
+<P>For this example, you can omit <TT>-ORBInitialHost localhost</TT> since the 
+name server is  running on the same host as the Hello client.  If the name server is 
+running 
+on a 
+different host, use  <TT>-ORBInitialHost</TT> <em>nameserverhost</em> to specify the 
+host on 
+which 
+the IDL name server is running.
+
+<P>Specify the name server (<tt>orbd</tt>) port as done in the previous step, for 
+example, 
+<TT>-ORBInitialPort  1050</TT>.  <P>
+<P>
+  
+<LI>When you have finished experimenting with the Server Manager, be sure to shut down or kill the name server (<tt>orbd</tt>) and <tt>servertool</tt>. 
+
+<P>To shut down <tt>orbd</tt> from a DOS prompt, select 
+the window that is running the server and enter <TT>Ctrl+C</TT> to shut it down.  
+ To shut down <tt>orbd</tt>from a Unix shell, find the process, and kill it.  The server will continue to wait for invocations until it is explicitly stopped.
+ 
+ <P>To shut down the <tt>servertool</tt>, type <code>quit</code> and press the <kbd>Enter</kbd> key on the keyboard.
+
+</OL>
+
+ 
+
+ 
+<P>
+
+
+
+
+<H2>
+See Also</H2>
+
+ 
+
+<UL>
+<LI><A HREF="jidlNaming.html">Naming Service</a><br>
+<LI><A HREF="servertool.html">servertool</A></UL><BR>
+
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2001
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
+
+

@@ -1,0 +1,977 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="callablestatement.html">[Prev]</a> <a href="bridge.doc.html">[Next]</a> 
+<hr><br>
+ 
+<a name="996857"> </a>
+<h2> Mapping</a> SQL</a> and</a> Java</a> Types</h2>
+<p><a name="1055442"> </a>
+NOTE: The material in this chapter is based on <em>JDBC</em>tm<em> API Tutorial and Reference, Second Edition: Universal Data Access for the Java</em>tm<em> 2 Platform</em>, published by Addison Wesley as part of the Java series, ISBN 0-201-43328-1.
+</p><a name="996858"> </a>
+<h3>8.1	 Mapping Overview</h3>
+<p><a name="996859"> </a>
+Because data types in SQL and data types in the Java programming language are not identical, there needs to be some mechanism for transferring data between an application using Java types and a database using SQL types. (Note that the phrase "Java types," as used in this book, stands for "types in the Java programming language.")
+</p><p><a name="997736"> </a>
+In order to transfer data between a database and an application written in the Java programming language, the JDBC API provides three sets of methods: 
+</p><ol>
+<a name="1037967"> </a>
+<li>Methods on the <code>ResultSet</code> class for retrieving SQL <code>SELECT</code> results as Java types
+<a name="1037968"> </a>
+<li>Methods on the </a><code>PreparedStatement</code> class for sending </a>Java </a>types as SQL statement parameters
+<a name="1037970"> </a>
+<li>Methods on the <code>CallableStatement</code> class for </a>retrieving </a>SQL <code>OUT</code> parameters as Java types
+</ol>
+<p><a name="999832"> </a>
+This section brings together information about data types affecting various classes and interfaces and puts all the tables showing the mappings between SQL types and Java types in one place for easy reference. It also describes each of the generic SQL data types, including the SQL3 types.
+</p>
+<a name="997737"> </a>
+<h3>8.2	 Mapping SQL Types to Java Types</h3>
+<p><a name="1008021"> </a>
+Unfortunately there are significant variations between the SQL types supported by different database products. Even when different databases support SQL types with the same semantics, they may give those types different names. For example, most of the major databases support an SQL data type for large binary values, but Oracle calls this type <code>LONG RAW</code>, Sybase calls it <code>IMAGE</code>, Informix calls it <code>BYTE</code>, and DB2 calls it <code>LONG VARCHAR FOR BIT DATA</code>.
+</p><p><a name="1008004"> </a>
+Fortunately, JDBC programmers will normally not need to concern themselves with the actual SQL type names used by a target database. Most of the time JDBC programmers will be programming against existing database tables, and they need not concern themselves with the exact SQL type names that were used to create these tables.
+</p><p><a name="1008022"> </a>
+</a>JDBC </a>defines a set of generic SQL type identifiers in the class <code>java.sql.Types</code>. These types have been designed to represent the most commonly used SQL types. In programming with the JDBC API, programmers will normally be able to use these JDBC types to reference generic SQL types, without having to be concerned about the exact SQL type name used by the target database. These JDBC types are fully described in the next section.
+</p><p><a name="1008017"> </a>
+The one major place where programmers may need to use SQL type names is in the SQL <code>CREATE TABLE </code>statement when they are creating a new database table. In this case programmers must take care to use SQL type names that are supported by their target databases. The table <a href="mapping.html#table1">"JDBC Types Mapped to Database-specific SQL Types" on page &#32;111</a> provides some suggestions for suitable SQL type names to be used for </a>JDBC types for some of the major databases. We recommend that you consult your database documentation if you need exact definitions of the behavior of the various SQL types on a particular database.
+</p><p><a name="1008018"> </a>
+If you want to be able to write portable JDBC programs that can create tables on a variety of different databases, you have two main choices. First, you can restrict yourself to using only very widely accepted SQL type names such as <code>INTEGER</code>, <code>NUMERIC</code>, or <code>VARCHAR</code>, which are likely to work for all databases. Or second, you can use the <code>java.sql.DatabaseMetaData.getTypeInfo</code> method to discover which SQL types are actually supported by a given database and select a database-specific SQL type name that matches a given JDBC type. 
+</p><p><a name="1007987"> </a>
+JDBC defines a standard mapping from the JDBC database types to Java types. For example, a JDBC <code>INTEGER</code> is normally mapped to a Java <code>int</code>. This supports a simple interface for reading and writing JDBC values as simple Java types.
+</p><p><a name="999592"> </a>
+ The Java types do not need to be exactly isomorphic to the JDBC types; they just need to be able to represent them with enough type information to correctly store and retrieve parameters and recover results from SQL statements. For example, a Java <code>String</code> object does not precisely match any of the JDBC <code>CHAR</code> types, but it gives enough type information to represent <code>CHAR</code>, <code>VARCHAR</code>, or <code>LONGVARCHAR</code> successfully.
+</p><a name="999005"> </a>
+<h3>8.3	 Basic JDBC Types</h3>
+<p><a name="1055112"> </a>
+This section describes the JDBC data types supported by both the JDBC 1.0 and 2.0 API. It also explains how they are related to standard SQL types and to types in the Java programming language. New JDBC data types introduced in the JDBC 2.0 core API are described in <a href="mapping.html#1042474">section 8.4 on page 94</a>.
+</p><a name="1055140"> </a>
+<h4>8.3.1	 CHAR</a>, </a>VARCHAR, and </a>LONGVARCHAR</a></h4>
+<p><a name="1055141"> </a>
+The JDBC types </a><code>CHAR</a></code>, <code>VARCHAR</a></code>, and <code>LONGVARCHAR</a></code> are closely related. <code>CHAR</code> represents a small, fixed-length character string, <code>VARCHAR</code> represents a small, variable-length character string, and <code>LONGVARCHAR</code> represents a large, variable-length character string.<strong></a>&#32;</a>&#32;</strong>
+</p><p><a name="1007839"> </a>
+The SQL <code>CHAR</code> type corresponding to JDBC <code>CHAR</code> is defined in SQL-92 and is supported by all the major databases. It takes a parameter that specifies the string length. Thus <code>CHAR(12)</code> defines a 12-character string. All the major databases support <code>CHAR</code> lengths up to at least 254 characters.
+</p><p><a name="1007735"> </a>
+The SQL <code>VARCHAR</code> type corresponding to JDBC <code>VARCHAR</code> is defined in SQL-92 and is supported by all the major databases. It takes a parameter that specifies the maximum length of the string. Thus <code>VARCHAR(12)</code> defines a string whose length may be up to 12 characters. All the major databases support <code>VARCHAR</code> lengths up to 254 characters. When a string value is assigned to a <code>VARCHAR</code> variable, the database remembers the length of the assigned string and on a <code>SELECT</code>, it will return the exact original string.
+</p><p><a name="1007725"> </a>
+Unfortunately there is no consistent SQL mapping for the JDBC <code>LONGVARCHAR</code> type. All the major databases support some kind of very large variable-length string supporting up to at least a gigabyte of data, but the SQL type names vary. See the table <a href="mapping.html#table1">"JDBC Types Mapped to Database-specific SQL Types" on page &#32;111</a> for some examples.
+</p><p><a name="1007835"> </a>
+Java programmers do not need to distinguish among the three types of JDBC strings, <code>CHAR</code>, <code>VARCHAR</code>, and <code>LONGVARCHAR</code>. Each can be expressed as a Java <code>String</code>, and it is possible to read and write an SQL statement correctly without knowing the exact data type that was expected.
+</p><p><a name="999345"> </a>
+<code>CHAR</code>, <code>VARCHAR</code>, and <code>LONGVARCHAR</code> could have been mapped to either <code>String</code> or <code>char[]</code>, but <code>String</code> is more appropriate for normal use. Also, the <code>String</code> class makes conversions between <code>String</code> and <code>char[]</code> easy: There is a method for converting a <code>String</code> object to a <code>char[]</code> and also a constructor for turning a <code>char[]</code> into a <code>String</code> object.
+</p><p><a name="999348"> </a>
+One issue that had to be addressed is how to handle fixed-length SQL strings of type <code>CHAR(n)</code>. The answer is that JDBC drivers (or the DBMS) perform appropriate padding with spaces. Thus, when a <code>CHAR(n)</code> field is retrieved from the database, the driver will convert it to a Java <code>String</code> object of length <code>n</code>, which may include some padding spaces at the end. Conversely, when a <code>String</code> object is sent to a <code>CHAR(n)</code> field, the driver and/or the database will add any necessary padding spaces to the end of the string to bring it up to length <code>n</code>.
+</p><p><a name="999351"> </a>
+The method <code>ResultSet.getString</code>, which allocates and returns a new <code>String</code> object, is recommended for retrieving data from <code>CHAR</code>, <code>VARCHAR</code>, and <code>LONGVARCHAR</code> fields. This is suitable for retrieving normal data, but can be unwieldy if the JDBC type <code>LONGVARCHAR</code> is being used to store multi-megabyte strings. To handle this case, two methods in the <code>ResultSet</code> interface allow programmers to retrieve a <code>LONGVARCHAR</code> value as a Java input stream from which they can subsequently read data in whatever size chunks they prefer. These methods are <code>getAsciiStream</code> and <code>getCharacterStream</code>, which deliver the data stored in a <code>LONGVARCHAR</code> column as a stream of ASCII or Unicode characters. Note that the method <code>getUnicodeStream</code> has been deprecated.
+</p><p><a name="1038144"> </a>
+The SQL3 <code>CLOB</code> data type, which is described later in this chapter, provides an alternate means of representing large amounts of character data.
+</p><a name="999403"> </a>
+<h4>8.3.2	 </a>BINARY, </a>VARBINARY, and </a>LONGVARBINARY</a></h4>
+<p><a name="1007752"> </a>
+The JDBC types <code>BINARY</a></code>, <code>VARBINARY</a></code>, and <code>LONGVARBINARY</a></code> are closely related. <code>BINARY</code> represents a small, fixed-length binary value, <code>VARBINARY</code> represents a small, variable-length binary value, and <code>LONGVARBINARY</code> represents a large, variable-length binary value.<strong></a>&#32;</a>&#32;</strong>
+</p><p><a name="1007822"> </a>
+Unfortunately, the use of these various <code>BINARY</code> types has not been standardized and support varies considerably among the major databases.
+</p><p><a name="1007753"> </a>
+</a>The SQL <code>BINARY</code> type corresponding to JDBC <code>BINARY</code> is a nonstandard SQL extension and is only implemented on some databases. It takes a parameter that specifies the number of binary bytes. Thus <code>BINARY(12)</code> defines a 12-byte binary type. Typically, <code>BINARY </code>values are limited to 254 bytes.
+</p><p><a name="1007754"> </a>
+The SQL <code>VARBINARY</code> type corresponding to JDBC <code>VARBINARY</code> is a nonstandard SQL extension and is only implemented on some databases. It takes a parameter that specifies the maximum number of binary bytes. Thus <code>VARBINARY(12)</code> defines a binary type whose length may be up to 12 bytes. Typically, <code>VARBINARY</code> values are limited to 254 bytes. When a binary value is assigned to a <code>VARBINARY</code> variable, the database remembers the length of the assigned value and on a <code>SELECT</code>, it will return the exact original value.
+</p><p><a name="1007755"> </a>
+Regrettably, there is no consistent SQL type name corresponding to the JDBC <code>LONGVARBINARY</code> type. All the major databases support some kind of very large variable length binary type supporting up to at least a gigabyte of data, but the SQL type names vary. See the table <a href="mapping.html#table1">"JDBC Types Mapped to Database-specific SQL Types" on page &#32;111</a> for some examples.
+</p><p><a name="999428"> </a>
+<code>BINARY</code>, <code>VARBINARY</code>, and <code>LONGVARBINARY</code> can all be expressed identically as <code>byte</code> arrays in the Java programming language. Since it is possible to read and write SQL statements correctly without knowing the exact <code>BINARY</code> data type that was expected, there is no need for programmers writing code in the Java programming language to distinguish among them.
+</p><p><a name="1033868"> </a>
+The method recommended for retrieving <code>BINARY</code> and <code>VARBINARY</code> values is <code>ResultSet.getBytes</code>. If a column of type JDBC <code>LONGVARBINARY</code> stores a byte array that is many megabytes long, however, the method <code>getBinaryStream</code> is recommended. Similar to the situation with <code>LONGVARCHAR</code>, this method allows a programmer to retrieve a <code>LONGVARBINARY</code> value as a Java input stream that can be read later in smaller chunks.
+</p><p><a name="1055357"> </a>
+The SQL3 <code>BLOB</code> data type, which is described later in this chapter, provides an alternate means of representing large amounts of binary data.
+</p><a name="1055360"> </a>
+<h4>8.3.3	 </a>BIT</a></h4>
+<p><a name="1055362"> </a>
+The JDBC type <code>BIT</a></code> represents a single bit value that can be zero or one.
+</p><p><a name="1007248"> </a>
+</a>SQL-92 defines an SQL <code>BIT</code> type. However, unlike the JDBC <code>BIT</code> type, this SQL-92 <code>BIT</code> type can be used as a parameterized type to define a fixed-length binary string. Fortunately, SQL-92 also permits the use of the simple non-parameterized <code>BIT</code> type to represent a single binary digit, and this usage corresponds to the JDBC <code>BIT</code> type. Unfortunately, the SQL-92 <code>BIT</code> type is only required in "full" SQL-92 and is currently supported by only a subset of the major databases. Portable code may therefore prefer to use the JDBC <code>SMALLINT</code> type, which is widely supported.
+</p><p><a name="1007641"> </a>
+The recommended Java mapping for the JDBC <code>BIT</code> type is as a Java <code>boolean</code>.
+</p><a name="999493"> </a>
+<h4>8.3.4	 </a>TINYINT</a>&#32;</a></h4>
+<p><a name="1007274"> </a>
+The JDBC type <code>TINYINT</a></code> represents an 8-bit integer value between <code>0</code> and <code>255</code> that may be signed or unsigned.
+</p><p><a name="1007647"> </a>
+The corresponding SQL type, <code>TINYINT</code>, is currently supported by only a subset of the major databases. Portable code may therefore prefer to use the JDBC <code>SMALLINT</code> type, which is widely supported.
+</p><p><a name="1007277"> </a>
+The recommended Java mapping for the JDBC <code>TINYINT</code> type is as either a Java <code>byte</code> or a Java <code>short</code>. The 8-bit Java <code>byte</code> type represents a signed value from <code>-128</code> to <code>127</code>, so it may not always be appropriate for larger <code>TINYINT</code> values, whereas the 16-bit Java <code>short</code> will always be able to hold all <code>TINYINT</code> values.
+</p><a name="1007309"> </a>
+<h4>8.3.5	 </a>SMALLINT</a></h4>
+<p><a name="1007311"> </a>
+The JDBC type <code>SMALLINT</a></code> represents a 16-bit signed integer value between -32768 and 32767.<strong></a>&#32;</strong>
+</p><p><a name="1007316"> </a>
+ The corresponding SQL type, <code>SMALLINT</code>, is defined in SQL-92 and is supported by all the major databases. The SQL-92 standard leaves the precision of <code>SMALLINT</code> up to the implementation, but in practice, all the major databases support at least 16 bits.
+</p><p><a name="1007652"> </a>
+ The recommended Java mapping for the JDBC <code>SMALLINT</code> type is as a Java <code>short</code>.
+</p><a name="1008299"> </a>
+<h4>8.3.6	 I</a>NTEGER</a></h4>
+<p><a name="1008300"> </a>
+The JDBC type <code>INTEGER</a></code> represents a 32-bit signed integer value ranging between &#32; &#32; &#32; -2147483648 and 2147483647.
+</p><p><a name="1007351"> </a>
+The corresponding SQL type, <code>INTEGER,</code> is defined in SQL-92 and is widely supported by all the major databases. The SQL-92 standard leaves the precision of <code>INTEGER</code> up to the implementation, but in practice all the major databases support at least 32 bits.
+</p><p><a name="1007659"> </a>
+The recommended Java mapping for the <code>INTEGER</code> type is as a Java <code>int</code>.
+</p><a name="1012177"> </a>
+<h4>8.3.7	 </a>BIGINT</a></h4>
+<p><a name="1012178"> </a>
+</a>The JDBC type <code>BIGINT</a></code> represents a 64-bit signed integer value between &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; <code>-9223372036854775808</code> and <code>9223372036854775807</code>.
+</p><p><a name="1007387"> </a>
+The corresponding SQL type <code>BIGINT</code> is a nonstandard extension to SQL. In practice the SQL <code>BIGINT</code> type is not yet currently implemented by any of the major databases, and we recommend that its use be avoided in code that is intended to be portable.
+</p><p><a name="1007668"> </a>
+The recommended Java mapping for the <code>BIGINT</code> type is as a Java <code>long</code>.
+</p><a name="1007339"> </a>
+<h4>8.3.8	 </a>REAL</a></h4>
+<p><a name="1007395"> </a>
+The JDBC type <code>REAL</a></code> represents a "single precision" floating point number that supports seven digits of mantissa.
+</p><p><a name="1007400"> </a>
+The corresponding SQL type <code>REAL</code> is defined in SQL-92 and is widely, though not universally, supported by the major databases. The SQL-92 standard leaves the precision of <code>REAL</code> up to the implementation, but in practice all the major databases supporting <code>REAL</code> support a mantissa precision of at least seven digits.
+</p><p><a name="1033873"> </a>
+The recommended Java mapping for the <code>REAL</code> type is as a Java <code>float</code>.
+</p><a name="1033874"> </a>
+<h4>8.3.9	 </a>DOUBLE</a></h4>
+<p><a name="1033875"> </a>
+The JDBC type <code>DOUBLE</a></code> represents a "double precision" floating point number that supports 15 digits of mantissa.
+</p><p><a name="1007412"> </a>
+The corresponding SQL type is <code>DOUBLE</code> <code>PRECISION,</code> which is defined in SQL-92 and is widely supported by the major databases. The SQL-92 standard leaves the precision of <code>DOUBLE</code> <code>PRECISION</code> up to the implementation, but in practice all the major databases supporting <code>DOUBLE</code> <code>PRECISION</code> support a mantissa precision of at least 15 digits.
+</p><p><a name="1055159"> </a>
+The recommended Java mapping for the <code>DOUBLE</code> type is as a Java <code>double</code>.
+</p><a name="1055162"> </a>
+<h4>8.3.10	 </a>FLOAT</a></h4>
+<p><a name="1055164"> </a>
+The JDBC type <code>FLOAT</code> is basically equivalent to the JDBC type <code>DOUBLE</code>. We provided both <code>FLOAT</code> and <code>DOUBLE</code> in a possibly misguided attempt at consistency with previous database APIs. <code>FLOAT</code> represents a "double precision" floating point number that supports 15 digits of mantissa.
+</p><p><a name="1007689"> </a>
+The corresponding SQL type <code>FLOAT</code> is defined in SQL-92.<code> </code>The SQL-92 standard leaves the precision of <code>FLOAT</code> up to the implementation, but in practice all the major databases supporting <code>FLOAT</code> support a mantissa precision of at least 15 digits.
+</p><p><a name="1055170"> </a>
+The recommended Java mapping for the <code>FLOAT</code> type is as a Java <code>double</code>. However, because of the potential confusion between the double precision SQL <code>FLOAT</code> and the single precision Java <code>float</code>, we recommend that JDBC programmers should normally use the JDBC <code>DOUBLE</code> type in preference to <code>FLOAT</code>.
+</p><a name="1055175"> </a>
+<h4>8.3.11	 DECIMAL</a> and </a>NUMERIC</a></h4>
+<p><a name="1055177"> </a>
+The JDBC types <code>DECIMAL</code> and <code>NUMERIC</code> are very similar. They both represent fixed-precision decimal values.
+ame="1007716"> </a>
+The corresponding SQL types <code>DECIMAL</code> and <code>NUMERIC</code> are defined in SQL-92 and are very widely implemented. These SQL types take precision and scale parameters. The precision is the total number of decimal digits supported, and the scale is the number of decimal digits after the decimal point. For most DBMSs, the scale is less than or equal to the precision. So for example, the value "12.345" has a precision of 5 and a scale of 3, and the value ".11" has a precision of 2 and a scale of 2. JDBC requires that all <code>DECIMAL</code> and <code>NUMERIC</code> types support both a precision and a scale of at least 15.
+</p><p><a name="1007712"> </a>
+The sole distinction between <code>DECIMAL</code> and <code>NUMERIC</code> is that the SQL-92 specification requires that <code>NUMERIC</code> types be represented with exactly the specified precision, whereas for <code>DECIMAL</code> types, it allows an implementation to add additional precision beyond that specified when the type was created. Thus a column created with type <code>NUMERIC(12,4)</code> will always be represented with exactly 12 digits, whereas a column created with type <code>DECIMAL(12,4)</code> might be represented by some larger number of digits.
+</p><p><a name="1007577"> </a>
+The recommended Java mapping for the <code>DECIMAL</code> and <code>NUMERIC</code> types is <code>java.math.BigDecimal</code>. The <code>java.math.BigDecimal</code> type provides math operations to allow <code>BigDecimal</code> types to be added, subtracted, multiplied, and divided with other <code>BigDecimal</code> types, with integer types, and with floating point types.
+</p><p><a name="1007578"> </a>
+The method recommended for retrieving <code>DECIMAL</code> and <code>NUMERIC</code> values is <code>ResultSet.getBigDecimal</code>. JDBC also allows access to these SQL types as simple <code>Strings</code> or arrays of <code>char</code>. Thus, Java programmers can use <code>getString</code> to receive a <code>DECIMAL</code> or <code>NUMERIC</code> result. However, this makes the common case where <code>DECIMAL</code> or <code>NUMERIC</code> are used for currency values rather awkward, since it means that application writers have to perform math on strings. It is also possible to retrieve these SQL types as any of the Java numeric types.
+</p><p><a name="1053769"> </a>
+
+</p><a name="1007474"> </a>
+<h4>8.3.12	 DATE</a>, TIME</a>, and </a>TIMESTAMP</a></h4>
+<p><a name="999565"> </a>
+There are three JDBC types relating to time:
+</p><ul><a name="1005696"> </a>
+<li>The JDBC </a><code>DATE</a></code> type represents a date consisting of day, month, and year. The corresponding SQL <code>DATE </code>type is defined in SQL-92, but it is implemented by only a subset of the major databases. Some databases offer alternative SQL types that support similar semantics.
+<a name="1005701"> </a>
+<li>The JDBC </a><code>TIME</code> </a>type represents a time consisting of hours, minutes, and seconds. The corresponding SQL <code>TIME </code>type is defined in SQL-92, but it is implemented by only a subset of the major databases. As with <code>DATE</code>, some databases offer alternative SQL types that support similar semantics.
+<li>The JDBC </a><code>TIMESTAMP</code> type represents <code>DATE</code> plus <code>TIME</code> plus a nanosecond field. The corresponding SQL <code>TIMESTAMP </code>type is defined in SQL-92, but it is implemented by only a very small number of databases.
+</ul><p><a name="1005709"> </a>
+Because the standard Java class <code>java.util.Date</code> does not match any of these three JDBC date/time types exactly (it includes both <code>DATE</code> and <code>TIME</code> information but has no nanoseconds), JDBC defines three subclasses of <code>java.util.Date</code> to correspond to the SQL types. They are:
+</p></ul><ul><a name="1005710"> </a>
+<li><code>java.sql.Date</code> for SQL <code>DATE</code> information. The hour, minute, second, and millisecond fields of the <code>java.util.Date</code> base class should be set to zero. If the number of milliseconds supplied to the <code>java.sql.Date</code> constructor is negative, the driver will compute the date as the number of milliseconds before January 1, 1970. Otherwise, the date is computed as the specified number of milliseconds after January 1, 1970.
+<p><a name="1054434"> </a>
+
+</p><a name="1005721"> </a>
+<li><code>java.sql.Time</code> for SQL <code>TIME</code> information. The year, month, and day fields of the <code>java.util.Date</code> base class are set to 1970, January, and 1. This is the "zero" date in the Java epoch. 
+</ul><ul><a name="1005716"> </a>
+<li><code>java.sql.Timestamp</code> for SQL <code>TIMESTAMP</code> information. This class extends <code>java.util.Date</code> by adding a <code>nanoseconds</code> field.
+</ul><p><a name="1005728"> </a>
+All three of the JDBC time-related classes are subclasses of <code>java.util.Date</code>, and as such, they can be used where a <code>java.util.Date</code> is expected. For example, internationalization methods take a <code>java.util.Date</code> object as an argument, so they can be passed instances of any of the JDBC time-related classes.
+</p><p><a name="1055300"> </a>
+ A JDBC <code>Timestamp</code> object has its parent's date and time components and also a separate nanoseconds component. If a <code>java.sql.Timestamp</code> object is used where a <code>java.util.Date</code> object is expected, the nanoseconds component is lost. However, since a j<code>ava.util.Date</code> object is stored with a precision of one millisecond, it is possible to maintain this degree of precision when converting a <code>java.sql.Timestamp</code> object to a <code>java.util.Date</code> object. This is done by converting the nanoseconds in the nanoseconds component to whole milliseconds (by dividing the number of nanoseconds by 1,000,000) and then adding the result to the <code>java.util.Date</code> object. Up to 999,999 nanoseconds may be lost in this conversion, but the resulting <code>java.util.Date</code> object will be accurate to within one millisecond.
+</p><p><a name="1055301"> </a>
+The following code fragment is an example of converting a </a><code>java.sql.Timestamp</code> object to a <code>java.util.Date</code> object that is accurate to within one millisecond.
+</p></ul><blockquote><pre>
+Timestamp t = new Timestamp(98724573287540L);
+java.util.Date d;
+d = new java.util.Date(t.getTime() + (t.getNanos() / 1000000));
+</pre></blockquote><p><a name="1042478"> </a>
+New methods in the JDBC 2.0 core API make it possible for the driver to take a specified time zone into account when calculating a date, time, or timestamp. The time zone information is included in a <code>java.util.Calendar</code> object that is passed to new versions of the methods for getting and setting <code>Date</code>, <code>Time</code>, and <code>Timestamp</code> values. When no time zone is specified, the driver uses the time zone of the virtual machine running the application when it calculates a date, time, or timestamp.
+</p><a name="1042474"> </a>
+<h3>8.4	 Advanced JDBC Data Types</h3>
+<p><a name="1042475"> </a>
+The ISO (International Organization for Standardization) and IEC (the International Electrotechnical Commission) have defined new data types that are commonly referred to as SQL3 types. Of these new SQL3 data types, <code>BLOB</code>, <code>CLOB</code>, <code>ARRAY</code>, and <code>REF</code> are predefined types, whereas the SQL structured type and the <code>DISTINCT</code> type are user-defined types (UDTs). These new types, with the exception of <code>DISTINCT</code>, are mapped to interfaces that are new in the JDBC 2.0 core API. This section describes each data type briefly; more complete information on each type can be found in the reference chapter for the corresponding interface. There is a chapter on the <code>DISTINCT</code> data type, but because <code>DISTINCT</code> types are mapped to a built-in type, there is no separate interface for it.
+</p><p><a name="1037814"> </a>
+The new data types in the JDBC 2.0 core API represent a significant expansion in the types of data that can be used in a relational database. In general, they are more like objects; in fact, two of the new data types are UDTs that can optionally be custom mapped to classes in the Java programming language. A third UDT (<code>JAVA_OBJECT</code>) is itself an instance of a class defined in the Java programming language. Despite their advanced nature, all of the new data types in the JDBC 2.0 core API can be used as conveniently as the data types in the JDBC 1.0 API. For example, they can be used as column values in database tables, and they can be retrieved and stored using the appropriate <code>getXXX</code> and <code>setXXX</code> methods.
+</p><a name="1037648"> </a>
+<h4>8.4.1	 BLOB</a></h4>
+<p><a name="1037649"> </a>
+The JDBC type </a><code>BLOB</code> represents an SQL3 <code>BLOB</code> (Binary Large Object).
+</p><p><a name="1037650"> </a>
+A JDBC <code>BLOB</code> value is mapped to an instance of the <code>Blob</code> interface in the Java programming language. If a driver follows the standard implementation, a <code>Blob</code> object logically points to the BLOB value on the server rather than containing its binary data, greatly improving efficiency. The <code>Blob</code> interface provides methods for materializing the <code>BLOB</code> data on the client when that is desired.
+</p><a name="1037617"> </a>
+<h4>8.4.2	 CLOB</a></h4>
+<p><a name="1037618"> </a>
+The JDBC type </a><code>CLOB</code> represents the SQL3 type <code>CLOB</code> (Character Large Object).
+</p><p><a name="1037633"> </a>
+A JDBC <code>CLOB</code> value is mapped to an instance of the <code>Clob</code> interface in the Java programming language. If a driver follows the standard implementation, a <code>Clob</code> object logically points to the <code>CLOB</code> value on the server rather than containing its character data, greatly improving efficiency. Two of the methods on the <code>Clob</code> interface materialize the data of a <code>CLOB</code> object on the client.
+</p><a name="1037699"> </a>
+<h4>8.4.3	 ARRAY</a></h4>
+<p><a name="1037700"> </a>
+The JDBC type </a><code>ARRAY</code> represents the SQL3 type <code>ARRAY</code>.
+</p><p><a name="1037713"> </a>
+An <code>ARRAY</code> value is mapped to an instance of the <code>Array</code> interface in the Java programming language. If a driver follows the standard implementation, an <code>Array</code> object logically points to an <code>ARRAY</code> value on the server rather than containing the elements of the <code>ARRAY</code> object, which can greatly increase efficiency. The <code>Array</code> interface contains methods for materializing the elements of the <code>ARRAY</code> object on the client in the form of either an array or a <code>ResultSet</code> object.
+</p><a name="1037725"> </a>
+<h4>8.4.4	 DISTINCT</a></h4>
+<p><a name="1037726"> </a>
+The JDBC type <a <CB>DISTINCT<Default Para Font> field (<CB>Types<Default Para Font> class)><code>DISTINCT</code> represents the SQL3 type <code>DISTINCT</code>.
+</p><p><a name="1037739"> </a>
+The standard mapping for a <code>DISTINCT</code> type is to the Java type to which the base type of a <code>DISTINCT</code> object would be mapped. For example, a <code>DISTINCT</code> type based on a <code>CHAR</code> would be mapped to a <code>String</code> object, and a <code>DISTINCT</code> type based on an SQL <code>INTEGER </code>would be mapped to an <code>int</code>.
+</p><p><a name="1037764"> </a>
+The <code>DISTINCT</code> type may optionally have a custom mapping to a class in the Java programming language. A custom mapping consists of a class that implements the interface <code>SQLData</code> and an entry in a <code>java.util.Map</code> object.
+</p><a name="1037756"> </a>
+<h4>8.4.5	 STRUCT</a></h4>
+<p><a name="1037757"> </a>
+The JDBC type </a><code>STRUCT</code> represents the SQL3 structured type. An SQL structured type, which is defined by a user with a <code>CREATE TYPE</code> statement, consists of one or more attributes. These attributes may be any SQL data type, built-in or user-defined.
+</p><p><a name="1037773"> </a>
+The standard mapping for the SQL type <code>STRUCT</code> is to a <code>Struct</code> object in the Java programming language. A <code>Struct</code> object contains a value for each attribute of the <code>STRUCT</code> value it represents.
+</p><p><a name="1037782"> </a>
+A <code>STRUCT</code> value may optionally be custom mapped to a class in the Java programming language, and each attribute in the <code>STRUCT</code> may be mapped to a field in the class. A custom mapping consists of a class that implements the interface <code>SQLData</code> and an entry in a <code>java.util.Map</code> object.
+</p><a name="1037806"> </a>
+<h4>8.4.6	 REF</a></h4>
+<p><a name="1037807"> </a>
+The JDBC type </a><code>REF</code> represents an SQL3 type <code>REF&lt;structured type&gt;</code>. An SQL <code>REF</code> references (logically points to) an instance of an SQL structured type, which the <code>REF</code> persistently and uniquely identifies. In the Java programming language, the interface <code>Ref</code> represents an SQL <code>REF</code>.
+</p><p><a name="1038312"> </a>
+If an application wants to point to an instance of an SQL structured type in the database rather than having its attribute values materialized on the client, it can use the type <code>REF&lt;structured type&gt;</code>, a reference to that SQL structured type.
+</p><p><a name="1050140"> </a>
+A <code>REF</code> value is a unique identifier created specifically for a particular instance of an SQL structured type. It is persistently stored with the instance it references in a special table on the server. An application can select the <code>REF</code> value from its special table and use it in place of the structured type instance it identifies.
+</p><a name="1038181"> </a>
+<h4>8.4.7	 JAVA_OBJECT</a></h4>
+<p><a name="1038182"> </a>
+The JDBC type <code>JAVA_OBJECT</code>, added in the JDBC 2.0 core API, makes it easier to use objects in the Java programming language as values in a database. <code>JAVA_OBJECT</code> is simply a type code for an instance of a class defined in the Java programming language that is stored as a database object. The type <code>JAVA_OBJECT</code> is used by a database whose type system has been extended so that it can store Java objects directly. The <code>JAVA_OBJECT</code> value may be stored as a serialized Java object, or it may be stored in some vendor-specific format.
+</p><p><a name="1042348"> </a>
+The type <code>JAVA_OBJECT</code> is one of the possible values for the column <code>DATA_TYPE</code> in the <code>ResultSet</code> objects returned by various <code>DatabaseMetaData</code> methods, including <code>getTypeInfo</code>, <code>getColumns</code>, and <code>getUDTs</code>. The method <code>getUDTs</code>, part of the new JDBC 2.0 core API, will return information about the Java objects contained in a particular schema when it is given the appropriate parameters. Having this information available facilitates using a Java class as a database type.
+</p><p><a name="1042357"> </a>
+For DBMSs that support them, values of type <code>JAVA_OBJECT</code> are stored in a database table using the method <code>PreparedStatement.setObject</code>. They are retrieved with the methods <code>ResultSet.getObject</code> or <code>CallableStatement.getObject</code> and updated with the <code>ResultSet.updateObject </code>method.
+</p><p><a name="1042441"> </a>
+For example, assuming that instances of the class <code>Engineer</code> are stored in the column <code>ENGINEERS</code> in the table <code>PERSONNEL</code>, the following code fragment, in which stmt is a <code>Statement</code> object, prints out the names of all of the engineers.
+</p><blockquote><pre>
+ResultSet rs = stmt.executeQuery("SELECT ENGINEERS FROM PERSONNEL");
+while (rs.next()) {
+	Engineer eng = (Engineer)rs.getObject("ENGINEERS");
+	System.out.println(eng.lastName + ", " + eng.firstName);
+}
+</pre></blockquote><p><a name="1042411"> </a>
+After the query returns the <code>ResultSet</code> object rs, which contains all of the instances of <code>Engineer</code>, the code retrieves each instance in turn with the method <code>getObject</code>. The value returned by <code>getObject</code> is an <code>Object</code> type, so it must be narrowed to the more specific type <code>Engineer</code> before being assigned to the variable eng.
+</p><a name="1037611"> </a>
+<h3>8.5	 </a>Examples of Mapping</a></h3>
+<p><a name="1037608"> </a>
+In any situation where a program written in the Java programming language retrieves data from a database, there has to be some form of mapping and data conversion. In most cases, programmers using the JDBC API will be programming with knowledge of their target database's schema. In other words, they know, for example, what tables the database contains and the data type for each column in those tables. They can therefore use the strongly typed access methods in the interfaces <code>ResultSet</code>, <code>PreparedStatement</code>, and <code>CallableStatement</code>. This section presents three different scenarios, describing the data mapping and conversion required in each case.
+</p><a name="1005254"> </a>
+<h4>8.5.1	 Simple SQL Statement</h4>
+<p><a name="1012455"> </a>
+In the most common case, a user executes a simple SQL statement and gets back a <code>ResultSet</code> object with the results. Each value returned by the database and stored in a <code>ResultSet</code> column will have a JDBC data type. A call to a <code>ResultSet.getXXX</code> method will retrieve that value as a Java data type. For example, if a <code>ResultSet</code> column contains a JDBC <code>FLOAT</code> value, the method <code>getDouble</code> will retrieve that value as a Java <code>double</code>. Table 8.6 on <a href="mapping.html#table2">page 110</a> shows which <code>getXXX</code> methods may be used to retrieve which JDBC types. (A user who does not know the type of a <code>ResultSet</code> column can get that information by calling the method <code>ResultSet.getMetaData</code> and then calling the method <code>ResultSetMetaData.getColumnType</code>.) 
+</p><a name="1005345"> </a>
+<h4>8.5.2	 </a>SQL Statement with IN Parameters</h4>
+<p><a name="1008333"> </a>
+In another possible scenario, the user sends an SQL query that takes input parameters. In this case, the user calls the <code>PreparedStatement.setXXX</code> methods to assign a value to each input parameter. For example, <code>PreparedStatement.setLong(1, 2345678)</code> will assign the value <code>2345678</code> to the first parameter as a Java <code>long</code>. The driver will convert <code>2345678</code> to a JDBC <code>BIGINT</code> in order to send it to the database. Which JDBC type the driver sends to the database is determined by the standard mapping from Java types to JDBC types, shown in Table 8.2 on <a href="mapping.html#1033804">page 106</a>.
+</p><a name="999840"> </a>
+<h4>8.5.3	 SQL</a> Statement with INOUT Parameters</a></h4>
+<p><a name="1008339"> </a>
+In yet another scenario, a user wants to call a stored procedure, assign values to its <code>INOUT</code> parameters, retrieve values from a <code>ResultSet</code> object, and retrieve values from the parameters. This case is rather uncommon and more complicated than most, but it gives a good illustration of mapping and data conversion. 
+</p><p><a name="1005634"> </a>
+In this scenario, the first thing to do is to assign values to the <code>INOUT</code> parameters using <code>PreparedStatement.setXXX</code> methods. In addition, because the parameters will also be used for output, the programmer must register each parameter with the JDBC type of the value that the database will return to it. This is done with the method <code>CallableStatement.registerOutParameter</code>, which takes one of the JDBC types defined in the class <code>Types</code>. A programmer retrieves the values stored in the output parameters with <code>CallableStatement.getXXX</code> methods.
+</p><p><a name="1005633"> </a>
+The <code>XXX</code> type used for <code>CallableStatement</code>.<code>getXXX</code> must map to the JDBC type registered for that parameter. For example, if the database is expected to return an output value whose type is JDBC <code>REAL</code>, the parameter should have been registered as <code>java.sql.Types.REAL</code>. Then to retrieve the JDBC <code>REAL</code> value, the method <code>CallableStatement.getFloat</code> should be called (the mapping from JDBC types to Java types is shown in Table 8.1 on <a href="mapping.html#1051555">page 105</a>). The method <code>getFloat</code> will return the value stored in the output parameter after converting it from a JDBC <code>REAL</code> to a Java <code>float</code>. To accommodate various databases and make an application more portable, it is recommended that values be retrieved from <code>ResultSet</code> objects before values are retrieved from output parameters.
+</p><p><a name="1008151"> </a>
+The following code demonstrates calling a stored procedure named <code>getTestData</code>, which has two parameters that are both <code>INOUT</code> parameters and which also returns a normal JDBC <code>ResultSet</code>. First the <code>Connection</code> object con creates the <code>CallableStatement</code> object cstmt. Then the method <code>setByte</code> sets the first parameter to <code>25</code> as a Java <code>byte</code>. The driver will convert <code>25</code> to a JDBC <code>TINYINT</code> and send it to the database. The method <code>setBigDecimal</code> sets the second parameter with an input value of <code>83.75</code>. The driver will convert this Java <code>BigDecimal</code> object to a JDBC <code>NUMERIC</code> value. Next the two parameters are registered as <code>OUT</code> parameters, the first parameter as a JDBC <code>TINYINT</code> and the second parameter as a JDBC <code>NUMERIC</code> with two digits after the decimal point. After cstmt is executed, the values are retrieved from the <code>ResultSet</code> object using <code>ResultSet.getXXX</code> methods. The method <code>getString</code> gets the value in the first column as a Java <code>String</code> object, <code>getInt</code> gets the value in the second column as a Java <code>int</code>, and the second <code>getInt</code> retrieves the value in the third column as a Java <code>int</code>. 
+</p><p><a name="1005450"> </a>
+Then <code>CallableStatement.getXXX</code> methods retrieve the values stored in the output parameters. The method <code>getByte</code> retrieves the JDBC <code>TINYINT</code> as a Java <code>byte</code>, and <code>getBigDecimal</code> retrieves the JDBC <code>NUMERIC</code> as a Java <code>BigDecimal</code> object with two digits after the decimal point. Note that when a parameter is both an input and an output parameter, the <code>setXXX</code> method uses the same Java type as the <code>getXXX</code> method (as in <code>setByte</code> and <code>getByte</code>). The <code>registerOutParameter</code> method registers it to the JDBC type that is mapped from the Java type (a Java <code>byte</code> maps to a JDBC <code>TINYINT</code>, as shown in Table 8.2 on <a href="mapping.html#1033804">page 106</a>). 
+</p><blockquote><pre>
+CallableStatement cstmt = con.prepareCall(
+	"{call getTestData(?, ?)}");
+cstmt.setByte(1, 25);
+cstmt.setBigDecimal(2, 83.75);
+// register the first parameter as a JDBC TINYINT and the second
+// as a JDBC NUMERIC with two digits after the decimal point
+cstmt.registerOutParameter(1, java.sql.Types.TINYINT);
+cstmt.registerOutParameter(2, java.sql.Types.NUMERIC, 2);
+ResultSet rs = cstmt.executeQuery();
+// retrieve and print values in result set
+while (rs.next()) { 	
+	String name = rs.getString(1);
+	int score = rs.getInt(2);
+	int percentile = rs.getInt(3);
+	System.out.print("name = " + name + ", score = " + score);
+
+	System.out.println(", percentile = " + percentile);
+}
+// retrieve values in output parameters	
+byte x = cstmt.getByte(1); 
+java.math.BigDecimal n = cstmt.getBigDecimal(2); 
+</pre></blockquote><p><a name="999857"> </a>
+To generalize, the <code>XXX</code> in <code>CallableStatement.getXXX</code> and <code>CallableStatement.setXXX</code> methods is a Java type. For <code>setXXX</code> methods, the driver converts the Java type to a JDBC type before sending it to the database (using the standard mappings shown in Table 8.2 on <a href="mapping.html#1033804">page 106</a>). For <code>getXXX</code> methods, the driver converts the JDBC type returned by the database to a Java type (using the standard mappings shown in Table 8.1 on <a href="mapping.html#1051555">page 105</a>) before returning it to the <code>getXXX</code> method.
+</p><p><a name="999909"> </a>
+The method <code>registerOutParameter</code> always takes a JDBC type as an argument, and the method <code>setObject</code> may take a JDBC type as an argument.
+</p><p><a name="1053832"> </a>
+Note that if a JDBC type is supplied in its optional third argument, the method <code>setObject</code> will cause an explicit conversion of the parameter value from a Java type to the JDBC type specified. If no target JDBC type is supplied to <code>setObject</code>, the parameter value will be converted to the JDBC type that is the standard mapping from the Java <code>Object</code> type (as shown in Table 8.4 on <a href="mapping.html#1034737">page 108</a>). The driver will perform the explicit or implicit conversion before sending the parameter to the database.
+</p><a name="1053842"> </a>
+<h3>8.6	 Custom Mapping</h3>
+<p><a name="1038001"> </a>
+The SQL3 user-defined types (UDTs), structured types and <code>DISTINCT</code> types, can be custom mapped to classes in the Java programming language. If a custom mapping has been set up, the driver will use that mapping instead of the standard mapping when it converts a UDT from a JDBC type to a Java type or vice versa.
+</p><p><a name="1038017"> </a>
+UDTs are retrieved from the database with the methods <code>ResultSet.getObject</code> and <code>CallableStatement.getObject;</code> UDTs are sent back to the database with the method <code>PreparedStatement.setObject</code>. When an application calls a <code>getObject</code> method to retrieve a UDT, the driver will check to see if the type map associated with the connection has an entry for the UDT. If it does, the driver will use that type map to custom map the UDT; if there is no matching entry, the driver will use the standard mapping.
+</p><p><a name="1042911"> </a>
+Almost all custom mapping is done using the connection's type map. It is possible, however, to have the driver use a different type map. The methods for which a custom mapping is possible have two versions, one that takes a type map and one that does not. The usual situation is not to supply a type map, in which case the driver uses the connection's type map by default. When a type map is supplied to a method, it supersedes the connection's type map, and the driver will use it instead of the type map associated with the connection to map a UDT. If the type map supplied has no entry for the UDT, the driver will use the standard mapping. 
+</p><p><a name="1039119"> </a>
+The <code>setObject</code> method does not take a type map as a parameter, so it operates a little differently. If <code>setObject</code> is passed an instance of a class that implements the <code>SQLData</code> interface, that is, an object that was custom mapped when it was retrieved, the driver will already have set up the mechanism for mapping it. The driver will convert the class instance, mapping the UDT back to its SQL type before sending it to the database. If the parameter to be set by the method <code>setObject</code> has not been custom mapped, the driver will use the standard mapping to convert it before sending it to the database.
+</p><p><a name="1055406"> </a>
+The fact that only the methods <code>getObject</code> and <code>setObject</code> can be used to retrieve or store SQL structured types ensures that a custom mapping will be used if there is one. Four methods in the <code>Array</code> interface may be passed a type map so that if the <code>ARRAY</code> elements are UDTs, they can be custom mapped when the elements are materialized on the client. The <code>Struct</code> method <code>getAttributes</code> also has a version that takes a type map, which is used to custom map an SQL structured type's attributes before bringing them over to the client. 
+</p><a name="1055417"> </a>
+<h3>8.7	 Dynamic Data Access</a></h3>
+<p><a name="1008547"> </a>
+</a>In most cases, the user wants to access results or parameters whose data types are known at compile time. However, some applications, such as generic browsers or query tools, are compiled with no knowledge of the database schema they will access. </a>For this reason, JDBC provides support for fully dynamically typed data access in addition to static data type access. 
+</p><p><a name="999298"> </a>
+Three methods facilitate accessing values whose data types are not known at compile time:
+</p><ul><a name="999302"> </a>
+<li> <code>ResultSet.getObject</code>
+<a name="999318"> </a>
+<li> <code>PreparedStatement.setObject</code>
+<li> <code>CallableStatement.getObject</code>
+</ul><p><a name="999337"> </a>
+If, for example, an application wants to be able to accept a variety of types as results in a <code>ResultSet</code> object, it can use the method <code>ResultSet.getObject</code>.
+</p><p><a name="1034382"> </a>
+The methods <code>ResultSet.getObject</code> and <code>CallableStatement.getObject</code> retrieve a value as a Java <code>Object</code>. Since <code>Object</code> is the base class for all Java objects, an instance of any Java class can be retrieved as an instance of <code>Object</code>. However, the following Java types are built-in "primitive" types and are therefore not instances of the class <code>Object</code>: <code>boolean</code>, <code>char</code>, <code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>, and <code>double</code>. As a result, these types cannot be retrieved by <code>getObject</code> methods. However, each of these primitive types has a corresponding class that serves as a wrapper. Instances of these classes are objects, which means that they can be retrieved with the methods <code>ResultSet.getObject</code> and <code>CallableStatement.getObject</code>. Table 8.3 on <a href="mapping.html#1004791">page 107</a> shows the mapping from a JDBC type to a Java <code>Object</code> type. This table differs from the standard mapping from JDBC type to Java type in that each primitive Java type is replaced by its wrapper class, except that JDBC <code>TINYINT</code> and JDBC <code>SMALLINT</code> are mapped to the Java class <code>Integer</code>.
+</p></ul><a name="999058"> </a>
+<h3>8.8	 Storing Java Objects in a Database</h3>
+<p><a name="1038073"> </a>
+Additions to the JDBC 2.0 core API make it easier to store Java objects in a database. The <code>PreparedStatement.setObject</code> method in the JDBC 1.0 API has always provided some support for persistent storage of objects defined in the Java programming language. With the new data type <code>JAVA_OBJECT</code>, in conjunction with the new method <code>DatabaseMetaData.getUDTs</code>, it is now easier to keep track of the Java objects stored in a database.
+</p><a name="1038075"> </a>
+<h3>8.9	 Tables for Type Mapping</a></h3>
+<p><a name="1005553"> </a>
+</a>This section contains the following tables relating to JDBC and Java data types:
+</p><p><a name="1008737"> </a>
+
+</p><p><a name="1005564"> </a>
+<strong>Table 8.1-JDBC Types Mapped to Java Types</strong>
+</p><a name="1050180"> </a>
+<blockquote>This table shows the conceptual correspondence between JDBC types and Java types. A programmer should write code with this mapping in mind. For example, if a value in the database is a <code>SMALLINT</code>, a <code>short</code> should be the data type used in a JDBC application.</blockquote>
+<a name="1050187"> </a>
+<blockquote>All CallableStatement.getXXX methods except for <code>getObject</code> use this mapping. The <code>getObject</code> methods for both the <code>CallableStatement</code> and <code>ResultSet</code> interfaces use the mapping in <a href="mapping.html#1004791">"JDBC Types Mapped to Java Object Types" on page &#32;107</a>.</blockquote>
+<a name="1054437"> </a>
+<blockquote></blockquote>
+<p><a name="1005566"> </a>
+<strong>Table 8.2-Java Types Mapped to JDBC Types</strong>
+</p><a name="1050199"> </a>
+<blockquote>This table shows the mapping a driver should use for the ResultSet.updateXXX methods and for IN parameters. PreparedStatement.setXXX methods and RowSet.setXXX methods use this table for mapping an IN parameter, which is a Java type, to the JDBC type that will be sent to the database. Note that the <code>setObject</code> methods for these two interfaces use the mapping shown in <a href="mapping.html#1034737">"Java Object Types Mapped to JDBC Types" on page &#32;108</a>.</blockquote>
+<a name="1050225"> </a>
+<blockquote></blockquote>
+<p><a name="1054438"> </a>
+<strong>Table 8.3-JDBC Types Mapped to Java Object Types</strong>
+</p><a name="1005572"> </a>
+<blockquote>ResultSet.getObject and CallableStatement.getObject use the mapping shown in this table for standard mappings.</blockquote>
+<a name="1050230"> </a>
+<blockquote></blockquote>
+<p><a name="1005573"> </a>
+<strong>Table 8.4-Java Object Types Mapped to JDBC Types</strong>
+</p><a name="1050232"> </a>
+<blockquote>PreparedStatement.setObject and RowSet.setObject use the mapping shown in this table when no parameter specifying a target JDBC type is provided.</blockquote>
+<a name="1050233"> </a>
+<blockquote></blockquote>
+<p><a name="1005575"> </a>
+<strong>Table 8.5-Conversions by setObject from Java Object Types to JDBC  Types</strong>
+</p><a name="1005576"> </a>
+<blockquote>This table shows which JDBC types may be specified as the target JDBC type to the methods PreparedStatement.setObject and RowSet.setObject.</blockquote>
+<a name="1054433"> </a>
+<blockquote></blockquote>
+<p><a name="1005577"> </a>
+<strong>Table 8.6-Type Conversions Supported by ResultSet.getXXX Methods</strong>
+</p><a name="1050293"> </a>
+<blockquote>This table shows which JDBC types may be returned by ResultSet.getXXX methods. A bold <strong>X</strong> indicates the method recommended for retrieving a JDBC type. A plain x indicates for which JDBC types it is possible to use a <code>getXXX</code> method.</blockquote>
+<a name="1051808"> </a>
+<blockquote>This table also shows the conversions used by the SQLInput.readXXX methods, except that they use only the recommended conversions.</blockquote>
+<p><a name="1054430"> </a>
+
+</p><p><a name="1023608"> </a>
+<strong>Table 8.7-JDBC Types Mapped to Database-specific SQL Types</strong>
+</p><a name="1051421"> </a>
+<blockquote>This table shows the names used by individual databases for their data types that most closely correspond to the JDBC types.</blockquote>
+<a name="1051555"> </a>
+<h4>8.9.1	 JDBC Types Mapped to Java Types 
+<Table Border="3">
+<caption></caption>
+<tr><th><br><p><a name="1051430"> </a>
+JDBC Type
+</p></th><th><br><p><a name="1051432"> </a>
+Java Type
+</p></th></tr>
+<tr><td><br><p><a name="1051435"> </a>
+<code>CHAR</a></code>
+</p></td><td><br><p><a name="1051437"> </a>
+<code>String</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051440"> </a>
+<code>VARCHAR</a></code>
+</p></td><td><br><p><a name="1051442"> </a>
+<code>String </code>
+</p></td></tr>
+<tr><td><br><p><a name="1051445"> </a>
+<code>LONGVARCHAR</a></code>
+</p></td><td><br><p><a name="1051447"> </a>
+<code>String</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051449"> </a>
+<code>NUMERIC</code>
+</p></td><td><br><p><a name="1051451"> </a>
+<code>java.math.BigDecimal</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051453"> </a>
+<code>DECIMAL</code>
+</p></td><td><br><p><a name="1051455"> </a>
+<code>java.math.BigDecimal</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051458"> </a>
+<code>BIT</code></a>
+</p></td><td><br><p><a name="1051460"> </a>
+<code>boolean</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051463"> </a>
+<code>TINYINT</a></code>
+</p></td><td><br><p><a name="1051465"> </a>
+<code>byte</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051468"> </a>
+<code>SMALLINT</a></code>
+</p></td><td><br><p><a name="1051470"> </a>
+<code>short</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051473"> </a>
+<code>INTEGER</a></code>
+</p></td><td><br><p><a name="1051475"> </a>
+<code>int</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051478"> </a>
+<code>BIGINT</code></a>
+</p></td><td><br><p><a name="1051480"> </a>
+<code>long</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051483"> </a>
+<code>REAL</a></code>
+</p></td><td><br><p><a name="1051485"> </a>
+<code>float</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051488"> </a>
+<code>FLOAT</a></code>
+</p></td><td><br><p><a name="1051490"> </a>
+<code>double</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051493"> </a>
+<code>DOUBLE</a></code>
+</p></td><td><br><p><a name="1051495"> </a>
+<code>double</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051498"> </a>
+<code>BINARY</code></a>
+</p></td><td><br><p><a name="1051500"> </a>
+<code>byte[]</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051503"> </a>
+<code>VARBINARY</a></code>
+</p></td><td><br><p><a name="1051505"> </a>
+<code>byte[]</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051508"> </a>
+<code>LONGVARBINARY</a></code>
+</p></td><td><br><p><a name="1051510"> </a>
+<code>byte[]</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051514"> </a>
+<code></a>DATE</a></code>
+</p></td><td><br><p><a name="1051516"> </a>
+<code>java.sql.Date</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051519"> </a>
+<code>TIME</a></code>
+</p></td><td><br><p><a name="1051521"> </a>
+<code>java.sql.Time</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051524"> </a>
+<code>TIMESTAMP</a></code>
+</p></td><td><br><p><a name="1051526"> </a>
+<code>java.sql.Timestamp</code>
+</p></td></tr>
+<tr><td><br><p><a name="1051528"> </a>
+CLOB
+</p></td><td><br><p><a name="1051530"> </a>
+Clob
+</p></td></tr>
+<tr><td><br><p><a name="1051532"> </a>
+BLOB
+</p></td><td><br><p><a name="1051534"> </a>
+Blob
+</p></td></tr>
+<tr><td><br><p><a name="1051536"> </a>
+ARRAY
+</p></td><td><br><p><a name="1051538"> </a>
+Array
+</p></td></tr>
+<tr><td><br><p><a name="1051540"> </a>
+DISTINCT
+</p></td><td><br><p><a name="1051542"> </a>
+mapping of underlying type
+</p></td></tr>
+<tr><td><br><p><a name="1051544"> </a>
+STRUCT
+</p></td><td><br><p><a name="1051546"> </a>
+Struct
+</p></td></tr>
+<tr><td><br><p><a name="1051548"> </a>
+REF
+</p></td><td><br><p><a name="1051550"> </a>
+Ref
+</p></td></tr>
+<tr><td><br><p><a name="1051552"> </a>
+JAVA_OBJECT
+</p></td><td><br><p><a name="1051554"> </a>
+underlying Java class
+</p></td></tr>
+
+</Table>
+
+</h4>
+<p><a name="1051582"> </a>
+This table has two purposes. First, it illustrates the general correspondence between types in the Java programming language and the SQL types. Second, it shows the mapping used by <code>CallableStatement.getXXX</code> methods and <code>SQLInput.readXXX </code>methods. (Note that the mapping used by the <code>CallableStatement.getObject</code> method is shown in Table 8.3.)
+</p><a name="1033804"> </a>
+<p>
+<br>
+<h4>8.9.2	 Java Types Mapped to JDBC Types 
+<Table Border="3">
+<caption></caption>
+<tr><th><br><p><a name="1039196"> </a>
+Java Type
+</p></th><th><br><p><a name="1039198"> </a>
+JDBC Type
+</p></th></tr>
+<tr><td><br><p><a name="1039201"> </a>
+<code>String </a></code>
+</p></td><td><br><p><a name="1039203"> </a>
+<code>CHAR</code>, <code>VARCHAR</code>, or <code>LONGVARCHAR</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039210"> </a>
+<code>java.math.BigDecimal</a></code>
+</p></td><td><br><p><a name="1039212"> </a>
+<code>NUMERIC</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039215"> </a>
+<code>boolean</a></code>
+</p></td><td><br><p><a name="1039217"> </a>
+<code>BIT</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039220"> </a>
+<code>byte</a></code>
+</p></td><td><br><p><a name="1039222"> </a>
+<code>TINYINT</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039225"> </a>
+<code>short</a></code>
+</p></td><td><br><p><a name="1039227"> </a>
+<code>SMALLINT</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039230"> </a>
+<code>int</a></code>
+</p></td><td><br><p><a name="1039232"> </a>
+<code>INTEGER</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039235"> </a>
+<code>long</a></code>
+</p></td><td><br><p><a name="1039237"> </a>
+<code>BIGINT</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039240"> </a>
+<code>float</a></code>
+</p></td><td><br><p><a name="1039242"> </a>
+<code>REAL</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039245"> </a>
+<code>double</a></code>
+</p></td><td><br><p><a name="1039247"> </a>
+<code>DOUBLE</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039249"> </a>
+<code>byte[]</code>
+</p></td><td><br><p><a name="1039251"> </a>
+<code>BINARY, VARBINARY, or LONGVARBINARY</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039257"> </a>
+<code>java.sql.Date</code>
+</p></td><td><br><p><a name="1039260"> </a>
+<code>DATE</a></code>
+</p></td></tr>
+<tr><td><br><p><a name="1039262"> </a>
+<code>java.sql.Time</code>
+</p></td><td><br><p><a name="1039265"> </a>
+<code>TIME</a></code>
+</p></td></tr>
+<tr><td><br><p><a name="1039267"> </a>
+<code>java.sql.Timestamp</code>
+</p></td><td><br><p><a name="1039270"> </a>
+<code>TIMESTAMP</a></code>
+</p></td></tr>
+<tr><td><br><p><a name="1042192"> </a>
+Clob
+</p></td><td><br><p><a name="1042194"> </a>
+CLOB
+</p></td></tr>
+<tr><td><br><p><a name="1042188"> </a>
+Blob
+</p></td><td><br><p><a name="1042190"> </a>
+BLOB
+</p></td></tr>
+<tr><td><br><p><a name="1039272"> </a>
+Array
+</p></td><td><br><p><a name="1039274"> </a>
+ARRAY
+</p></td></tr>
+<tr><td><br><p><a name="1039276"> </a>
+Struct
+</p></td><td><br><p><a name="1039278"> </a>
+STRUCT
+</p></td></tr>
+<tr><td><br><p><a name="1039280"> </a>
+Ref
+</p></td><td><br><p><a name="1039282"> </a>
+REF
+</p></td></tr>
+<tr><td><br><p><a name="1042198"> </a>
+Java class
+</p></td><td><br><p><a name="1042200"> </a>
+JAVA_OBJECT
+</p></td></tr>
+
+</Table>
+
+</h4>
+<p><a name="1039287"> </a>
+This table shows the conversions used for IN parameters before they are sent to the DBMS, used by the <code>PreparedStatement.setXXX</code> and <code>RowSet.setXXX</code> methods<code>.</code> These same conversions are also used by <code>ResultSet.updateXXX</code> methods and <code>SQLOutput.writeXXX</code> methods. (Note that the <code>PreparedStatement.setObject</code> and <code>RowSet.setObject</code> methods use the mapping in Table 8.4.)
+</p><p><a name="1039288"> </a>
+The mapping for <code>String</code> will normally be <code>VARCHAR</code> but will turn into <code>LONGVARCHAR</code> if the given value exceeds the driver's limit on <code>VARCHAR</code> values. The same is true for <code>byte[]</code>, which may be mapped to either <code>VARBINARY</code> or <code>LONGVARBINARY</code> values, depending on the driver's limit on <code>VARBINARY</code> values. In most cases, the choice between <code>CHAR</code> and <code>VARCHAR</code> is not significant. In any case, drivers will just make the right choice. The same is true for the choice between <code>BINARY</code> and <code>VARBINARY</code>.
+</p><a name="1004791"> </a>
+<p>
+<br>
+<h4>8.9.3	 JDBC Types Mapped to Java Object Types</a>&#32;</a>&#32;</a> 
+<a name="table3"></a>
+<Table Border="3">
+<caption></caption>
+<tr><th><br><p><a name="1005155"> </a>
+JDBC Type
+</p></th><th><br><p><a name="1005157"> </a>
+Java Object Type
+</p></th></tr>
+<tr><td><br><p><a name="1005159"> </a>
+<code>CHAR</a></code>
+</p></td><td><br><p><a name="1005161"> </a>
+<code>String</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005163"> </a>
+<code>VARCHAR</a></code>
+</p></td><td><br><p><a name="1005165"> </a>
+<code>String </code>
+</p></td></tr>
+<tr><td><br><p><a name="1005167"> </a>
+<code>LONGVARCHAR</a></code>
+</p></td><td><br><p><a name="1005169"> </a>
+<code>String</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005171"> </a>
+<code>NUMERIC</code>
+</p></td><td><br><p><a name="1005173"> </a>
+<code>java.math.BigDecimal</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005175"> </a>
+<code>DECIMAL</a></code>
+</p></td><td><br><p><a name="1005177"> </a>
+<code>java.math.BigDecimal</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005179"> </a>
+<code>BIT</code>
+</p></td><td><br><p><a name="1005181"> </a>
+<code>Boolean</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005183"> </a>
+<code>TINYINT</a></code>
+</p></td><td><br><p><a name="1005185"> </a>
+<code>Integer</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005187"> </a>
+<code>SMALLINT</a></code>
+</p></td><td><br><p><a name="1005189"> </a>
+<code>Integer</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005191"> </a>
+<code>INTEGER</a></code>
+</p></td><td><br><p><a name="1005193"> </a>
+<code>Integer</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005195"> </a>
+<code>BIGINT</code>
+</p></td><td><br><p><a name="1005197"> </a>
+<code>Long</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005199"> </a>
+<code>REAL</a></code>
+</p></td><td><br><p><a name="1005201"> </a>
+<code>Float</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005203"> </a>
+<code>FLOAT</a></code>
+</p></td><td><br><p><a name="1005205"> </a>
+<code>Double</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005207"> </a>
+<code>DOUBLE</a></code>
+</p></td><td><br><p><a name="1005209"> </a>
+<code>Double</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005211"> </a>
+<code>BINARY</code>
+</p></td><td><br><p><a name="1005213"> </a>
+<code>byte[]</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005215"> </a>
+<code>VARBINARY</a></code>
+</p></td><td><br><p><a name="1005217"> </a>
+<code>byte[]</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005219"> </a>
+<code>LONGVARBINARY</a></code>
+</p></td><td><br><p><a name="1005221"> </a>
+<code>byte[]</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005223"> </a>
+<code>DATE</a></code>
+</p></td><td><br><p><a name="1005225"> </a>
+<code>java.sql.Date</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005227"> </a>
+<code>TIME</a></code>
+</p></td><td><br><p><a name="1005229"> </a>
+<code>java.sql.Time</code>
+</p></td></tr>
+<tr><td><br><p><a name="1005231"> </a>
+<code>TIMESTAMP</a></code>
+</p></td><td><br><p><a name="1005233"> </a>
+<code>java.sql.Timestamp</code>
+</p></td></tr>
+<tr><td><br><p><a name="1039349"> </a>
+DISTINCT
+</p></td><td><br><p><a name="1039351"> </a>
+Object type of underlying type
+</p></td></tr>
+<tr><td><br><p><a name="1042180"> </a>
+CLOB
+</p></td><td><br><p><a name="1042182"> </a>
+Clob
+</p></td></tr>
+<tr><td><br><p><a name="1042176"> </a>
+BLOB
+</p></td><td><br><p><a name="1042178"> </a>
+Blob
+</p></td></tr>
+<tr><td><br><p><a name="1039315"> </a>
+ARRAY
+</p></td><td><br><p><a name="1039317"> </a>
+Array
+</p></td></tr>
+<tr><td><br><p><a name="1039311"> </a>
+STRUCT
+</p></td><td><br><p><a name="1039313"> </a>
+Struct or SQLData
+</p></td></tr>
+<tr><td><br><p><a name="1039307"> </a>
+REF
+</p></td><td><br><p><a name="1039309"> </a>
+Ref
+</p></td></tr>
+<tr><td><br><p><a name="1042184"> </a>
+JAVA_OBJECT
+</p></td><td><br><p><a name="1042186"> </a>
+underlying Java class
+</p></td></tr>
+
+</Table>
+
+</h4>
+<p><a name="1051614"> </a>
+This table shows the mapping from JDBC types to Java object types that is used by the <code>ResultSet.getObject</code> and <code>CallableStatement.getObject </code>methods. 
+</p><a name="1034737"> </a>
+<p>
+<br>
+<h4>8.9.4	 Java Object Types Mapped to JDBC Types 
+<Table Border="3">
+<caption></caption>
+<tr><th><br><p><a name="1034740"> </a>
+Java Object Type
+</p></th><th><br><p><a name="1034742"> </a>
+JDBC Type
+</p></th></tr>
+<tr><td><br><p><a name="1034744"> </a>
+<code>String </a></code>
+</p></td><td><br><p><a name="1034746"> </a>
+<code>CHAR, VARCHAR, or LONGVARCHAR</code>
+</p></td></tr>
+<tr><td><br><p><a name="1034748"> </a>
+<code>java.math.BigDecimal</a></code>
+</p></td><td><br><p><a name="1034750"> </a>
+<code>NUMERIC</code>
+</p></td></tr>
+<tr><td><br><p><a name="1034752"> </a>
+<code>Boolean</code>
+</p></td><td><br><p><a name="1034754"> </a>
+<code>BIT</code>
+</p></td></tr>
+<tr><td><br><p><a name="1034756"> </a>
+<code>Integer</a></code>
+</p></td><td><br><p><a name="1034758"> </a>
+<code>INTEGER</code>
+</p></td></tr>
+<tr><td><br><p><a name="1034760"> </a>
+<code>Long</a></code>
+</p></td><td><br><p><a name="1034762"> </a>
+<code>BIGINT</code>
+</p></td></tr>
+<tr><td><br><p><a name="1034764"> </a>
+<code>Float</a></code>
+</p></td><td><br><p><a name="1034766"> </a>
+<code>REAL</code>
+</p></td></tr>
+<tr><td><br><p><a name="1034768"> </a>
+<code>Double</a></code>
+</p></td><td><br><p><a name="1034770"> </a>
+<code>DOUBLE</code>
+</p></td></tr>
+<tr><td><br><p><a name="1034772"> </a>
+<code>byte[]</a></code>
+</p></td><td><br><p><a name="1034774"> </a>
+<code>BINARY, VARBINARY, or LONGVARBINARY</code>
+</p></td></tr>
+<tr><td><br><p><a name="1034776"> </a>
+<code>java.sql.Date</code>
+</p></td><td><br><p><a name="1034778"> </a>
+<code>DATE</a></code>
+</p></td></tr>
+<tr><td><br><p><a name="1034780"> </a>
+<code>java.sql.Time</code>
+</p></td><td><br><p><a name="1034782"> </a>
+<code>TIME</a></code>
+</p></td></tr>
+<tr><td><br><p><a name="1034784"> </a>
+<code>java.sql.Timestamp</code>
+</p></td><td><br><p><a name="1034786"> </a>
+<code>TIMESTAMP</a></code>
+</p></td></tr>
+<tr><td><br><p><a name="1042166"> </a>
+Clob
+</p></td><td><br><p><a name="1042168"> </a>
+CLOB
+</p></td></tr>
+<tr><td><br><p><a name="1042162"> </a>
+Blob
+</p></td><td><br><p><a name="1042164"> </a>
+BLOB
+</p></td></tr>
+<tr><td><br><p><a name="1039345"> </a>
+Array
+</p></td><td><br><p><a name="1039347"> </a>
+ARRAY
+</p></td></tr>
+<tr><td><br><p><a name="1039341"> </a>
+Struct
+</p></td><td><br><p><a name="1039343"> </a>
+STRUCT
+</p></td></tr>
+<tr><td><br><p><a name="1039337"> </a>
+Ref
+</p></td><td><br><p><a name="1039339"> </a>
+REF
+</p></td></tr>
+<tr><td><br><p><a name="1042172"> </a>
+Java class
+</p></td><td><br><p><a name="1042174"> </a>
+JAVA_OBJECT
+</p></td></tr>
+
+</Table>
+
+</h4>
+<p><a name="1034793"> </a>
+These are the mappings used by the <code>PreparedStatement.setObject</code> method when no parameter specifying a target JDBC type is given. (The JDBC types that may be specified to the <code>PreparedStatement.setObject</code> method are shown in Table 8.5.)
+</p><p><a name="1051619"> </a>
+Note that the mapping for <code>String</code> will normally be <code>VARCHAR</code> but will turn into <code>LONGVARCHAR</code> if the given value exceeds the driver's limit on <code>VARCHAR</code> values. The case is similar for <code>byte[]</code>, which will be <code>VARBINARY</code> or <code>LONGVARBINARY</code>, depending on the driver's limit for <code>VARBINARY</code> values.
+</p><a name="1004845"> </a>
+<p>
+<br>
+<h4>8.9.5	 Conversions by setObject</h4> 
+<p>
+<img src="mapping.anc1.gif" alt="Conversions by setObject" longdesc="table8.5.html"><a href="table8.5.html" title="Long descriptions for">[D]</a>
+<p>
+An "x" means that the given Java object type may be converted to the given 
+JDBC type. This table show the possible values for the parameter specifying a
+target JDBC type that is passed to the method <code>PreparedStatement.setObject</code> or <code>RowSet.setObject</code>. Note that some conversions may fail at
+run time if the value presented is invalid.
+<p>
+<br>
+<h4>8.9.6	Conversions by ResultSet.getXXX Methods</h4>
+</p><p><a name="1036700"> </a>
+<a name="table2"></a>
+<img src="mapping.anc2.gif" alt="Conversions by ResultSet.getXXX Methods" longdesc="table8.6.html"><a href="table8.6.html" title="Long description for">[D]</a>
+<br>
+<code>SQLInput.readXXX</code> methods support only the recommended conversions.
+An "x" means that the method <i>can</i> retrieve the JDBC type. An "<b>X</b>"
+means that the method is <i>recommended</i> for retrieving the JDBC type.
+<p>
+<br>
+<h4>8.9.7	JDBC Types Mapped to Database-specific SQL Types</h4>
+<a name="table1"></a>
+<p>
+There is considerable variation among the different SQL types supported by the
+different databases. Table 8.7 shows the database-specific SQL types that best
+match the JDBC type for various major databases. The presence of a 
+database-specific type name indicates that the given type can be used to
+achieve the semantics of the corresponding JDBC type, though the 
+database-specific type may also provide additional semantics.
+<p>
+Notes and Lamentations:
+<ol>
+<li>Some databases provide extra precision for some integral and 
+floating-point types.
+<li>Some databases provide a <code>DATE</code> or <code>DATETIME</code> type 
+that can be used to contain either a <code>DATE</code> or a <code>TIME</code> or
+both.
+<li><code>VARCHAR</code> and <code>VARCHAR2</code> are currently synonyms in
+Oracle8.
+<li>For <code>LONGVARCHAR</code>, DB2 also supports "CLOB(n)" with a limit
+of 2 gigabytes.
+<li>For <code>LONGVARBINARY</code>, DB2 also supports "BLOB(n)" with a limit
+of 2 gigabytes.
+<li>Handling of <code>BINARY</code>, <code>VARBINARY</code>, and <code>LONGVARBINARY</code> literals in SQL statements varies widely among databases. We 
+recommend using <code>PreparedStatement.setBytes</code> to set values in a 
+portable way.
+<li>Handling of <code>DATE</code>, <code>TIME</code>, and <code>TIMESTAMP</code>
+literals in SQL statements varies widely among databases. We recommend using the
+JDBC SQL escape syntax for dates and times (see "SQL Escape Syntax in Statements" on page 36) to set <code>Date</code>, <code>Time</code>, and <code>Timestamp</code> values in a portable way.
+</ol>
+<p>
+<img src="mapping.anc3.gif" alt="Types mapped to Database-specific SQL types" longdesc="table8.7.html"><a href="table8.7.html" title="Long description for new two images">[D]</a>
+<p>
+<img src="mapping.anc4.gif" alt="See long description for previous image">
+</p><p><a name="998993"> </a>
+
+</p>
+
+<hr><br>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="callablestatement.html">[Prev]</a> <a href="bridge.doc.html">[Next]</a> 
+<hr><br>
+
+
+
+<i><a href="copyright.html">Copyright</a> &#169; 1999, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

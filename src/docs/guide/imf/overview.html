@@ -1,0 +1,414 @@
+<!--This file created by Claris Home Page version 2.0-->
+<HTML>
+<HEAD>
+   <TITLE>Input Method Framework Overview</TITLE>
+   <META NAME=GENERATOR CONTENT="Claris Home Page 2.0">
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" VLINK="#000077">
+
+<P><TABLE summary="layout" BORDER=0 WIDTH="100%">
+   <TR>
+      <TD WIDTH=60>
+         <P><IMG SRC="../../images/javalogo52x88.gif" ALT="Java"
+         WIDTH=52 HEIGHT=88 BORDER=0 ALIGN=bottom>
+      </TD><TD>
+         <H1><CENTER>Input Method Framework Overview</CENTER></H1>
+      </TD></TR>
+</TABLE><!-- Body text begins here --></P>
+
+<H2>Contents</H2>
+
+<OL>
+   <LI><A HREF="#Introduction">Introduction</A>
+   
+   <LI><A HREF="#Goals">Goals</A>
+   
+   <LI><A HREF="#Input Method Support in Other Frameworks">Input
+   Method Support in Other Frameworks</A>
+   
+   <LI><A HREF="#FAQ">Frequently Asked Questions</A>
+   
+   <LI><A HREF="#References">References</A>
+</OL>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Introduction"></A>1. Introduction</H2>
+
+<P>Input methods are software components that interpret user
+operations such as typing keys, speaking, or writing using a pen
+device to generate text input for applications. The most common input
+methods are the ones that let users type text in Chinese, Japanese,
+or Korean, languages that use thousands of different characters, on a
+regular-sized keyboard. The text is typed in a form that can be
+handled by regular-sized keyboards, for example, in a romanized form,
+and then converted into the form that's really intended. Typically a
+sequence of several characters needs to be typed and then converted
+in one chunk, and conversion may have to be retried because there may
+be several possible translations. Similarly, for hand-writing
+recognition, the user may write a series of characters, convert them,
+and select the correct text from several possible conversion results.
+This process is called <EM>composition</EM>, and the text that the
+input method is working on is called <EM>composed text</EM>. It ends
+when the user confirms the final conversion result and the text is
+<EM>committed</EM>.</P>
+
+<P>During composition, the composed text logically belongs to the
+input method, but still needs to be displayed to the user. Input
+method frameworks cooperate with input methods to provide at least
+two ways to do this: They enable modern text editing components to
+display the text in the context of the document that it will
+eventually belong to, albeit in a style that indicates that the text
+still needs to be converted or confirmed by the input method. This is
+called <EM>on-the-spot</EM> style input. And they provide a separate
+window to display the text as a fall-back if a not-so-modern text
+editing component can't deal with the text until it's confirmed. We
+call this <EM>root-window</EM> style input.</P>
+
+<P>The input method framework in the Java 2 platform enables the
+collaboration between text editing components and input methods in
+entering text. Its input method client API provides interfaces and
+classes that enable text editing components to communicate with input
+methods and implement a well-integrated text input user interface in
+the on-the-spot and below-the-spot styles; it also provides
+root-window style input as a fallback. Its service provider interface
+(SPI) for input method engines provides interfaces that enable the
+development of input methods in the Java programming language that
+can be used with any Java runtime environment; it also supports
+native input methods of the host platform.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Goals"></A>2. Goals</H2>
+
+<H3>"Write Once, Run Anywhere in the World" for Text Components</H3>
+
+<P>Text editing components that use the input method framework run on
+any Java application environment and support any text input methods
+available on that Java application environment without modifying or
+recompiling the text editing component. The framework isolates text
+editing components from differences in platforms and input method
+engines. It provides only one programming model for interacting with
+input methods. This lets developers write to a single API, and lets
+users choose whatever input method they prefer. When using native
+input methods, the framework maps to the platform input method APIs.
+</P>
+
+<P>Although engine independence will be important to most developers,
+some high-end developers may want access to engine specific features.
+The framework allows this access.</P>
+
+<H3>"Write Once, Run Anywhere in the World" for Input Methods</H3>
+
+<P>Input methods written in the Java programming language and using
+the input method engine SPI can be installed into any Java
+application environment and support any text component running in
+that Java application environment. The framework isolates input
+methods from differences in platforms and text editing components. It
+provides only one programming model for interacting with text
+components. This lets developers write to a single SPI, and lets
+users choose whatever text editing component they prefer.</P>
+
+<H3>Language Independence</H3>
+
+<P>The input method framework is language independent in order to
+satisfy the needs of fully international applications. Although input
+methods are generally used for entering East Asian text, they may be
+useful for other languages as well. For example, a transliteration
+input method might be developed to allow Greek to be entered using
+Latin characters.</P>
+
+<P>The framework handles input methods for different languages at the
+same time for truly multilingual text editing. While the choice of
+native input methods may be limited by the host operating system, any
+input method written in the Java programming language and using the
+input method engine SPI can be used at any time. Text created by an
+input method can have language attributes so that applications can
+perform language sensitive operations on the text.</P>
+
+<H3>Input Device Independence</H3>
+
+<P>The input method framework is designed to accommodate many
+possible input devices. Although keyboards are the predominant way of
+entering text today, other devices are gaining importance. For some
+platforms, pen-based input is the only way to enter text. Also, voice
+input is becoming more and more popular. The input method engine SPI
+opens the way to support these alternate devices.</P>
+
+<H3>Multiple Service Levels</H3>
+
+<P>Different programs have different needs for input method support.
+Tight integration with input methods provides the best user
+interface, but requires some additional programming. Some developers
+may not find that additional work worthwhile, but their applications
+still need to be able to receive East Asian text input. A few
+programs, such as games, want direct low-level keyboard input without
+interference from an input method. The framework lets programs choose
+one of the following levels of text input support.</P>
+
+<H4>Integrated Text Input User Interface</H4>
+
+<P>Modern programs intended to be used with East Asian languages
+usually provide a fully integrated user interface for text input
+operations and show the text being composed embedded in the document
+text. While converting text, the current candidate is highlighted,
+and when the user chooses a different candidate, the previous
+candidate text is replaced with the new one. This user interface
+support for input methods is known as <EM>on-the-spot</EM> style (or
+<EM>inline</EM> style). An alternative that Chinese-speaking users
+often prefer is the <EM>below-the-spot</EM> style, where composed
+text is shown in a separate composition window that is automatically
+positioned close to the insertion point where text will be inserted
+after being committed. The input method client API lets text editing
+components implement these integrated text input user interfaces.
+</P>
+
+<P>Integration does not only mean displaying the composed text in the
+context of the target document. It also means that the text editing
+component understands "input method events", which let the input
+method communicate more information about the text than simple key
+events (for example, grammatical information), and that it can
+responds to requests for information from the input method that let
+the input method improve its functionality (for example, its
+accuracy).</P>
+
+<H4>Non-Integrated Text Input User Interface</H4>
+
+<P>For programs that do not want to deal with the user interface for
+text input operations, only final input text is sent to the
+application. In this case, the framework provides a user interface
+for input operations in a separate composition window outside the
+application. This is known as <I>root-window</I> style. It is less
+convenient because the user either has to manually position the
+window near the insertion point or to move his/her eyes between the
+composition window and the application window.</P>
+
+<P>In this case, the application receives the input text as a
+sequence of key events. Therefore, there is no way to receive any
+information associated with the input text, such as grammatical
+information. Also, surrogate pairs (as defined in the Unicode
+Standard, version 2.0) are received as two separate key events.</P>
+
+<H4>No Input Method Support</H4>
+
+<P>Some applications, such as game software, may need only raw key
+input and no input method support. The framework provides a way to
+explicitly disable input method support.</P>
+
+<H3>Building Block Reuse</H3>
+
+<P>An important theme of object-oriented programming is reuse of
+program building blocks. The same building block may be used in many
+different applications, and several times within the same
+application. To make it easy to combine different text editing
+building blocks of possibly different capabilities, the input method
+framework interacts with each text editing component directly and
+individually.</P>
+
+<P>As a consequence, many applications will not interact with the
+input method framework directly at all. Instead, they will use
+ready-made text editing components, such as the Swing text
+components, which will handle the interaction for them.</P>
+
+<H3>Close Integration with Other Frameworks</H3>
+
+<P>The input method framework is designed as an integral part of the
+Java platform. Interfaces that are necessary to exchange text between
+input methods and text components are designed to also support
+communication between other text-related frameworks, such as Java 2D
+and the Swing text components. Support for input method highlight
+drawing is integrated into Java 2D, so that text components can treat
+composed text just like any other text and the highlights just like
+any other style. Java 2D interacts with the input method framework to
+determine appropriate visual styles for input method highlights
+depending on the platform. The Swing text components use the input
+method framework to implement the best possible user interface with
+minimal additional programming.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Input Method Support in Other Frameworks"></A>3. Input
+Method Support in Other Frameworks</H2>
+
+<P>This chapter summarizes functionality in other Java platform
+frameworks that support input methods.</P>
+
+<H3>Text</H3>
+
+<P>The
+<CODE><A HREF="../../api/java/text/AttributedCharacterIterator.html">AttributedCharacterIterator</A></CODE>
+interface provides a standard way of communicating text information
+with attributes between frameworks. It lets text readers access text
+without having to know how the text is stored in the information
+provider. Attribute information may include font and style attributes
+as well as language tags and grammatical annotations.</P>
+
+<H3>Abstract Window Toolkit</H3>
+
+<P>The
+<CODE><A HREF="../../api/java/awt/Window.html">Window</A></CODE>
+class creates an initial input context for the window, and disposes
+this input context for the window when the window is disposed.
+Explicitly disposing input contexts allows to free up the (often
+substantial) resources allocated by native input methods.</P>
+
+<P>The
+<CODE><A HREF="../../api/java/awt/Component.html">Component</A></CODE>
+class has methods to handle input contexts and input method request
+handlers. Newly created <CODE>Component</CODE> instances other than
+windows initially share the input context of their containing window.
+The event handling in the <CODE>Component</CODE> class redirects
+incoming events to the input context associated with the component,
+and only passes them on to the component's listeners if they have not
+been consumed by an input method. Focus changes are communicated to
+the input context so it can activate or deactivate input methods.
+</P>
+
+<P>The AWT classes that have knowledge of event or listener classes
+handle the <CODE>InputMethodEvent</CODE> and
+<CODE>InputMethodListener</CODE> classes.</P>
+
+<P>The <CODE>Graphics</CODE> class defines a
+<CODE><A HREF="../../api/java/awt/Graphics.html#drawString(java.text.AttributedCharacterIterator, int, int)">drawString</A></CODE>
+method that accepts <CODE>AttributedCharacterIterator</CODE>
+instances as input. Instances of the
+<CODE><A HREF="../../api/java/awt/font/TextLayout.html">TextLayout</A></CODE>
+class can be constructed from
+<CODE>AttributedCharacterIterator</CODE> instances and used to draw
+text with input method highlights. Both ways of drawing text
+recognize input method highlights as attributes of the text and
+render them.</P>
+
+<H3>Swing</H3>
+
+<P>The <A HREF="../../api/javax/swing/text/JTextComponent.html">Swing
+text components</A> in the Java 2 platform are by default active
+clients of the input method framework. That means, applications using
+these text components will use on-the-spot or below-the-spot style
+input by default. Application developers are still responsible for
+<A HREF="api-tutorial.html#Ending Input Operations">ending input
+operations</A> when some other operation is started that requires the
+text to be committed. They may also use the input method framework's
+methods to
+<A HREF="api-tutorial.html#Creating Private Input Contexts">create a
+private input context</A>, to
+<A HREF="api-tutorial.html#Selecting Input Methods">select an input
+method</A>, or to
+<A HREF="api-tutorial.html#Setting an Expected Character Subset">set
+an expected character subset</A>.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="FAQ"></A>4. Frequently Asked Questions</H2>
+
+<H4>How are input methods supported in previous versions of the Java
+platform?</H4>
+
+<P>Here's the history of input method support in the Java platform:
+</P>
+
+<UL>
+   <LI>1.0: no input method support.
+   
+   <LI>1.1: host input methods supported for peered text components
+   (TextArea, TextField).
+   
+   <LI>1.1.6: host input methods supported for lightweight
+   components, root-window style only.
+   
+   <LI>1.2: introduces input method client API, enabling on-the-spot
+   style for lightweight components. Swing text components become
+   active clients.
+   
+   <LI>1.3: introduces input method engine SPI, enabling input
+   methods written in the Java programming language. Introduces
+   below-the-spot style.
+</UL>
+
+<H4>Why is there no method that lets a client component choose an
+input method by name?</H4>
+
+<P>The input method framework lets client components select an input
+method by locale, but not by name. Which input method is used to
+enter text for a given language is the user's choice, and text
+components should be written to work with any input method. If text
+components want to take advantage of enhanced features of specific
+input methods, they can call getInputMethodControlObject and, if the
+result is an instance of a class they know about, call its methods.
+</P>
+
+<H4>How can I obtain a IIIMP adapter?</H4>
+
+<P>Version 1.2 of the Java 2 Runtime Environment included a client
+side adapter for the Internet-Intranet Input Method Protocol (IIIMP),
+a Sun Microsystems technology which enables the use of server-based
+input methods over the network. This adapter was included to allow
+the evaluation of this protocol at a time when there was no public
+interface that would let users install the adapter into a Java
+runtime environment as a separate software component. Version 1.3 of
+the Java 2 platform provides a public input method engine SPI, so
+that the adapter, like other input systems, can now be developed and
+distributed as a separate product and installed into any
+implementation of the Java 2 platform. A version of the IIIMP adapter
+that uses the SPI is currently being developed by Sun Microsystems.
+To obtain current information, go to the
+<A HREF="http://soldc.sun.com">Solaris Developer Connection</A> and
+search for "IIIM".</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="References"></A>5. References</H2>
+
+<P>Information about the implementation of input methods on different
+platforms can be found in the following literature:</P>
+
+<UL>
+   <LI><I>"Programmer's Supplement for Release 6,"</I> O'Reilly &amp;
+   Associates, Inc. (ISBN 1-56592-089-9).
+   
+   <LI><I>"Inside Macintosh: Text,"</I> Addison-Wesley (ISBN
+   0-201-63298-5).
+   
+   <LI><I>"Developing International Software for Windows 95 and
+   Windows NT,"</I> Microsoft Press (ISBN 1-55615-840-8).
+   
+   <LI><I>"IIIMP - Platform Independent Input Method for Internet and
+   Java,"</I> Proc. Twelfth International Unicode/ISO 10646
+   Conference, Unicode Consortium.
+</UL>
+
+<P><!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE="3" NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%">
+   <TR>
+      <TD VALIGN=top>
+         <P><FONT
+         SIZE="-2"><A HREF="../../relnotes/SMICopyright.html">Copyright
+         &copy;</A></FONT><FONT SIZE="-2"> 1995-99 </FONT><FONT
+         SIZE="-2"><A HREF="http://www.sun.com/">Sun Microsystems,
+         Inc.</A></FONT><FONT SIZE="-2"> All Rights Reserved.</FONT>
+         </P>
+         
+         <P><FONT SIZE="-1">Please send comments to: </FONT><FONT
+         SIZE="-1"><A HREF="mailto:java-intl@java.sun.com">java-intl@java.sun.com</A></FONT><FONT
+         SIZE="-1"> </FONT>
+      </TD><TD VALIGN=top align=RIGHT>
+         <P ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif"
+         ALT="Sun" WIDTH=64 HEIGHT=30 BORDER=0 ALIGN=bottom><BR>
+         
+         <I><FONT SIZE="+1">Java Software</FONT></I><FONT SIZE="+1">
+         </FONT>
+      </TD></TR>
+</TABLE></P>
+</BODY>
+</HTML>

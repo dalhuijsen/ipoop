@@ -1,0 +1,525 @@
+<HTML>
+<HEAD>
+<title>
+JNDI/RMI Registry Service Provider 
+</title>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077
+ALINK=#ff0000>
+<hr SIZE=3 NOSHADE WIDTH="100%">
+<center>
+
+<h1>
+RMI Registry Service Provider for the 
+<br>
+Java Naming and Directory Interface<font size=4><sup>TM</sup></font>
+(JNDI)
+</h1>
+</center>
+<hr SIZE=3 NOSHADE WIDTH="100%">
+<P><FONT SIZE=-1>Please send feedback to 
+<a href="mailto:jndi@java.sun.com">jndi@java.sun.com</a></FONT>
+<P>
+<P><I>Table of Contents</I>
+<UL>
+<LI>
+<A HREF="#INTRO">Introduction</A></LI>
+
+<LI>
+<A HREF="#PROP">Environment Properties</A></LI>
+
+<LI>
+<A HREF="#NAME">Names</A></LI>
+
+<LI>
+<A HREF="#RMI">RMI URLs</A></LI>
+   
+<LI>
+<A HREF="#FORM">RMI URL Format</A></LI>
+
+<LI>
+<A HREF="#MAP">API Mapping</A></LI>
+
+<LI>
+<A HREF="#BIND">Bindings</A></LI>
+
+<LI>
+<A HREF="#USAGE">Usage Examples</A></LI>
+
+<LI>
+<A HREF="#SEC">Security Considerations</A></LI>
+
+</UL>
+<P>
+<HR>
+<P>
+
+<A NAME="INTRO">
+
+<h2>Introduction</h2>
+<p>
+The RMI registry service provider allows JNDI applications to access
+remote objects registered with the RMI registry.  Given the location
+of a registry, the provider will create a naming context with bindings
+for the objects registered there.  Such a context may be bound into
+another JNDI-accessible namespace (such as LDAP, for example).
+References to individual remote objects may likewise be bound into
+another namespace.
+<p>
+A key benefit of binding registry contexts into other namespaces is
+location-independent access to remote objects:  the RMI clients do not
+need to know the registry's host name or port number.  RMI servers can
+take advantage of this to advertise their services to potential
+clients.  In addition, remote objects can be linked into the same
+enterprise directory that is used to access information about people,
+organizations, and network resources.
+<p>
+With this service provider installed, JNDI subsumes the functionality
+of the <tt>java.rmi.Naming</tt> class.
+<p>
+<p>
+This document describes the features of the RMI registry service provider.
+<hr>
+<p>
+<A NAME="PROP">
+<h2>Environment Properties</h2>
+<p>
+The following JNDI environment properties are used by the RMI registry
+service provider.
+See the 
+<a href="../../api/javax/naming/InitialContext.html#ENVIRONMENT">JNDI
+documentation</a>
+for a 
+description of how properties are initialized using the environment 
+properties, system properties, applet parameters, and resource files.
+
+<p>
+<a name=INITPROP><b><pre>java.naming.factory.initial</pre></b></a>
+<blockquote>
+    This property is used to select the registry service provider as
+    the initial context.  It is not used by the provider itself.
+    It specifies the class name of the initial context factory for
+    the provider.
+<p>
+    For example:
+<p>
+<blockquote>
+<pre>
+env.put(Context.INITIAL_CONTEXT_FACTORY,
+    "com.sun.jndi.rmi.registry.RegistryContextFactory");
+</pre>
+</blockquote>
+<p>
+    This property is used in conjunction with the
+    <a href=#URLPROP><tt>java.naming.provider.url</tt> property</a>.
+    This property must be set if you are using the
+    registry as the initial context. The only exception is 
+    if you supply only URLs to the initial context, in which case, 
+    you don't need to specify this property. See 
+    <a href="#RMI">RMI URLs</a> for details.
+
+</blockquote>
+<a name=URLPROP><b><pre>java.naming.provider.url</pre></b></a>
+<blockquote>
+    This property specifies the location of the registry when the
+    registry is being used as the initial context.  It's value is an
+    RMI URL with no object name component 
+    (see <a href="#FORM">RMI URL Format</a> below).
+<p>
+    For example:
+<p>
+<blockquote>
+<pre>
+env.put(Context.PROVIDER_URL, "rmi://server:1099");
+</pre>
+</blockquote>
+<p>
+    The default value of this property is "rmi:", signifying a registry
+    running on port 1099 of the local host.
+<p>
+    This property is used in conjunction with the
+    <a href=#INITPROP><tt>java.naming.factory.initial</tt> property</a>.
+
+</blockquote>
+
+<b><pre>java.naming.factory.state</pre></b>
+
+<blockquote>
+    A colon-separated list of the fully qualified class names
+    of state factory classes used to get an object's state for storing
+    given the object itself. You can use this mechanism to transform
+    an object into forms that can be stored into the registry.
+    The RMI registry service provider supports storing <tt>java.rmi.Remote</tt>,
+    <tt>javax.naming.Reference</tt>, and <tt>javax.naming.Referenceable</tt> objects.
+    See 
+<a href="../../api/javax/naming/spi/NamingManager.html#getStateToBind(java.lang.Object, javax.naming.Name, javax.naming.Context, java.util.Hashtable)">
+<tt>javax.naming.spi.NamingManager.getStateToBind()</tt></a> for details.
+</blockquote>
+
+<b><pre>java.naming.factory.object</pre></b>
+
+<blockquote>
+
+    A colon-separated list of the fully qualified class names
+    of object factory classes for transforming objects read from the registry.
+    You can use this mechanism to transform an object into forms expected
+    by the application. See
+<a href="../../api/javax/naming/spi/NamingManager.html#getObjectInstance(java.lang.Object, javax.naming.Name, javax.naming.Context, java.util.Hashtable)">
+<tt>javax.naming.spi.NamingManager.getObjectInstance()</tt></a> for details.
+</blockquote>
+
+<b><pre>java.naming.rmi.security.manager</pre></b>
+<blockquote>
+    This property, when set to any value, indicates that the provider
+    should attempt to install the <tt>RMISecurityManager</tt>.  See the
+    <a href="#SEC">Security Considerations</a> section below.
+</blockquote>
+<hr>
+<p>
+<A NAME="NAME">
+<h2>Names</h2>
+<p>
+
+The RMI registry supports a flat namespace.  Since there is no
+hierarchy, every name is atomic.  Each name may be composed of any
+characters, and case is significant.
+<p>
+Names are passed as arguments to the methods of a registry context,
+and are returned as the results of those methods, either as 
+<tt><a href="../../api/javax/naming/Name.html">Name</a></tt>
+objects or as strings.  When a <tt>Name</tt> object is used, it should have a
+single component whose value is the atomic name that will be passed on
+to the registry.  When a string is used as a name, it is interpreted
+as the string representation of a composite name.  So if <tt>ctx</tt> is a
+registry context, for example, then the following two unbind
+operations are equivalent:
+<blockquote><pre>
+String name = ...
+ctx.unbind(name);
+ctx.unbind(new CompositeName(name));
+</pre></blockquote>
+
+Care must be taken with names containing any of the four
+meta-characters that are treated specially during the parsing of
+composite names:  '/', '\\', '"', and '\''.  These characters must
+be properly escaped or quoted.  The atomic name <em>X/Y</em>, for example,
+may be represented as the composite name <em>X\/Y</em> so as not to be
+mistaken for a two-component name with <em>X</em> and <em>Y</em> as its components.
+See <a href="../../api/javax/naming/CompositeName.html"><tt>CompositeName</tt></a> for more information.
+<hr>
+<p>
+<A NAME="RMI">
+<h2>RMI URLs</h2>
+<p>
+JNDI provides support for resolving URLs that name objects.  The
+registry service provider allows RMI URLs to be used as names in this
+manner.  This provides a generalization of the <tt>java.rmi.Naming</tt>
+functionality, only using the more general JNDI interface.
+<p>
+The class <tt>com.sun.jndi.url.rmi.rmiURLContextFactory</tt> implements
+a URL context factory for RMI URLs.  This allows an RMI URL to be passed
+as a name to the default JNDI initial context.
+<hr>
+<p>
+<A NAME="FORM">
+<h2>RMI URL Format</h2>
+<p>
+The format of an RMI URL is one of the following:
+<pre>
+   rmi://[host][:port][/[object]]
+
+   rmi:[/][object]
+</pre>
+If the object name is absent, then the URL names the registry at the
+given host and port.  Otherwise, it names the remote object registered
+at that registry under the name provided.
+<p>
+If the host is omitted, the local host is assumed.  If the port
+is omitted, the default registry port 1099 is assumed.
+<hr>
+<p>
+<A NAME="MAP">
+<h2>API Mapping</h2>
+<p>
+
+The registry service provider implements the <tt>java.naming.Context</tt> and 
+<tt>java.naming.Referenceable</tt>
+interfaces.  <tt>Context</tt> and <tt>Referenceable</tt> methods are
+mapped onto registry operations as described below.
+
+<b><pre>
+lookup()
+lookupLink()
+</pre></b>
+<blockquote>
+    The <tt>java.rmi.Registry.lookup()</tt> method is called.  If the returned
+    object is a wrapper around a <tt>javax.naming.Reference</tt>, 
+    the referenced object is
+    created using <tt>javax.naming.spi.NamingManager.getObjectInstance()</tt>.  
+    JNDI links
+    are not currently supported.
+</blockquote>
+
+<b><pre>bind()</pre></b>
+<blockquote>
+    The <tt>java.rmi.Registry.bind()</tt> method is called.  State factories are
+    first consulted through <tt>javax.naming.spi.NamingManager.getStateToBind()</tt>.  The
+    object being bound must be of type <tt>java.rmi.Remote</tt>,
+    <tt>javax.naming.Reference</tt>, or <tt>javax.naming.Referenceable</tt>.  
+    If the object is a
+    <tt>javax.naming.Reference</tt> or <tt>javax.naming.Referenceable</tt>, 
+    its reference is wrapped in a <tt>Remote</tt> wrapper and then bound 
+    (see <a href="#BIND">Binding Objects into the Registry</a> below).
+</blockquote>
+
+
+<b><pre>rebind()</pre></b>
+<blockquote>
+    The <tt>java.rmi.Registry.rebind()</tt> method is called.  Objects are
+    otherwise treated as for the JNDI <tt>bind()</tt> operation.
+</blockquote>
+
+<b><pre>unbind()</pre></b>
+<blockquote>
+    The <tt>java.rmi.Registry.unbind()</tt> method is called.
+</blockquote>
+
+<b><pre>rename()</pre></b>
+<blockquote>
+    This method is implemented as a sequence of JNDI operations:
+    <tt>lookup()</tt>, <tt>bind()</tt>, <tt>unbind()</tt>.  The sequence
+    is not performed atomically.
+</blockquote>
+
+<b><pre>list()</pre></b>
+<blockquote>
+    The <tt>java.rmi.Registry.list()</tt> method is called.  As this provides no
+    information about the types of the bound objects, each
+    <tt>javax.naming.NameClassPair</tt> returned has the generic
+    <tt>java.lang.Object</tt> as its class name.
+</blockquote>
+
+<b><pre>listBindings()</pre></b>
+<blockquote>
+    The <tt>java.rmi.Registry.list()</tt> method is called.  As each 
+    <tt>javax.naming.Binding</tt> is read from the resulting enumeration,
+    <tt>java.rmi.Registry.lookup()</tt> is called and passed through
+    <tt>javax.naming.spi.NamingManager.getObjectInstance()</tt>. 
+</blockquote>
+
+<b><pre>createSubcontext()
+destroySubcontext()</pre></b>
+<blockquote>
+    These operations are not supported.
+</blockquote>
+
+<b><pre>getNameParser()</pre></b>
+<blockquote>
+    Returns a name parser for case-sensitive atomic names.
+</blockquote>
+
+<b><pre>getNameInNamespace()</pre></b>
+<blockquote>
+    Returns the empty string (the name of the registry).
+</blockquote>
+
+<b><pre>composeName()</pre></b>
+<blockquote>
+    Returns the composition of the two names.
+</blockquote>
+
+<b><pre>addToEnvironment()</pre></b>
+<blockquote>
+    The specified property is added to the context's environment.
+    If the <tt>java.naming.rmi.security.manager</tt> property is added,
+    the provider will attempt to install the default RMI security manager
+    (see <a href="#SEC">Security Considerations</a>). Other properties may be
+    added or changed in the environment, but have no additional effect on
+    the context.
+</blockquote>
+
+<b><pre>removeFromEnvironment()</pre></b>
+<blockquote>
+    The specified property is removed from the context's environment.
+    The context is otherwise unaffected.
+</blockquote>
+
+<b><pre>close()</pre></b>
+<blockquote>
+    Clears internal state used by the provider, but otherwise has
+    no immediate effect.
+</blockquote>
+
+<b><pre>getReference()</pre></b>
+<blockquote>
+    If this context was constructed from a reference, a clone of
+    that reference is returned.  Otherwise a new reference for the
+    context is returned, providing that the host name can be
+    determined and is not "localhost" 
+    (see <a href="#BIND">Binding Registry Contexts and Remote Objects</a>
+    below).
+</blockquote>
+
+<hr>
+<p>
+<A NAME="BIND">
+<h2>Bindings</h2>
+<p>
+
+<b>Binding Objects into the Registry</b>
+<p>
+An object may be bound into a registry context if it implements the
+<tt>java.rmi.Remote</tt> interface.  An object may also be bound if it is
+a JNDI Reference object, or if it implements the <tt>Referenceable</tt>
+interface (in which case the corresponding reference will be bound in
+place of the object itself).
+<p>
+
+<b>Binding Registry Contexts and Remote Objects</b>
+<p>
+Each RMI registry context implements the <tt>Referenceable</tt> interface.
+It may therefore be bound into any JNDI-accessible namespace that can
+store <tt>Referenceable</tt> objects.  A reference to an individual remote
+object that is registered with a registry may also be constructed,
+allowing that object to be bound into another namespace.
+<p>
+The class <tt>com.sun.jndi.rmi.registry.RegistryContextFactory</tt> 
+implements the object factory that converts registry references into the
+corresponding registry contexts or remote objects.
+<p>
+For a registry context to be constructed, the registry's URL must be
+determined.  This URL may come from the
+<tt>java.naming.provider.url</tt> property, or may be passed as a name
+to the initial context, or may be embedded in a registry reference.  If
+the URL contains no host name or uses the host name "localhost", then the
+registry context's <tt>getReference()</tt> method is unable to return a
+reference for the context.  Such a registry context, therefore, cannot be
+bound into another namespace.
+<p>
+
+<b>Registry Reference Format</b>
+<p>
+A JNDI reference for an RMI registry contains
+a list of string addresses (class <tt>StringRefAddr</tt>), each
+tagged with the type "URL".  Each address contains an RMI URL locating
+either a registry, or a remote object registered with a registry 
+(see <a href="#FORM">RMI URL Format</a> above).
+<p>
+When multiple URLs appear within a single reference, each
+represents an alternative address for the same logical resource.  The
+order of the addresses is not significant.  Addresses not of class
+<tt>StringRefAddr</tt>, or not of address type "URL", are ignored.
+<hr>
+<p>
+
+<A NAME="USAGE">
+<h2>Usage Examples</h2>
+<p>
+
+<b>Example 1</b>
+<p>
+To create an initial context that accesses a registry, set the
+properties <tt>java.naming.factory.initial</tt> and
+<tt>java.naming.provider.url</tt> as described in 
+<a href="#PROP">Environment Properties</a> above.  Then the names stored
+in the registry, for example, may be listed as follows:
+<blockquote>
+<pre>
+Context ictx = new InitialContext(env);
+NamingEnumeration enum = ictx.list("");
+</pre>
+</blockquote>
+
+<p>
+<b>Example 2</b>
+<p>
+Instead of using the properties as above, you may pass an RMI URL
+as a name to resolve in the default initial context:
+<blockquote>
+<pre>
+Context registryCtx = (Context)ictx.lookup("rmi://host");
+</pre>
+</blockquote>
+
+<p>
+<b>Example 3</b>
+<p>
+A registry context may be bound into another JNDI-accessible
+namespace.  To bind <tt>registryCtx</tt> (from the preceding example) into an
+LDAP directory, for example:
+<blockquote>
+<pre>
+Context ldapCtx = (Context)ictx.lookup("ldap://server/o=sun,c=us");
+ldapCtx.bind("cn=rmi", registryCtx);
+</pre>
+</blockquote>
+
+If the names <em>R1</em> and <em>R2</em> are bound in this registry, then a JNDI
+client browsing the LDAP namespace will see <em>R1</em> and <em>R2</em> beneath the
+<em>cn=rmi</em> entry.
+<p>
+
+<b>Example 4</b>
+<p>
+A remote object that is registered with an RMI registry may be
+bound into another JNDI-accessible namespace by constructing a
+reference for that object.  If the variable <tt>obj</tt> holds the object
+named <em>R1</em> from the preceding examples, it may be bound into an LDAP
+directory as follows:
+<blockquote>
+<pre>
+RefAddr addr = new StringRefAddr("URL", "rmi://host/R1");
+Reference ref = new Reference(obj.getClass().getName(), addr);
+ldapCtx.bind("cn=R1", ref);
+</pre>
+</blockquote>
+<hr>
+<p>
+
+<A NAME="SEC">
+<h2>Security Considerations</h2>
+
+<h4>Security Manager</h4>
+<p>
+The usual security considerations of RMI apply.  For RMI to
+dynamically load classes from a remote server, a security manager must
+first be installed.  This can be done in the same way as it would for
+any other RMI application.  See the 
+<a href="../rmi/spec/rmiTOC.html">
+Java<sup>TM</sup> Remote Method Invocation Specification</a>.  Or, if the
+environment property <tt>java.naming.rmi.security.manager</tt> is passed
+to the provider, then the provider will attempt to install the
+<tt>RMISecurityManager</tt> itself.
+
+<h4>Permissions</h4>
+<p>
+The application using JNDI and the RMI registry provider must be
+granted the following permissions:
+<p>
+<pre>permission java.net.SocketPermission "host[:port]", "connect";</pre>
+<blockquote>
+	For each host/port identified in the <tt>java.naming.provider.url</tt>
+        property and in URL string names supplied to context methods.
+</blockquote>
+<p>
+<pre>permission java.net.SocketPermission "host[:port]", "connect,accept";
+</pre>
+<blockquote>
+	For each host/port identified in the URL strings in 
+        <tt>javax.naming.Reference</tt>s.
+</blockquote>
+<p>
+<pre>permission java.lang.RuntimePermission "setSecurityManager";</pre>
+<blockquote>
+	If using the <tt>java.naming.rmi.security.manager</tt> environment
+        property, which asks the RMI registry provider to install the
+        <tt>RMISecurityManager</tt>.
+</blockquote>
+
+<HR SIZE=3 NOSHADE WIDTH=100%>
+<br><i>Copyright &copy; 1999-2001 Sun Microsystems, Inc., All Rights Reserved.</i> 
+
+</body>
+</html>
+

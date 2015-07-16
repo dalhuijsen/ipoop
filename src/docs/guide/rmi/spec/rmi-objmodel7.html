@@ -1,0 +1,127 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 2 - Distributed Object Model
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-objmodel6.html">PREV</a>
+ | <a href="rmi-objmodel8.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	2.6	</i> Parameter Passing in Remote Method Invocation
+</a></h2>
+
+
+<a name="5102"><!-- --></a>
+<blockquote>
+<a name="2537"><!-- --></a>
+An argument to, or a return value from, a remote object can be any object that is <em>serializable</em>. This includes primitive types, remote objects, and non-remote objects that implement the <code>java.io.Serializable</code> interface. For more details on how to make classes serializable, see the &#34;Java Object Serialization Specification.&#34; Classes, for parameters or return values, that are not available locally are downloaded dynamically by the RMI system. See the section on &#34;<a href="rmi-arch5.html">Dynamic Class Loading</a>&#34; for more information on how RMI downloads parameter and return value classes when reading parameters, return values and exceptions.<p>
+</blockquote>
+<br>
+<h3>
+<a name="2523"><!-- --></a>
+<i>	2.6.1	</i> Passing Non-remote Objects
+</h3>
+
+<blockquote>
+<a name="2524"><!-- --></a>
+A non-remote object, that is passed as a parameter of a remote method invocation or returned as a result of a remote method invocation, is passed by <em>copy</em>; that is, the object is serialized using the object serialization mechanism of the Java platform.<p>
+<a name="3655"><!-- --></a>
+So, when a non-remote object is passed as an argument or return value in a remote method invocation, the content of the non-remote object is copied before invoking the call on the remote object.<p>
+<a name="3393"><!-- --></a>
+When a non-remote object is returned from a remote method invocation, a new object is created in the calling virtual machine.<p>
+</blockquote>
+<br>
+<h3>
+<a name="3404"><!-- --></a>
+<i>	2.6.2	</i> Passing Remote Objects
+</h3>
+
+<blockquote>
+<a name="3728"><!-- --></a>
+When passing an exported remote object as a parameter or return value in a remote method call, the stub for that remote object is passed instead. Remote objects that are not exported will not be replaced with a stub instance. A remote object passed as a parameter can only implement remote interfaces.<p>
+</blockquote>
+<br>
+<h3>
+<a name="4716"><!-- --></a>
+<i>	2.6.3	</i> Referential Integrity
+</h3>
+
+<blockquote>
+<a name="4792"><!-- --></a>
+If two references to an object are passed from one JVM to another JVM in parameters (or in the return value) in a single remote method call and those references refer to the same object in the sending JVM, those references will refer to a single copy of the object in the receiving JVM. More generally stated: within a single remote method call, the RMI system maintains referential integrity among the objects passed as parameters or as a return value in the call.<p>
+</blockquote>
+<br>
+<h3>
+<a name="4795"><!-- --></a>
+<i>	2.6.4	</i> Class Annotation
+</h3>
+
+<blockquote>
+<a name="4796"><!-- --></a>
+When an object is sent from one JVM to another in a remote method call, the RMI system annotates the class descriptor in the call stream with information (the URL) of the class so that the class can be loaded at the receiver. It is a requirement that classes be downloaded on demand during remote method invocation.<p>
+</blockquote>
+<br>
+<h3>
+<a name="4941"><!-- --></a>
+<i>	2.6.5	</i> Parameter Transmission
+</h3>
+
+<blockquote>
+<a name="4947"><!-- --></a>
+Parameters in an RMI call are written to a stream that is a subclass of the class <code>java.io.ObjectOutputStream</code> in order to serialize the parameters to the destination of the remote call. The <code>ObjectOutputStream</code> subclass overrides the <code>replaceObject</code> method to replace each exported remote object with its corresponding stub instance. Parameters that are objects are written to the stream using the <code>ObjectOutputStream</code>&#39;s <code>writeObject</code> method. The <code>ObjectOutputStream</code> calls the <code>replaceObject</code> method for each object written to the stream via the <code>writeObject</code> method (that includes objects referenced by those objects that are written). The <code>replaceObject</code> method of RMI&#39;s subclass of <code>ObjectOutputStream</code> returns the following:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="4977"><!-- --></a>
+If the object passed to <code>replaceObject</code> is an instance of <code>java.rmi.Remote</code> and that object is exported to the RMI runtime, then it returns the stub for the remote object. If the object is an instance of <code>java.rmi.Remote</code> and the object is <em>not</em> exported to the RMI runtime, then <code>replaceObject</code> returns the object itself. A stub for a remote object is obtained via a call to the method <code>java.rmi.server.RemoteObject.toStub</code>.
+</li>
+<li>
+<a name="4980"><!-- --></a>
+If the object passed to <code>replaceObject</code> is not an instance of <code>java.rmi.Remote</code>, then the object is simply returned.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="4981"><!-- --></a>
+RMI&#39;s subclass of <code>ObjectOutputStream</code> also implements the <code>annotateClass</code> method that annotates the call stream with the location of the class so that it can be downloaded at the receiver. See the section &#34;<a href="rmi-arch5.html">Dynamic Class Loading</a>&#34; for more information on how <code>annotateClass</code> is used.<p>
+<a name="4985"><!-- --></a>
+Since parameters are written to a single <code>ObjectOutputStream</code>, references that refer to the same object at the caller will refer to the same copy of the object at the receiver. At the receiver, parameters are read by a single <code>ObjectInputStream</code>.<p>
+<a name="4996"><!-- --></a>
+Any other default behavior of <code>ObjectOutputStream</code> for writing objects (and similarly <code>ObjectInputStream</code> for reading objects) is maintained in parameter passing. For example, the calling of <code>writeReplace</code> when writing objects and <code>readResolve</code> when reading objects is honored by RMI&#39;s parameter marshal and unmarshal streams.<p>
+<a name="4990"><!-- --></a>
+In a similar manner to parameter passing in RMI as described above, a return value (or exception) is written to a subclass of <code>ObjectOutputStream</code> and has the same replacement behavior as parameter transmission.<p>
+</blockquote>
+
+</ul>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-objmodel6.html">PREV</a>
+ | <a href="rmi-objmodel8.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

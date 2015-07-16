@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Internal Frames</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Internal Frames:
+	   <br>JInternalFrame, JDesktopPane,
+	   and Related Classes</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+   <h2>Internal Frames Invisible By Default</h2>
+
+      In v 1.2 internal frames were visible by default;
+      now they start out invisible.
+      To make a JInternalFrame appear onscreen,
+      use this code:
+
+      <blockquote>
+      <pre>
+      anInternalFrame.setVisible(true);
+      </pre>
+      </blockquote>
+
+      <p>
+      Why the change? The rule for default visibility in Swing is that only
+      top-level components, such as JFrame and JDialog, have
+      default visibility <tt>false</tt>; the remaining components have default
+      visibility <tt>true</tt>. This is so that once a <tt>JFrame</tt> is
+      constructed, one call to <tt>setVisible(true)</tt> on the JFrame will
+      show it and all of its contents.
+
+      <p>
+      Although JInternalFrame is not really a top-level
+      component, it needs to behave like a JFrame in many ways. In
+      particular, it needs to fire JInternalFrame events corresponding to
+      Window events on JFrames. One such event,
+      <tt>INTERNAL_FRAME_OPENED</tt>, is
+      fired in response to the initial visibility change from <tt>false</tt>
+      to <tt>true</tt>; with no such change prior to version 1.3, the event
+      wasn't being fired.
+      <p>
+      To fix this bug, and to make JInternalFrame more compatible
+      with its heavyweight cousin JFrame, the default visibility of
+      JInternalFrame changed to <tt>false</tt> beginning with version 1.3
+      of the Java 2 Platform. 
+      Therefore, to show an internal frame, just call
+      <tt>setVisible(true)</tt> after adding the frame to its parent.
+
+
+   <h2>Added JInternalFrame setLayer(int layer) Method</h2>
+
+      JInternalFrame's setLayer() method takes an int, so that
+      the beans introspector recognizes this as a property.
+<P>
+See: 
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JInternalFrame.html#setLayer(int)">public void setLayer(int layer)</a>
+</tt>
+</ul>
+
+
+    <h2>Added protected BasicInternalFrameUI.uninstallListeners() Method</h2>
+
+    Previously BasicInternalFrameTitlePane did not remove
+    its listeners when no longer needed (thus becoming a memory
+    leak). This behavior is now provided.
+    <p>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/plaf/basic/BasicInternalFrameUI.html#uninstallListeners()">protected void uninstallListeners()</a>
+<li><a href="../../../api/javax/swing/plaf/basic/BasicInternalFrameUI.html#installListeners()">protected void installListeners()</a>
+</tt>
+</ul>
+
+
+ <h2>JInternalFrame "closed" Property</h2>
+<ol>
+<li>The default setting for defaultCloseOperation has been changed
+from HIDE_ON_CLOSE to DISPOSE_ON_CLOSE. This change is provided 
+so that clients who want to use only the
+vetoable property mechanism (which is the simplest, and which we
+encourage) can just do so, without having to set
+defaultCloseOperation.
+
+<li>JInternalFrame's doDefaultCloseAction method has been changed from
+private to public. This is because the UI has to be able to invoke
+it. In the past, the UI just invoked JInternalFrame's public setClosed
+method, which called doDefaultCloseAction. But setClosed is used for
+programmatically closing frames, and thus should not call
+doDefaultCloseAction, because defaultCloseOperation is defined only
+for user-initiated close operations.
+</ol>
+<P>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JInternalFrame.html#doDefaultCloseAction()">public void doDefaultCloseAction()</a>
+</tt>
+</ul>
+
+
+
+    <h2>JInternalFrame Normal Bounds</h2>
+Getting the normal dimensions of
+an internal frame is now possible
+through a new method to JInternalFrame:
+getNormalBounds()
+<P>
+See:
+<tt>
+<ul>
+   <li><a href="../../../api/javax/swing/JInternalFrame.html#getNormalBounds()"> public Rectangle getNormalBounds()</a>
+    <li><a href="../../../api/javax/swing/JInternalFrame.html#setNormalBounds(java.awt.Rectangle)">public void setNormalBounds(Rectangle r)</a>
+</ul>
+    </tt>
+
+
+
+    <h2>Added getFocusOwner Method to JInternalFrame</h2>
+
+
+New method for JInternalFrame:
+
+      <tt>
+<ul>
+<li>
+     <a href="../../../api/javax/swing/JInternalFrame.html#getFocusOwner()">public Component getFocusOwner()</a>
+</ul>
+     </tt>
+
+
+      <h2>Added getInternalFrame method to InternalFrameEvent</h2>
+
+New method to InternalFrameEvent:
+
+        <tt>
+<ul>
+<li>
+    <a href="../../../api/javax/swing/event/InternalFrameEvent.html#getInternalFrame()">public JInternalFrame getInternalFrame()</a>
+</ul>
+         </tt>
+
+        <h2>MetalInternalFrameTitlePane Class is now public</h2>
+
+<p>
+See:
+<ul>
+<li> <tt><a href="../../../api/javax/swing/plaf/metal/MetalInternalFrameTitlePane.html">MetalInternalFrameTitlePane</a></tt>
+</ul>
+
+        <h2>Added restoreSubcomponentFocus Method to JInternalFrame</h2>
+
+New method to JInternalFrame:
+
+<ul>
+        <tt>
+<li><a href="../../../api/javax/swing/JInternalFrame.html#restoreSubcomponentFocus()">public void restoreSubcomponentFocus()</a>
+</tt>
+</ul>
+
+        <h2>Added setDragMode Method to JDesktopPane</h2>
+
+New method to JDesktopPane:
+
+<ul>
+        <tt>
+<li><a href="../../../api/javax/swing/JDesktopPane.html#setDragMode(int)">public void setDragMode(int dragMode)</a>
+</tt>
+</ul>
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

@@ -1,0 +1,377 @@
+h36560
+s 00105/00031/00323
+d R 1.7 02/03/16 13:35:44 dkramer 8 7
+c Made major revisions to include AbstractExecutableMemberTaglet and AbstractInlineTag
+c 
+e
+s 00026/00000/00328
+d R 1.6 01/10/14 22:34:03 dkramer 7 6
+c Added warnings and errors
+c 
+e
+s 00021/00000/00307
+d R 1.5 01/09/24 15:56:46 dkramer 6 5
+c Added a commented-out paragraph about links to standard taglets
+c 
+e
+s 00013/00040/00294
+d R 1.4 01/09/20 17:08:02 dkramer 5 4
+c Fixed copyright date
+c 
+e
+s 00034/00029/00300
+d R 1.3 01/09/20 16:45:41 dkramer 4 3
+c Updated with lots of input from Jamie
+c 
+e
+s 00000/00000/00329
+d D 1.2 01/09/18 20:45:32 dkramer 3 1
+c Added the bulk of the documentation
+e
+s 00000/00000/00000
+d R 1.2 70/01/01 00:00:02 Codemgr 2 1
+c SunPro Code Manager data about conflicts, renames, etc...
+c Name history : 1 0 j2se/1.4/docs/tooldocs/javadoc/taglet/overview.html
+e
+s 00329/00000/00000
+d D 1.1 01/09/18 20:43:47 dkramer 1 0
+c CodeManager Uniquification: j2se/1.4.1/docs/tooldocs/javadoc/taglet/overview.html
+c 
+e
+u
+U
+f b 
+f e 0
+t
+T
+I 1
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Taglet Overview</title>
+  </head>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+<TABLE BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD>
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+<td>
+<CENTER>
+      <h1>Taglet Overview</h1>
+</CENTER>
+</td>
+
+<TD WIDTH="52">
+&nbsp;
+</TD>
+
+</TR>
+</table>
+
+<!-- Body text begins here -->
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#basics">The Basics</a>
+<li><a href="#standaloneexample">Example - A Standalone Taglet</a>
+<li><a href="#inlineexample">Example - An Inline Taglet</a>
+</ul>
+
+<a name="basics"></a>
+<h2>The Basics</h2>
+
+Taglets are programs written in the Java<font size="-2"><sup>TM</sup>
+</font> programming language that implement the 
+
+<ul>
+  <li><a href="Taglet.html">Taglet API</a>
+</ul>
+
+A taglet modifies or redirects the text argument of a custom tag.  
+A taglet can also override a standard tag.
+<p>
+
+Taglets are a variation on the 
+<a href="../../solaris/javadoc.html#tag"><code>-tag</code></a> 
+option.  When you use the <code>-tag</code> option, it generates
+default HTML formatting that is similar to that generated 
+for <code>@return</code>.  
+<p>
+
+Taglets enable you to customize the text that is generated, as shown in the
+examples below.
+<p>
+
+Here are the basic steps you need to follow to create and use your own taglet:
+<ol>
+  <li>Write the Java program that constitutes your taglet. Your program 
+      should import the following:
+
+<pre>
+   import com.sun.tools.doclets.*;
+   import com.sun.tools.doclets.standard.*;
+   import com.sun.javadoc.*;
+   import java.util.*;
+</pre>
+
+      The Taglet class resides in com.sun.tools.doclets.
+      The ? class is in com.sun.tools.doclets.standard.
+      The ? class is part of the Doclet API, in com.sun.javadoc.*
+      The ? class is part of java.util.
+<p>
+
+  <li>Your program must implement the following method:
+<pre>
+    public static void register(Map tagletMap)
+</pre>
+
+  <li>Compile your doclet. You can use the javac compiler in the Java 2 SDK.
+      The required class files are in the <code>lib/tools.jar</code> file in the 
+      SDK.  When you compile a taglet, the <code>tools.jar</code> must be on 
+      the class path. You can use the <code>-classpath</code> option on javac 
+      for this purpose.  For the first example below:
+<pre>
+   javac -classpath C:\jdk1.4\lib ToDoTaglet.java
+</pre>
+<p>
+
+  <li>Run the javadoc tool using the <code>-taglet</code> and 
+      <code>-tagletpath</code> options.  For example, if your taglet 
+      class file is defined to be in package <code>com.sun</code> and 
+      is stored in <code>C:\bin\com\sun</code>, then you should set 
+      tagletpath to <code>C:\bin</code>:
+<pre>
+      javadoc -taglet ToDoTaglet -tagletpath C:\bin com.package1
+</pre>
+</ol>
+<p>
+
+The following are examples of standalone and inline taglets.
+
+
+<!-- ====================== STANDALONE TAG EXAMPLE ======================= -->
+
+<a name="standaloneexample"></a>
+<h2>Example - A Standalone Taglet</h2>
+
+<blockquote>
+
+The source code for an example of a 
+<a href="../../solaris/javadoc.html#standalonetags">standalone</a> 
+taglet implementing <code>@todo</code> is included at:
+<ul>
+  <li><code><a href="ToDoTaglet.java">ToDoTaglet.java</a></code>
+</ul>
+
+The corresponding class file <code>ToDoTaglet.class</code> is already 
+compiled and saved in the same directory as this source file.
+<p>
+
+This taglet formats the output for the <code>@todo</code> tag.  
+A doc comment containing the following tag:
+
+<pre>
+    /**
+     * @todo Fix this!
+     */
+</pre>
+
+would be output in HTML as follows:
+
+<blockquote>
+<DL>
+  <DT><B>To Do:</B>
+    <DD><table cellpadding=2 cellspacing=0><tr><td bgcolor="yellow">Fix this!
+  </td></tr></table></DD>
+</DL>
+</blockquote>
+<p>
+
+<H3>Source Code</H3>
+
+Let's look at the source code.  To name the tag and define the header text,
+define two private fields:
+
+<pre>
+    private String NAME = "todo";
+    private String HEADER = "To Do:";
+</pre>
+
+To make this a standalone tag rather than an inline tag,
+you set <code>isInlineTag</code> to return false:
+
+<pre>
+    public boolean isInlineTag() {
+        return false;
+    }
+</pre>
+
+There are other methods <code>inField</code>, <code>inMethod</code>,
+<code>inType</code>, <code>inPackage</code> and <code>inOverview</code>
+that you specify to determine where in the source code this tag can 
+be used.
+<p>
+
+The <code>toString(Tag)</code> method determines how the text is 
+inserted into the output when a single <code>{@todo}</code> tag
+is encountered.  This code creates a bold heading followed by
+a table with a yellow background that contains the text (specified
+by <code>tag.text()</code>).
+
+<pre>
+    public String toString(Tag tag) {`
+        return "&lt;DT&gt;&lt;B&gt;" + HEADER + "&lt;/B&gt;&lt;DD&gt;"
+               + "&lt;table cellpadding=2 cellspacing=0&gt;&lt;tr&gt;&lt;td bgcolor=\"yellow\"&gt;"
+               + tag.text() 
+               + "&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/DD&gt;\n";
+    }
+</pre>
+
+Similarly, the <code>toString(Tag[])</code> method (which takes an array
+of tags) determines how the text is inserted into the output when multiple 
+<code>{@todo}</code> tags are encountered. 
+
+</blockquote>
+
+
+<!-- ====================== INLINE TAG EXAMPLE ======================= -->
+
+<a name="inlineexample"></a>
+<h2>Example - An Inline Taglet</h2>
+
+<blockquote>
+
+The source code for an example of a 
+<a href="../../solaris/javadoc.html#inlinetags">inline</a> 
+taglet implementing <code>{@underline}</code> is included at:
+<ul>
+  <li><code><a href="UnderlineTaglet.java">UnderlineTaglet.java</a></code>
+</ul>
+
+The corresponding class file <code>UnderlineTaglet.class</code> is already 
+compiled and saved in the same directory as this source file.
+<p>
+
+This taglet formats the output for the <code>{@underline}</code> tag.  
+A doc comment containing the following tag:
+
+<pre>
+    /**
+     * Be sure to insert the value at the {@underline start} of the array.
+     */
+</pre>
+
+would be output in HTML as follows:
+
+<blockquote>
+  Be sure to insert the value at the <u>start</u> of the array.
+</blockquote>
+<p>
+
+
+<H3>Source code</H3>
+
+
+Let's look at how this source code differs from the previous
+example.  Of course the tag name is different (and inline tags
+have no heading, so none is defined):
+<pre>
+    private String NAME = "underline";
+</pre>
+
+To define this as an inline tag rather than a  standalone tag,
+you set <code>isInlineTag</code> to return true:
+
+<pre>
+    public boolean isInlineTag() {
+        return true;
+    }
+</pre>
+<p>
+
+The methods <code>inField</code>, <code>inMethod</code>,
+<code>inType</code>, <code>inPackage</code> and <code>inOverview</code>
+must be set to false for inline tags, because, by definition, inline tags can be used
+in any of these places.  <font color=red><b>REWRITE THIS SENTENCE BASED ON JAMIE'S INPUT</font></b>
+<p>
+
+The <code>toString(Tag)</code> method determines how the text is 
+inserted into the output when a single <b><font color=red>SINGLE??</font></b> <code>{@underline}</code> tag
+is encountered.  This code creates surrounds the text with the HTML 
+underline tags <code>&lt;ul&gt;</code> and <code>&lt;/ul&gt;</code>.
+
+<pre>
+    public String toString(Tag tag) {
+        return "&lt;u&gt;" + tag.text() + "&lt;/u&gt;";
+    }
+</pre>
+
+Similarly, the <code>toString(Tag[])</code> method (which takes an array
+of tags) determines how the text is inserted into the output when multiple 
+<code>{@underline}</code> tags are encountered. <b><font color=red>I THINK THIS METHOD
+IS NOT CALLED WHEN isInlineTag() IS TRUE</font></b>.
+<p>
+
+</blockquote>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-98
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT>
+</P>
+
+
+
+
+
+   <FONT SIZE="-1">Please send comments to: <a href="mailto:javadoc-tool@sun.com">javadoc-tool@sun.com</a> 
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+  </body>
+</html>
+E 1

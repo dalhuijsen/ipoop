@@ -1,0 +1,29 @@
+/* CSS for KSearch Client Side by KScripts */
+
+/* Search Top Frame */
+.top_frame { font-size: 12px; font-weight: bold; text-decoration: none; color: #000000;font-family: Verdana; }
+
+/* Search Results */
+.results { font-size: 12px; font-weight: bold; text-decoration: none; color: #000000;font-family: Verdana; }
+
+/* Search Help Page */
+.help { font-size: 12px; font-weight: bold; text-decoration: none; color: #000000;font-family: Verdana; }
+.helpsmall { font-size: 10px; font-weight: bold; text-decoration: none; color: #000000;font-family: Verdana; }
+
+/* Copyright */
+.copyright { font-size: 10px; font-weight: bold; text-decoration: none; color: #000000;font-family: Verdana; }
+
+/* Search links */
+A.search_results:link { font-size: 12px; font-weight: bold; text-decoration: none;color: #006699;font-family: Verdana; }
+A.search_results:visited { font-size: 12px; font-weight: bold; text-decoration: none;color: #006699;font-family: Verdana; }
+A.search_results:active { font-size: 12px; font-weight: bold; text-decoration: underline; color: #006699;font-family: Verdana; }
+A.seach_results:hover { font-size: 12px; text-decoration: underline; color: #006699;font-family: Verdana; }
+
+/* Regular links */
+A:link { font-size: 12px; font-weight: bold; text-decoration: none;color: #006699;font-family: Verdana; }
+A:visited { font-size: 12px; font-weight: bold; text-decoration: none;color: #006699;font-family: Verdana; }
+A:active { font-size: 12px; font-weight: bold; text-decoration: underline; color: #006699;font-family: Verdana; }
+A:hover { font-size: 12px; text-decoration: underline; color: #006699;font-family: Verdana; }
+
+H4 { font-weight: bold; text-decoration: none; color: #000000;font-family: Verdana; }
+

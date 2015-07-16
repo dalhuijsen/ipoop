@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>appletviewer - The Java Applet Viewer</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+
+<h1>appletviewer - The Java Applet Viewer</h1>
+<blockquote>
+The <b>appletviewer</b> command allows you to run applets outside
+of the context of a World-Wide Web browser.
+</blockquote>
+
+<h2>SYNOPSIS</h2>
+<blockquote>
+<code><b>appletviewer</b></code> [ <a href="appletviewer.html#Options">options</a> ] <I>urls</I> ...</code>
+</blockquote>
+
+<h2>DESCRIPTION</h2>
+<blockquote>
+The <b>appletviewer</b> command connects to the documents or resources
+designated by <i>urls</i> and displays each applet referenced by the
+documents in its own window. Note: if the documents referred to by <i>urls</i>
+do not reference any applets with the <I>OBJECT</I>, <I>EMBED</I>, or <i>APPLET</i> tag, 
+then <b>appletviewer</b> does nothing. For details on the HTML tags that <B>appletviewer</B> 
+supports, see <a href="../appletviewertags.html">AppletViewer Tags</a>.
+<p>
+The Java 2 SDK contains two implementations 
+of the Java virtual machine. <p>
+<b>The Java HotSpot<sup><font size=-2>TM</font></sup> Client VM</b><br>
+The Java HotSpot Client VM is the default virtual machine.  Its use of 
+Java HotSpot technology gives it superior 
+performance as compared with the Classic VM. Unless special command-line 
+options are used to invoke the Classic VM instead (see below), 
+<b>appletviewer</b> will always launch an applet to run on the 
+Client VM.
+<p>
+<b>The Java 2 Classic VM</b><br>
+The Java 2 Classic VM is essentially the same virtual machine 
+implementation as in version 1.2 of the Java 2 SDK. It may 
+be invoked by using the <tt>-classic</tt> command-line option, as 
+in this example:
+<blockquote><pre>
+appletviewer -classic MyApplet.html
+</pre></blockquote>
+</blockquote>
+
+<a name=Options>
+<h2>OPTIONS</h2>
+</a>
+<blockquote>
+
+<dl>
+<dt><b>-debug</b>
+<dd>
+Starts the applet viewer in the Java debugger, <a href=jdb.html><b>jdb</b></a>, thus
+allowing you to debug the applets in the document.
+
+<p>
+<dt><b>-encoding</b><i>&nbsp; &nbsp;encoding name</i>
+<dd>
+Specifies the input HTML file encoding name.
+<p>
+<dt><b>-J</b><i>javaoption</i>
+<dd>
+Passes through the string <i>javaoption</i> as a single argument to the
+Java interpreter which runs the appletviewer.  The argument should not
+contain spaces.  Multiple argument words must all begin with the prefix
+<b>-J</b>, which is stripped.  This is useful for adjusting the
+compiler's execution environment or memory usage.
+
+
+</dl>
+</blockquote>
+
+<!-- PENDING: put in a SEE ALSO link to hotjava after the ADR -->
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+
+
+</body>
+</html>

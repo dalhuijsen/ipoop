@@ -1,0 +1,522 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head profile="http://gmpg.org/xfn/11">
+
+
+<script type="text/javascript" src="/static/js/analytics.js"></script>
+<script type="text/javascript">archive_analytics.values.server_name="wwwb-app14.us.archive.org";archive_analytics.values.server_ms=468;</script>
+<link type="text/css" rel="stylesheet" href="/static/css/banner-styles.css"/>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<title>  Tricks with Enums</title>
+
+<meta name="generator" content="WordPress 3.3.1" /> <!-- leave this for stats -->
+
+<link rel="stylesheet" href="/web/20130419164839cs_/http://chaoticjava.com/wp-content/themes/itheme/style.css" type="text/css" media="all" />
+<link rel="stylesheet" href="/web/20130419164839cs_/http://chaoticjava.com/wp-content/themes/itheme/print.css" type="text/css" media="print" />
+
+<!-- Sidebar docking boxes (dbx) by Brothercake - /web/20130419164839/http://www.brothercake.com/ -->
+<script type="text/javascript" src="/web/20130419164839js_/http://chaoticjava.com/wp-content/themes/itheme/dbx.js"></script>
+<script type="text/javascript" src="/web/20130419164839js_/http://chaoticjava.com/wp-content/themes/itheme/dbx-key.js"></script>
+<link rel="stylesheet" type="text/css" href="/web/20130419164839cs_/http://chaoticjava.com/wp-content/themes/itheme/dbx.css" media="screen, projection" />
+
+<!--[if lt IE 7]>
+<link rel="stylesheet" href="/web/20130419164839/http://chaoticjava.com/wp-content/themes/itheme/ie-gif.css" type="text/css" />
+<![endif]-->
+
+<link rel="alternate" type="application/rss+xml" title="Chaotic Java RSS Feed" href="http://chaoticjava.com/feed/" />
+<link rel="pingback" href="http://chaoticjava.com/xmlrpc.php" />
+
+<link rel="alternate" type="application/rss+xml" title="Chaotic Java &raquo; Tricks with Enums Comments Feed" href="http://chaoticjava.com/posts/tricks-with-enums/feed/" />
+<link rel='stylesheet' id='A2A_SHARE_SAVE-css'  href='/web/20130419164839cs_/http://chaoticjava.com/wp-content/plugins/add-to-any/addtoany.min.css?ver=1.4' type='text/css' media='all' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://chaoticjava.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://chaoticjava.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Help Recover a Post' href='http://chaoticjava.com/posts/help-recover-a-post/' />
+<link rel='next' title='Thanks Lang!' href='http://chaoticjava.com/posts/thanks-lang/' />
+<meta name="generator" content="WordPress 3.3.1" />
+<link rel='canonical' href='http://chaoticjava.com/posts/tricks-with-enums/' />
+<link rel='shortlink' href='http://chaoticjava.com/?p=135' />
+
+<script type="text/javascript"><!--
+var a2a_config=a2a_config||{},wpa2a={done:false,html_done:false,script_ready:false,script_load:function(){var a=document.createElement('script'),s=document.getElementsByTagName('script')[0];a.type='text/javascript';a.async=true;a.src='/web/20130419164839/http://static.addtoany.com/menu/page.js';s.parentNode.insertBefore(a,s);wpa2a.script_load=function(){};},script_onready:function(){if(a2a.type=='page'){wpa2a.script_ready=true;if(wpa2a.html_done)wpa2a.init();}},init:function(){for(var i=0,el,target,targets=wpa2a.targets,length=targets.length;i<length;i++){el=document.getElementById('wpa2a_'+(i+1));target=targets[i];a2a_config.linkname=target.title;a2a_config.linkurl=target.url;if(el)a2a.init('page',{target:el});wpa2a.done=true;}}};a2a_config.tracking_callback=['ready',wpa2a.script_onready];
+//--></script>
+
+<link rel="stylesheet" href="/web/20130419164839cs_/http://chaoticjava.com/wp-content/plugins/wp-syntax/wp-syntax.css" type="text/css" media="screen" />
+<!--[if IE]>
+<style type="text/css">
+.addtoany_list a img{filter:alpha(opacity=70)}
+.addtoany_list a:hover img,.addtoany_list a.addtoany_share_save img{filter:alpha(opacity=100)}
+</style>
+<![endif]-->
+</head>
+<body>
+
+
+<!-- BEGIN WAYBACK TOOLBAR INSERT -->
+<script type="text/javascript" src="/static/js/disclaim-element.js" ></script>
+<script type="text/javascript" src="/static/js/graph-calc.js" ></script>
+<script type="text/javascript" src="/static/jflot/jquery.min.js" ></script>
+<script type="text/javascript">//<![CDATA[
+var __wm = (function(){
+var wbPrefix = "/web/";
+var wbCurrentUrl = "http://chaoticjava.com/posts/tricks-with-enums";
+
+var firstYear = 1996;
+var imgWidth = 500,imgHeight = 27;
+var yearImgWidth = 25,monthImgWidth = 2;
+var displayDay = "19";
+var displayMonth = "Apr";
+var displayYear = "2013";
+var prettyMonths = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var $D=document,$=function(n){return document.getElementById(n)};
+var trackerVal,curYear = -1,curMonth = -1;
+var yearTracker,monthTracker;
+function showTrackers(val) {
+  if (val===trackerVal) return;
+  var $ipp=$("wm-ipp");
+  var $y=$("displayYearEl"),$m=$("displayMonthEl"),$d=$("displayDayEl");
+  if (val) {
+    $ipp.className="hi";
+  } else {
+    $ipp.className="";
+    $y.innerHTML=displayYear;$m.innerHTML=displayMonth;$d.innerHTML=displayDay;
+  }
+  yearTracker.style.display=val?"inline":"none";
+  monthTracker.style.display=val?"inline":"none";
+  trackerVal = val;
+}
+function getElementX2(obj) {
+  var $e=jQuery(obj);
+  return (typeof $e=="undefined"||typeof $e.offset=="undefined")?
+    getElementX(obj):Math.round($e.offset().left);
+}
+function trackMouseMove(event,element) {
+  var eventX = getEventX(event);
+  var elementX = getElementX2(element);
+  var xOff = Math.min(Math.max(0, eventX - elementX),imgWidth);
+  var monthOff = xOff % yearImgWidth;
+
+  var year = Math.floor(xOff / yearImgWidth);
+  var monthOfYear = Math.min(11,Math.floor(monthOff / monthImgWidth));
+  // 1 extra border pixel at the left edge of the year:
+  var month = (year * 12) + monthOfYear;
+  var day = monthOff % 2==1?15:1;
+  var dateString = zeroPad(year + firstYear) + zeroPad(monthOfYear+1,2) +
+    zeroPad(day,2) + "000000";
+
+  $("displayYearEl").innerHTML=year+firstYear;
+  $("displayMonthEl").innerHTML=prettyMonths[monthOfYear];
+  // looks too jarring when it changes..
+  //$("displayDayEl").innerHTML=zeroPad(day,2);
+  var url = wbPrefix + dateString + '/' +  wbCurrentUrl;
+  $("wm-graph-anchor").href=url;
+
+  if(curYear != year) {
+    var yrOff = year * yearImgWidth;
+    yearTracker.style.left = yrOff + "px";
+    curYear = year;
+  }
+  if(curMonth != month) {
+    var mtOff = year + (month * monthImgWidth) + 1;
+    monthTracker.style.left = mtOff + "px";
+    curMonth = month;
+  }
+}
+function hideToolbar() {
+  $("wm-ipp").style.display="none";
+}
+function bootstrap() {
+  var $spk=$("wm-ipp-sparkline");
+  yearTracker=$D.createElement('div');
+  yearTracker.className='yt';
+  with(yearTracker.style){
+    display='none';width=yearImgWidth+"px";height=imgHeight+"px";
+  }
+  monthTracker=$D.createElement('div');
+  monthTracker.className='mt';
+  with(monthTracker.style){
+    display='none';width=monthImgWidth+"px";height=imgHeight+"px";
+  }
+  $spk.appendChild(yearTracker);
+  $spk.appendChild(monthTracker);
+
+  var $ipp=$("wm-ipp");
+  $ipp&&disclaimElement($ipp);
+}
+return{st:showTrackers,mv:trackMouseMove,h:hideToolbar,bt:bootstrap};
+})();//]]>
+</script>
+<style type="text/css">
+body {
+  margin-top:0 !important;
+  padding-top:0 !important;
+  min-width:800px !important;
+}
+</style>
+<div id="wm-ipp" lang="en" style="display:none;">
+
+<div style="position:fixed;left:0;top:0;width:100%!important">
+<div id="wm-ipp-inside">
+   <table style="width:100%;"><tbody><tr>
+   <td id="wm-logo">
+       <a href="/web/" title="Wayback Machine home page"><img src="/static/images/toolbar/wayback-toolbar-logo.png" alt="Wayback Machine" width="110" height="39" border="0" /></a>
+   </td>
+   <td class="c">
+       <table style="margin:0 auto;"><tbody><tr>
+       <td class="u" colspan="2">
+       <form target="_top" method="get" action="/web/form-submit.jsp" name="wmtb" id="wmtb"><input type="text" name="url" id="wmtbURL" value="http://chaoticjava.com/posts/tricks-with-enums" style="width:400px;" onfocus="this.focus();this.select();" /><input type="hidden" name="type" value="replay" /><input type="hidden" name="date" value="20130419164839" /><input type="submit" value="Go" /><span id="wm_tb_options" style="display:block;"></span></form>
+       </td>
+       <td class="n" rowspan="2">
+           <table><tbody>
+           <!-- NEXT/PREV MONTH NAV AND MONTH INDICATOR -->
+           <tr class="m">
+           	<td class="b" nowrap="nowrap">
+		
+		    <a href="/web/20121003033537/http://chaoticjava.com/posts/tricks-with-enums/" title="3 Oct 2012">OCT</a>
+		
+		</td>
+		<td class="c" id="displayMonthEl" title="You are here: 16:48:39 Apr 19, 2013">APR</td>
+		<td class="f" nowrap="nowrap">
+		
+		    <a href="/web/20130520132909/http://chaoticjava.com/posts/tricks-with-enums" title="20 May 2013"><strong>MAY</strong></a>
+		
+                </td>
+	    </tr>
+           <!-- NEXT/PREV CAPTURE NAV AND DAY OF MONTH INDICATOR -->
+           <tr class="d">
+               <td class="b" nowrap="nowrap">
+               
+                   <a href="/web/20121003033537/http://chaoticjava.com/posts/tricks-with-enums/" title="3:35:37 Oct 3, 2012"><img src="/static/images/toolbar/wm_tb_prv_on.png" alt="Previous capture" width="14" height="16" border="0" /></a>
+               
+               </td>
+               <td class="c" id="displayDayEl" style="width:34px;font-size:24px;" title="You are here: 16:48:39 Apr 19, 2013">19</td>
+	       <td class="f" nowrap="nowrap">
+               
+		   <a href="/web/20130520132909/http://chaoticjava.com/posts/tricks-with-enums" title="13:29:09 May 20, 2013"><img src="/static/images/toolbar/wm_tb_nxt_on.png" alt="Next capture" width="14" height="16" border="0" /></a>
+	       
+	       </td>
+           </tr>
+           <!-- NEXT/PREV YEAR NAV AND YEAR INDICATOR -->
+           <tr class="y">
+	       <td class="b" nowrap="nowrap">
+               
+                   <a href="/web/20120414000621/http://chaoticjava.com/posts/tricks-with-enums/" title="14 Apr 2012"><strong>2012</strong></a>
+               
+               </td>
+               <td class="c" id="displayYearEl" title="You are here: 16:48:39 Apr 19, 2013">2013</td>
+	       <td class="f" nowrap="nowrap">
+               
+                   2014
+               
+	       </td>
+           </tr>
+           </tbody></table>
+       </td>
+       </tr>
+       <tr>
+       <td class="s">
+           <a class="t" href="/web/20130419164839*/http://chaoticjava.com/posts/tricks-with-enums" title="See a list of every capture for this URL">53 captures</a>
+           <div class="r" title="Timespan for captures of this URL">11 May 06 - 8 Jun 13</div>
+       </td>
+       <td class="k">
+       <a href="" id="wm-graph-anchor">
+       <div id="wm-ipp-sparkline" title="Explore captures for this URL">
+	 <img id="sparklineImgId" alt="sparklines"
+		 onmouseover="__wm.st(1)" onmouseout="__wm.st(0)"
+		 onmousemove="__wm.mv(event,this)"
+		 width="500"
+		 height="27"
+		 border="0"
+		 src="/web/jsp/graph.jsp?graphdata=500_27_1996:-1:000000000000_1997:-1:000000000000_1998:-1:000000000000_1999:-1:000000000000_2000:-1:000000000000_2001:-1:000000000000_2002:-1:000000000000_2003:-1:000000000000_2004:-1:000000000000_2005:-1:000000000000_2006:-1:000010000010_2007:-1:000000000001_2008:-1:111101010101_2009:-1:032232000000_2010:-1:000300000000_2011:-1:000001111222_2012:-1:220232000100_2013:3:000221000000_2014:-1:000000000000_2015:-1:000000000000" />
+       </div>
+       </a>
+       </td>
+       </tr></tbody></table>
+   </td>
+   <td class="r">
+       <a href="#close" onclick="__wm.h();return false;" style="background-image:url(/static/images/toolbar/wm_tb_close.png);top:5px;" title="Close the toolbar">Close</a>
+       <a href="http://faq.web.archive.org/" style="background-image:url(/static/images/toolbar/wm_tb_help.png);bottom:5px;" title="Get some help using the Wayback Machine">Help</a>
+   </td>
+   </tr></tbody></table>
+</div>
+</div>
+</div>
+<script type="text/javascript">__wm.bt();</script>
+<!-- END WAYBACK TOOLBAR INSERT -->
+
+<div id="page">
+  <div id="wrapper">
+    <div id="header">
+      <h1><a href="/web/20130419164839/http://chaoticjava.com/">Chaotic Java</a></h1>
+      <div class="description">The internet, design patterns, frameworks and Java</div>
+      <form method="get" id="searchform" action="/web/20130419164839/http://chaoticjava.com/">
+<div><input type="text" value="Search" name="s" id="s" onfocus="if (this.value == 'Search') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Search';}" />
+<input type="submit" id="searchsubmit" value="Go" />
+</div>
+</form>
+    </div><!-- /header -->
+
+    <div id="left-col">
+      <div id="nav">
+        <ul>
+          <li class="page_item "><a href="/web/20130419164839/http://chaoticjava.com/" title="Home">Home</a></li>
+		  <li class="page_item page-item-2"><a href="/web/20130419164839/http://chaoticjava.com/about/">About</a></li>
+<li class="page_item page-item-72"><a href="/web/20130419164839/http://chaoticjava.com/archives/">Archives</a></li>
+        </ul>
+      </div><!-- /nav -->
+
+    	  <div id="content">
+  
+  <div class="post-nav"> <span class="previous"><a href="/web/20130419164839/http://chaoticjava.com/posts/help-recover-a-post/" rel="prev">Help Recover a Post</a></span> <span class="next"><a href="/web/20130419164839/http://chaoticjava.com/posts/thanks-lang/" rel="next">Thanks Lang!</a></span></div>
+  
+  
+        <div class="post" id="post-135">
+		  <div class="date"><span>Feb</span> 24</div>
+		  <div class="title">
+          <h2><a href="/web/20130419164839/http://chaoticjava.com/posts/tricks-with-enums/" rel="bookmark" title="Permanent Link to Tricks with Enums">Tricks with Enums</a></h2>
+          <div class="postdata"><SPAN class="category"><a href="/web/20130419164839/http://chaoticjava.com/posts/category/code/java-language/language/tiger/" title="View all posts in Tiger" rel="category tag">Tiger</a></SPAN> <span class="right mini-add-comment"><a href="#respond">Add comments</a></span></div>
+		  </div>
+          <div class="entry">
+            <script type="text/javascript">dzone_url = "/web/20130419164839/http://chaoticjava.com/posts/tricks-with-enums/";</script><p><!--adsense-->We all know how to use <code>enum</code>s &#8211; Ordinal values and even their textual names are now accessible. Heck, we can even iterate over all of them, eliminating the need of the old-fashioned C++ â€œSTART&#8221; and â€œEND&#8221; values.</p>
+<p><code>Enum</code>s are much more though. Java implements <code>enum</code>s as full-fledged classes:</p>
+<ul>
+<li>They have <b>constructors</b>, they have <b>methods</b> and they have <b>fields</b>. </li>
+<li>They are <b>treated specially in <code>switch</code> statements</b> to make them more efficient. </li>
+<li>They have special classes that allows <code>enum</code>s to be <b>used as bit-flags</b>, and to be <b>used efficiently when mapping values</b>. </li>
+</ul>
+<h4>Enums as Classes</h4>
+<p>When you write a new <code>enum</code>, <b>you are actually creating a class</b> containing static instances of itself &#8211; The <code>enum</code> values. The class will extend the <a onclick="javascript:pageTracker._trackPageview('/outgoing/java.sun.com/j2se/1.5.0/docs/api/java/lang/Enum.html');"  href="/web/20130419164839/http://java.sun.com/j2se/1.5.0/docs/api/java/lang/Enum.html" target="_blank">class <code>Enum</code></a> (<a href="/web/20130419164839/http://chaoticjava.com/?p=43" target="_blank">discussed earlier</a> for its weird generification), and every instance will be initialised with a <code>String</code> &#8211; the name of the <code>enum</code> value &#8211; and an integer &#8211; the <code>enum</code>â€™s ordinal value.<br />
+So, for example, the following <code>enum</code>:<br />
+<span id="more-135"></span></p>
+<p><code>
+<pre>
+enum CipherType {
+  RSA,
+  Blowfish;
+}
+</pre>
+<p></code></p>
+<p>Is in fact the equivilant of:</p>
+<p><code>
+<pre>
+class CipherType extends Enum<ciphertype> {
+  public static final CipherType RSA = new CipherType("RSA", 0);
+  public static final CipherType Blowfish = new CipherType("Blowfish", 1);
+
+  private static final CipherType[] values = new CipherType[] { RSA, Blowfish };
+
+  public static CipherType[] values() { return values.clone(); }
+  public static CipherType valueOf(String name) { return Enum.valueOf(CipherType.class, name); }
+
+  private CipherType(String name, int ord) {
+    super(name, ord);
+  }
+}
+</ciphertype></pre>
+<p></code></p>
+<p>Simple, isnâ€™t it? <b>The compiler does all of this for you</b>. Itâ€™s just a regular class and instances, in every way. And as such, you can add methods to it, add fields to it, and then &#8211; Use them at your code for good measure. You can see how <a href="/web/20130419164839/http://chaoticjava.com/?p=48" target="_blank">I used <code>enum</code>s in my code as factory methods</a>, and itâ€™s not the only example at all. <b>Almost any time youâ€™d want to use a <code>switch</code> statement</b> to perform something with a known set of parameters or determine a specific value, <b>you could replace it with an <code>enum</code> method or field</b>.</p>
+<h4>EnumSet and EnumMap</h4>
+<p>There are two classes provided with <code>enum</code>s and for <code>enum</code>s. <b>The <code><a onclick="javascript:pageTracker._trackPageview('/outgoing/java.sun.com/j2se/1.5.0/docs/api/java/util/EnumSet.html');"  href="/web/20130419164839/http://java.sun.com/j2se/1.5.0/docs/api/java/util/EnumSet.html" target="_blank">EnumSet</a></code> class</b> is implemented internally with a <b>bit-vector</b>, so that itâ€™s a <b>true flag</b>. No more â€œand&#8221;s and â€œor&#8221;s &#8211; Use it like any other <code>Set</code> and it will do the hard work for you. For example, statements like <code>if ((flag &#038; SomeEnum.SomeValue) == SomeEnum.SomeValue) { .. }</code> are replaced with the much more readable statement <code>if (flag.contains(SomeEnum.SomeValue)) { .. }</code>. Also, calls to methods where flags are required will use <code>EnumSet.of(SomeEnum.SomeValue, SomeEnum.SomeOtherValue)</code> instead of the awkward â€œor&#8221; semantic.</p>
+<p>The second provided class is <code><a onclick="javascript:pageTracker._trackPageview('/outgoing/java.sun.com/j2se/1.5.0/docs/api/java/util/EnumMap.html');"  href="/web/20130419164839/http://java.sun.com/j2se/1.5.0/docs/api/java/util/EnumMap.html" target="_blank">EnumMap</a></code> and it uses an array and the automatically generated ordinal values of the <code>enum</code> to locate and store values according to these <code>enum</code>s. This is a <b>great boost to performance</b> and every time you wish to map anything using an <code>enum</code> as key, you should use this class.</p>
+<h4>Performancing your <code>switch</code> statements</h4>
+<p>This is just being nit-picking, but for some it might be important. The <b><code>switch</code> statement is implemented under the hood in two ways</b>: Either it is using an array as a table to locate the code to jump to according to the given value, or it uses a lookup table where it needs to search through a list of values, which is less efficient than the table. Because of that, the lookup table is used only when an array canâ€™t be used, or in other words: When the values used for the <code>case</code>s are not sequential enough.</p>
+<p>All that said, when <code>enum</code>s are used in a <code>switch</code> statement, itâ€™s their <em>ordinal value</em> that is being compared. <b>That is, a table is always used for <code>enum</code>s</b>. So, if any of the previous paragraphs didnâ€™t convince you to use <code>enum</code>s yet, this really should!</p>
+<p>Seriously now, I guess thatâ€™s what happens when you mess around with bytecode for fun.</p>
+<script>var dzone_style="2";</script><script language="javascript" src="/web/20130419164839js_/http://widgets.dzone.com/widgets/zoneit.js"></script><script src="/web/20130419164839js_/http://feeds.feedburner.com/~s/ChaoticJava?i=http://chaoticjava.com/posts/tricks-with-enums/" type="text/javascript" charset="utf-8"></script><div class="linkwithin_hook" id="http://chaoticjava.com/posts/tricks-with-enums/"></div><script>
+<!-- //LinkWithinCodeStart
+var linkwithin_site_id = 307490;
+var linkwithin_div_class = "linkwithin_hook";
+//LinkWithinCodeEnd -->
+</script>
+<script src="/web/20130419164839js_/http://www.linkwithin.com/widget.js"></script>
+<a onclick="javascript:pageTracker._trackPageview('/outgoing/www.linkwithin.com/');"  href="/web/20130419164839/http://www.linkwithin.com/"><img src="/web/20130419164839im_/http://www.linkwithin.com/pixel.png" alt="Related Posts with Thumbnails" style="border: 0" /></a><div class="addtoany_share_save_container"><div class="a2a_kit a2a_target addtoany_list" id="wpa2a_1"><a class="a2a_dd addtoany_share_save" href="/web/20130419164839/http://www.addtoany.com/share_save"><img src="/web/20130419164839im_/http://chaoticjava.com/wp-content/plugins/add-to-any/share_save_171_16.png" width="171" height="16" alt="Share"/></a></div>
+<script type="text/javascript"><!--
+wpa2a.script_load();
+//--></script>
+</div>						          </div><!--/entry -->
+		
+		
+<!-- You can start editing here. -->
+
+	<h3 id="comments">5 Responses to &#8220;Tricks with Enums&#8221;</h3> 
+
+	<ol class="commentlist">
+
+	
+		<li class="alt" id="comment-279">
+			<cite><a href='/web/20130419164839/http://chaoticjava.com/posts/whirling-around-java/' rel='external nofollow' class='url'>Chaotic Java &raquo; Blog Archive &raquo; Whirling around Java</a></cite> Says:
+						<br />
+
+			<small class="commentmetadata"><a href="#comment-279" title="">March 7th, 2006 at 2:58 pm</a> </small>
+
+			<p>[...] To implement the 24 Whirl commands I&#8217;ve used two enums (one for each wheel), each of them implementing the Command interface, which exposed one method of execute. This allowed me to write very short code (an enum name and a simple operation for execution, as they were all simple) and the compiler took care of generating 24 different classes for me. Then, the wheels could receive an array of the Command interface without knowing they are receiving an enum at all. Read back my tips with enums post for a refresh about them. [...]</p>
+
+		</li>
+
+	
+	
+		<li class="" id="comment-12075">
+			<cite><a href='/web/20130419164839/http://chaoticjava.com/posts/enums-gwt/' rel='external nofollow' class='url'>Chaotic Java &raquo; Blog Archive &raquo; Enums &#38; GWT</a></cite> Says:
+						<br />
+
+			<small class="commentmetadata"><a href="#comment-12075" title="">October 1st, 2007 at 9:50 pm</a> </small>
+
+			<p>[...] And that&#8217;s just unfortunate, because I really got used to using enums! Still, not having the syntax is not going to stop me. After all, enums in Java are eventually translated into classes, so I can just write my own GWT-compatible Enum-class. [...]</p>
+
+		</li>
+
+	
+	
+		<li class="alt" id="comment-31881">
+			<cite><a href='/web/20130419164839/http://chaoticjava.com/posts/switch-by-class-type/' rel='external nofollow' class='url'>Switch by class type</a></cite> Says:
+						<br />
+
+			<small class="commentmetadata"><a href="#comment-31881" title="">May 24th, 2008 at 6:47 am</a> </small>
+
+			<p>[...] language has done a great deal of removing boiler-plate code through means of compiler decisions: enums, stringsÂ and for-each loops are just a few of those. We could see something like the following for [...]</p>
+
+		</li>
+
+	
+	
+		<li class="" id="comment-159420">
+			<cite>Woodz</cite> Says:
+						<br />
+
+			<small class="commentmetadata"><a href="#comment-159420" title="">August 12th, 2011 at 6:52 pm</a> </small>
+
+			<p>Please take note of character encoding &#8211; this post is full of &#8220;itâ€™s&#8221; which makes it unreadable. Browsed on Firefox 5 on Ubuntu 10.10 x64.</p>
+
+		</li>
+
+	
+	
+		<li class="alt" id="comment-162867">
+			<cite><a onclick="javascript:pageTracker._trackPageview('/outgoing/javarevisited.blogspot.com/2011/06/comparator-and-comparable-in-java.html');"  href='/web/20130419164839/http://javarevisited.blogspot.com/2011/06/comparator-and-comparable-in-java.html' rel='external nofollow' class='url'>Javin @ comparator example in java</a></cite> Says:
+						<br />
+
+			<small class="commentmetadata"><a href="#comment-162867" title="">August 30th, 2011 at 6:44 am</a> </small>
+
+			<p>fantastic man, I have also blogged my experience as  <a onclick="javascript:pageTracker._trackPageview('/outgoing/javarevisited.blogspot.com/2011/08/enum-in-java-example-tutorial.html');"  href="/web/20130419164839/http://javarevisited.blogspot.com/2011/08/enum-in-java-example-tutorial.html" rel="nofollow">10 examples of enum in java</a> , let me know how do you find it.</p>
+
+		</li>
+
+	
+	
+	</ol>
+
+ 
+
+		
+			
+	</div><!--/post -->
+
+  </div><!--/content -->
+  
+  <div id="footer"><a href="/web/20130419164839/http://www.ndesign-studio.com/resources/wp-themes/">WP Theme</a> &amp; <a href="/web/20130419164839/http://www.ndesign-studio.com/stock-icons/">Icons</a> by <a href="/web/20130419164839/http://www.ndesign-studio.com/">N.Design Studio</a></div>
+</div><!--/left-col -->
+
+<div class="dbx-group" id="sidebar">
+
+  <!--sidebox start --><div id="text-2" class="dbx-box widget_text"><h3 class="dbx-handle">RSS Counter</h3><div class="dbx-content">			<div class="textwidget"><p><a href="/web/20130419164839/http://feeds.feedburner.com/ChaoticJava"><img src="/web/20130419164839im_/http://feeds.feedburner.com/~fc/ChaoticJava?bg=#00CCFF&amp;fg=333333&amp;anim=1" height="26" width="88" style="border:0" alt="" /></a></p></div>
+		</div></div><!--sidebox end --><!--sidebox start --><div id="archives-2" class="dbx-box widget_archive"><h3 class="dbx-handle">Archive</h3><div class="dbx-content">		<select name="archive-dropdown" onchange='document.location.href=this.options[this.selectedIndex].value;'> <option value="">Select Month</option> 	<option value='http://chaoticjava.com/posts/2011/11/'> November 2011 </option>
+	<option value='http://chaoticjava.com/posts/2011/09/'> September 2011 </option>
+	<option value='http://chaoticjava.com/posts/2011/06/'> June 2011 </option>
+	<option value='http://chaoticjava.com/posts/2010/10/'> October 2010 </option>
+	<option value='http://chaoticjava.com/posts/2010/07/'> July 2010 </option>
+	<option value='http://chaoticjava.com/posts/2010/02/'> February 2010 </option>
+	<option value='http://chaoticjava.com/posts/2009/08/'> August 2009 </option>
+	<option value='http://chaoticjava.com/posts/2009/07/'> July 2009 </option>
+	<option value='http://chaoticjava.com/posts/2009/01/'> January 2009 </option>
+	<option value='http://chaoticjava.com/posts/2008/12/'> December 2008 </option>
+	<option value='http://chaoticjava.com/posts/2008/08/'> August 2008 </option>
+	<option value='http://chaoticjava.com/posts/2008/07/'> July 2008 </option>
+	<option value='http://chaoticjava.com/posts/2008/05/'> May 2008 </option>
+	<option value='http://chaoticjava.com/posts/2008/04/'> April 2008 </option>
+	<option value='http://chaoticjava.com/posts/2008/03/'> March 2008 </option>
+	<option value='http://chaoticjava.com/posts/2008/02/'> February 2008 </option>
+	<option value='http://chaoticjava.com/posts/2008/01/'> January 2008 </option>
+	<option value='http://chaoticjava.com/posts/2007/12/'> December 2007 </option>
+	<option value='http://chaoticjava.com/posts/2007/10/'> October 2007 </option>
+	<option value='http://chaoticjava.com/posts/2007/09/'> September 2007 </option>
+	<option value='http://chaoticjava.com/posts/2007/08/'> August 2007 </option>
+	<option value='http://chaoticjava.com/posts/2007/07/'> July 2007 </option>
+	<option value='http://chaoticjava.com/posts/2007/06/'> June 2007 </option>
+	<option value='http://chaoticjava.com/posts/2007/05/'> May 2007 </option>
+	<option value='http://chaoticjava.com/posts/2007/04/'> April 2007 </option>
+	<option value='http://chaoticjava.com/posts/2006/09/'> September 2006 </option>
+	<option value='http://chaoticjava.com/posts/2006/08/'> August 2006 </option>
+	<option value='http://chaoticjava.com/posts/2006/07/'> July 2006 </option>
+	<option value='http://chaoticjava.com/posts/2006/04/'> April 2006 </option>
+	<option value='http://chaoticjava.com/posts/2006/03/'> March 2006 </option>
+	<option value='http://chaoticjava.com/posts/2006/02/'> February 2006 </option>
+	<option value='http://chaoticjava.com/posts/2006/01/'> January 2006 </option>
+	<option value='http://chaoticjava.com/posts/2005/12/'> December 2005 </option>
+	<option value='http://chaoticjava.com/posts/2005/11/'> November 2005 </option>
+ </select>
+</div></div><!--sidebox end --><!--sidebox start --><div id="pages-2" class="dbx-box widget_pages"><h3 class="dbx-handle">Other Pages</h3><div class="dbx-content">		<ul>
+			<li class="page_item page-item-2"><a href="/web/20130419164839/http://chaoticjava.com/about/">About</a></li>
+<li class="page_item page-item-72"><a href="/web/20130419164839/http://chaoticjava.com/archives/">Archives</a></li>
+		</ul>
+		</div></div><!--sidebox end --><!--sidebox start --><div id="text-4" class="dbx-box widget_text"><h3 class="dbx-handle">Firewall</h3><div class="dbx-content">			<div class="textwidget"><img src="/web/20130419164839im_/http://chaoticjava.com/misc/FirewallLogo.png" />
+Liked Chaotic Java? It's free! But I also make some other things that aren't, which you might like. Like Firewall, a rule changing, turn based strategy game for iOS. <a href="/web/20130419164839/http://itunes.apple.com/us/app/firewall/id457495406?mt=8&amp;uo=4" target="itunes_store">Give it a try!</></div>
+		</div></div><!--sidebox end -->
+</div><!--/sidebar -->  
+    <hr class="hidden" />
+
+  </div><!--/wrapper -->
+
+</div><!--/page -->
+
+<div id="sk2-footer" style="color:#FFF; background-color:#444; padding: 3px 2px 3px 2px; border-top: #888 solid 1px;">This blog is protected by <a href="/web/20130419164839/http://unknowngenius.com/blog/" title="Dave">Dave</a>'s <strong><a href="/web/20130419164839/http://unknowngenius.com/blog/wordpress/spam-karma/" title="SK2">Spam Karma 2</a></strong>: <strong>170878</strong>  Spams eaten and counting...</div>
+<script type="text/javascript"><!--
+wpa2a.targets=[
+{title:'Tricks with Enums',url:'/web/20130419164839/http://chaoticjava.com/posts/tricks-with-enums/'}];
+wpa2a.html_done=true;if(wpa2a.script_ready&&!wpa2a.done)wpa2a.init();wpa2a.script_load();
+//--></script>
+
+<!-- tracker added by Ultimate Google Analytics plugin v1.6.0: /web/20130419164839/http://www.oratransplant.nl/uga -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "/web/20130419164839/https://ssl." : "/web/20130419164839/http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-283180-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<script type='text/javascript' src='/web/20130419164839js_/http://chaoticjava.com/wp-includes/js/jquery/jquery.js?ver=1.7.1'></script>
+<script type='text/javascript' src='/web/20130419164839js_/http://s.gravatar.com/js/gprofiles.js?aa&amp;ver=3.3.1'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='/web/20130419164839js_/http://chaoticjava.com/wp-content/plugins/jetpack/modules/wpgroho.js?ver=3.3.1'></script>
+	<div style="display:none">
+	</div>
+
+	<script src="/web/20130419164839js_/http://stats.wordpress.com/e-201316.js" type="text/javascript"></script>
+	<script type="text/javascript">
+	st_go({v:'ext',j:'1:1.2.2',blog:'21038074',post:'135'});
+	var load_cmc = function(){linktracker_init(21038074,135,2);};
+	if ( typeof addLoadEvent != 'undefined' ) addLoadEvent(load_cmc);
+	else load_cmc();
+	</script></body>
+</html>
+
+
+
+
+
+<!--
+     FILE ARCHIVED ON 16:48:39 Apr 19, 2013 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 23:37:02 Jun 26, 2015.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->

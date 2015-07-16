@@ -1,0 +1,212 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<hr><br>
+ 
+<p><a name="997472"> </a>
+<h1> Clob </h1>
+<a name="1000770"> </a>
+<h2>10.1	 Clob Overview</h2>
+<p><a name="997474"> </a>
+A <code>Clob</code> object represents the Java programming language </a>mapping of an SQL <code>CLOB</code> (Character Large Object). An SQL <code>CLOB</code> is a built-in type that stores a Character Large Object as a column value in a row of a database table. Methods in the interfaces <code>ResultSet</code>, <code>CallableStatement</code>, and <code>PreparedStatement</code> allow a programmer to </a>access the SQL3 type <code>CLOB</code> in the same way that more basic SQL types are accessed.  In other words, an application using the JDBC<font size="-2"><sup> </sup></font>2.0 API uses methods such as <code>getClob</code> and <code>setClob</code> for a <code>CLOB</code> value the same way it uses <code>getInt</code> and <code>setInt</code> for an <code>INTEGER</code> value or <code>getString</code> and <code>setString</code> for a <code>CHAR</code> or <code>VARCHAR</code> value.
+</p><p><a name="1001612"> </a>
+The default is for a JDBC driver to implement the <code>Clob</code> interface using the SQL type </a><code>LOCATOR(CLOB)</code> behind the scenes. A <code>LOCATOR(CLOB)</code> designates an SQL <code>CLOB</code> residing on a database server, and operations on the locator achieve the same results as operations on the <code>CLOB</code> itself. This means that a client can operate on a <code>Clob</code> instance without ever having to materialize the <code>CLOB</code> data on the client machine. The driver uses <code>LOCATOR(CLOB)</code> behind the scenes, making its use completely transparent to the JDBC programmer.
+</p><p><a name="1001614"> </a>
+The standard behavior for a <code>Clob</code> instance is to </a>remain valid until the transaction in which it was created is either committed or rolled back.
+</p><p><a name="998385"> </a>
+The interface <code>Clob</code> provides methods for getting the length of an SQL <code>CLOB</code> value, for materializing the data in a <code>CLOB</code> value on the client, and for searching for a substring or <code>CLOB</code> object within a <code>CLOB</code> value.
+</p><a name="997483"> </a>
+<h3>10.1.1	 Creating a Clob Object</h3>
+<p><a name="997529"> </a>
+The following code fragment illustrates </a>creating a <code>Clob</code> object, where <code>rs</code> is a <code>ResultSet</code> object:
+</p><blockquote><pre>Clob clob = rs.getClob(1);
+</pre></blockquote>
+<p><a name="997533"> </a>
+The variable <code>clob</code> can now be used to operate on the <code>CLOB</code> value that is stored in the first column of the result set <code>rs</code>. 
+</p><a name="998877"> </a>
+<h3>10.1.2	 Materializing Clob Data</h3>
+<p><a name="998878"> </a>
+Programmers can invoke methods in the JDBC API on a <code>Clob</code> object as if they were operating on the SQL <code>CLOB</code> value it designates. However, if they want to operate on a <code>Clob</code> object as an object in the Java programming language, they must first </a>materialize  the data of the <code>CLOB</code> object on the client. The <code>Clob</code> interface provides three methods for materializing a <code>Clob</code> object as an object in the Java programming language: 
+</p><ul><a name="998985"> </a>
+<li><code>getAsciiStream</code> </a>materializes the  <code>CLOB</code> value as a byte stream containing Ascii bytes
+</ul><blockquote><pre>Clob notes = rs.getClob("NOTES");
+java.io.InputStream in = notes.getAsciiStream();
+byte b = in.read();
+// in contains the characters in the CLOB value designated by
+// notes as Ascii bytes; b contains the first character as an Ascii 
+// byte
+</pre></blockquote><ul><a name="1001630"> </a>
+<li><code>getCharacterStream</code> </a>materializes the  <code>CLOB</code> value as a stream of Unicode characters
+</ul><blockquote><pre>java.io.Reader reader = notes.getCharacterStream();
+int c = Reader.read();
+// c contains the first character in the CLOB that notes designates
+</pre></blockquote><ul><a name="998987"> </a>
+<li><code>getSubString</code> </a>materializes all or part of the <code>CLOB</code> value as a <code>String</code> object
+</ul><blockquote><pre>String substring = notes.getSubString(10, 5);
+// substring contains five characters, starting with the tenth
+// character of the CLOB value that notes designates
+long len = notes.length();
+String substring = notes.getSubString(1, len);
+// substring contains all of the characters in the CLOB object that
+// notes designates
+</pre></blockquote><a name="998892"> </a>
+<h3>10.1.3	 Storing a Clob Object</h3>
+<p><a name="998893"> </a>
+To store a <code>Clob</code> object in the database, it is passed as a parameter to the <code>PreparedStatement</code> method <code>setClob</code>. For example, the following code fragment </a>stores the <code>Clob</code> object <code>notes</code> by passing it as the first input parameter to the <code>PreparedStatement</code> object <code>pstmt</code>:
+</p><blockquote><pre>Clob notes = rs.getClob("NOTES");
+PreparedStatement pstmt = con.prepareStatement(
+		"UPDATE SALES_STATS SET COMMENTS = ? WHERE SALES &gt; 500000");
+pstmt.setClob(1, notes);
+pstmt.executeUpdate();
+</pre></blockquote>
+<p><a name="998898"> </a>
+The <code>CLOB</code> value designated by <code>notes</code> is now stored in the table <code>SALES_STATS</code> in column <code>COMMENTS </code>in every row where the value in the column <code>SALES</code> is greater than <code>500000</code>.
+</p><a name="1001839"> </a>
+<blockquote></blockquote>
+<a name="1001840"> </a>
+<blockquote></blockquote>
+</pre></blockquote><a name="1000808"> </a>
+<h2>10.2	 Clob Interface Definition</h2>
+<pre>
+package java.sql;
+public interface java.sql.Clob {
+	long <strong>length</strong>() throws SQLException;
+	InputStream <strong>getAsciiStream</strong>() throws SQLException;
+	Reader <strong>getCharacterStream</strong>() throws SQLException;
+	String <strong>getSubString</strong>(long <em>pos</em><code>,</code><em> </em>int <em>length</em>) throws SQLException;
+	long <strong>position</strong>(String <em>searchstr</em><code>,</code><em> </em>long <em>start</em>) throws SQLException;
+	long <strong>position</strong>(Clob <em>searchstr</em><code>,</code><em> </em>long <em>start</em>) throws SQLException;
+}
+</pre><a name="998414"> </a>
+<h2>10.3	 Clob Methods</h2>
+<a name="998784"> </a>
+<h4> </a>getAsciiStream</h4>
+<p><a name="998785"> </a>
+</a><pre>InputStream <code>getAsciiStream</code>() throws SQLException</pre>
+<blockquote>Materializes the <code>CLOB</code> value designated by this <code>Clob</code> object as a stream of Ascii bytes.
+<p><a name="998788"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998789"> </a>
+an <code>InputStream</code> object with all the data in the <code>CLOB</code> value designated by this <code>Clob</code> object as Ascii bytes
+</p><p><a name="998817"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>
+java.io.InputStream in = clob.getAsciiStream();
+byte b = in.read();
+// in has all of the characters in the CLOB value designated by
+// clob as Ascii bytes; b designates the first character as an Ascii
+// byte
+</pre></blockquote><a name="1001646"> </a>
+</blockquote>
+<h4> </a>getCharacterStream</h4>
+<p><a name="1001647"> </a>
+</a><pre>Reader <code>getCharacterStream</code>() throws SQLException</pre>
+<a name="999053"> </a>
+<blockquote>Materializes the <code>CLOB</code> value designated by this <code>Clob</code> object as a stream of Unicode characters.
+<p><a name="998419"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998420"> </a>
+a <code>Reader</code> object with all the data in the <code>CLOB</code> value designated by this <code>Clob</code> object as Unicode characters
+</p><p><a name="998421"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>Reader read = clob.getCharacterStream();
+// read has all the data in the CLOB value designated by clob
+// as Unicode characters
+</pre></blockquote><a name="998424"> </a>
+</blockquote>
+<h4> </a>getSubString</h4>
+<p><a name="998425"> </a>
+</a><pre>length <strong>getSubString</strong>(long <em>pos</em><code>,</code><em> </em>int <em>length</em>) throws SQLException</pre>
+<a name="998427"> </a>
+<blockquote>Returns a copy of the portion of the <code>CLOB</code> value represented by this <code>Clob</code> object that starts at position <code>pos</code> and has up to <code>length</code> consecutive characters.
+<p><a name="998428"> </a>
+<b>PARAMETERS:</b>
+<table summary="layout" border=0>
+<tr><td valign=top><em>pos</em></td><td> </td>
+<td>the position of the first <code>char</code> to extract from the <code>CLOB</code> value designated by this <code>Clob</code> object; the initial position is <code>1</code></td></tr>
+<tr><td><em>length</em></td><td> </td>	
+<td>the number of consecutive characters to be copied</td></tr></table>
+</p><p><a name="998431"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998432"> </a>
+a <code>String</code> object containing a copy of up to <code>length</code> consecutive characters from the <code>CLOB</code> value represented by this <code>Clob</code> object, starting with the <code>char</code> at position <code>pos</code>
+</p><p><a name="998433"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>String substr = clob.getSubString(1, 100);
+// substr contains the first 100 characters in the CLOB value
+// designated by clob (those in positions 1 through 100, inclusive)
+</pre></blockquote><a name="998436"> </a>
+</blockquote>
+<h4> </a>length</h4>
+<p><a name="998437"> </a>
+<pre>long <strong>length</strong>() throws SQLExceptions</pre>
+<blockquote>Returns the number of characters in the <code>CLOB</code> value designated by this <code>Clob</code> object.
+<p><a name="998440"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998441"> </a>
+the length in characters of the <code>CLOB</code> value that this <code>Clob</code> object represents
+</p><p><a name="998442"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>
+Clob clob = rs.getClob(3);
+long len = clob.length(); 
+// len contains the number of characters in the CLOB value
+// designated by clob
+</pre></blockquote><a name="998821"> </a>
+</blockquote>
+<h4> </a>position</h4>
+<p><a name="998822"> </a>
+<pre>long <strong>position</strong>(Clob <em>searchstr</em><code>,</code><em> </em>long <em>start</em>) throws SQLException</pre>
+<a name="998824"> </a>
+<blockquote>Determines the character position at which the <code>Clob</code> object <code>searchstr </code>begins within the <code>CLOB</code> value that this <code>Clob</code> object represents. The search begins at position <code>start</code>.
+<p><a name="998825"> </a>
+<b>PARAMETERS:</b>
+<table summary="layout" order=0>
+<tr><td valign=top><em>searchstr</em></td><td> </td>
+<td>the <code>Clob</code> object for which to search</td></tr> 
+<tr><td valign=top><em>start</em></td><td> </td>
+<td>the position at which to begin searching; the first character is at position <code>1</code></td></tr></table>
+</p><p><a name="998828"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998829"> </a>
+the position at which the <code>Clob</code> object <code>searchstr</code> begins, which will be <code>start</code> or larger if the search, starting at position <code>start</code>, is successful; <code>-1</code> otherwise
+</p><p><a name="998830"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>
+Clob clob2 = rs.getClob(4);
+long beginning = clob.position(clob2, 1024);
+// if clob2 is contained in clob starting at position 1024 or later, 
+// beginning will contain the position at which clob2 begins
+</pre></blockquote><a name="1001698"> </a>
+</blockquote>
+<h4> </a>position</h4>
+<p><a name="1001700"> </a>
+<pre>long <strong>position</strong>(String <em>searchstr</em><code>,</code><em> </em>long <em>start</em>) throws SQLException</pre>
+<blockquote>Determines the position at which the <code>String</code> <code>searchstr</code> begins within the <code>CLOB</code> value that this <code>Clob</code> object represents. The search begins at position <code>start</code>.
+<p><a name="998451"> </a>
+<b>PARAMETERS:</b>
+<table summary="layout" border=0>
+<tr><td valign=top><em>searchstr</em></td><td> </td>
+<td>the string for which to search</td></tr>
+<tr><td valign=top><em>start</em></td><td> </td>
+<td>the position at which to begin searching; the first character is at position <code>1</code></td></tr></table>
+</p><p><a name="998454"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998455"> </a>
+the position at which the <code>String</code> object <code>searchstr</code> begins, which will be <code>start</code> or larger if the search, starting at position <code>start</code>, is successful; <code>-1</code> otherwise
+</p><p><a name="998456"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>
+String searchstr= clob.getSubString(5, 100);
+long beginning = clob.position(searchstr, 1024);
+// if searchstr is contained in clob from position 1024 on, beginning
+// will contain the position at which searchstr begins
+</p></pre></blockquote>
+</blockquote>
+<hr><br>
+ 
+<i>Copyright &#169; 2000, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

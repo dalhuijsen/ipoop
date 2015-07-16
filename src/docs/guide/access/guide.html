@@ -1,0 +1,274 @@
+<HTML>
+<HEAD>
+   <META NAME="Author" CONTENT="Beth Whitman">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.02 [en] (X11; U; SunOS 5.5.1 sun4u) [Netscape]">
+   <TITLE>Java Accessibility - Overview</TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EE" VLINK="#551A8B" ALINK="#FF0000">
+&nbsp;
+<TABLE Summary="layout" BORDER=0 WIDTH="100%" >
+<TR>
+<TD WIDTH="60"><IMG SRC="javalogo52x88.gif" ALT="Java logo" BORDER=0 HEIGHT=88 WIDTH=52>&nbsp;</TD>
+
+<TD>
+<H1>
+Java Accessibility Overview</H1>
+</TD>
+</TR>
+</TABLE>
+
+<HR NOSHADE WIDTH="100%">
+
+<P>Java Accessibility provides the technology that allows assistive 
+technologies to obtain accessible information about the user interface 
+objects in the Java Virtual Machine. Java Accessibility supports version 
+1.1 and up of the Java platform and is provided in several ways: 
+<OL>
+
+
+<LI>
+A <a href=#api>Java Accessibility API</a> toolkit that provides "boiler plate" interfaces for UI
+components. 
+
+These interfaces allow the user to obtain information that is common to all
+"accessible" components (such as AccessibleName and
+AccessibleDescription), as well as information that is more component specific
+(such as AccessibleValue and AccessibleSelection). </LI>
+
+<LI>
+
+<a href=#utilities>Utilities</A>
+that support assistive technology developers.</LI>
+
+<LI>Support for <a href=#keyboard>keyboard navigation</a> of graphical user interface components.
+
+<LI>
+The accessible design of the Java Foundation Classes include the ability to
+"<a href=#plug>plug in</a>" an alternative look and feel for an application without requiring
+changes to be made in the application. </LI>
+</OL>
+
+
+
+<a name=api>
+<B><FONT SIZE=+2>Explanation of API Packages, Interfaces, and Classes
+<HR NOSHADE %></FONT></B></a>
+<p>
+The following are brief descriptions of the Java 2 Platform's accessibility 
+API. More information can be found in the <A HREF="../../api/javax/accessibility/package-summary.html">API
+documentation</A> for
+the javax.accessibility package.
+<p>
+<B>Package javax.accessibility</B>
+<blockquote>
+Defines a contract between user-interface components and an assistive 
+technology that provides access to those components. 
+</blockquote>
+
+<B>Interface Accessible</B>
+<BLOCKQUOTE>Interface Accessible is the main interface for the
+Accessibility package.</BLOCKQUOTE>
+
+<B>Interface AccessibleAction</B>
+<BLOCKQUOTE>The AccessibleAction interface should be supported by any 
+object that can perform one or more actions.</BLOCKQUOTE>
+
+
+<B>Interface AccessibleComponent</B>
+<BLOCKQUOTE>The AccessibleComponent interface should be supported by 
+any object that is rendered on the screen.</BLOCKQUOTE>
+
+<B>Interface AccessibleHypertext</B>
+<blockquote>The AccessibleHypertext class is the base class for all 
+classes that present hypertext information on the display.
+</blockquote>
+
+<B>Interface AccessibleIcon</B>
+<blockquote>
+The AccessibleIcon interface should be supported by any object that has an 
+associated icon (for example, buttons). </blockquote>
+
+<b>Interface AccessibleSelection</b>
+<blockquote>
+The AccessibleSelection interface provides the standard mechanism for an 
+assistive technology to determine what the current selected children are, 
+as well as modify the selection set. 
+</blockquote>
+
+<b>Interface AccessibleTableModelChange</b>
+<blockquote>
+The AccessibleTableModelChange interface describes a change to the table 
+model. </blockquote>
+
+<b>Interface AccessibleText</b>
+<blockquote>
+The AccessibleText interface should be implemented by all classes that 
+present textual information on the display. 
+</blockquote>
+
+<b>Interface AccessibleValue</b>
+<blockquote>
+The AccessibleValue interface should be supported by any object that 
+supports a numerical value (for example, a scroll bar). 
+</blockquote>
+
+<b>Class AccessibleBundle</b>
+<blockquote>
+Base class used to maintain a strongly typed enumeration. 
+</blockquote>
+
+<b>Class AccessibleContext</b>
+<blockquote>AccessibleContext represents the minimum information all 
+accessible objects return. </blockquote>
+
+<b>Class AccessibleHyperlink</b>
+<blockquote>
+Encapsulation of a link, or set of links.
+</blockquote>
+
+<b>Class AccessibleRelation</b>
+<blockquote>
+Class AccessibleRelation describes a relation between the object that 
+implements the AccessibleRelation and one or more other objects. 
+</blockquote>
+
+<b>Class AccessibleRelationSet</b>
+<blockquote>Class AccessibleRelationSet determines a component's 
+relation set. </blockquote>
+
+<b>Class AccessibleResourceBundle</b>
+<blockquote>
+A resource bundle containing the localized strings in the accessibility 
+package. 
+</blockquote>
+
+<b>Class AccessibleRole</b>
+<blockquote>
+Class AccessibleRole determines the role of a component. 
+</blockquote>
+
+<b>Class AccessibleState</b>
+<blockquote>
+Class AccessibleState describes a components particular state. </blockquote>
+
+<b>Class AccessibleStateSet</b>
+<blockquote>
+Class AccessibleStateSet determines a components state set. 
+</blockquote>
+
+<b>Class AccessibleTable</b>
+<blockquote>
+Class AccessibleTable describes a user-interface component that presents 
+data in a two-dimensional table format. 
+</blockquote>
+
+<a name=utilities>
+<B><FONT SIZE=+2>The Java Accessibility Utilities
+<HR NOSHADE %></FONT></B></a>
+<blockquote>
+The Java Accessibility Utilities are delivered by Sun as a separately downloadable package for use by assistive technology vendors in their
+products which provide access to Java applications running in a Java Virtual Machine. This package provides the necessary support for assistive
+technologies to locate and query user interface objects inside a Java application running in a Java Virtual Machine. It also provides support for
+installing "event listeners" 
+into these objects. These event listeners allow objects to learn about specific events occurring in other objects using the peer-to-peer approach
+defined by the delegation event model introduced in JDK1.1. 
+<p>
+To date the Accessibility Utilities are as follows. 
+<ul>
+<li>AwtMonitor 
+<li>Ferret 
+<li>JavaMonitor 
+<li>Linker 
+<li>Monkey 
+</ul>
+
+For more information, see  
+<A HREF="http://java.sun.com/products/jfc/accessibility/doc/index.html">
+Java Accessibility Utilities</a>.
+</blockquote>
+
+
+<a name=keyboard>
+<B><FONT SIZE=+2>Keyboard Navigation Support
+<HR NOSHADE %></FONT></B></a>
+<blockquote>
+
+  The interactive user interface components provide a full set of
+  <a href="../../api/javax/swing/doc-files/Key-Index.html">keyboard bindings</A> that enable mouseless navigation, edit, and control
+  of the components. No special efforts are required of the developer to
+  enable these capabilities and if the developer so desires they can
+  easily change any keybinding.
+</blockquote>
+
+<a name=plug>
+<B><FONT SIZE=+2>Pluggable Look and Feel
+<HR NOSHADE %></FONT></B></a>
+<blockquote>
+The Java Foundation Classes (JFC) implement a Pluggable Look and Feel 
+architecture. This architecture allows non-visual manifestations of a
+user interface to replace or enhance the visual presentation of an 
+application. The expression of the user interface is separated from the 
+underlying structure and data of each individual component. This is 
+accomplished by separating the user interface of the component from its 
+model. The model of a component is the structure which encapsulates the 
+state and information that is presented to the user by the user interface. 
+More information on this architecture 
+can be found in <A HREF="http://java.sun.com/products/jfc/tsc/">The 
+Swing Connection</A>.
+</blockquote>
+
+<P>
+<FONT SIZE="-1"><B>*As used on this web site, the terms "Java Virtual Machine" 
+or "JVM" mean a virtual machine for the Java platform.</B></FONT>
+<P>
+
+<!---- END Main text Area ---->
+<HR NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../relnotes/SMICopyright.html">Copyright
+&copy;</A> 1995-98 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+All Rights Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:access@sun.com">access@sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+<BR><FONT SIZE=+1><I>Java Software</I>&nbsp;</FONT></TD>
+</TR>
+</TABLE>
+&nbsp;
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</BODY>
+</HTML>

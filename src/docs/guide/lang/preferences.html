@@ -1,0 +1,416 @@
+<html><body><title>Preferences API</title></head>
+<body bgcolor="#ffffff">
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT
+=88>
+</TD>
+<TD>
+<center>
+<h1>Preferences API</h1>
+</center>
+</TD>
+<TD ALIGN=RIGHT VALIGN=TOP>
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+</TD>
+</TR>
+</TABLE>
+<hr>
+
+<h2>Overview</h2>
+
+Applications require preference and configuration data to adapt to 
+the needs of different users and environments. 
+The <a href="../../api/java/util/prefs/package-summary.html">java.util.prefs package</a> provides a way for applications to 
+store and retrieve user and system preference and configuration data. 
+The data is stored persistently in an implementation-dependent backing store. 
+There are two separate trees of preference nodes, one for user
+preferences and one for system preferences. 
+<p>
+All of the methods that modify preference data are permitted to operate
+asynchronously.  They may return immediately, and changes will eventually
+propagate to the persistent backing store.  
+The <a href="../../api/java/util/prefs/Preferences.html#flush()">flush</a>
+method can be used to force updates to the backing store.
+<p>
+The methods in the <a href="../../api/java/util/prefs/Preferences.html">Preferences class</a> may be invoked concurrently by multiple threads
+in a single JVM without the need for external synchronization, and the
+results will be equivalent to some serial execution.  If this class is used
+concurrently by multiple JVMs that store their preference data in
+the same backing store, the data store will not be corrupted, but no
+other guarantees are made concerning the consistency of the preference
+data.
+
+<p>
+For more details, choose from the following links:
+<ul>
+<li>
+<a href=#prefs-other>Comparing Preferences API to Other Mechanisms</a>
+</li>
+<li>
+<a href=#prefs-usage>Usage Notes</a>
+</li>
+<li>
+<a href=#prefs-design-faq>Design FAQ</a>
+</li>
+</ul>
+<hr>
+
+<a name=prefs-other>
+<h3>Comparing Preferences API to Other Mechanisms</h3>
+Prior to the introduction of the Preferences API, 
+developers could choose to manage preference and configuration data in
+an ad hoc fashion, by using the Properties API or the JNDI API as 
+described below.
+<p>
+Often, preference and configuration data was stored
+in properties files, accessed through the java.util.Properties
+API.  However, there are no standards as to where such files should
+reside on disk, or what they should be called.  Using this mechanism, it is 
+extremely difficult to backup a user's preference data, or
+transfer it from one machine to another. As the number of
+applications increases, the possibility of file name conflicts
+increases.  Also, this mechanism is of no help on platforms
+that lack a local disk, or where it is desirable that the data
+be stored in an external data store (such as an enterprise-wide
+LDAP directory service). 
+<p>
+Less frequently, developers stored user preference and
+configuration data in a directory service, accessed through the
+Java Naming and Directory Interface (JNDI) API. Unlike the Properties API,
+JNDI allows the use of arbitrary data stores (back-end
+neutrality). While JNDI is extremely powerful, it is also rather
+large, consisting of 5 packages and 83 classes.  JNDI provides no
+policy as to where in the directory name space the preference data should 
+be stored, or in which name space. 
+<p>
+Neither Properties nor JNDI provide a simple, ubiquitous,
+back-end neutral preferences management facility.  The Preferences API 
+does provide such a facility, combining the simplicity of Properties
+with the back-end neutrality of JNDI.  It provides
+sufficient built-in policy to prevent name clashes, foster
+consistency, and encourage robustness in the face of
+inaccessibility of the backing data store. 
+
+<ul>
+<li>See Also:  <a href=#prefs-design-faq>Design FAQ</a>
+</ul>
+
+<hr>
+<a name=prefs-usage>
+<h2>Usage Notes</h2>
+
+The material contained in this section is not part of the Preferences API 
+specification, instead it is intended to provide some examples of 
+how the Preferences API might be used.   
+
+<ul>
+<li>
+<a href=#prefs-usage-enclosing>
+Obtaining Preferences Objects for an Enclosing Class</a>
+</li>
+<li>
+<a href=#prefs-usage-static>
+Obtaining Preferences Objects for a Static Method</a>
+</li>
+<li>
+<a href=#prefs-usage-atomic>Atomic Updates</a
+>
+</li>
+<li>
+<a href=#prefs-usage-backingstore>Determining Backing Store Status</a>
+</li>
+</ul>
+
+
+<a name=prefs-usage-enclosing>
+<h3>Obtaining Preferences Objects for an Enclosing Class</h3>
+The following examples illustrate how you might obtain the Preferences
+objects (system and user) pertaining to the enclosing class.  
+These examples would work only inside instance methods.  
+<p>
+Note that static final fields, rather than inline String literals,
+are used for the key names (<code>NUM_ROWS</code> and <code>NUM_COLS</code>). 
+This reduces the likelihood of runtime bugs from typographical errors in key
+names.
+<p>
+Note also that reasonable defaults are provided for each of the
+preference values obtained.  These defaults will be returned if no preference
+value has been set, or if the backing store is inaccessible.  
+<a name=ex-enclosing>
+<pre>
+package com.acme.widget;
+import  java.util.prefs.*;
+
+public class Gadget {
+    // Preference keys for this package
+    private static final String NUM_ROWS = "num_rows";
+    private static final String NUM_COLS = "num_cols";
+
+    void foo() {
+        Preferences prefs = Preferences.userNodeForPackage(this);
+
+        int numRows = prefs.getInt(NUM_ROWS, 40);
+        int numCols = prefs.getInt(NUM_COLS, 80);
+
+        ...
+    }
+}
+</pre>
+
+The above example obtains per-user preferences.  If a single, per-system
+value were desired, the first line in <tt>foo</tt> would be replaced by:
+<pre>
+        Preferences prefs = Preferences.systemNodeForPackage(this);
+</pre>
+
+<a name=prefs-usage-static>
+<h3>Obtaining Preferences Objects for a Static Method</h3>
+
+The examples in the prior section illustrate obtaining Preferences objects 
+pertaining to the enclosing class, and work inside instance methods.  
+In a static method (or static initializer), you need to explicitly
+provide the name of the package :
+<pre>
+    Static String ourNodeName = "/com/acme/widget";
+
+    static void foo() {
+        Preferences prefs = Preferences.userRoot().node(ourNodeName);
+
+        ...
+    }
+</pre>
+
+It is always acceptable to obtain a system preferences object once, in a
+static initializer, and use it whenever system preferences are required:
+<pre>
+    static Preferences prefs =  Preferences.systemRoot().node(ourNodeName);
+</pre>
+
+In general, it is acceptable to do the same thing for a user preferences
+object, but not if the code in question is to be used in a server,
+wherein multiple users will be running concurrently or serially.
+In such a system, <code>userNodeForPackage</code> and <code>userRoot</code> 
+will return the appropriate node for the calling user, thus it's critical
+that calls to <code>userNodeForPackage</code> or <code>userRoot</code> 
+be made from the appropriate thread at the appropriate time.  
+If a piece of code may eventually be used in such a server environment, 
+it is good, conservative practice to obtain user preferences objects 
+immediately before they are used, as in the 
+<a href=#ex-enclosing>prior example</a>.
+
+<a name=prefs-usage-atomic>
+<h3>Atomic Updates</h3>
+
+The preferences API does not provide database like "transactions" wherein 
+multiple preferences are modified atomically.  Occasionally, it is necessary 
+to modify two or more preferences as a unit.  For example, suppose you are
+storing the x and y coordinates where a window is to be placed.  The only
+way to achieve atomicity is to store both values in a single preference.  
+Many encodings are possible.  Here's a simple one:
+<pre>
+    int x, y;
+    ...
+    prefs.put(POSITION, x + "," + y);
+</pre>
+When such a "compound preference" is read, it must be decoded.  For
+robustness, allowances should be made for a corrupt (unparseable) value:
+<pre>
+    static int X_DEFAULT = 50, Y_DEFAULT = 25;
+    void baz() {
+        String position = prefs.get(POSITION, X_DEFAULT + "," + Y_DEFAULT);
+        int x, y;
+        try {
+            int i = position.indexOf(',');
+            x = Integer.parseInt(coordinates.substring(0, i));
+            y = Integer.parseInt(position.substring(i + 1));
+        } catch(Exception e) {
+            // Value was corrupt, just use defaults
+            x = X_DEFAULT;
+            y = Y_DEFAULT;
+        }
+        ...
+    }
+</pre>
+
+<a name=prefs-usage-backingstore>
+<h3>Determining Backing Store Status</h3>
+
+Typical application code has no need to know whether the backing store is
+available.  It should almost always be available, but if it isn't, the code
+should continue to execute using default values in place of preference values
+from the backing store.  Very rarely, some advanced program might want
+to vary its behavior (or simply refuse to run) if the backing store were
+unavailable. Following is a method that determines whether the backing store is
+available by attempting to modify a preference value and flush the result
+to the backing store.
+<pre>
+    private static final String BACKING_STORE_AVAIL = "BackingStoreAvail";
+
+    private static boolean backingStoreAvailable() {
+        Preferences prefs = Preferences.userRoot().node("<temporary>");
+        try {
+            boolean oldValue = prefs.getBoolean(BACKING_STORE_AVAIL, false);
+            prefs.putBoolean(BACKING_STORE_AVAIL, !oldValue);
+            prefs.flush();
+        } catch(BackingStoreException e) {
+            return false;
+        }
+        return true;
+    }
+</pre>
+
+<hr>
+<a name=prefs-design-faq>
+<h2>Design FAQ</h2>
+Following is a collection of frequently asked questions concerning the
+design of the Preferences API.
+<ol>
+<li><b>How does this Preferences API relate to Properties API? </b>
+<p>
+It is intended to replace most common uses of Properties,
+rectifying many of its deficiencies, while retaining its light weight.  When
+using Properties, the programmer must explicitly specify a pathname
+for each properties file, but there is no standard location or naming
+convention.  Properties files are "brittle", as they are hand-editable but
+easily corrupted by careless editing.  Support for non-string data types in
+properties is non-existent.  Properties cannot easily be used with a
+persistence mechanism other than the file system.  In sum, the
+Properties facility does not scale.
+<p>
+<li><b>How does Preferences API relate to JNDI?</b>
+
+<p>Like JNDI, it provides back-end neutral access to persistent
+key-value data.  JNDI, however, is far more powerful, and correspondingly
+heavyweight.  JNDI is appropriate for enterprise applications that need its
+power.  Preferences API is intended as a simple, ubiquitous, back-end neutral
+preferences-management facility, enabling <b>any</b> Java application to
+easily tailor its behavior to user preferences and maintain small amounts of
+state from run to run.
+
+<p>
+<li><b>Why do all of the <code>get</code> methods require the caller to
+pass in a default?</b>
+
+<p>This forces the application authors to provide reasonable
+default values, so that applications have a reasonable chance of running
+even if the repository is unavailable. 
+
+<p>
+<li><b>How was it decided which methods should throw
+<code>BackingStoreException</code>?</b>
+
+<p>Only methods whose semantics absolutely require the ability to
+communicate with the backing store throw this exception.  Typical
+applications will have no need to call these methods.  As long as these
+methods are avoided, applications will be able to run even if the backing
+store is unavailable, which was an explicit design goal.
+
+<p>
+<li><b>Why doesn't this API provide stronger guarantees concerning
+concurrent access by multiple VMs?  Similarly, why doesn't the API allow
+multiple Preferences updates to be combined into a single  "transaction", with
+all or nothing semantics?</b> 
+
+<p>While the the API does provide rudimentary persistent data storage, it is
+not intended as a substitute for a database.  It is critical that it be
+possible to implement this API atop standard preference/configuration
+repositories, most of which do not provide database-like
+guarantees and functionality.  Such repositories have proven adequate 
+for the purposes for which this API is intended.
+
+<p>
+<li><b>Why does this API have case-sensitive keys and node-names, while other
+APIs playing in a similar space (such as the Microsoft Windows Registry 
+and LDAP) do not?
+</b>
+
+<p>In the Java programming universe, case-sensitive String keys are
+ubiquitous.  In particular, they are provided by the Properties class,
+which this API is intended to replace.  It is not uncommon for people to use
+Properties in a fashion that demands case-sensitivity.  For example,
+Java package names (which are case-sensitive) are sometimes used as keys.  It
+is recognized that this design decision complicates the life of the systems
+programmer who implements Preferences atop a backing store
+with case-insensitive keys, but this is considered an acceptable price to
+pay, as far more programmers will use the Preferences API than will
+implement it.
+
+<p>
+<li><b>Why doesn't this API use the Java 2 Collections Framework?</b>
+
+<p>This API is designed for a very particular purpose, and is optimized
+for that purpose.  In the absence of generic types (see 
+<a href="http://java.sun.com/aboutJava/communityprocess/index.jsp">
+JSR-14</a>), the API would be less convenient for typical users. 
+It would lack compile-time type safety, if forced to conform to 
+the <tt>Map</tt> API.  Also, it is not anticipated that interoperability 
+with other Map implementations will be required (though it would be
+straightforward to implement an adapter class if this assumption turned out to
+be wrong).  Preferences API is, by design, so similar to
+Map that programmers familiar with the latter should have no
+difficulties using the former.  
+
+<p>
+<li><b>Why don't the put and remove methods return the old values?</b>
+
+<p>It is desirable that both of these methods be executable even if 
+the backing store is unavailable.  This would not be possible if they were
+required to return the old value.  Further, it would have negative
+performance impact if the API were implemented atop some common back-end
+data stores. 
+
+<p>
+<li><b>Why does the API permit, but not require, stored defaults?</b>
+
+<p>This functionality is required in enterprise settings for scalable,
+cost-effective administration of preferences across the enterprise, but would
+be overkill in a self-administered single-user setting.
+
+<p>
+<li><b>Why doesn't this API contain methods to read and write
+arbitrary serializable objects?</b>
+
+<p>Serialized objects are somewhat fragile: if the version of the
+program that reads such a property differs from the version that wrote
+it, the object may not deserialize properly (or at all).  It is not
+impossible to store serialized objects using this API, but
+we do not encourage it, and have not provided a convenience method.
+
+<p>
+<li><b>Why is <code>Preferences</code> an abstract class rather than an
+interface?</b>
+
+<p>It was decided that the ability to add new methods in an upward compatible
+fashion outweighed the disadvantage that Preferences cannot be used
+as a "mixin" (That is to say, arbitrary classes cannot also be made to serve as
+Preferences objects.)  Also, this obviates the need for a separate
+class for the static methods.  (Interfaces cannot contain static methods.)
+
+</ol>
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+</TR>
+</TABLE>
+
+</body></html>
+

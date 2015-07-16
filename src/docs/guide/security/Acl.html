@@ -1,0 +1,376 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE> Access Control Lists
+
+</TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.0Gold (Win95; I) [Netscape]">
+</HEAD>
+<BODY>
+
+<H1 ALIGN=CENTER>Access Control Abstractions</H1>
+<br>
+
+<H3 ALIGN=CENTER><I>Last Modified: 30 April 2001</I></H3>
+
+<HR>
+
+<H1>java.security.acl </H1>
+
+<HR>
+
+<H2>Introduction</H2>
+
+<P>An Access Control List (ACL) is a data structure that guards access
+to resources. The <I>java.security.acl </I>package provides the interface to
+such a data structure and the <i>sun.security.acl</i> package provides
+a default implementation of the interfaces specified in the <I>java.security.acl
+</I>package. 
+
+<p>Note: This API is not used internally for JDK system
+security. It was introduced in JDK 1.1, and remains for backwards
+compatibility. It may undergo substantial
+revision and extension or even replacement in future releases.
+This document describes the current interfaces.
+
+<p>An ACL can be thought of as a data structure with multiple
+ACL entries. Each ACL entry, of interface type AclEntry, contains a
+set of permissions associated with a particular principal. (A
+principal represents an entity such as an individual user or a
+group). Additionally, each ACL entry is specified as being either
+positive or negative. If positive, the permissions are to be
+granted to the associated principal. If negative, the permissions
+are to be denied.<p>
+
+<p>An access control list
+is independent of the authentication scheme used to verify the validity
+of the principal. It is also independent of the encryption scheme used
+to transmit the data across the network. The ACL is consulted after the
+authentication phase. After the principal is verified to be an authenticated
+user in the system, the principal might access resources. For each such
+resource, the principal might or might not be granted access depending
+on the permissions that are granted to the principal in the ACL that guards
+the resource. The ACL itself is independent of the resource that it guards.
+The ACL can be consulted to find the list of permissions a particular principal
+has or to find out whether or not a principal is granted a particular permission.
+</P>
+
+<H2>ACL structure </H2>
+
+<P>An ACL is an object that implements the <i>java.security.acl.Acl</i> interface.
+Each <I>Acl </I>is a list of <I>AclEntry </I>objects. Each <I>AclEntry
+</I>associates a <I>Principal</I> or a <I>Group</I> object to a list of
+<I>Permission</I> objects. (Note: Group is a subclass of Principal.)
+Each <I>AclEntry </I>can also be designated
+as a positive entry or a negative entry. A positive entry grants the list
+of permissions in the entry to the principal or group and a negative entry
+denies the list of permissions to the principal or group. </P>
+
+<H2>Calculation of granted permissions </H2>
+
+<P>When calculating the net permissions a principal is granted, the following
+rules are used. </P>
+
+<OL>
+<LI>Each principal or group can have at most one positive ACL entry and 
+one negative entry; that is, multiple positive or negative ACL entries are
+not allowed for any principal or group. </LI>
+
+<LI>If there is no entry for a particular principal or a group, then 
+the principal or the group has the null permission set. </LI>
+
+<LI>The net group positive permission set for a principal is the union
+of all the positive permissions of each group that the principal belongs
+to. </LI>
+
+<LI>The net group negative permission set for a principal is the union
+of all the negative permissions of each group that the principal belongs
+to. </LI>
+
+<LI>If there is a positive entry that grants a principal or a group a particular
+permission and a negative entry that denies the principal or group the
+same permission, then that permission is removed from both the positive
+permissions set and the negative permissions set. </LI>
+
+<LI>Individual permissions (permissions granted or denied to a specific
+principal) always override the Group permissions. Specifically, individual
+negative permissions (specific denial of permissions) override the group's
+positive permissions. And individual positive permissions override the
+group's negative permissions. </LI>
+
+<LI>Assume that the positive permission set of all the groups that the
+principal belongs to is g1 and the negative permission set of all the groups
+that the principal belongs to is g2. Also assume that the individual
+positive permission set for the principal is p1 and the individual negative
+permission set for the principal is p2. Then the resulting permissions
+that the principal is granted are (p1 + (g1 - p2)) - (p2 + (g2 - p1)). </LI>
+</OL>
+
+<H2>Example permission calculations </H2>
+
+<P>Assume that a principal P belongs to groups G1 and G2. The table below
+shows 5 columns using some examples of permissions given to G1, G2 and
+P. The resulting permissions granted to P are shown in the last column.
+</P>
+
+<TABLE summary="example permissions calculations" CELLSPACING=0 CELLPADDING=0 >
+<thead>
+<TR>
+<TH></TH>
+
+<TH>Group G1 Permissions</TH>
+
+<TH>Group G2 Permissions </TH>
+
+<TH>Union (G1, G2) perms</TH>
+
+<TH>Individual Permissions </TH>
+
+<TH>Resulting Permissions </TH>
+
+<TD></TD>
+</TR>
+</thead>
+<TR>
+<TH>Positive </TH>
+
+<TD align = center>A </TD>
+
+<TD align = center>B </TD>
+
+<TD align = center>A+B </TD>
+
+<TD align = center>C </TD>
+
+<TD align = center rowspan = 2>A+B+C </TD>
+</TR>
+
+<TR>
+<TH>Negative </TH>
+
+<TD align = center>null set </TD>
+
+<TD align = center>null set</TD>
+
+<TD align = center>null set </TD>
+
+<TD align = center>null set </TD>
+</TR>
+
+<TR>
+<TD><BR>
+</TD>
+</TR>
+
+<TR>
+<TH>Positive </TH>
+
+<TD align = center>A </TD>
+
+<TD align = center>B </TD>
+
+<TD align = center>B </TD>
+
+<TD align = center>C </TD>
+
+<TD align = center rowspan = 2>B+C </TD>
+</TR>
+
+<TR>
+<TH>Negative </TH>
+
+<TD align = center>-C </TD>
+
+<TD align = center>-A </TD>
+
+<TD align = center>-C </TD>
+
+<TD align = center>null set</TD>
+</TR>
+
+<TR>
+<TD><BR>
+</TD>
+</TR>
+
+<TR>
+<TH>Positive </TH>
+
+<TD align = center>A </TD>
+
+<TD align = center>B </TD>
+
+<TD align = center>A+B </TD>
+
+<TD align = center>C </TD>
+
+<TD align = center rowspan = 2>B+C </TD>
+</TR>
+
+<TR>
+<TH>Negative </TH>
+
+<TD align = center>null set</TD>
+
+<TD align = center>null set</TD>
+
+<TD align = center>null set</TD>
+
+<TD align = center>-A</TD>
+</TR>
+
+<TR>
+<TD><BR>
+</TD>
+</TR>
+
+<TR>
+<TH>Positive </TH>
+
+<TD align = center>A </TD>
+
+<TD align = center>C </TD>
+
+<TD align = center>A </TD>
+
+<TD align = center>B </TD>
+
+<TD align = center rowspan = 2>B </TD>
+</TR>
+
+<TR>
+<TH>Negative </TH>
+
+<TD align = center>-C</TD>
+
+<TD align = center>-B</TD>
+
+<TD align = center>-B</TD>
+
+<TD align = center>-A</TD>
+</TR>
+</TABLE>
+
+<P><BR>
+</P>
+
+<H2>Example usage </H2>
+
+<PRE>
+/* Note: This sample program is meant just as an example
+ * of the types of things that can be done with an
+ * implementation of the java.security.acl interfaces. 
+ * This example uses the implementation supplied by the 
+ * sun.security.acl package. Please note that sun.* classes 
+ * are unsupported and subject to change.
+*/
+
+import java.security.Principal;
+import java.security.acl.*;
+import sun.security.acl.*;
+import java.util.Enumeration;
+
+public class AclEx {
+
+  public static void main(String argv[])  
+    throws Exception
+  {
+
+    Principal p1 = new PrincipalImpl("user1");
+    Principal p2 = new PrincipalImpl("user2");
+    Principal owner = new PrincipalImpl("owner");
+ 
+    Permission read = new PermissionImpl("READ");
+    Permission write = new PermissionImpl("WRITE");
+ 
+    System.out.println("Creating a new group with two members: user1 and
+user2");
+    Group g = new GroupImpl("group1");
+    g.addMember(p1);
+    g.addMember(p2);
+ 
+    // 
+    // create a new acl with the name "exampleAcl" 
+    // 
+    System.out.println("Creating a new Acl named 'exampleAcl'");
+    Acl acl = new AclImpl(owner, "exampleAcl"); 
+ 
+    // 
+    // Allow group all permissions 
+    // 
+    System.out.println("Creating a new Acl Entry in exampleAcl for the
+group, ");
+    System.out.println("  with read & write permissions");
+    AclEntry entry1 = new AclEntryImpl(g); 
+    entry1.addPermission(read); 
+    entry1.addPermission(write); 
+    acl.addEntry(owner, entry1); 
+ 
+    // 
+    // Take away WRITE permissions for  
+    // user1. All others in groups still have 
+    // WRITE privileges. 
+    // 
+    System.out.println("Creating a new Acl Entry in exampleAcl for user1");
+    System.out.println("  without write permission");
+    AclEntry entry2 = new AclEntryImpl(p1); 
+    entry2.addPermission(write); 
+    entry2.setNegativePermissions(); 
+    acl.addEntry(owner, entry2);         
+ 
+    // 
+    // This enumeration is an enumeration of  
+    // Permission interfaces. It should return 
+    // only "READ" permission. 
+    Enumeration e1 = acl.getPermissions(p1); 
+    System.out.println("Permissions for user1 are:");
+    while (e1.hasMoreElements()) {
+	System.out.println("  " + e1.nextElement());
+	};
+ 
+    // 
+    // This enumeration should have "READ" and"WRITE"  
+    // permissions. 
+    Enumeration e2 = acl.getPermissions(p2); 
+    System.out.println("Permissions for user2 are:");
+    while (e2.hasMoreElements()) {
+	System.out.println("  " + e2.nextElement());
+	};
+
+    // This should return false. 
+    boolean b1 = acl.checkPermission(p1, write); 
+    System.out.println("user1 has write permission: " + b1);
+     
+    // This should all return true; 
+    boolean b2 = acl.checkPermission(p1, read); 
+    boolean b3 = acl.checkPermission(p2, read); 
+    boolean b4 = acl.checkPermission(p2, write); 
+    System.out.println("user1 has read permission: " + b2);
+    System.out.println("user2 has read permission: " + b3);
+    System.out.println("user2 has write permission: " + b4);
+  }
+}
+</PRE>
+
+
+<p>
+<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<HR SIZE=3 NOSHADE>
+ 
+<IMG alt="Sun logo" SRC="../../images/sunlogo64x30.gif" ALIGN=RIGHT>
+ 
+<FONT SIZE=-2>
+<A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 
+1996-2001 Sun Microsystems, Inc., 2550 Garcia Ave., Mtn. View, CA 94043-1100 USA. All rights 
+reserved.
+</FONT>
+
+<br><br>
+<FONT SIZE=-1>
+Please send comments to: <a href="mailto:java-security@sun.com">
+java-security@sun.com</a>
+</FONT>
+
+
+</BODY>
+</HTML>

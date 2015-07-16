@@ -1,0 +1,317 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>NIO 1.4 RC Changes</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+<h1>
+NIO APIs:
+<br>
+1.4 RC Changes
+</h1>
+
+
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="index.html">New I/O APIs</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+<blockquote>
+
+
+
+This document describes how the NIO APIs in the RC release of J2SE v 1.4 
+differ from those in Beta 3.
+The changes are summarized by area:
+</p>
+
+<ul>
+<li> <a href="#buffers">Buffers</a>
+<li> <a href="#generalchannels">Channels (general)</a>
+<li> <a href="#filechannels">File channels</a>
+<li> <a href="#other">Other</a>
+</ul>
+
+<a name="buffers">
+<p><b><i>Buffers</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- b001 -->
+  Revised the type-specific buffer classes (<A
+HREF="../../api/java/nio/ByteBuffer.html"><CODE>ByteBuffer</CODE></A>,
+  <A HREF="../../api/java/nio/CharBuffer.html"><CODE>CharBuffer</CODE></A>, <i>etc.</i>)
+to implement the <A
+HREF="../../api/java/lang/Comparable.html"><CODE>Comparable</CODE></A>
+  interface.  They already defined the necessary
+  <A
+HREF="../../api/java/lang/Comparable.html#compareTo(java.lang.Object)"><CODE>compareTo</CODE></A> methods.
+
+
+
+  </p></li>
+
+  <li><p> <!-- b002 -->
+  Revised the type-specific buffer classes to make it impossible to access the
+ backing array of a non-direct heap buffer.  Invoking the
+  <A HREF="../../api/java/nio/ByteBuffer.html#hasArray()"><CODE>hasArray</CODE></A>
+method of such a buffer will always
+  return <tt>false</tt>.  Invoking the <A
+HREF="../../api/java/nio/ByteBuffer.html#array()"><CODE>array</CODE></A> or
+  <A HREF="../../api/java/nio/ByteBuffer.html#arrayOffset()"><CODE>arrayOffset</CODE></A>
+methods of such a buffer will cause a
+  <A
+HREF="../../api/java/nio/ReadOnlyBufferException.html"><CODE>ReadOnlyBufferException</CODE></A> to be thrown.
+
+
+
+  </p></li>
+
+</ul>
+
+
+<a name="generalchannels">
+<p><b><i>Channels (general)</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- c003 -->
+  Revised the <A
+HREF="../../api/java/nio/channels/Channel.html"><CODE>Channel</CODE></A> interface by
+moving the functionality
+  of asynchronous closing and interruption to the new interface
+  <A
+HREF="../../api/java/nio/channels/InterruptibleChannel.html"><CODE>InterruptibleChannel</CODE></A>, renamed the SPI class
+  <tt>AbstractChannel</tt> to <A
+HREF="../../api/java/nio/channels/spi/AbstractInterruptibleChannel.html"><CODE>AbstractInterruptibleChannel</CODE></A>,
+  and revised that class to implement 
+<CODE>InterruptibleChannel</CODE>.
+  As a consequence of these changes all of the public channel classes now
+  implement the new interface, while methods such as
+  <A
+HREF="../../api/java/nio/channels/Channels.html#newChannel(java.io.InputStream)"><CODE>Channels.newChannel</CODE></A> can return
+  channels that are readable or writable but not necessarily interruptible.
+
+
+
+  </p></li>
+
+  <li><p> <!-- c004 -->
+  Revised the <A
+HREF="../../api/java/nio/channels/Pipe.SourceChannel.html"><CODE>Pipe.SourceChannel</CODE></A> class to implement the
+  <A
+HREF="../../api/java/nio/channels/ScatteringByteChannel.html"><CODE>ScatteringByteChannel</CODE></A> interface, and revised the
+  <A
+HREF="../../api/java/nio/channels/Pipe.SinkChannel.html"><CODE>Pipe.SinkChannel</CODE></A> class to implement the
+  <A
+HREF="../../api/java/nio/channels/GatheringByteChannel.html"><CODE>GatheringByteChannel</CODE></A> interface.
+  </p></li>
+
+  <li><p> <!-- new -->
+
+    Revised the <code>read</code> methods of the
+<A HREF="../../api/java/nio/channels/GatheringByteChannel.html"><CODE>GatheringByteChannel</CODE></A> interface
+    and the <code>write</code> methods of the 
+<A HREF="../../api/java/nio/channels/ScatteringByteChannel.html"><CODE>ScatteringByteChannel</CODE></A> interface
+    to return <code>long</code> rather than <code>int</code> byte counts.
+    Corresponding changes were also made to the
+<A HREF="../../api/java/nio/channels/DatagramChannel.html"><CODE>DatagramChannel</CODE></A>,
+<A HREF="../../api/java/nio/channels/FileChannel.html"><CODE>FileChannel</CODE></A>, and
+<A HREF="../../api/java/nio/channels/SocketChannel.html"><CODE>SocketChannel</CODE></A> classes.
+
+  </p></li>
+
+</ul>
+
+<a name="filechannels">
+<p><b><i>File channels</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- f005 -->
+  Revised the <A HREF="../../api/java/nio/channels/FileChannel.html#transferTo(long, long, java.nio.channels.WritableByteChannel)"><CODE>transferTo</CODE></A> and
+  <A HREF="../../api/java/nio/channels/FileChannel.html#transferFrom(java.nio.channels.ReadableByteChannel, long, long)"><CODE>transferFrom</CODE></A> methods to take
+  <tt>long</tt> rather than <tt>int</tt> <code>count</code> parameters,
+  and to return 
+  <tt>long</tt> rather than <tt>int</tt> byte counts,
+  so that they can be
+used to
+  transfer large files.  Revised the <A
+HREF="../../api/java/nio/channels/FileChannel.html#map(java.nio.channels.FileChannel.MapMode, long, long)"><CODE>map</CODE></A>
+  method's <tt>size</tt> parameter to be <tt>long</tt> rather than
+<tt>int</tt> for consistency.
+
+
+
+  </p></li>
+
+
+</ul>
+
+
+<a name="other">
+<p><b><i>Other</i></b></p>
+</a>
+
+The changes described in this section
+were made in the 1.4 RC release
+but not described in this document
+until the 1.4 FCS release.
+For further details, see the
+<a href="http://java.sun.com/j2se/1.4/nio/jsr-51-change-log.html">JSR-51
+Change Log.</a>
+
+<ul>
+<p>
+<li> Added a security check to the 
+<a href="../../api/java/nio/charset/spi/CharsetProvider.html#CharsetProvider()"><tt>CharsetProvider</tt>
+constructor.</a>
+We defined a new runtime security
+permission, <tt>charsetProvider</tt>, and revised the 
+<tt>CharsetProvider</tt>
+constructor to throw a <code>SecurityException</code>
+if the security manager refuses permission.
+</li>
+</p>
+
+
+<p>
+<li> Replaced  the insecure <tt>CharsetProvider</tt> method
+<tt>putCharsets</tt> 
+with a new method named
+<a
+href="../../api/java/nio/charset/spi/CharsetProvider.html#charsets()"><code>charsets</code></a>.
+The new method creates an iterator
+for the charsets supported by the provider.  
+</li>
+</p>
+
+
+<p>
+<li>
+Added a security check to the <tt>SelectorProvider</tt> constructor.
+</p>
+
+
+<p>
+<li> Removed the <tt>setProvider</tt> method of <tt>SelectorProvider</tt>.
+Trusted code can still declare its own selector provider
+as the system-wide default 
+by setting a system property on the command line
+or making a provider available as a service.
+(The specification of the <a
+href="../../api/java/nio/channels/spi/SelectorProvider.html#provider()"><tt>provider</tt></a>
+method describes the lookup algorithm in detail.)
+</p>
+
+<p>
+<li> Declared <code>public static</code> fields in 
+<a href="../../api/java/nio/charset/CodingErrorAction.html"><tt>CodingErrorAction</tt></a>
+to be <code>final</code>.
+</li>
+</p>
+
+</ul>
+
+
+</blockquote>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+    <FONT SIZE="-1">
+
+    Please send comments to:
+    <a href="mailto:java-io@java.sun.com">java-io@java.sun.com</a>
+
+    </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+</BODY>
+
+</HTML>

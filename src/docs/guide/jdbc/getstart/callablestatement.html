@@ -1,0 +1,138 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="preparedstatement.html">[Prev]</a> <a href="mapping.html">[Next]</a> 
+<hr><br>
+ 
+<a name="999652"> </a>
+<h2> CallableStatement</h2>
+<p><a name="1005788"> </a>
+NOTE: The material in this chapter is based on <em>JDBC</em>tm<em> API Tutorial and Reference, Second Edition: Universal Data Access for the Java</em>tm<em> 2 Platform</em>, published by Addison Wesley as part of the Java series, ISBN 0-201-43328-1.
+</p><a name="999651"> </a>
+<h3>7.1	 CallableStatement Overview</a>&#32;</a></h3>
+<p><a name="1001837"> </a>
+A<code> CallableStatement</code> object provides a way to </a>call stored procedures in a standard way for all RDBMSs. A stored procedure is stored in a database; the <em>call</em> to the stored procedure is what a </a><code>CallableStatement</code> object contains. This call is written in an </a>escape syntax that may take one of two forms: one form with a </a>result </a>parameter, and the other without one. A </a>result </a>parameter, a kind of OUT parameter, is the return value for the stored procedure. Both forms may have a variable number of parameters used for input (</a>IN parameters), output (</a>OUT parameters), or both (</a>INOUT </a>parameters). </a>A question mark serves as a </a>placeholder for a parameter.
+</p><p><a name="998255"> </a>
+The </a>syntax for </a>invoking</a> a stored procedure using the JDBC API is shown here. Note that the square brackets indicate that what is between them is optional; they are not themselves part of the syntax.
+</p><blockquote><pre>
+{call procedure_name[(?, ?, ...)]}
+</pre></blockquote><p><a name="998254"> </a>
+The syntax for a procedure that returns a result parameter is:
+</p><blockquote><pre>
+{? = call procedure_name[(?, ?, ...)]}
+</pre></blockquote><p><a name="1000167"> </a>
+The syntax for a stored procedure with no parameters would look like this:
+</p><blockquote><pre>
+{call procedure_name}
+</pre></blockquote><p><a name="1001781"> </a>
+Normally, anyone </a>creating a </a><code>CallableStatement</code> object would already know that the DBMS being used supports stored procedures and what those procedures are. If one needed to check, however, various </a><code>DatabaseMetaData</code> methods will supply such information. For instance, the method <code>supportsStoredProcedures</code> will return <code>true</code> if the DBMS supports stored procedure calls, and the method </a><code>getProcedures</code> will return a description of the stored procedures available.
+</p><p><a name="998690"> </a>
+<code>CallableStatement</code> </a>inherits <code>Statement</code> methods, which deal with SQL statements in general, and it also inherits <code>PreparedStatement</code> methods, which deal with IN parameters. All of the methods defined in <code>CallableStatement</code> deal with </a><a <B>OUT parameters<Default Para Font>>OUT parameters or the output aspect of </a>INOUT parameters: registering the JDBC types of the OUT parameters, retrieving values from them, or checking whether a returned value was </a>JDBC <code>NULL</code>. Whereas the <code>getXXX</code> methods defined in <code>ResultSet</code> retrieve values from a result set, the <code>getXXX</code> methods in </a><code>CallableStatement</code> retrieve values from the OUT parameters and/or return value of a stored procedure.
+</p><a name="998526"> </a>
+<h4>7.1.1	 </a>Creating a CallableStatement Object</a></h4>
+<p><a name="998090"> </a>
+<code>CallableStatement</code> objects are created with the <code>Connection</code> method </a><code>prepareCall</code>. The following example, in which con is an active JDBC <code>Connection</code> object, creates an instance of <code>CallableStatement</code>.
+</p><blockquote><pre>
+CallableStatement cstmt = con.prepareCall(
+	"{call getTestData(?, ?)}");
+</pre></blockquote><p><a name="998100"> </a>
+The variable cstmt contains a call to the stored procedure <code>getTestData</code>, which has two input parameters and no result parameter. Whether the</a> <code>?</code> placeholders are IN, OUT, or INOUT parameters depends on the stored procedure <code>getTestData</code>. This instance of a <code>CallableStatement</code> object was created using JDBC 1.0 API; consequently, any query in the stored procedure called by cstmt will produce a default <code>ResultSet</code> object (one that is non-scrollable and non-updatable). 
+</p><p><a name="1003380"> </a>
+The JDBC 2.0 API provides the means to create </a><code>CallableStatement</code> objects that can produce <code>ResultSet</code> objects that are scrollable and </a>updatable, as the following code fragment demonstrates.
+</p><blockquote><pre>
+String sql = "{call getTestData(?, ?)}";
+CallableStatement cstmt2 = con.prepareCall(sql,
+	ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+</pre></blockquote><p><a name="1003418"> </a>
+The variable cstmt2 contains the same call to the stored procedure <code>TestData that </code>cstmt does, but with cstmt2, any <code>resultSet</code> objects that <code>TestData</code> produces can be updated and are scrollable (though they will not be sensitive to updates made while they are open). Explanations for the constants used to indicate scrollability and updatability are given in the chapter "ResultSet."
+</p><a name="999427"> </a>
+<h4>7.1.2	 IN Parameters</h4>
+<p><a name="998103"> </a>
+</a>Passing </a>in any IN parameter values to a <code>CallableStatement</code> object is done using the <code>setXXX</a></code> methods</a> inherited from <code>PreparedStatement</code>. The type of the value being passed in determines which <code>setXXX</code> method to use (<code>setFloat</code> to pass in a <code>float</code> value, <code>setBoolean</code> to pass in a <code>boolean</code>, and so on). Of the programs that use parameters, the vast majority use only IN parameters.
+</p><a name="1000220"> </a>
+<h4>7.1.3	 Making Batch Updates</h4>
+<p><a name="1003294"> </a>
+The ability to make </a>batch updates is the same for <code>CallableStatement</code> objects as it is for <code>PreparedStatement</code> objects. In fact, a <code>CallableStatement</code> object is restricted to the same functionality that a <code>PreparedStatement</code> object has. More precisely, when using the batch update facility, a <code>CallableStatement</code> object can call only stored procedures that take </a>input parameters</a> or no parameters at all. Further, the stored procedure must return an update count. The <code>CallableStatement.executeBatch</code> method (inherited from <code>PreparedStatement</code>) will throw a <code>BatchUpdateException</code> if the stored procedure returns anything other than an update count or takes OUT or INOUT parameters.
+</p><p><a name="1003367"> </a>
+The following code fragment illustrates using the batch update facility to associate two sets of parameters with a <code>CallableStatement</code> object.
+</p><blockquote><pre>
+CallableStatement cstmt = con.prepareCall(
+			"{call updatePrices(?, ?)}");
+cstmt.setString(1, "Colombian");
+cstmt.setFloat(2, 8.49f);
+cstmt.addBatch();
+
+cstmt.setString(1, "Colombian_Decaf");
+cstmt.setFloat(2, 9.49f);
+cstmt.addBatch();
+
+int [] updateCounts = cstmt.executeBatch();
+</pre></blockquote><p><a name="1003355"> </a>
+The variable cstmt contains a call to the stored procedure <code>updatePrices</code> with two sets of parameters associated with it. When cstmt is executed, two update statements will be executed together as a batch: one with the parameters <code>Colombian</code> and <code>8.49f</code>, and a second one with the parameters <code>Colombian_Decaf</code> and <code>9.49f</code>. An <code>f</code> after a number, as in <code>8.49f</code>, tells the Java compiler that the value is a <code>float</code>; otherwise, the compiler assumes that a number with decimal digits is a <code>double</code> and will not allow it to be used as a <code>float</code>.
+</p><a name="1003293"> </a>
+<h4>7.1.4	 OUT Parameters</h4>
+<p><a name="1000230"> </a>
+If the </a>stored procedure returns OUT parameters, the JDBC type of each OUT parameter must be </a>registered before the <code>CallableStatement</code> object can be executed. This is necessary because some DBMSs require the SQL type (which the JDBC type represents), not because JDBC requires it. JDBC types, a set of generic SQL </a>type identifiers that represent the most commonly used SQL types, are explained fully in the chapter <a href="mapping.html#996857">"Mapping SQL and Java Types" on page &#32;85</a>.
+</p><p><a name="1001504"> </a>
+Registering the </a>JDBC type is done with the method </a><code>registerOutParameter</code>. Then after the statement has been executed, <code>CallableStatement</code>'s </a><code>getXXX</code> methods can be used to </a>retrieve OUT parameter values. The correct </a><code>CallableStatement</code>.<code>getXXX</code> method to use is the type in the Java programming language that corresponds to the JDBC type registered for that parameter. (The standard mapping from JDBC types to Java types is shown in <a href="mapping.html#1051555">Table &#32;8.1 on page &#32;105</a>.) In other words, <code>registerOutParameter</code> uses a JDBC type (so that it matches the data type that the database will return), and <code>getXXX</code> casts this to a Java type.
+</p><p><a name="998136"> </a>
+To illustrate, the following code registers the </a>OUT parameters, executes the stored procedure called by cstmt, and then retrieves the values returned in the OUT parameters. The method <code>getByte</code> retrieves a Java <code>byte</code> from the first OUT parameter, and <code></a>getBigDecimal</code> retrieves a <code>java.math.BigDecimal</code> object (with three digits after the decimal point) from the second OUT parameter. The method </a><code>executeQuery</code> is used to execute cstmt because the stored procedure that it calls returns a result set.
+</p><blockquote><pre>
+CallableStatement cstmt = con.prepareCall(
+	"{call getTestData(?, ?)}");
+cstmt.registerOutParameter(1, java.sql.Types.TINYINT);
+cstmt.registerOutParameter(2, java.sql.Types.DECIMAL, 3);
+ResultSet rs = cstmt.executeQuery();
+// . . . retrieve result set values with rs.getXXX methods
+byte x = cstmt.getByte(1);
+java.math.BigDecimal n = cstmt.getBigDecimal(2);
+</pre></blockquote><p><a name="998397"> </a>
+Unlike <code>ResultSet,</code> <code>CallableStatement</code> does not provide a special mechanism for retrieving </a>large OUT values incrementally. More specifically, it does not have <code>getXXX</code> methods for streams of data, such as <code>getAsciiStream</code> or <code>getBinary-Stream.</code> However, the JDBC 2.0 API provides <code>CallableStatement</code> methods for retrieving SQL3 datatypes as OUT or INOUT parameters, which includes the methods <code>getBlob</code> and <code>getClob</code> for retrieving binary large objects and character large objects.
+</p><a name="999937"> </a>
+<h4>7.1.5	 Numbering of</a> Parameters</a></h4>
+<p><a name="999941"> </a>
+When a method takes an <code>int</code> specifying which parameter to act upon (<code>setXXX</code>, <code>getXXX</code>, and <code>registerOutParameter</code>), that <code>int</code> refers to </a><code>?</code> placeholder </a>parameters only, with numbering starting at one. The parameter number does not refer to literal parameters that might be supplied to a stored procedure call. For example, the following code fragment illustrates a stored procedure call with one literal parameter and one <code>?</code> parameter: 
+</p><blockquote><pre>
+CallableStatement cstmt = con.prepareCall(
+		"{call getTestData(25, ?)}");
+cstmt.registerOutParameter(1, java.sql.Types.TINYINT);
+</pre></blockquote><p><a name="999951"> </a>
+In this code, the first argument to <code>registerOutParameter</code>, the <code>int</code> <code>1</code>, refers to the first <code>? </code>parameter (and in this case, the only <code>?</code> parameter). It does not refer to the literal <code>25</code>, which is the first parameter to the stored procedure.
+</p><a name="999940"> </a>
+<h4>7.1.6	 INOUT Parameters</a></h4>
+<p><a name="999944"> </a>
+A parameter that supplies input as well as accepts output (an </a>INOUT parameter) requires a call to the appropriate </a><code>setXXX</code> method (inherited from <code>PreparedStatement</code>) in addition to a call to the method </a><code>registerOutParameter</code>. The <code>setXXX</code> method sets a parameter's value as an input parameter, and the method <code>registerOutParameter</code> registers its </a>JDBC type as an output parameter. The <code>setXXX</code> method provides a Java value that the driver converts to a JDBC value before sending it to the database. The JDBC type of this IN value and the JDBC type supplied to the method <code>registerOutParameter</code> should be the same. Then, to retrieve the output value, a corresponding </a><code>getXXX</code> method is used. For example, a parameter whose Java type is <code>byte</code> should use the method <code>setByte</code> to assign the input value, should supply a <code>TINYINT</code> as the JDBC type to <code>registerOutParameter</code>, and should use <code>getByte</code> to retrieve the output value. (<a href="mapping.html#996857">"Mapping SQL and Java Types" on page &#32;85</a> contains tables of type mappings.)
+</p><p><a name="998437"> </a>
+The following example assumes that there is a stored procedure <code>reviseTotal</code> whose only parameter is an INOUT parameter. The method </a><code>setByte</code> sets the parameter to <code>25</code>, which the driver will send to the database as a JDBC </a><code>TINYINT</code>. Next <code>registerOutParameter</code> registers the parameter as a JDBC <code>TINYINT</code>. After the stored procedure is executed, a new JDBC <code>TINYINT</code> value is returned, and the method <code>getByte</code> will retrieve this new value as a Java <code>byte</code>. Since the stored procedure called in this example returns an update count, the method <code>executeUpdate</code> is used.
+</p><blockquote><pre>
+CallableStatement cstmt = con.prepareCall(
+		"{call reviseTotal(?)}");
+cstmt.setByte(1, (byte)25);
+cstmt.registerOutParameter(1, java.sql.Types.TINYINT);
+cstmt.executeUpdate();
+byte x = cstmt.getByte(1);
+</pre></blockquote><a name="998187"> </a>
+<h4>7.1.7	 Retrieve OUT Parameters after Results</h4>
+<p><a name="1000244"> </a>
+Because of limitations imposed by some DBMSs, it is recommended that for maximum </a>portability, all of the results in a <code>ResultSet</code> object generated by the execution of a </a><code>CallableStatement</code> object should be retrieved </a>before OUT parameters are retrieved. When all values have been retrieved from a </a>result set, the method <code>ResultSet.next</code> will return <code>false</code>.
+</p><p><a name="1000753"> </a>
+If a <code>CallableStatement</code> object returns multiple <code>ResultSet</code> objects (which is possible only if it is executed with a call to the method <code>execute</code>), all of the results should be retrieved before</a> OUT parameters are retrieved. In this case, to be sure that all results have been accessed, the <code>Statement</code> methods </a><code>getResultSet</code>, <code>getUpdateCount</code>, and <code>getMoreResults</code> need to be called until there are no more results. When all results have been exhausted, the method </a><code>getMoreResults</code> returns <code>false</code>, and the method <code>getUpdateCount</code> returns <code>-1</code>.
+</p><p><a name="998197"> </a>
+After all values have been retrieved from <code>ResultSet</code> objects (using <code>ResultSet.getXXX</code> methods), and after it has been determined that there are no more update counts, values from </a>OUT parameters can be retrieved (using <code>CallableStatement</code>.<code>getXXX</code> methods).
+</p><a name="998204"> </a>
+<h4>7.1.8	 Retrieving NULL Values as OUT Parameters</h4>
+<p><a name="998220"> </a>
+The value returned to an OUT parameter may be JDBC <code>NULL</code>. When this happens, the JDBC</a> <code>NULL</a></code> value will be converted so that the value returned by a <code>getXXX</code> method will be <code>null</code>, <code>0</code>, or <code>false</code>, depending on the <code>getXXX</code> method type. As with <code>ResultSet</code> objects, the only way to know if a value of <code>0</code> or <code>false</code> was originally<code> </code>JDBC <code>NULL</code> </a>is to test it with the method <code>wasNull</code>, which returns <code>true</code> if the last value read by a <code>getXXX</code> method was JDBC <code>NULL,</code> and <code>false</code> otherwise. 
+</p>
+<hr><br>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="preparedstatement.html">[Prev]</a> <a href="mapping.html">[Next]</a> 
+<hr><br>
+
+
+
+<i><a href="copyright.html">Copyright</a> &#169; 1999, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

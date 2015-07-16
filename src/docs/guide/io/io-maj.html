@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Features of java.io.File in the Java(TM) 2 Platform</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Features of <code>java.io.File</code> in the Java<sup><font size=-2>TM</font></sup> 2 Platform</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Java<sup><font size=-2>TM</font></sup> 2 SDK Contents</a></font>
+
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+<blockquote>
+
+The <a href="../../api/java/io/File.html">File</a> class is a true abstract
+      representation of file and directory pathnames. This allows
+the File class to better support non-Unix platforms such as Windows,
+      which has a rich pathname syntax involving drive letters, UNC share
+names, and multiple separator characters. The 
+      specification of class File prior to the Java<sup><font size=-2>TM</font></sup>&nbsp;2 Platform could not handle these cases because it was written in
+terms of simple string operations. 
+<P>
+
+The following features were introduced in the <code>File</code> class 
+in the Java 2 Platform, v1.2: 
+<ul>
+<LI>The ability to create temporary files, and a simple delete-on-exit facility (the new
+methods 
+<a href="../../api/java/io/File.html#createNewFile()">createNewFile</a>,
+<a href="../../api/java/io/File.html#createTempFile(java.lang.String, java.lang.String)">createTempFile</a>,
+and <a href="../../api/java/io/File.html#deleteOnExit()">deleteOnExit</a>); 
+<LI>Conversion of abstract pathnames to URLs (the new method <a href="../../api/java/io/File.html#toURL()">toURL</a>); 
+<LI>Access to the list of filesystem roots (the new method <a href="../../api/java/io/File.html#listRoots()">listRoots</a>); 
+<LI>Comparability (the new <a href="../../api/java/io/File.html#compareTo(java.lang.Object)">compareTo</a> methods); 
+<LI>Access to additional file attributes (the new methods 
+<a href="../../api/java/io/File.html#isHidden()">isHidden</a>,
+<a href="../../api/java/io/File.html#setLastModified(long)">setLastModified</a>, and 
+<a href="../../api/java/io/File.html#setReadOnly()">setReadOnly</a>); and 
+<LI>A uniform set of methods that accept and return File objects rather
+than strings (the new methods 
+<a href="../../api/java/io/File.html#getParentFile()">getParentFile</a>, 
+<a href="../../api/java/io/File.html#getAbsoluteFile()">getAbsoluteFile</a>,
+<a href="../../api/java/io/File.html#getCanonicalFile()">getCanonicalFile</a>, 
+and 
+<a href="../../api/java/io/File.html#listFiles()">listFiles</a>, and the new interface
+<a href="../../api/java/io/FileFilter.html">FileFilter</a>). 
+</ul>
+</blockquote>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+</BODY>
+
+</HTML>

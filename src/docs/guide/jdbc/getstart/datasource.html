@@ -1,0 +1,267 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="drivermanager.html">[Prev]</a> <a href="statement.html">[Next]</a> <a href="appendixB.html">[Bottom]</a>
+<hr><br>
+ 
+<a name="998071"> </a>
+<h2> DataSource</h2>
+<p><a name="1002949"> </a>
+NOTE: The material in this chapter is based on <em>JDBC</em>tm<em> API Tutorial and Reference, Second Edition: Universal Data Access for the Java</em>tm<em> 2 Platform</em>, published by Addison Wesley as part of the Java series, ISBN 0-201-43328-1.
+</p><a name="997347"> </a>
+<h3>4.1	 DataSource Overview</h3>
+<p><a name="999430"> </a>
+A </a><code>DataSource</code> object is the representation of a data source in the Java programming language. In basic terms, a </a>data source is a facility for storing data. It can be as sophisticated as a complex database for a large corporation or as simple as a file with rows and columns. A data source can reside on a remote server, or it can be on a local desktop machine. Applications access a data source using a connection, and a <code>DataSource</code> object can be thought of as a factory for connections to the particular data source that the <code>DataSource</code> instance represents. The <code>DataSource</code> interface provides two methods for establishing a connection with a data source.
+</p><p><a name="1000190"> </a>
+Using a <code>DataSource</code> object is the </a>preferred alternative to using the <code>DriverManager</code> for establishing a connection to a data source. They are </a>similar to the extent that the <code>DriverManager</code> class and <code>DataSource</code> interface both have methods for creating a connection, methods for getting and setting a timeout limit for making a connection, and methods for getting and setting a stream for logging.
+</p><p><a name="1000714"> </a>
+Their differences are more significant than their similarities, however. Unlike the <code>DriverManager</code>, a <code>DataSource</code> object has properties that identify and describe the data source it represents. Also, a <code>DataSource</code> object works with a Javatm Naming and Directory Interfacetm (JNDI) naming service and is created, deployed, and managed separately from the applications that use it. A driver vendor will provide a class that is a basic implementation of the <code>DataSource</code> </a>interface as part of its JDBC 2.0 or 3.0 driver product. What a system administrator does to register a <code>DataSource</code> object with a JNDI naming service and what an application does to get a connection to a data source using a <code>DataSource</code> object registered with a JNDI naming service are described later in this chapter.
+</p><p><a name="1000683"> </a>
+Being registered with a JNDI naming service gives a <code>DataSource</code> object two major </a></a>advantages over the <code>DriverManager</code>. First, an application does not need to hardcode driver information, as it does with the <code>DriverManager</code>. A programmer can choose a logical name for the data source and register the logical name with a JNDI naming service. The application uses the logical name, and the JNDI naming service will supply the <code>DataSource</code> object associated with the logical name. The <code>DataSource</code> object can then be used to create a connection to the data source it represents.
+</p><p><a name="1000217"> </a>
+The second major advantage is that the <code>DataSource</code> facility allows developers to implement a <code>DataSource</code> class to take advantage of features like connection pooling and distributed transactions. Connection pooling can increase performance dramatically by reusing connections rather than creating a new physical connection each time a connection is requested. The ability to use distributed transactions enables an application to do the heavy duty database work of large enterprises.
+</p><p><a name="1000232"> </a>
+Although an application may use either the <code>DriverManager</code> or a <code>DataSource</code> object to get a connection, using a <code>DataSource</code> object offers significant advantages and is the recommended way to establish a connection.
+</p><a name="999708"> </a>
+<h4>4.1.1	 Properties</h4>
+<p><a name="999444"> </a>
+A <code>DataSource</code> object has a set of </a>properties</a> that identify and describe the real world data source that it represents. These properties include information like the location of the database server, the name of the database, the network protocol to use to communicate with the server, and so on. <code>DataSource</code> properties follow the JavaBeans design pattern and are usually set when a <code>DataSource</code> object is deployed. 
+</p><p><a name="999619"> </a>
+To encourage uniformity among <code>DataSource</code> implementations from different vendors, the JDBC 2.0 API specifies a standard set of properties and a standard name for each property. The following table gives the standard name, the data type, and a description for each of the standard properties. Note that a <code>DataSource</code> implementation does not have to support all of these properties; the table just shows the standard name that an implementation should use when it supports a property.
+</p><p><a name="999604"> </a>
+ 
+<Table Border="3">
+<caption><p><a name="999468"> </a>
+Table 4.1	 <strong> &#32; &#32;Standard Data Source Properties</strong>
+</p></caption>
+<tr><th><br><p><a name="999474"> </a>
+Property Name
+</p></th><th><br><p><a name="999476"> </a>
+Type
+</p></th><th><br><p><a name="999478"> </a>
+Description
+</p></th></tr>
+<tr><td><br><p><a name="999480"> </a>
+<a <CB>databaseName<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>databaseName
+</p></td><td><br><p><a name="999482"> </a>
+<code>String</code>
+</p></td><td><br><p><a name="999484"> </a>
+the name of a particular database on a server
+</p></td></tr>
+<tr><td><br><p><a name="1001055"> </a>
+<a <CB>dataSourceName<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>dataSourceName
+</p></td><td><br><p><a name="1001057"> </a>
+String
+</p></td><td><br><p><a name="1001059"> </a>
+the logical name for the underlying <code>XADataSource</code> or <code>ConnectionPoolDataSource</code> object; used only when pooling of connections or distributed transactions are implemented
+</p></td></tr>
+<tr><td><br><p><a name="999486"> </a>
+<a <CB>description<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>description
+</p></td><td><br><p><a name="999488"> </a>
+<code>String</code>
+</p></td><td><br><p><a name="999490"> </a>
+a description of this data source
+</p></td></tr>
+<tr><td><br><p><a name="999492"> </a>
+<a <CB>networkProtocol<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>networkProtocol
+</p></td><td><br><p><a name="999494"> </a>
+<code>String</code>
+</p></td><td><br><p><a name="999496"> </a>
+the network protocol used to communicate with the server
+</p></td></tr>
+<tr><td><br><p><a name="999498"> </a>
+<a <CB>password<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>password
+</p></td><td><br><p><a name="999500"> </a>
+<code>String</code>
+</p></td><td><br><p><a name="999502"> </a>
+the user's database password
+</p></td></tr>
+<tr><td><br><p><a name="999504"> </a>
+<a <CB>portNumber<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>portNumber
+</p></td><td><br><p><a name="999506"> </a>
+<code>int</code>
+</p></td><td><br><p><a name="999508"> </a>
+the port number where a server is listening for requests
+</p></td></tr>
+<tr><td><br><p><a name="999510"> </a>
+<a <CB>roleName<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>roleName
+</p></td><td><br><p><a name="999512"> </a>
+<code>String</code>
+</p></td><td><br><p><a name="999514"> </a>
+the initial SQL rolename
+</p></td></tr>
+<tr><td><br><p><a name="999516"> </a>
+<a <CB>serverName<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>serverName
+</p></td><td><br><p><a name="999518"> </a>
+<code>String</code>
+</p></td><td><br><p><a name="999520"> </a>
+the database server name
+</p></td></tr>
+<tr><td><br><p><a name="999522"> </a>
+<a <CB>user<Default Para Font> <B>property (<CB>DataSource<Default Para Font> <B>interface)>user
+</p></td><td><br><p><a name="999524"> </a>
+<code>String</code>
+</p></td><td><br><p><a name="999526"> </a>
+the user's account name
+</p></td></tr>
+
+</Table>
+
+<Table>
+<tr><td>
+</Table>
+
+</p><p><a name="999652"> </a>
+A <code>DataSource</code> object will, of course, have to support all of the properties that the data source it represents needs for making a connection, but the only property that all <code>DataSource</code> implementations are required to support is the <code>description</code> property. This standardizing of properties makes it possible, for instance, for a utility to be written that lists available data sources, giving a description of each along with the other property information that is available.
+</p><p><a name="999722"> </a>
+A <code>DataSource</code> object is not restricted to using only those properties specified in Table <a href="datasource.html#997347">4.1</a>. A vendor may add its own properties, in which case it should give each new property a </a>vendor-specific name.
+</p><p><a name="999627"> </a>
+If a <code>DataSource</code> object supports a property, it must supply <code>getter</code> and <code>setter</code> methods for it. The following code fragment illustrates the methods that a <code>DataSource</code> object ds would need to include if it supports, for example, the property <code>serverName</code>.
+</p><blockquote><pre>
+ds.setServerName("my_database_server");
+String serverName = ds.getServerName();
+
+</pre></blockquote><p><a name="999635"> </a>
+Properties will most likely be </a>set by a developer or </a>system administrator using a GUI tool as part of the installation of the data source. Users connecting to the data source do not get or set properties. This is enforced by the fact that the <code>DataSource</code> interface does not include the <code>getter</code> and <code>setter</code> methods for properties; they are supplied only in a particular implementation. The effect of including <code>getter</code> and <code>setter</code> methods in the implementation but not the public interface creates some separation between the management API for <code>DataSource</code> objects and the API used by applications. Management tools can get at properties by using introspection.
+</p><a name="1000020"> </a>
+<h4>4.1.2	 Using JNDI</h4>
+<p><a name="1000021"> </a>
+JNDI provides a uniform way for an application to find and </a>access remote services over the network. The remote service may be any enterprise service, including a messaging service or an application-specific service, but, of course, a JDBC application is interested mainly in a database service. Once a <code>DataSource</code> object is created and registered with a JNDI naming service, an application can use the JNDI API to access that <code>DataSource</code> object, which can then be used to connect to the data source it represents.
+</p><a name="1000023"> </a>
+<h4>4.1.3	 Creating and Registering a DataSource Object</h4>
+<p><a name="1000024"> </a>
+A <code>DataSource</code> object is usually created, </a>deployed, and managed separately from the Java applications that use it. For example, the following code fragment creates a <code>DataSource</code> object, sets its properties, and </a>registers it with a JNDI naming service. Note that a <code>DataSource</code> object for a particular data source is created and deployed by a developer or system administrator, not the user. The class <code>VendorDataSource</code> would most likely be supplied by a driver vendor. (The code example in the next section will show the code that a user would write to get a connection.) Note also that a GUI tool will probably be used to </a>deploy a <code>DataSource</code> object, so the following code, shown here mainly for illustration, is what such a tool would execute.
+</p><blockquote><pre>
+VendorDataSource vds = new VendorDataSource();
+<blockquote><pre>
+vds.setServerName("my_database_server");
+vds.setDatabaseName("my_database");
+vds.setDescription("the data source for inventory and personnel");
+
+Context ctx = new InitialContext();
+</pre></blockquote>ctx.bind("jdbc/AcmeDB", vds);
+
+</pre></blockquote><p><a name="1000032"> </a>
+The first four lines represent API from a vendor's class <code>VendorDataSource</code>, an implementation of the <code>javax.sql.DataSource</code> interface. They create a <code>DataSource</code> object, vds, and set its <code>serverName</code>, <code>databaseName</code>, and <code>description</code> properties. The fifth and sixth lines use JNDI API to register vds with a JNDI naming service. The fifth line calls the default <code>InitialContext</code> constructor to create a Java object that references the initial JNDI naming context. System properties, which are not shown here, tell JNDI which naming service provider to use. The last line associates vds with a logical name for the data source that vds represents.
+</p><p><a name="1000033"> </a>
+The JNDI namespace consists of an initial naming context and any number of subcontexts under it. It is hierarchical, similar to the directory/file structure in many file systems, with the initial context being analogous to the root of a file system and </a>subcontexts</a> being analogous to subdirectories. The root of the JNDI hierarchy is the initial context, here represented by the variable ctx. Under the initial context there may be many </a>subcontexts, one of which is <code>jdbc</code>, the JNDI subcontext reserved for JDBC data sources. (The logical data source name may be in the subcontext <code>jdbc</code> or in a subcontext under <code>jdbc</code>.) The last element in the hierarchy is the object being registered, analogous to a file, which in this case is a logical name for a data source. The result of the preceding six lines of code is that the <code>VendorDataSource</code> object vds is associated with <code>jdbc/AcmeDB</code>.</a> The following section shows how an application uses this to connect to a data source.
+</p><a name="1000034"> </a>
+<h4>4.1.4	 Connecting to a Data Source</h4>
+<p><a name="1000035"> </a>
+In the previous section, a </a><code>DataSource</code> object, vds, was given properties and bound to the </a>logical name <code>AcmeDB</code>. The following code fragment shows application code that uses this logical name to </a>connect to the database that vds represented. The code then uses the connection to print lists with the name and title of each member of the sales and customer service departments.
+</p><blockquote><pre>
+Context ctx = new InitialContext();
+<blockquote><pre>DataSource ds = (DataSource)ctx.lookup("jdbc/AcmeDB");
+Connection con = ds.getConnection("genius", "abracadabra");
+con.setAutoCommit(false);
+PreparedStatement pstmt = con.prepareStatement(
+ &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32; &#32;"SELECT NAME, TITLE FROM PERSONNEL WHERE DEPT = ?");
+pstmt.setString(1, "SALES");
+ResultSet rs = pstmt.executeQuery();
+
+System.out.println("Sales Department:");
+while (rs.next()) {
+ &#32; &#32; &#32; &#32;String name = rs.getString("NAME");
+ &#32; &#32; &#32; &#32;String title = rs.getString("TITLE");
+ &#32; &#32; &#32; &#32;System.out.println(name + "  &#32; &#32;" + title);
+}
+pstmt.setString(1, "CUST_SERVICE");
+ResultSet rs = pstmt.executeQuery();
+
+System.out.println("Customer Service Department:");
+while (rs.next()) {
+ &#32; &#32; &#32; &#32;String name = rs.getString("NAME");
+ &#32; &#32; &#32; &#32;String title = rs.getString("TITLE");
+ &#32; &#32; &#32; &#32;System.out.println(name + "  &#32; &#32;" + title);
+}
+rs.close();
+pstmt.close();
+</pre></blockquote>con.close();
+
+</pre></blockquote><p><a name="1000039"> </a>
+The first two lines use JNDI API; the third line uses <code>DataSource</code> API. After the first line creates an instance of <code>javax.naming.Context</code> for the initial naming context, the second line calls the method <code>lookup</code> on it to get the <code>DataSource</code> object associated with <code>jdbc/AcmeDB</code>. Recall that in the previous code fragment, the last line of code associated <code>jdbc/AcmeDB</code> with vds, so the object returned by the <code>lookup</code> method refers to the same <code>DataSource</code> object that vds represented. However, the return value for the method <code>lookup</code> is a reference to a Java <code>Object</code>, the most generic of objects, so it must be cast to the more narrow <code>DataSource</code> before it can be assigned to the <code>DataSource</code> variable ds.
+</p><p><a name="1000040"> </a>
+At this point ds refers to the same data source that vds referred to previously, the database my_database on the server my_database_server. Therefore, in the third line of code, calling the method <code>DataSource.getConnection</code> on ds and supplying it with a user name and password is enough to create a connection to my_database.
+</p><p><a name="1001163"> </a>
+The rest of the code fragment uses a single transaction to execute two queries and print the results of each query. The <code>DataSource</code> implementation in this case is a basic implementation included with the JDBC driver. If the <code>DataSource</code> class had been implemented to work with an <code>XADataSource</code> class, and the preceding code example was executed in the context of a distributed transaction, the code could not have called the method <code>Connection.commit</code>. It also would not have set the auto-commit mode to <code>false</code> because that would have been unnecessary. The default for newly-created connections that can participate in distributed transactions is to have auto-commit mode turned off. The next section will discuss the three broad categories of <code>DataSource</code> implementations.
+</p><p><a name="1000044"> </a>
+In addition to the version of <code>getConnection</code> that takes a user name and password, the <code>DataSource</code> interface provides a version of the method <code>DataSource.getConnection</code> that takes no parameters. It is available for situations where a data source does not require a user name and password because it uses a different security mechanism or where a data source does not restrict access.
+</p><a name="1000109"> </a>
+<h4>4.1.5	 DataSource Implementations</h4>
+<p><a name="1000418"> </a>
+The <code>DataSource</code> interface may be implemented to provide three different kinds of connections. As a result of <code>DataSource</code> objects working with a JNDI service provider, all connections produced by a <code>DataSource</code> object offer the advantages of portability and easy maintenance, which are explained later in this chapter. Implementations of <code>DataSource</code> that work with implementations of the more specialized <code>ConnectionPoolDataSource</code> and <code>XADataSource</code> interfaces produce connections that are pooled or that can be used in distributed transactions. The following list summarizes the three general categories of classes that implement the <code>DataSource</code> interface:
+</p><ol>
+<a name="1001226"> </a>
+<li></a>Basic <code>DataSource</code> class
+<ul>
+<a name="1001228"> </a>
+<li>provided by: driver vendor
+<a name="1001229"> </a>
+<li>advantages: portability, easy maintenance
+</ul>
+<a name="1001227"> </a>
+<li><code></a>DataSource</code> class implemented to provide connection pooling
+<ul>
+<a name="1001534"> </a>
+<li>provided by: application server vendor or driver vendor
+<a name="1001540"> </a>
+<li>works with: a <code>ConnectionPoolDataSource</code> class, which is always provided by a driver vendor
+<a name="1001240"> </a>
+<li>advantages: portability, easy maintenance; increased performance
+</ul>
+<a name="1001230"> </a>
+<li><code></a>DataSource</code> class implemented to provide distributed transactions
+<ul>
+<a name="1001249"> </a>
+<li>provided by: application server vendor such as an EJB server vendor
+<a name="1001536"> </a>
+<li>works with: an <code>XADataSource</code> class, which is always provided by a driver vendor
+<a name="1001250"> </a>
+<li>advantages: portability, easy maintenance; ability to participate in distributed transactions
+<a name="1001507"> </a>
+<blockquote>Note that a <code>DataSource</code> implementation that supports distributed transactions is almost always implemented to support connection pooling as well.</blockquote>
+<a name="1001586"> </a>
+<blockquote></blockquote>
+<p><a name="1001558"> </a>
+An instance of a class that implements the <code>DataSource</code> interface represents one particular data source. Every connection produced by that instance will reference the same data source. In a </a>basic <code>DataSource</code> implementation, a call to the method <code>DataSource.getConnection</code> returns a <code>Connection</code> object that, like the <code>Connection</code> object returned by the <code>DriverManager</code> facility, is a physical connection to the data source. Appendix A of the specification for the JDBC 2.0 Standard Extension API (available at <code>http://java.sun.com/products/jdbc</code>) gives a </a>sample implementation of a basic <code>DataSource</code> class.
+</p><p><a name="1001289"> </a>
+<code>DataSource</code> objects that implement </a>connection pooling likewise produce a connection to the particular data source that the <code>DataSource</code> class represents. The <code>Connection</code> object that the method <code>DataSource.getConnection</code> returns, however, is a handle to a <code>PooledConnection</code> object rather than being a physical connection. An application uses the <code>Connection</code> object just as it usually does and is generally unaware that it is in any way different. Connection pooling has no effect whatever on application code except that a pooled connection, as is true with all connections, should always be explicitly closed. When an application closes a connection that is pooled, the connection joins a pool of reusable connections. The next time <code>DataSource.getConnection</code> is called, a handle to one of these pooled connections will be returned if one is available. Because connection pooling avoids creating a new physical connection every time one is requested, it can help to make applications run significantly faster. Connection pooling is generally used, for example, by a web server that supports servlets and JavaServertm Pages.
+</p><p><a name="1000427"> </a>
+A <code>DataSource</code> class can likewise be implemented to work with a </a>distributed transaction environment. An EJB server, for example, supports distributed transactions and requires a <code>DataSource</code> class that is implemented to interact with it. In this case, the <code>DataSource.getConnection</code> method returns a <code>Connection</code> object that can be used in a distributed transaction. As a rule, EJB servers provide a <code>DataSource</code> class that supports connection pooling as well as distributed transactions. Like connection pooling, transaction management is handled internally, so using distributed transactions is easy. The only </a>requirement is that when a transaction is distributed (involves two or more data sources), the application cannot call the methods <code>commit</code> or <code>rollback</code>. It also cannot put the connection in auto-commit mode. The reason for these restrictions is that a transaction manager begins and ends a distributed transaction under the covers, so an application cannot do anything that would affect when a transaction begins or ends.
+</p></ul>
+</ol>
+<a name="1001178"> </a>
+<h4>4.1.6	 Logging and Tracing</h4>
+<p><a name="1001179"> </a>
+The <code>DataSource</code> interface provides methods that allow a user to get and set the character stream to which tracing and error logging will be written. A user can </a>trace</a> a specific data source on a given stream, or multiple data sources can write log messages to the same stream provided that the stream is set for each data source. Log messages that are written to a log stream specific to a <code>DataSource</code> object are not written to the log stream maintained by the <code>DriverManager</code>.
+</p><a name="1000417"> </a>
+<h4>4.1.7	 Advantages of Using JNDI</h4>
+<p><a name="1000110"> </a>
+There are major </a>advantages</a> to connecting to a data source using a <code>DataSource</code> object registered with a JNDI naming service rather than using the <code>DriverManager</code> facility. The first is that it makes code more portable. With the <code>DriverManager</code>, the name of a JDBC driver class, which usually identifies a particular driver vendor, is included in application code. This makes the application specific to that vendor's driver product and thus non-portable.
+</p><p><a name="1000117"> </a>
+Another advantage is that it makes code much easier to </a>maintain. If any of the necessary information about the data source changes, only the relevant <code>DataSource</code> properties need to be modified, not every application that connects to that data source. For example, if a database is moved to a different server and uses a different port number, only the <code>DataSource</code> object's <code>serverName</code> and <code>portNumber</code> properties need to be updated. A system administrator could keep all existing code usable with the following code fragment. In practice, a system administrator would probably use a GUI tool to set the properties, so the following code fragment illustrates the code a tool might execute internally.
+</p><blockquote><pre>
+Context ctx = new InitialContext()
+<blockquote><pre>DataSource ds = (DataSource)ctx.lookup("jdbc/AcmeDB");
+ds.setServerName("my_new_database_server");
+</pre></blockquote>ds.setPortNumber("940");
+
+</pre></blockquote><p><a name="1001212"> </a>
+The application programmer would not need to do anything at all to keep all of the applications using the data source running smoothly.
+</p><p><a name="1000370"> </a>
+Yet another advantage is that applications using a <code>DataSource</code> object to get a connection will automatically benefit from connection pooling if the <code>DataSource</code> class has been implemented to support connection pooling. Likewise, an application will automatically be able to use distributed transactions if the <code>DataSource</code> class has been implemented to support them.
+</p><p><a name="998114"> </a>
+
+</p>
+<hr><br>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="drivermanager.html">[Prev]</a> <a href="statement.html">[Next]</a> <a href="appendixB.html">[Bottom]</a>
+<hr><br>
+ 
+
+
+<i><a href="copyright.html">Copyright</a> &#169; 2001, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

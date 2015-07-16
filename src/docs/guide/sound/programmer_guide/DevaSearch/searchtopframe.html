@@ -1,0 +1,568 @@
+<html>
+<!-- 
+Copyright 2001, Deva Associates LLC. All rights reserved.
+Portions copyright 2001, KScripts Web Consulting and Design. All rights reserved. 
+-->
+<head>
+<title>Deva Search</title>
+<script language="Javascript" type="text/javascript">
+<!-- // START OF SEARCH SCRIPT
+var window_loaded = 0;
+
+var displaymatches = 10; // number of matches to display
+var termlength = 2; // minimum term length
+var displayfilename = 0; // set to 0 if you don't want the file name to be shown in results
+var displaydescription = 1; // set to 0 if you don't want the description to be shown in results
+var displaylastupdated = 0; // set to 0 if you don't want the last updated date to be shown in results
+var displayfilesize = 0; // set to 0 if you don't want the file size to be shown in results
+var displayresultin = 2; // 0 - open in the same window; 1 - open in the new window; 2 - open in the bottom frame;
+var urlprefix = "";// where the site resides
+var style_sheet = "style.css"; // url of style sheet
+
+
+var other, minus, plus;
+var currentmatch = 0;
+var mainframe;
+var sortedurls = new Array();
+var cleanquery = new Array();
+var searchresults = 0;
+
+function window_onload()
+  {
+  window_loaded = 1;
+  document.searchform.query.focus();
+  }
+  
+function search (q) 
+  {
+	searchresults = 0;
+	
+  var notmatching = ""; // initialize variables
+  other = "";
+  minus = "";
+  plus = "";
+	  
+	q = q.replace(/\s+/g, " "); // remove extra spaces
+	q = q.replace(/^\s+/g, ""); 
+	q = q.replace(/\s+$/g, "");
+	q = q.toLowerCase();	// switch to lower case
+	var noplusminus = q.replace(/^[\-\+]/,"");
+	if (noplusminus.length < termlength) 
+	  {	// check term length
+		alert("Term must be at least " + termlength + " characters long");
+		document.searchform.query.focus();
+		return searchresults;
+	  }
+	    
+	var done = "";
+	var isitanumber = /^[0-9]+$/;		// number regex
+	cleanquery = clean(q.split(" "));	// remove repeating terms
+	for (i = 0; i < cleanquery.length; i++) 
+	  {	// process each term
+		var cleaned = cleanquery[i];
+		if (isitanumber.test(cleaned)) 
+		  {	// add # in front of numbers
+			cleaned = "#" + cleaned;
+		  }
+	  	  
+		if (cleanquery[i].charAt(0) == "+" && cleanquery[i].length > 1) 
+		  {	// get plus boolean terms
+			cleaned = cleanquery[i].replace(/^\+/,"");
+			if (isitanumber.test(cleaned)) 
+			  {
+  			cleaned = "#" + cleaned;
+	  		}
+	    		
+			if (w[cleaned]) 
+			  {
+				plus += " " + w[cleaned];
+			  } 
+			else 
+			  {
+				notmatching += " " + cleanquery[i];
+			  }
+	  		  
+			continue;
+		  }
+	  	  
+		if (cleanquery[i].charAt(0) == "-" && cleanquery[i].length > 1) 
+		  { // get minus boolean terms
+			cleaned = cleanquery[i].replace(/^\-/,"");
+			if (isitanumber.test(cleaned)) 
+			  {
+				cleaned = "#" + cleaned;
+			  }
+	  		  
+			if (w[cleaned]) 
+			  {
+				minus += "|" + w[cleaned];
+			  } 
+	  		  
+			continue;
+		  }
+	  	  
+		if (w[cleaned]) 
+		  {
+			other += " " + w[cleaned];
+  		} 
+    else 
+      {
+			notmatching += " " + cleanquery[i];
+		  }
+	  }
+	    
+	document.searchform.query.value=cleanquery.join(" ");
+	if (notmatching) 
+	  {
+		notmatching = notmatching.replace(/^\s+/, "");
+		notmatching = notmatching.split(" ");
+	  }
+	
+  process_booleans(notmatching);
+  return  searchresults;
+  }
+
+function process_booleans(notmatching) 
+  {
+	var a = "";
+	var allurlstrings = "";
+	var nextinloop = "";
+	if (notmatching.length >= 1) 
+	  { 
+	  noresults(notmatching); 
+	  return; 
+	  }
+	  
+	if (other) 
+	  {
+		other = other.replace(/^\s+/, "");
+		other = other.split(" ");
+		for (j = 0; j < other.length; j++) 
+		  {	// process other terms
+			var urlstrings = other[j].split("|"); 
+			for (k = 0; k < urlstrings.length; k++) 
+			  {
+				allurlstrings += " " + urlstrings[k]; 
+			  }
+		  }
+	  }
+	  
+	if (plus) 
+	  {
+		plus = plus.replace(/^\s+/, "");
+		plus = plus.split(" ");
+		
+		for (j = 0; j < plus.length; j++) 
+		  {	// process plus boolean terms
+			var turlslist = "";
+			var urlslist = "";
+			var urlstrings = plus[j].split("|"); 
+			for (k = 0; k < urlstrings.length; k++) 
+			  {
+				allurlstrings += " " + urlstrings[k]; 
+				var breakup = urlstrings[k].split("=");
+				urlslist += " " + breakup[0];
+			  }
+			  
+			urlslist = urlslist.replace(/^\s+/,"");
+			urlslist = urlslist.split(" ");
+			if (!nextinloop) 
+			  { 
+			  var allwordsurls = urlslist; 
+			  nextinloop = 1; 
+			  continue;
+			  } 
+			  
+			for (l = 0; l < urlslist.length; l++) 
+			  {
+				for (m = 0; m < allwordsurls.length; m++) 
+				  {
+					if (urlslist[l] == allwordsurls[m]) 
+					  {
+						turlslist += " " + urlslist[l];
+					  }
+				  }
+			  }
+			  
+			turlslist = turlslist.replace(/^\s+/,"");
+			turlslist = turlslist.split(" ");
+			var allwordsurls = turlslist; 
+		  }
+		  
+		allurlstrings = allurlstrings.replace(/^\s+/,"");
+		allurlstrings = allurlstrings.split(" ");
+		for (n = 0; n < allurlstrings.length; n++) 
+		  {
+			var breakup = allurlstrings[n].split("=");
+			for (o = 0; o < allwordsurls.length; o++) 
+			  {
+				if (breakup[0] == allwordsurls[o]) 
+				  {
+					a += " " + allurlstrings[n];
+				  }
+			  }
+		  }
+	  }
+	else 
+	  {
+		a = allurlstrings;
+	  }
+	  
+	if (minus) 
+	  {	// process minus booleans
+		var atemp = "";
+		minus = minus.replace(/^\|/,"");
+		minus = minus.split("|");
+		var minusurls = geturls(minus);
+		a = a.replace(/^\s+/,"");
+		a = a.split(" ");
+		
+outerloop:
+		for (n = 0; n < a.length; n++) 
+		  {
+			var breakup = a[n].split("=");
+			for (o = 0; o < minusurls.length; o++) 
+			  {
+				if (breakup[0] == minusurls[o]) 
+				  {
+					continue outerloop;
+				  }
+			  }	
+			  
+			atemp += " " + a[n];
+		  }
+		  
+		a = atemp;
+	  }
+	  
+	a = a.replace(/^\s+/,"");
+	a = a.split(" ");
+	a = a.join("|");
+	
+  if (a) 
+    {
+  	process(a);
+    } 
+  else 
+    {
+  	noresults(cleanquery);  
+    }
+  }
+
+function noresults (q) 
+  {
+	var noresults = "";
+	var newcleanquery = "";
+	for (h = 0; h < cleanquery.length; h++) 
+	  {
+		var match = "";
+		for (g = 0; g < q.length; g++) 
+		  {
+			if (cleanquery[h] == q[g]) 
+			  {
+				match = 1;
+  			}
+	  	}
+	  	
+		if (!match) {newcleanquery += " " + cleanquery[h];}
+	  }	
+	  
+	newcleanquery = newcleanquery.replace(/^\s+/,"");
+	noresults = q.join(" ");
+	if (q.length == 1) 
+	  { 
+		if (newcleanquery) 
+		  {
+			var finalnoresults = q[0] + "  \nContinuing without this term";
+			alert ("Cannot find: " + finalnoresults);		
+		  } 
+		else 
+		  {
+			var finalnoresults = q[0];
+			alert ("No documents match: " + finalnoresults);		
+		  }
+	  }
+	  
+	if (q.length > 1) 
+	  {
+		if (newcleanquery) 
+		  {
+			noresults += "  \nContinuing without these terms";
+			alert("Cannot find: " + noresults);
+		  } 
+		else 
+		  {
+			alert("No documents match: " + noresults);
+		  }
+	  }
+	  
+	if (newcleanquery) 
+	  {
+		search(newcleanquery);
+	  }
+	  
+	document.searchform.query.focus();
+	document.searchform.query.select();
+	return;
+  }
+
+function process(a) 
+  {
+	var sorturls = "";
+	var urls = new Array();
+	var query = a.split("|");
+	urls = geturls(query);
+	for (j=0;j<urls.length;j++) 
+	  {
+		var total = new Number();
+		var n = 0; 
+		for (k=0;k<query.length;k++) 
+		  {
+			urlinfo = query[k].split("=");
+			if (urlinfo[0] != urls[j]) 
+			  continue;
+			  
+			n = parseFloat(urlinfo[1]); 
+			total += n;
+		  }
+		  
+		sorturls += " " + (total + "|" + urls[j]);
+	  }
+	  
+	var arethereurls = sorturls;
+	sorturls = sorturls.replace(/^\s+/,"");
+	sorturls = sorturls.split(" ");
+	sortedurls = sorturls.sort(bynumber);
+
+	if (!arethereurls) 
+	  { 
+		noresults(cleanquery); 
+		searchresults = 0;
+	  }
+	  
+	searchresults = 1;
+  }		
+  
+function bynumber(a,b) 
+  { 
+	c = a.split("|");
+	d = b.split("|");
+	return d[0] - c[0]
+  }
+  
+function clean(q) 
+  {
+	var s = "";
+	var c = new Array();
+	var t = new Array();
+	for (i=0;i<q.length;i++) 
+	  {
+		if (!t[q[i]]) 
+		  { 
+		  s += " " + q[i]; 
+		  t[q[i]] = 1;
+		  }
+	  }
+	  
+	s = s.replace(/^[\s]+/, "");
+	c = s.split(" ");
+	return c;
+  }
+  
+function geturls(query) 
+  {
+	var urls = ""; 
+	var t = new Array();
+	for (z=0;z<query.length;z++) 
+	  {
+		urlinfo = query[z].split("=");
+		if (!t[urlinfo[0]]) 
+		  { 
+		  urls += " " + urlinfo[0]; 
+		  t[urlinfo[0]] = 1;
+		  }
+	  }
+	  
+	urls = urls.replace(/^\s+/,"");
+	urls = urls.split(" ");
+	return urls;
+  }
+
+function writetarget()
+  {
+  
+  if (displayresultin == 0) 
+    return ' target="_top" ';     // 0 - open in the same window
+
+  else if (displayresultin == 1) 
+    return ' target="_blank" ';   // 1 - open in the new window; 
+
+  else if (displayresultin == 2) 
+    return ' target="_self" ';    // 2 - open in the bottom frame
+
+//  else if (displayresultin == 3) 
+//    return ' target="_self" ';    // 3 - open in the parent frame
+  }
+  
+function display(urls, ref, dif) 
+  {
+	var displaynumber = (urls.length < ref + dif ? urls.length : ref + dif);
+	mainframe = parent.frames[1].document;
+	mainframe.open();
+	
+	if (urls.length == 0) 
+	  {
+		mainframe.writeln('<table summary="layout" width=95% border=0 align=center cellpadding=3 cellspacing=0><tr><td align=center nowrap>' + 
+		                  '<BR><BR><P><B>The browser has lost your search results. Please resubmit your search query.</B></P>' + 
+		                  '</td></tr></table></body></html>');
+		mainframe.close();
+		return;
+	  } 
+	  
+	mainframe.writeln('<table summary="layout" width=95% border=0 align=center cellpadding=5 cellspacing=0>\n<tr><td class="results">\n' + 
+	                  '<B>Search Terms: ' + parent.frames[0].document.searchform.query.value + 
+	                  '<BR>');
+
+	if (ref + 1 == displaynumber) 
+	  {
+		mainframe.writeln('Results: ' + displaynumber + ' of ' + urls.length);
+	  } 
+	else 
+	  {
+		mainframe.writeln('Results: ' + (ref + 1) + ' - ' + displaynumber + ' of ' + urls.length);
+	  }
+	  
+	mainframe.writeln('</B></td></tr><tr><td class="results" align=right nowrap>');
+	prevnext(urls.length, ref, dif, "top");
+	mainframe.writeln('</td></tr>\n' + '\n<!-- // start search results list // -->\n\n');	
+	for (var i = ref; i < displaynumber; i++) 
+	  {
+		searchresults = urls[i].split("|");
+		urlinfo = u[searchresults[1]];
+		temparray = urlinfo.split("|");
+		mainframe.writeln('<tr><td class="results">\n');
+		mainframe.writeln('	<DL><DT><B>' + (i + 1) + '.</B> &nbsp; <a href="' + urlprefix + 
+		                  temparray[0] + '" ' + writetarget() + ' class="search_results">' + temparray[1] + '</a>\n');
+		
+		// write description 
+		if (displaydescription) 
+      mainframe.writeln('		<DD>' + temparray[2] + '...\n');
+
+    // write file name
+		if (displayfilename) 
+		  {
+		  mainframe.writeln('		<DD><a href="' + urlprefix + temparray[0] + '" ' +
+		                    writetarget() + ' class="search_results"><font size=1>' + urlprefix + temparray[0] + '</font></a>\n');
+  		}
+  		
+		// write number of matches
+		mainframe.writeln('		<DD><font size=1><B>');
+		if (searchresults[0] == "1" && searchresults[0] != "0") 
+		  { 
+		  mainframe.writeln('		' + searchresults[0] + ' Match ');
+		  }
+		  
+		if (searchresults[0] != "1" && searchresults[0] != "0") 
+		  { 
+		  mainframe.writeln('		' + searchresults[0] + ' Matches '); 
+		  }
+		  
+		// write file size
+		if (displayfilesize) 
+		  { 
+		  mainframe.writeln('		&nbsp; Size: ' + temparray[3] + ' kb ');
+		  }
+		  
+		// write last updated date
+		if (displaylastupdated) 
+		  { 
+		  mainframe.writeln('		&nbsp; Last Updated: ' + temparray[4]);
+		  }
+		  
+		mainframe.writeln('		</B></font>\n	</DT></DL>\n</td></tr>\n');
+  	}
+  	
+	mainframe.writeln('<tr><td class="results" nowrap><P>');
+	if (urls.length - ref > 4) 
+	  {
+		prevnext(urls.length, ref, dif, "bottom");
+	  }
+	  
+	mainframe.writeln('</P></td></tr>');
+	mainframe.writeln('</table>');
+	mainframe.close();
+	parent.frames[0].document.searchform.query.focus();
+	parent.frames[0].document.searchform.query.select();
+  }
+  
+function prevnext (top, ref, dif, location) 
+  {
+	if (location == "top") 
+	  {
+		mainframe.writeln('<table summary="layout" ><tr>');
+  	} 
+  else 
+    {
+		mainframe.writeln('<center><table summary="layout"><tr>');
+	  }
+	  
+	if (ref > 0) 
+	  {
+		mainframe.writeln('<td>');
+		mainframe.writeln('<form id=formPrev name=formPrev method=GET ACTION="searchresults.html" TARGET="searchmain">');
+		mainframe.writeln('<input type=submit value="Previous ' + dif + '" >');
+		mainframe.writeln('<input type=hidden value="' + (ref  - dif) + '" id=res_prev name=res_prev>');
+		mainframe.writeln('</form>');
+		mainframe.writeln('</td>');
+  	}
+  	
+	if (ref >= 0 && ref + dif < top) 
+	  {
+		var ttop = ((top - (dif + ref) < dif) ? top - (ref + dif) : dif);
+		mainframe.writeln('<td>');
+		mainframe.writeln('<form id=formNext name=formNext method=GET ACTION="searchresults.html" TARGET="searchmain">');
+		mainframe.writeln('<input type=submit value="Next ' + ttop + '" >');
+		mainframe.writeln('<input type=hidden value="' + (ref  + dif) + '" id=res_next name=res_next>');
+		mainframe.writeln('</form>');
+		mainframe.writeln('</td>');
+  	}
+	
+	if (location == "top") 
+	  {
+		mainframe.writeln('</tr></table>');
+	  } 
+	else 
+	  {
+		mainframe.writeln('</tr></table></center>\n');
+	  }
+  }
+   
+// END OF SEARCH SCRIPT -->
+</script>
+<script src="devasearch.js" language="Javascript1.2" type="text/javascript"><!-- // LOAD INDEX // --></script>
+<LINK REL="stylesheet" TYPE="text/css" HREF="style.css" TITLE="style">
+</head>
+
+<!-- Edit HTML below to match your web site design -->
+
+<BODY  topmargin=5 leftmargin=0 rightmargin=0 onload="window_onload()" bgColor=CornflowerBlue>
+<table summary="layout" border=0 cellpadding=7 width="100%">
+	<td width="50%" class="top_frame" align="center" nowrap>
+		
+      <H4 align="center"><B>Java Sound Search Page</B></H4>
+	</td>
+	<td width="50%" class="top_frame" align="center" nowrap>
+		<form ID=searchform name=searchform method=GET ACTION="searchresults.html" TARGET="searchmain">
+        <div align="center">
+          <input type=text size=18 id=query name=query>
+          &nbsp; 
+          <input type=submit value=Search id=submit_btn name=submit_btn>
+          <input type=hidden value="0" id=res_start name=res_start>
+          &nbsp; <B><A HREF="help.html" target="searchmain"><font color=yellow>Tips</font></A></B> 
+        </div>
+      </form>
+	</td>
+</table>
+
+</body>
+</html>

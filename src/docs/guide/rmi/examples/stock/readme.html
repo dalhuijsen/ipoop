@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>Stock Example Using RMI</title>
+</head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR>
+<TD>
+<H1>
+<A HREF="index.html"><IMG SRC="../../images/javalogo52x88.gif" ALT="JavaSoft, a Sun Microsystems Business" BORDER=0 ></A></H1>
+</TD>
+<TD align=center>
+<h1>Stock Example Using RMI</h1>
+</td>
+<TD width=15% ALIGN=center>
+   <font size="-1"><a href="../../../../index.html">
+	Documentation Comments </a>
+   </font>
+</TD>
+</tr>
+</table>
+<HR SIZE=3 NOSHADE>
+<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<p>
+This directory contains an example that illustrates an applet that
+exports a remote object in order to receive stock updates from a stock
+server. The applet displays the stock data dynamically as notifications
+are received from the server. The interfaces and classes for this
+example are:
+<p>
+<ul>
+<li><code>StockWatch</code> is the remote interface for stock server.
+<p>  
+<li><code>StockNotify</code> is the remote interface for stock observer.
+<p> 
+<li><code>Stock</code> is the serializable object containing stock data.
+<p>
+
+<li><code>StockServer</code> (implements <code>StockWatch</code>)
+sends notifications of stock updates to remote objects that have
+registered to receive updates.
+<p>
+<li><code>StockApplet</code> (implements <code>StockNotify</code>)
+exports a remote object (itself), registers with StockServer for stock
+updates, and displays stock notifications as they are received.
+<p>
+</ul>
+<p>
+On Windows systems, after downloading the Java<sup><font
+size=-2>TM</font></sup> 2 SDK, execute <code>run.bat</code> in
+the <code>docs/guide/rmi/examples/stock</code> directory, which will
+explain each step as it builds and runs the example.  Upon completion,
+you will need to explicitly destroy the window created for the server
+process.
+<p>
+On Solaris, after downloading the Java 2 SDK,
+execute the <code>run</code> script in this
+<code>examples/stock</code> directory, and the script will print out
+what it is doing while it runs the example. It assumes that you have
+installed the Java<sup><font
+size=-2>TM</font></sup> 2 SDK and set your
+PATH, CLASSPATH and LD_LIBRARY_PATH according to the SDK installation
+instructions. The stock server creates its own RMI registry, so the
+"rmiregistry" command does not need to be run.  Here are the basic
+steps that the <code>run</code> script executes:
+<p>
+<ul>
+<p><code>setenv CLASSPATH ../..:$CLASSPATH</code>
+<p><code>javac -d ../.. *.java</code>
+<p><code>rmic -d ../.. examples.stock.StockServer examples.stock.StockApplet</code>
+<p><code>java -Djava.security.policy=security.policy examples.stock.StockServer &</code>
+<p><code>appletviewer index.html</code>
+</ul>
+<p>
+Note: You can set your CLASSPATH back to the old CLASSPATH (without
+../.. in it) before running the appletviewer, so that classes get
+downloaded from the network rather than from your CLASSPATH; each of
+the scripts actually does this.
+<p>
+<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<HR SIZE=3 NOSHADE>
+
+<IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30 ALIGN=RIGHT>
+
+<FONT SIZE=-2>
+
+<A HREF="../../../../relnotes/SMICopyright.html">Copyright &#169;</A>
+1996-2003 Sun Microsystems, Inc., 2550 Garcia Ave., Mtn. View, CA
+94043-1100 USA. All rights reserved.  <br><br>
+
+</BODY>
+</HTML>

@@ -1,0 +1,169 @@
+<html>
+<head>
+<title>Special Applet Attributes</title>
+
+<LINK REL=STYLESHEET TYPE="text/css" HREF="styles/style1.css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Special Applet Attributes</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <script src="menu_script.js" language="JavaScript"></script>
+  </select>
+</form>
+<p>There are six special attributes that can be used for customizing the applet 
+  window during downloading of an applet. (Note: The same applies to a JavaBeans 
+  component.) This section discusses:</p>
+<ul>
+  <li>The <a href="#default">default appearance</a> of the applet window (no special 
+    attributes specified)</li>
+  <li>The six special attributes
+    <ul>
+      <li><code><a href="#image">image</a></code></li>
+      <li><code><a href="#progressbar">progressbar</a></code></li>
+      <li><code><a href="#boxmessage">boxmessage</a></code></li>
+      <li><code><a href="#color">boxbgcolor</a></code></li>
+      <li><code><a href="#color">boxfgcolor</a></code></li>
+      <li><code><a href="#color">progresscolor</a></code></li>
+    </ul>
+  </li>
+  <li>The order of <a href="#precedence">attribute precedence</a></li>
+  <li>The <a href="#failure">failure scenario</a>, i.e., what happens when an 
+    applet does not download or run cleanly </li>
+</ul>
+<h2><a name="default"></a>Default Appearance</h2>
+<p>When none of these tags are used, the <b>default appearance</b> of the applet 
+  window is as follows: </p>
+<p>The coffee cup logo is placed in the upper left corner. Its dimensions are 
+  24x24 pixels and it is located 6 pixels from the top and left sides of the applet 
+  window. If the entire size of the applet is less than 36x36 pixels, then it 
+  will not be displayed. The status bar of the browser will display "<code>Loading 
+  Java Applet ...</code>" when the mouse points at the applet window.</p>
+<h2>Special Attributes</h2>
+<h2><code><a name="image"></a>image</code></h2>
+<p>The <code>image</code> attribute allows you to replace the default coffee cup 
+  logo with a custom graphic. The format with the standard <code>APPLET</code> 
+  element is: </p>
+<blockquote>
+  <p><code>&lt;APPLET ...&gt;<br>
+    &lt;PARAM name=&quot;image&quot; value="my_image.gif"&gt;<br>
+    &lt;/APPLET&gt;</code></p>
+</blockquote>
+<p>See <a href="using_tags.html">Using <code>OBJECT</code>, <code>EMBED</code> 
+  and <code>APPLET</code> Tags in Java Plug-in</a> for how this would be mapped 
+  to the <code>OBJECT</code> or the <code>EMBED</code> tags.</p>
+<p>If a custom graphic is specified, it should be the same size as the area of 
+  the applet window. If these sizes do not match, the graphic will be placed in 
+  the upper left corner of the area specified for applet. If it is larger than 
+  the applet window, part of it will get chopped off. If it is smaller than the 
+  applet window, gray, or whatever color is specified for <code>boxbgcolor</code>, 
+  will appear around it.</p>
+<p>The image can be either a GIF or JPEG, and it should reside in the same directory 
+  where other resources for the applet reside; i.e., if the applet uses the <code>codebase</code> 
+  attribute, then this image should be in the <code>codebase</code> directory. 
+</p>
+<p><b><font size="+1">Note:</font></b> The image file should not be in a packaged 
+  jar file with other applet resources, since the image needs to be displayed 
+  while downloading resources. </p>
+<p>The status bar of the browser will display "<code>Loading Java Applet ...</code>" 
+  when the mouse is pointed at the applet window. </p>
+<h2><code><a name="progressbar"></a>progressbar</code></h2>
+<p>With the <code>progressbar</code> attribute you can request display of a progress 
+  bar instead of the default graphic. The progress bar will horizontally fill 
+  the applet window up to 6 pixels to the right and left. The text "<code>Loading 
+  Java Applet ...</code>" will appear above the progress bar and be center-aligned 
+  with it. By default the progress bar is purple. The format for turning on the 
+  progress bar with the standard <code>APPLET</code> element is:</p>
+<blockquote>
+  <p><code>&lt;APPLET ...&gt;<br>
+    &lt;PARAM name=&quot;progressbar&quot; value=&quot;true&quot;&gt;<br>
+    &lt;/APPLET&gt;</code></p>
+</blockquote>
+<p>The status bar of the browser will display "<code>Loading Java Applet ...</code>" 
+  when the mouse is pointed at the applet window. </p>
+<h2><code><a name="boxmessage"></a>boxmessage</code></h2>
+<p>With the <code>boxmessage</code> attribute you can customize the text that 
+  is displayed. If you use this attribute, the text will be used with the progress 
+  bar and with the status bar of the browser. The format for using this with the 
+  standard <code>APPLET</code> element is:</p>
+<blockquote>
+  <p><code>&lt;APPLET ...&gt;<br>
+    &lt;PARAM name=&quot;boxmessage&quot; value=&quot;&lt;your custom message 
+    goes here&gt;&quot;&gt;<br>
+    &lt;/APPLET&gt;</code></p>
+</blockquote>
+<h2><code><a name="color"></a>boxbgcolor, boxfgcolor, progresscolor</code></h2>
+<p>These attributes can be used to customize colors in the applet window.</p>
+<p>By default the applet window background color is gray. The attribute <code><b>boxbgcolor</b></code> 
+  can be used to specify a different background color. The format for use with 
+  the standard <code>APPLET</code> element is:</p>
+<blockquote> 
+  <p><code>&lt;APPLET ...&gt;</code><br>
+    <code>&lt;PARAM name=&quot;boxbgcolor&quot; value=&quot;&lt;value&gt;&quot;&gt;<br>
+    </code><code>&lt;/APPLET&gt;</code></p>
+  </blockquote>
+<p>where <code>&lt;value&gt;</code> may be: </p>
+<ul>
+  <li>any <code>Color</code> from <code>java.awt.Color</code>;</li>
+  <li><code>r,g,b</code> where <code>r</code>, <code>g</code>, and <code>b</code> 
+    are integers in the range of <code>0-255</code> that would render an opaque 
+    standard RGB (sRGB) color in the <code>Color</code> constructor <code>Color(int 
+    r, int g, int b)</code>;</li>
+  <li>standard HTML colors: silver, green, maroon, purple, navy, teal, and olive; 
+    or</li>
+  <li>hexadecimal color format</li>
+</ul>
+<p><b>Examples of each item above:</b> <code>value=&quot;cyan&quot;</code>, <code>value=&quot;111,222,145&quot;</code>, 
+  <code>value=&quot;silver&quot;</code>, <code>value=&quot;#33FF33&quot;</code></p>
+<p>By default the applet window foreground color is black. (The applet window 
+  foreground color is used for messages that appear in the window and for the 
+  border of the progress bar.) The attribute <code><b>boxfgcolor</b></code> can 
+  be used to specify a different foreground color. The color values are the same 
+  as described above. The format for use with the standard <code>APPLET</code> 
+  element is:</p>
+<blockquote> 
+  <p><code>&lt;APPLET ...&gt;</code><br>
+    <code>&lt;PARAM name=&quot;boxfgcolor&quot; value=&quot;&lt;value&gt;&quot;&gt;<br>
+    </code><code>&lt;/APPLET&gt;</code></p>
+</blockquote>
+<p>By default the progress bar fill color is purple. The attribute <code><b>progresscolor</b></code> 
+  can be used to specify a different fill color. The color values are the same 
+  as described above. The format for use with the standard <code>APPLET</code> 
+  element is:</p>
+<blockquote> 
+  <p><code>&lt;APPLET ...&gt;</code><br>
+    <code>&lt;PARAM name=&quot;progresscolor&quot; value=&quot;&lt;value&gt;&quot;&gt;<br>
+    </code><code>&lt;/APPLET&gt;</code></p>
+</blockquote>
+<h2><a name="precedence"></a>Attribute Precedence</h2>
+<p>The order of precedence for these attributes is as follows: </p>
+<p>1) If no parameters are provided, the <a href="#default">default appearance</a> 
+  described above is used. <br>
+  2) If a custom graphic is specified via the <code>image</code> attribute, then 
+  the custom graphic will appear as described above under <a href="#image"><code>image</code></a>. 
+  <br>
+  3) If a progress bar is requested via the <code>progressbar</code> attribute, 
+  then the progress bar is displayed with the default text and color as described 
+  above under <a href="#progressbar"><code>progressbar</code></a>. <br>
+  4) If custom text is provided via the <code>boxmessage</code> attribute, then 
+  the progress bar is displayed with the custom text as described above under 
+  <a href="#boxmessage"> <code>boxmessage</code></a>.</p>
+<p>With any combination of <code>image</code>, <code>progressbar</code>, and <code>boxmessage</code> 
+  attributes, custom colors can always be provided via the <code>boxbgcolor</code>, 
+  <code>boxfgcolor</code>, and <code>progresscolor</code> attributes.</p>
+<h2><a name="failure"></a>Failure Scenario</h2>
+<p>If an applet fails to load, the applet window will display error information. 
+  The applet window will have a single pixel border using the foreground color, 
+  and a small "broken" graphic will occupy the upper left corner. The user can 
+  right-mouse click over the applet window to get a popup menu with options to: 
+</p>
+<ul>
+  <li>open the Java Console, or </li>
+  <li>open a window with information about the Java VM and Java Plug-in.</li>
+</ul>
+<p>&nbsp;</p>
+</body>
+</html>

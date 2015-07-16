@@ -1,0 +1,521 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Java Web Start 1.4.2 Release Notes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+  <TR> 
+    <TD WIDTH="60"> <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88> 
+    </TD>
+    <TD> <center>
+        <h1>Java<sup><font size="-2">TM</font></sup> Web Start 1.4.2 Release Notes</h1>
+      </center></TD>
+    <TD ALIGN=RIGHT VALIGN=TOP WIDTH="60"> <font size="-1"><a href="../../index.html">Documentation 
+      Contents</a></font> </TD>
+  </TR>
+</TABLE>
+<!-- Body text begins here -->
+<p>&nbsp;</p>
+<p>These release notes include the following sections:</p>
+<ul>
+  <li><a href="#enhancements">Enhancements</a> 
+    <ul>
+      <li><a href="#improved">Improved JNLP URL Support In Application Manager</a></li>
+      <li><a href="#dynamic">Dynamic Download of HTTPS Certificates</a></li>
+      <li><a href="#automatic">Automatic Detection of JREs</a></li>
+      <li><a href="#combined">Combined Control Panel Infrastructure</a></li>
+      <li><a href="#security">Security Audit of Java Web Start</a></li>
+      <li><a href="#Prompt">First-Time Prompt for Shortcut</a></li>
+      <li><a href="#integration">Integration with InstallShield 7</a></li>
+    </ul>
+  </li>
+  <li><a href="#bug">Bug Fixes</a></li>
+</ul>
+<h2><a name="enhancements"></a>Enhancements</h2>
+<h3><a name="improved"></a>Improved JNLP URL Support In Application Manager</h3>
+<p>JNLP URLs are now directly openable from the JAWS Application Manager and can 
+  be bookmarked. Moreover, they may be <code>.html</code> or <code>.jnlp</code> 
+  files. (This is RFE <a href="http://developer.java.sun.com/developer/bugParade/bugs/4531885.html">4531885</a>.)</p>
+<h3><a name="dynamic"></a>Dynamic Download of HTTPS Certificates</h3>
+<p>Java Web Start now dynamically imports certificates in much the same way as 
+  browsers do, making use of <code>https</code> much easier for users. (This is 
+  RFE <a href="http://developer.java.sun.com/developer/bugParade/bugs/4696477.html">4696477</a>.) 
+  For more information, see <a href="developersguide/development.html#dynamic">Dynamic 
+  Download of HTTPS Certificates</a> in the <a href="developersguide/contents.html">Java 
+  Web Start 1.4.2 Developer Guide</a>.</p>
+<h3><a name="automatic"></a>Automatic Detection of JREs</h3>
+<p>Every time JAWS is run, it automatically detects all &quot;registered&quot; 
+  JREs on the computer.</p>
+<p>There are two types of JREs recognized by JAWS: registered and unregistered. 
+  A registered JRE is one that is recorded in the system or package registry, 
+  i.e., the system registry on Windows, the package database on Solaris, and the 
+  RPM database on Linux. An unregistered JRE is not recorded in a registry; e.g., 
+  a JRE mounted on a network drive in an unregistered JRE. (This is RFE <a href="http://developer.java.sun.com/developer/bugParade/bugs/4474876.html">4474876</a>.) 
+</p>
+<h3><a name="combined"></a>Combined Control Panel Infrastructure</h3>
+<p>There is now a combined control panel infrastructure used for the Java deployment 
+  products, including Java Plug-in and Java Web Start. If you have taken advantage 
+  of knowing certain undocumented information, such as the Java Web Start cache 
+  location or the configuration file format and location, you could be affected. 
+  (This is RFE <a href="http://developer.java.sun.com/developer/bugParade/bugs/4723794.html">4723794</a>.)</p>
+<h3><a name="security"></a>Security Audit of Java Web Start</h3>
+<p>A security audit of Java Web Start has been completed. (This is RFE <a href="http://developer.java.sun.com/developer/bugParade/bugs/4645808.html">4645808</a>.)</p>
+<h3><a name="Prompt"></a>First-Time Prompt for Shortcut</h3>
+<p>Users are now asked if they want a desktop shorcut the first time an application 
+  is downloaded and cached. (This is RFE <a href="http://developer.java.sun.com/developer/bugParade/bugs/4737538.html">4737538</a>.)</p>
+<h3><a name="integration"></a>Integration with InstallShield 7</h3>
+<p>Java Web Start is now installed via InstallShield 7 as part of the JRE. There 
+  is no longer a separate installer for Java Web Start. (This is RFE <a href="http://developer.java.sun.com/developer/bugParade/bugs/4718282.html">4718282</a>.) 
+</p>
+<h2><a name="bug"></a>Bug Fixes</h2>
+<br>
+<table summary="bug fixes" width="90%" border="2" align="center" cellpadding="5" cellspacing="0">
+  <tr align="center" valign="middle" bgcolor="#CCCCCC"> 
+    <td width="25%"><strong><font size="+1">Bug ID</font></strong></td>
+    <td><strong><font size="+1">Synopsis</font></strong></td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4791532.html">4791532</a> 
+    </td>
+    <td>Dialogs are layed out wrong in javawebstart</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4778185.html">4778185</a></td>
+    <td> JNLPClassLoader can still return unencoded URL</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4780676.html">4780676</a></td>
+    <td>Java Web Start sometimes fails to launch applications while offline</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4757170.html">4757170</a></td>
+    <td>Typo in Jaws Pop-up window &lt;Rename HTML Entry&gt; &quot;You must enter 
+      and entry name&quot;</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4777238.html">4777238</a></td>
+    <td>Cache Location JTextField should handle enter properly</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4685501.html">4685501</a></td>
+    <td>De - Word &quot;Console&quot; is not translated in the titlebar of jaws 
+      Console dialog</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4688776.html">4688776</a></td>
+    <td>JaWS, JAWS 1.2 b08, Translation errors</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4785128.html">4785128</a></td>
+    <td>Exception coming if you use mantis-beta jaws with jre1.2.2 on Windows</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4772298.html">4772298</a></td>
+    <td>Proxy authentication dialog pops up twice even if username/password is 
+      correct </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4772381.html">4772381</a></td>
+    <td>System.exit not working with shutdownhook and JWS console</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4784292.html">4784292</a></td>
+    <td>Java Web Start should use cached jnlp file if possible to improve startup 
+      time </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4782008.html">4782008</a></td>
+    <td>Review webstart ActiveX control</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4782000.html">4782000</a></td>
+    <td>Need to update webstart autoinstall version tags</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4785581.html">4785581</a></td>
+    <td>JAWS on linux cannot be invoked via symbolic link</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4789162.html">4789162</a></td>
+    <td>JAWS on solaris/sparc cannot be invoked via symbolic link</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4792033.html">4792033</a></td>
+    <td>Need javaws link in /usr/bin on Solaris</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4792949.html">4792949</a></td>
+    <td>autoupdate of javaws file is not getting staged in RE area</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4791695.html">4791695</a></td>
+    <td>Help Menu Item, &quot;Check For Update&quot; doesn't notify of the latest 
+      1.2 JWS version</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4735750.html">4735750</a></td>
+    <td>Fix Certificate-chain Validation</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4711515.html">4711515</a></td>
+    <td>Wrong AppContext used in RMI threads</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4757168.html">4757168</a></td>
+    <td>Jaws application not properly cached if PATH to the application contains 
+      letter N</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4759001.html">4759001</a></td>
+    <td>Exception coming (getText()),when trying to Clear Folder with the Downloaded 
+      vie </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4759005.html">4759005</a></td>
+    <td>Exception coming (synchron),when trying to Clear Folder with the Downloaded 
+      vie </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4665132.html">4665132</a></td>
+    <td>Webstart not returning ContextClassLoader consistently under jre 1.4.0</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4696315.html">4696315</a></td>
+    <td>Splash screen is not showing with large image</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4699299.html">4699299</a></td>
+    <td>Splash Screen is wierd on Linux machine</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4734410.html">4734410</a></td>
+    <td>JAVAWS is passing the property set in extension installer to main program</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4739089.html">4739089</a></td>
+    <td>Java Web Wtart does not handle signed jars correctly</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4743169.html">4743169</a></td>
+    <td>Root Certificates panel in Java WS app mgr is blank if cacerts is missing</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4754648.html">4754648</a></td>
+    <td>Advanced Preference Panel miss a key shortcut</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4754763.html">4754763</a></td>
+    <td>getResourceAsStream() fails with JNLPClassLoader</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4772558.html">4772558</a></td>
+    <td>Implement new Icons from UE group.</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4772559.html">4772559</a></td>
+    <td>Reduce access scope (phase II)</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4772563.html">4772563</a></td>
+    <td>New default splash screen, and modified customized ones</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4772926.html">4772926</a></td>
+    <td>Extra ; char on the window title</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4773110.html">4773110</a></td>
+    <td>Apps are run with the wrong JRE</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4775373.html">4775373</a></td>
+    <td>Problem checking for updates on https codebase</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4379831.html">4379831</a></td>
+    <td>Please launch new VM for -Dsun.java2d.noddraw=true</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4474875.html">4474875</a></td>
+    <td>Incremental updates fail if going from basic proto to version based.</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4485537.html">4485537</a></td>
+    <td>'Read -1 of 2k (0%)' message still displayed in DL window</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4653074.html">4653074</a></td>
+    <td>JWS: Update Shortcuts and programs folder when app name changed in jnlp 
+      file. </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4666303.html">4666303</a></td>
+    <td>Cannot delete java.sun.com cache directory structure in Application Manager</td>
+  </tr>
+  <tr> 
+    <td width="25%"><p><a href="http://developer.java.sun.com/developer/bugParade/bugs/4687256.html">4687256</a></p>
+      </td>
+    <td>Jaws App_mgr did not prompt shortcut options on the second launch with 
+      j2re1.2.2 </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4688193.html">4688193</a></td>
+    <td>Reduce access scope</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4691541.html">4691541</a></td>
+    <td>JWS should handle the version control of splash screen icons</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4708051.html">4708051</a></td>
+    <td>Exception coming when you try to &quot;Clear Folder&quot; with View/Download_App 
+      enabled </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4718813.html">4718813</a></td>
+    <td>Application Manager lost focus after first startup</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4729230.html">4729230</a></td>
+    <td>Loging to &quot;TEMP&quot; file does not work</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4761563.html">4761563</a></td>
+    <td>Can't set property to &quot;&quot; in jnlp file</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4625826.html">4625826</a></td>
+    <td>Unexpected exit when lazy-loading unsigned jar file</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4775823.html">4775823</a></td>
+    <td>Unnecessary . (dot) in Appman Shortcuts tab after &quot;When to Create&quot; 
+      instruction. </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4685497.html">4685497</a></td>
+    <td>De - Overlapping text in the certificates tab</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4723717.html">4723717</a></td>
+    <td>JRE1.4.0_x - JaWS component cannot be installed in non-default location.</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4777764.html">4777764</a></td>
+    <td>Cancelling import certificate will cause ca chain completely broken</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4694453.html">4694453</a></td>
+    <td>Customize splash screen would not work if no href</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4720897.html">4720897</a></td>
+    <td>Jar Diff'ing does not work if jars are packaged in a war file.</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4724977.html">4724977</a></td>
+    <td>The application panel size it too small to show the string.</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4726525.html">4726525</a></td>
+    <td>Certificate detail panel should have focus on OK button</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4751780.html">4751780</a></td>
+    <td>JWS Hanging on Jar update (Scanning entries at 100% for a LONG time)</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4759104.html">4759104</a></td>
+    <td>Clear cache function could not remove certificate</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4759298.html">4759298</a></td>
+    <td>&quot;details&quot; button not showing on app_mgr root certicates tab</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4480656.html">4480656</a></td>
+    <td>View Source in IE won't work after creating shortcut for Notepad Demo</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4498419.html">4498419</a></td>
+    <td>WebStart won't start if the default browser is deinstalled</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4623207.html">4623207</a></td>
+    <td>jaxp.jar</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4626733.html">4626733</a></td>
+    <td>Multi-platform support</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4653036.html">4653036</a></td>
+    <td>JarDiffHandler() should use javax.servlet.context.</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4654173.html">4654173</a></td>
+    <td>JWS litters $WINUSERHOME\Local Settings\Temp and d:\TMP</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4667701.html">4667701</a></td>
+    <td>JWS should give the name of the resource that fails</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4668473.html">4668473</a></td>
+    <td>Cannot create shortcut if title is too long</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4676386.html">4676386</a></td>
+    <td>Better user-agent value in http request header</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4685505.html">4685505</a></td>
+    <td>De - Broken border around &quot; Choose Log File Name&quot;</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4687857.html">4687857</a></td>
+    <td>Focus is back to wrong window after closing dialog</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4699771.html">4699771</a></td>
+    <td>JWS login prompt for secure resources is not robust.</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4744945.html">4744945</a></td>
+    <td>JWS 1.2 application cannot delete after upgrade</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4775777.html">4775777</a></td>
+    <td>&quot;Invalid Cache Location&quot; window incorrect behavior</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4492987.html">4492987</a></td>
+    <td>Java Web Start Installation documentation for Linux</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4768914.html">4768914</a></td>
+    <td>Javaws unsigned extension installer can call setJREInfo</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4773602.html">4773602</a></td>
+    <td>Auto proxy detection is failing when using Netscape 4.79 and 7.0</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4777392.html">4777392</a></td>
+    <td>Mantis b06:file type description for jnlp is not set to NS/IE on Win98 
+      ja </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4665251.html">4665251</a></td>
+    <td>Preferences: Shortcut Options: When To Create := &quot;Always&quot; fails 
+      (always:) </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4692415.html">4692415</a></td>
+    <td>Jaws application freezing if you launching it as a root, through browser 
+      on Sol</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4723790.html">4723790</a></td>
+    <td>Web start install should use pack instead of crunch</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4739415.html">4739415</a></td>
+    <td>Jaws j2re1.4.0 installer problem</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4772158.html">4772158</a></td>
+    <td>Make web start part of J2RE image on Unix platform</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4776098.html">4776098</a></td>
+    <td>Javaws JRE autodownload not working</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4431364.html">4431364</a></td>
+    <td>JRE should always be installed</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4459559.html">4459559</a></td>
+    <td>J2SE Installer can't finish the work if Installed</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4463745.html">4463745</a></td>
+    <td>WebStart can't handle Netscape automatic proxy configuration</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4469455.html">4469455</a></td>
+    <td>Proxy autoconfig script parsing has problems</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4514686.html">4514686</a></td>
+    <td>Installer can't handle adding &gt;100th mime type to Netscape on Windows</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4615288.html">4615288</a></td>
+    <td>Build fails under Windows due to install directory not existing</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4653566.html">4653566</a></td>
+    <td>JWS is not compatible with the centralization of home directories under 
+      NT </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4685474.html">4685474</a></td>
+    <td>Message on Japanese Installer/Uninstaller does not fall within a view 
+      area </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4730185.html">4730185</a></td>
+    <td>javaws.cfg file in $USERPROFILE is not uninstalled</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4763779.html">4763779</a></td>
+    <td>Need to check javaws bootdir during control build</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4764601.html">4764601</a></td>
+    <td>Unsigned extension installer throws exception when Main.systemExit is 
+      called </td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4765164.html">4765164</a></td>
+    <td>Singleton api service classes can be re-initialized</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4765165.html">4765165</a></td>
+    <td>com.sun.jnlp package needs to be protected from package addition</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4775492.html">4775492</a></td>
+    <td>Javaws app with no href in JNLP causing nonfatal exception on netscape/unix</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4768903.html">4768903</a></td>
+    <td>Javaws dev target doesn't work during dev build</td>
+  </tr>
+  <tr> 
+    <td width="25%"><a href="http://developer.java.sun.com/developer/bugParade/bugs/4741507.html">4741507</a></td>
+    <td>Missing signed entry JNLPException is not explicit</td>
+  </tr>
+</table>
+<p>&nbsp; </p>
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%">
+  <TR VALIGN=TOP> 
+    <TD> <P><FONT SIZE="-2"> <A HREF="../../relnotes/SMICopyright.html">Copyright 
+        &#169;</A> 2002 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> 
+        All Rights Reserved.</FONT></P>
+      <FONT SIZE="-1"> Please submit comments at our <a href="/docs/forms/javaws-sendusmail.html">feedback 
+      form</a>. </FONT> </TD>
+    <TD ALIGN=RIGHT> <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30> 
+      <BR> <FONT SIZE="+1"> <i>Java Software</i> </FONT> </TD>
+  </TR>
+</TABLE>
+</body>
+</html>

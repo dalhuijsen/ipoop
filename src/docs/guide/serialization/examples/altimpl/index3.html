@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//SoftQuad//DTD HoTMetaL PRO 4.0::19971010::extensions to HTML 4.0//EN"
+ "hmpro4.dtd">
+
+<HTML>
+  
+  <HEAD>
+    <TITLE>Using Serialization and the Serializable Fields API </TITLE>
+  </HEAD>
+  
+  <BODY BGCOLOR="ffffff"><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" 
+    HEIGHT="4">
+    
+    <H2>Using Serialization and the Serializable Fields API</H2>
+    
+    <IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+    
+    <H3>Abstract</H3>
+    
+    <BLOCKQUOTE>
+      
+      <P>This example shows how to use the Serializable Fields API with
+        Serialization, demonstrating that the class can define fields other than
+        those already in the class to be serializable. This differs from just
+        rewriting the <TT>writeObject</TT> method to customize the data format
+        (see the <A HREF="../custom/index3.html">Custom Data Format example</A>)
+        because, in this example, versioning support still holds.</P>
+      
+      <P>Using the Serializable Fields API, this example specifically changes
+        the internal representation of a rectangle from x1,y1,x2,y2
+        implementation (see <A HREF="./OriginalClass.java">OriginalClass.java</A>)
+        to Point(x1,y1), Point(x2,y2) (see <A HREF="./EvolvedClass.java">EvolvedClass.java</A>)
+        while the external representation still remains x1, y1, x2, y2. This
+        ensures bidirectional compatibility between the original and evolved
+        representations. </P>
+      
+      <P>As with all examples dealing with evolution, here the evolved class
+        (ARectangle) must define a <TT>serialVersionUID</TT> field that is
+        obtained using the command <A HREF="./serialver.html"><TT>serialver</TT></A>
+        on the original class (<TT>ARectangle</TT>).</P> </BLOCKQUOTE><IMG 
+    SRC="./../images/bg2.gif" alt="blue bar" WIDTH="190" HEIGHT="2">
+    
+    <H3>Additional Information</H3>
+    
+    <DL>
+      <DD><A HREF="./sources.html">Source Files</A> </DD>
+      <DD><A HREF="./torun.html">Running the Example</A> </DD>
+      <DD><A HREF="../index.html">List of Examples</A> </DD>
+    </DL><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+  </BODY>
+</HTML>

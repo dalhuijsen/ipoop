@@ -1,0 +1,279 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>ActiveX Bridge</title>
+</head>
+
+<body>
+<hr>
+<h1>ActiveX Bridge Developer Guide</h1>
+<h2>Implementation for SDK/JRE 1.4.2 and Above</h2>
+<hr>
+<p>This document includes the following topics:</p>
+<ul>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#supported">Supported OSs and ActiveX Containers</a></li>
+  <li><a href="#packaging">Packaging the Bean</a></li>
+  <li><a href="#using">Using the Bean in an Application</a></li>
+  <li><a href="#deployment">Deployment</a></li>
+  <li><a href="#creating">Java Objects in the ActiveX Bridge Environment</a></li>
+  <li><a href="#other">Other Topics</a> 
+    <ul>
+      <li><a href="#methods">Methods</a></li>
+      <li><a href="#properties">Properites</a></li>
+      <li><a href="#ambient_properties">Ambient properties</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#configuration">JVM Configuration</a></li>
+    </ul>
+  </li>
+</ul>
+<p> The <a href="examples.html">Example Applications</a> chapter describes two 
+  example applications.</p>
+<h2><a name="overview"></a>Overview</h2>
+<p>The ActiveX Bridge allow a component based on JavaBeans(TM) component architecture 
+  (&quot;bean&quot;) to be effectively packaged as an ActiveX control, thereby 
+  allowing it to be used as a functional component in an ActiveX container.</p>
+<p>Note that this implementation of the ActiveX Bridge may not be compatible with 
+  the previous implementation for SDK/JRE 1.1 through 1.3.1. In order to use the 
+  new bridge, beans will need to be repackaged.</p>
+<h2><a name="supported"></a>Supported OSs and ActiveX Containers</h2>
+<p>For development purposes, this implementation supports the following OSs and 
+  ActiveX Containers:</p>
+<p>OSs: Windows NT, 2000, XP.</p>
+<p>ActiveX Containers: Visual Studio 6.0 with SP3.</p>
+<p>Note that packaged beans should run on any Windows platform and in any ActiveX 
+  container&#8212;not just those platforms and containers listed above.</p>
+<h2><a name="packaging"></a>Packaging the Bean</h2>
+<table width="80%" border="1" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFCC">
+  <tr> 
+    <td><p><u><strong><font size="+2">Notes</font></strong></u></p>
+      <p>1. Running the packager (<code>packager.exe</code>) requires that you 
+        have the following installed on your computer:</p>
+      <ul>
+        <li>SDK 1.4.2 or higher</li>
+        <li>Microsoft Visual C++ 6.0 with SP3</li>
+      </ul>
+      <p>2. In order for <code>packager</code> to work you must first run <code>VCVARS32.BAT</code>. 
+        <code>cd</code> to the <code>/bin</code> directory where it is located 
+        in your Microsoft Visual C++ installation and type <code>VCVARS32</code>.</p>
+      </td>
+  </tr>
+</table>
+<p>Use <code>packager.exe</code> to generated the <code>.dll</code> for the bean.</p>
+<p>Use of <code>packager.exe</code> is as follows:</p>
+<table width="95%" border="1" align="center" cellpadding="5" cellspacing="0" bgcolor="#CCCCCC">
+  <tr>
+    <td><h3><code>Packager</code> Usage</h3>
+      <blockquote> 
+        <pre>Usage: packager [-options] &lt;jar file name&gt; &lt;bean name&gt;<jar file name> <bean name>
+
+where options include:
+   -clsid&nbsp;&lt;class-id&gt;<class-id> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLSID for the packaged bean
+   -out &lt;output directory&gt;<output directory>   destination directory for the packaged bean
+   -reg    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;consent to register the Active-X control</pre>
+      </blockquote>
+</td>
+  </tr>
+</table>
+<h3>Additional Information</h3>
+<ul>
+  <li>A <code>.dll</code> can contain only one packaged bean. Thus, a separate 
+    <code>.jar</code> file is required for each bean.</li>
+  <li>If one <code>.jar</code> file depends on another <code>.jar</code> file 
+    or <code>.class</code> file(s), then you will need to set <code>CLASSPATH</code>.</li>
+  <li><code>&lt;jar file name&gt;</code> needs to include the path to the <code>.jar</code> 
+    file. The path may be full or relative.</li>
+  <li><code>&lt;bean name&gt;</code> needs to be the fully qualified package name 
+    of the bean (e.g., <code>sunw.demo.jelly.JellyBean</code>.).</li>
+  <li>If the <code>-clsid</code> option is not used, the packaged bean <code>CLSID</code> 
+    will be generated randomly. This <code>-clsid</code> option allows you to 
+    specify the same <code>CLSID</code> for a given bean every time.</li>
+  <li>Default: Unless <code>-out</code> is specified, <code>packager.exe</code> 
+    will generate the <code>.dll</code> fill in the same directory in which it 
+    is executed. If you specify the <code>-out</code> parameter, then <code>packager</code> 
+    places the <code>.dll</code> file in the directory you specify. For example, 
+    you might want to place the <code>.dll</code> in a directory called <code>&lt;jre_home&gt;\axbridge\bin</code> 
+    where it could be deployed with an application. (Note that <code>&lt;jre_home&gt;</code> 
+    would be the public JRE, not the private one. The public JRE on Windows is 
+    normally located at <code>C:\Program Files\Java\j2re1.4.2</code>. The private 
+    JRE, associated with the SDK, is normally located at <code>C:\j2sdk1.4.2\jre</code>.)</li>
+  <li>If <code>-out</code> is not specified, or <code>-out</code> does not specify 
+    <code>&lt;jre_home&gt;\axbridge\bin</code>, then the <code>-reg</code> option 
+    should not be used.</li>
+</ul>
+<h4>Example</h4>
+<p>For example, suppose <code>&lt;bean&gt;.jar</code> is <code>jelly.jar</code>; 
+  <code>jelly.jar</code> is located at <code>C:\my_bean_jars</code>; the fully 
+  qualified bean name is <code>sunw.demo.jelly.JellyBean</code>; and the SDK is 
+  <code>j2sdk1.4.2</code>. You could run <code>packager.exe</code> as follows:</p>
+<blockquote>
+  <p><code>C:\j2sdk1.4.2\bin\packager -clsid</code> <code>{D824B185-AE3C-11D6-ABF5-00B0D07B8581}</code> 
+    <code>-out C:\Program Files\Java\j2re1.4.2\axbridge\bin -reg C:\my_bean_jars\jelly.jar 
+    sunw.demo.jelly.JellyBean</code></p>
+</blockquote>
+<p>The packager would: </p>
+<ul>
+  <li>generate a <code> .dll</code> file with the bean name (<code>JellyBean.dll</code>) 
+    and put it in the <code>j2re\axbridge\bin </code>directory;</li>
+  <li>create a <code>j2re1.4.2\axbridge\lib</code> directory and place <code>jelly.jar</code> 
+    there;</li>
+  <li>register the bean <code>.dll</code> with the <code>CLSID</code> <code>D824B185-AE3C-11D6-ABF5-00B0D07B8581</code>.</li>
+</ul>
+<h3>Manually Registering the bean <code>.dll</code></h3>
+<p>If you don't use the <code>-reg</code> option with <code>packager.exe</code> 
+  as shown above, you can manually register the <code>.dll</code> with <code>regsvr32.exe</code>. 
+  <code>cd</code> to the directory where the <code>.dll</code> file is located 
+  (e.g., <code>C:\Program Files\Java\j2re1.4.2\axbridge\bin</code>) and type:</p>
+<blockquote>
+  <p><code>&lt;path_regsvr32&gt;\regsvr32 &lt;bean name&gt;.dll</code></p>
+</blockquote>
+<p>Suppose you are running Windows 2000. <code>regsvr32.exe</code> is located 
+  at <code>C:\winnt\system32</code> on Windows 2000. Then to register <code>JellyBean.dll</code> 
+  you would do this:</p>
+<blockquote>
+  <p><code>C:\Program Files\Java\j2re1.4.2\axbridge\bin&gt;C:\winnt\system32\regsvr32 
+    JellyBean.dll</code></p>
+</blockquote>
+<p>This will: </p>
+<ul>
+  <li>create a <code>CLSID</code> registry entry for <code>JellyBean.dll</code> 
+    under <code>HKEY_CLASSES_ROOT</code>; </li>
+  <li>create a <code>j2re1.4.2\axbridge\lib</code> directory and place <code>jelly.jar</code> 
+    there.</li>
+</ul>
+<h2><a name="using"></a>Using the Bean in an Application</h2>
+<p>Now that the bean is registered as an ActiveX control, you should be able to 
+  insert it into an ActiveX container. In the case of the ActiveX Control Test 
+  Container that comes with Visual Studio, on the main menu go to <code>Edit&gt;Insert 
+  New Control...</code> and scroll down the list until you find the bean control. 
+  In the case of the <code>JellyBean.dll</code> control, it shows up as <code>JellyBean 
+  Bean Control</code>. Below it is shown inserted into the Visual Studio test 
+  container.</p>
+<p align="center"><img src="images/ControlTest-JellyBean-3.gif" width="896" height="725"></p>
+<h2><a name="deployment"></a>Deployment</h2>
+<p>To deploy a bean packaged as an ActiveX control in an application, you will 
+  need to include registration of the <code>.dll</code> as part of the installation 
+  process. The <code>.dll</code> should be installed into the <code>&lt;jre_home&gt;axbridge\bin</code> 
+  directory, and it should be registered there with <code>regsvr32.exe</code>. 
+  As stated previously, when the <code>.dll</code> is registered, the bean <code>.jar</code> 
+  will be placed in the <code>&lt;jre_home&gt;\axbridge\lib</code> directory.</p>
+<h2><a name="creating"></a>Java Objects in the ActiveX Bridge Environment</h2>
+<p>Java objects are accessible via wrapper objects supporting the <code>IDispatch</code> 
+  interface; i.e., they are accessed indirectly through the ActiveX Bridge. For 
+  example, if you are working with a packaged bean in Visual Basic (VB) and want 
+  to pass a Java object as an argument to a bean method, it is necessary that 
+  either (1) the bean has a method that returns the required type of Java object; 
+  or (2) the Java object is available as a bean property.</p>
+<p>For example, consider the calendar example, <a href="examples.html#calendar">JCalendarPanel</a>, 
+  in the Examples chapter.</p>
+<p>If you were working directly in Java with this bean, you would create a <code>Date</code> 
+  object, set its properties, then pass it as an argument to the <code>setSelectedDate()</code> 
+  method of <code>JCalendarePanel</code>. The way this is done with the ActiveX 
+  Bridge as follows:</p>
+<p>Assuming you are working in VB and have an instance of <code>JCalendarPanel</code> 
+  called <code>JCalendarPanel1</code>, in VB you could use the <code>JCalendarPanel1.</code><code>selectedDate</code> 
+  property to get a <code>Date</code> object:</p>
+<blockquote>
+  <p><code>Set dat = JCalendarPanel1.selectedDate</code></p>
+</blockquote>
+<p>Then you would use the VB methods of the <code>Date</code> object (<code>dat</code>) 
+  to set it. For instance:</p>
+<blockquote> 
+  <p> <code>dat.setYear (1986 - 1900)<br>
+    dat.setMonth (11 - 1)<br>
+    dat.setDate 24</code></p>
+</blockquote>
+<p> Finally, you would use the <code>setSelectedDate</code> method of <code>JCalendarPanel1</code> 
+  to set the date:</p>
+<blockquote> 
+  <p> <code>JCalendarPanel1.setSelectedDate dat</code></p>
+</blockquote>
+<h2><a name="other"></a>Other Considerations</h2>
+<h3><a name="methods"></a>Methods and Method Overloading</h3>
+<p>All the methods provided by the <code>BeanInfo</code> via <code>getMethodDescriptors()</code> 
+  are accessible from ActiveX containers.</p>
+<p>However, if a method is overloaded, only the method which takes the highest 
+  number of arguments will be available. This is because COM IDL does not support 
+  overloading. However, the argument and return value type will be <code>VARIANT</code>. 
+  Each argument is optional. For any overloaded method you will need to refer 
+  to the bean documentation to know the exact number of arguments and their types. 
+  Methods or property names which are identical to any MIDL keyword are dropped.</p>
+<h3><a name="properties"></a>Properties</h3>
+<p>All the properties are accessible though the bridge with the same access right 
+  as defined in the <code>BeanInfo</code> via <code>PropertyDescriptor</code>. 
+  The ActiveX bridge will invoke the accessor methods as defined in the <code>PropertyDescriptor</code>. 
+</p>
+<p>If the bean property is <code>bound</code> or <code>constrained</code>, the 
+  <code>bindable</code> or <code>requestedit</code> flags are set in the attributes 
+  of the COM property. The container is notified of the property change through 
+  <code>IPropertyNotifySink</code> interface. If the property is constrained and 
+  the container denies the property change, then the bean <code>PropertyVetoException</code> 
+  is thrown by the bridge. </p>
+<p>For primitive types and for string, font, and color properties, most ActiveX 
+  containers like Visual Basic will allow direct manipulation of properties in 
+  their <code>PropertySheet</code>. For all other properties, such as arrays or 
+  objects, the properties will not be accessible in the <code>PropertySheet</code> 
+  but can still be invoked through the scripting language associated with the 
+  container. </p>
+<p></p>
+<h3><a name="ambient_properties"></a>Ambient Properties</h3>
+<p>The bridge will support four ambient properties that get translated to the 
+  bean properties if the bean component implements these properties. These ambient 
+  properties will be read and set on the bean component when the component is 
+  initialized and each time a change notification for the ambient properties is 
+  received. </p>
+<blockquote>
+  <p><code>DISPID_BACKCOLOR<br>
+    DISPID_FORECOLOR<br>
+    DISPID_FONT<br>
+    DISPID_ENABLED </code></p>
+</blockquote>
+<p>The bridge will forward ActiveX container ambient property changes to the bean 
+  via setting properties.</p>
+<h3><a name="events"></a>Events</h3>
+<p>All source interfaces that are declared as default in the <code>EventSetDescriptor</code> 
+  array returned by the <code>BeanInfo</code> will be merged into one interface 
+  which is declared as being the ActiveX default source interface. It is an ActiveX 
+  requirement that at least the default source interface is accessible by ActiveX 
+  containers. </p>
+<p>Each method returned by the <code>getListenerMethodDescriptors</code> API of 
+  the <code>EventSetDescriptor</code> is mapped to an ActiveX event. The event 
+  name is the method name. Since all default interfaces of beans are merged to 
+  a unique interface, interfaces that contain the same method name are not allowed.</p>
+<p>Consider, for example the <code>java.awt.event.ActionListener</code> source 
+  interface: </p>
+<blockquote>
+  <p><code>public interface ActionListener extends EventListener {</code></p>
+  <p><code> &nbsp;&nbsp;public void actionPerformed(ActionEvent e);</code></p>
+  <p><code>}</code></p>
+</blockquote>
+<p>The ActiveX event name generated from this interface definition is <code>actionPerformed</code>. 
+  For example, in case of Visual Basic the event signature looks like this:</p>
+<blockquote>
+  <p><code>Private Sub Button_actionPerformed (ByVal evt As Object)</code></p>
+  <p><code> &nbsp;&nbsp;MsgBox evt.toString </code></p>
+  <p><code>End-Sub</code></p>
+</blockquote>
+<p>The <code>evt</code> provided to the container is an automation object, which 
+  represents the <code>java.awt.AWTEvent</code> <code>Object</code>. Containers 
+  could access the information on the event by invoking the methods supported 
+  by the <code>AWTEvent</code> class.</p>
+<h3><a name="security"></a>Security</h3>
+<p>The bean packaged as an ActiveX control will be part of a stand-alone application. 
+  Hence it will be executed outside the applet sand box security model. </p>
+<p>In Internet Explorer scripting of the bean is not safe, as it has been granted 
+  the <code>AllPermission</code> permission.</p>
+<h3><a name="configuration"></a>JVM Configuration</h3>
+<p>Note that you can configure the JVM through the <a href="http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/control_panel.html">Java 
+  Plug-in Control Panel</a>. The following tabs are relevant to the ActiveX Bridge:</p>
+<ul>
+  <li>Basic</li>
+  <li>Advanced</li>
+  <li>Proxies</li>
+</ul>
+<p>You can use the <a href="http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/console.html">Java 
+  Console</a> for debugging beans.</p>
+<p>&nbsp;</p>
+</body>
+</html>

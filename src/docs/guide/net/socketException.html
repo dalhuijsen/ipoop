@@ -1,0 +1,87 @@
+<HTML><HEAD><TITLE>
+New SocketExceptions in JDK1.1
+</TITLE></HEAD>
+<!-- Changed by: David Brown, 21-Aug-1996 -->
+<BODY>
+<H2>
+<IMG alt="Duke icon" SRC="images/duke4.gif" ALIGN=CENTER WIDTH=55 HEIGHT=68>
+New SocketExceptions in JDK1.1
+</H2>
+<P>
+Previously, all network errors in java raised a <B>SocketException</B>, which didn't
+provide enough information to decipher what went wrong.  Was the connection refused by
+the remote machine (no one listening on that port)?  Or was the host unreachable (connect
+attempt timed out)?  JDK 1.1 adds three new classes that provide a finer granularity of
+reported errors:
+<UL>
+<LI> <H3>java.net.BindException</H3> 
+	The local port is in use, or the requested bind address couldn't be assigned locally.
+<PRE>
+ 	public class BindException extends SocketException {
+	...
+	}
+</PRE>
+
+<LI> <H3>java.net.ConnectException</H3> 
+	This exception is raised when a connection is refused at the remote host (i.e.,
+	no process is listening on that port).
+
+<PRE>
+ 	public class ConnectException extends SocketException {
+	...
+	}
+</PRE>
+
+<LI> <H3>java.net.NoRouteToHostException</H3> 
+	The connect attempt timed out, or the remote host is otherwise unreachable.
+
+<PRE>
+ 	public class NoRouteToHostException extends SocketException {
+	...
+	}
+</PRE>
+</UL>
+<P>
+<H2>Simple Usage Examples:</H2>
+<UL>
+<LI>On the Client Side:
+<PRE>
+import java.net.*;
+	...
+	Socket s = null;
+	try {
+	   s = new Socket("foo.org", 80);
+	} catch (UnknownHostException e) {
+	   // check spelling of hostname
+	} catch (ConnectException e) {
+	   // connection refused - is server down? Try another port.
+	} catch (NoRouteToHostException e) {
+	   // The connect attempt timed out.  Try connecting through a proxy
+	} catch (IOException e) {
+	   // another error occurred
+	}
+</PRE>
+<LI> On the Server Side:
+<PRE>
+import java.net.*;
+ 	...
+	ServerSocket ss = null;
+	try {
+	    /* try to bind to local address 129.144.175.156 */
+	    InetAddress in = InetAddress.getByName("129.144.175.156");
+	    int port = 8000;
+	    int backlog = 5;
+	    ss = new ServerSocket(port, backlog, in);
+	} catch (BindException e) {	   	
+	    // port 8000 in use, or can't bind to 129.144.175.156 as a local address
+	} catch (SocketException e) {
+	    // another error occurred
+	}
+</PRE>
+<P>
+<HR>
+<ADDRESS>
+<A HREF="mailto:brown@eng.sun.com">David Brown</A>
+</ADDRESS>
+</BODY>
+</HTML>

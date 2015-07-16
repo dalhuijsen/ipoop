@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide: 2 - Attributes
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="attributes.fm3.html">PREV</a>
+ | <a href="attributes.fm5.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="1000879"><i></i> How to Specify Attributes
+</a></h2>
+
+<blockquote>
+<a name="1000880"><!-- --></a>
+Whether you are printing or streaming data, you specify attributes in the same way. You will usually use PrintRequestAttribute more often than the other kinds of attributes because print request attributes specify the settings for an entire print job. Bec
+ause you will most likely want to specify more than one attribute for a particular job, you need to create an attribute set. This sample demonstrates creating a PrintRequestAttributeSet that instructs the service to use A4 media to print five copies of th
+e job using both sides of the paper:<p>
+<a name="1000897"><!-- --></a>
+<p>
+<a name="1000882"><!-- --></a>
+<blockquote><pre>PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
+aset.add(new Copies(5)); 
+aset.add(MediaSize.ISO_A4); 
+aset.add(Sides.DUPLEX); 
+</pre></blockquote>
+After creating an attribute set, you will pass it to the print job&#39;s print method, along with the DocFlavor. The <a href="docflavor.fm.html#996958"><em>Specifying Document Types</em></a> discusses using DocFlavor. The <a href="printing.fm.html#996958"
+><em>Printing and Streaming Documents</em></a> chapter discusses how to print. The next section explains some of the more commonly-used attributes in more detail.<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="attributes.fm3.html">PREV</a>
+ | <a href="attributes.fm5.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

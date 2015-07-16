@@ -1,0 +1,77 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation:  - Exceptions In RMI
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td><a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-exceptions4.html">PREV</a>
+ | <a href="rmi-exceptions6.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h3><a name="5112"><i>	A.3.1	</i> Possible Causes of <code>java.rmi.ServerException</code>
+</h3>
+
+<blockquote>
+<a name="4942"><!-- --></a>
+These are some of the underlying exceptions which can occur on the server when the server is itself executing a remote method invocation. These exceptions are wrapped in a <code>java.rmi.ServerException</code>; that is the <code>java.rmi.ServerException</code> contains the original exception for the client to extract. These exceptions are wrapped by <code>ServerException</code> so that the client will know that its own remote method invocation on the server did not fail, but that a secondary remote method invocation made by the server failed. 
+
+<br><br>
+<Table Border="1" Cellpadding="5">
+<caption></caption>
+
+<tr>
+	<th>Exception<br></th>
+	<th>Context<br></th>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.server.SkeletonMismatchException</code> <p><em>note: this exception is deprecated as of the </em>Java 2 SDK, Standard Edition, v1.2</td>
+	<td><p>Hash mismatch of stub and skeleton.</td>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.UnmarshalException</code></td>
+	<td><p>I/O error unmarshaling call header. I/O error unmarshaling arguments.</td>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.MarshalException</code></td>
+	<td><p>Protocol error marshaling return.</td>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.RemoteException</code></td>
+	<td><p>Method number out of range due to corrupted stream.</td>
+</tr>
+</Table>
+ 
+<p>
+</blockquote>
+
+</ul>
+<br>
+<hr>
+<a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-exceptions4.html">PREV</a>
+ | <a href="rmi-exceptions6.html">NEXT</a> 
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Monday, October 7, 2002 -->
+ 
+
+
+</body>
+</html>

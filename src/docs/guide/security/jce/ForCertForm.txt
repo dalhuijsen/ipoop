@@ -1,0 +1,98 @@
+      Certification Form for Foreign-Developed CSPs
+
+Sun's JCE implements encryption using Cryptographic Service 
+Providers (CSPs). Only CSPs signed by a trusted entity can be 
+plugged into the JCE framework. You have indicated that you will 
+be providing a foreign-developed CSP for JCE. 
+
+In order to comply with our reporting obligations under the 
+Export Administration Regulations, we need to have this form 
+completed, signed, and returned to us before we can issue a
+code-signing certificate to be used to sign your JCE CSP
+code. Return the form to
+
+    Corporate Export
+    Attn: Encryption export
+    4120 Network Circle MS: USCA12-204
+    Santa Clara, CA  95054
+
+Before you return this form, you must send, via email, a
+Certificate Signing Request (CSR) and contact information
+to javasoft-cert-request@sun.com, as noted in
+http://java.sun.com/j2se/1.4/docs/guide/security/jce/HowToImplAJCEProvider.html
+
+In response, you will receive a request number, also via email.
+You may then mail this form. Include the request number here:
+
+    Request Number: ______________________________________
+
+Including the request number ensures this form can be matched 
+to your email message.
+
+
+Name of Person Completing Form: ___________________________
+
+Company Name: _____________________________________________
+
+Address: __________________________________________________
+
+         __________________________________________________
+
+         __________________________________________________
+
+         __________________________________________________
+
+Phone: _______________ E-Mail:  ___________________________
+
+
+Non-proprietary technical description:  ___________________
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+
+Algorithms and Key Lengths Used (e.g., 168-bit 3DES, 1024-bit 
+RSA, etc.):  
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+
+Please provide a description of any general programming 
+interfaces to the product:  
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+
+Please list any standards or protocols that this product adheres 
+to:  
+
+___________________________________________________________ 
+
+___________________________________________________________ 
+
+___________________________________________________________
+
+
+If available, please include a product brochure or other 
+documentation with this certification. 
+
+
+Signature: ___________________________   Date: _____________
+

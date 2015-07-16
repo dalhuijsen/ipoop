@@ -1,0 +1,219 @@
+<html>
+<head>
+<title>Creating the Web Page That Lauches the Application</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Creating the Web Page That Launches the Application</h1>
+<hr>
+<form name="form1">
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<br>
+This chapter includes the following topics: 
+<ul>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#netscape">Detecting if Java Web Start is installed on Netscape</a></li>
+  <li><a href="#ie">Detecting if Java Web Start is installed on IE, and if so, 
+    the version number</a></li>
+  <li><a href="#launching">Launching the application if Java Web Start is Installed&#8212;or 
+    providing a link for auto-install or general download page</a></li>
+  <li><a href="#creating">Creating an auto-install page</a></li>
+</ul>
+<h3><a name="intro"></a>Introduction</h3>
+<p>In order for an application to be launched from a web page via JNLP, the page 
+  must include a link to the JNLP file. E.g., to be able to launch application 
+  <code>app.jnlp</code> on a web site <code>http://www.yyy.zzz</code>, the page 
+  needs to include the following link:</p>
+<blockquote> 
+  <p><code>&lt;a href=http://www.yyy.zzz/app.jnlp&gt;Launch the application&lt;/a&gt;</code></p>
+</blockquote>
+<p>It may be the case, however, that JAWS is not installed on the user's computer. 
+  Thus the page needs to include logic (scripts) to take account of this. In fact, 
+  the page should include logic for the following:</p>
+<p>Detect if Java Web Start (JAWS) is installed</p>
+<ul>
+  <li>If so, launch the application.</li>
+  <li>If not, detect if user is running IE on Window.
+    <ul>
+      <li>If so, provide link to a page that can auto-install the JRE for Windows</li>
+      <li>If not, provide a link to the general download page for the SDK/JRE.</li>
+    </ul>
+  </li>
+</ul>
+<p>The scripts, and the HTML for the auto-install page, are discussed below.</p>
+<h3><a name="netscape"></a>Detecting if JAWS is installed on Netscape</h3>
+<p>Here is the first script that should be run on a web page for launching an 
+  application via JNLP:</p>
+<blockquote> 
+  <pre>&lt;SCRIPT LANGUAGE="JavaScript"&gt; <br>var javawsInstalled = 0; <br>var javaws12Installed = 0; 
+var javaws142Installed=0; <br>isIE = "false"; <br>if (navigator.mimeTypes && navigator.mimeTypes.length) { <br>   x = navigator.mimeTypes['application/x-java-jnlp-file']; <br>   if (x) { 
+      javawsInstalled = 1; 
+      javaws12Installed=1; <br>      javaws142Installed=1; <br>   } <br>} <br>else { <br>   isIE = "true"; <br>} <br>&lt;/SCRIPT&gt; 
+</pre>
+</blockquote>
+<p>This script looks at the <code>navigator.mimeTypes</code> object and the <code>navigator.mimeTypes.length</code> 
+  var to decide if the browser is Netscape or IE. If <code>length</code> is 0, 
+  it is assumed the browser is IE, as with IE the <code>navigator.mimeTypes</code> 
+  array is defined but always empty. If length is non-zero, then the browser is 
+  assumed to be Netscape and the JNLP MIME type is checked to see if it exists 
+  on Netscape. If so, <code>javawsInstalled</code>, <code>javaws12Installed</code>, 
+  and <code>javaws142Installed</code> are all set to 1. With Netscape it is not 
+  possible to determine which particular version of JAWS is installed, so all 
+  three variables are set to 1.</p>
+<h3><a name="ie"></a>Detecting if JavaWeb Start is installed on IE, and if so, 
+  the version</h3>
+<p>The above JavaScript should be followed by a VBScript that sets variables related 
+  to Internet Explorer browers: </p>
+<blockquote> 
+  <pre>
+&lt;SCRIPT LANGUAGE="VBScript"&gt;
+on error resume next
+If isIE = "true" Then
+  If Not(IsObject(CreateObject("JavaWebStart.isInstalled"))) Then
+     javawsInstalled = 0
+  Else
+     javawsInstalled = 1
+  End If
+  If Not(IsObject(CreateObject("JavaWebStart.isInstalled.2"))) Then
+     javaws12Installed = 0
+  Else
+     javaws12Installed = 1
+  End If
+  If Not(IsObject(CreateObject("JavaWebStart.isInstalled.1.4.2.0"))) Then
+     javaws142Installed = 0
+  Else
+     javaws142Installed = 1
+  End If  
+End If
+&lt;/SCRIPT&gt;
+</pre>
+</blockquote>
+<p>This VBScript is executed if the variable <tt>isIE</tt> from the preceeding 
+  JavaScript is <tt>"true"</tt>; i.e., if the end-user's browser is Internet Explorer. 
+  This script instantiates the <code>isInstalled</code> COM object in <tt>JavaWebStart.dll</tt>, 
+  and this object determines two things: </p>
+<ul>
+  <li>whether the client machine has any version of JAWS installed;</li>
+  <li>whether the client machine has version 1.2 of JAWS installed;</li>
+  <li>whether the client machine has versions 1.4.2 of JAWS installed.</li>
+</ul>
+<p>After the above two scripts have been executed, the variables <tt>javawsInstalled</tt>, 
+  <tt>javaws12Installed</tt>, and <code>javaws142Installed</code> will be set 
+  to either 1 or 0, as follows: </p>
+<blockquote> 
+  <table summary="layout" border=1>
+    <tr bgcolor="#CCCCCC"> 
+      <td width="19%"> <div align="center"><font size="+1">Browser</font> </div>
+      <th width="27%"><font size="+1"><code>javawsInstalled</code> </font> 
+      <th width="27%"><font size="+1"><code>javaws12Installed </code></font> 
+      <th width="27%"><font size="+1"><code>javaws142Installed</code></font> 
+    <tr> 
+      <th width="19%">Internet Explorer 
+      <td width="27%">1 if any version of JAWS is installed; 0 otherwise. 
+      <td width="27%">1 if JAWS 1.2 is installed; 0 otherwise. 
+      <td width="27%">1 if JAWS 1.4.2 is installed; 0 otherwise. 
+    <tr> 
+      <th width="19%">Netscape Navigator 
+      <td width="27%">1 if any version of JAWS is installed; 0 otherwise. 
+      <td width="27%">1 if any version of JAWS is installed; 0 otherwise. 
+      <td width="27%">1 if any version of JAWS is installed; 0 otherwise. 
+  </table>
+</blockquote>
+<h3><a name="launching"></a>Launching the application if JAWS is Installed&#8212;or 
+  providing a link for auto-install or general download page</h3>
+<p>An additional JavaScript can be used to decide whether to:</p>
+<ul>
+  <li> provide a link to the application's jnlp file (i.e., JAWS is installed); 
+  </li>
+  <li>initiate auto-download of JRE 1.4.2, which includes JAWS (i.e., 
+    JAWS is not installed and the user is running IE on Windows); </li>
+  <li>or provide a link to the general download page for the 1.4.2 SDK/JRE (i.e., 
+    JAWS is not installed and the user is not running IE on Windows). </li>
+</ul>
+<p>The following JavaScript handles these scenarios:</p>
+<blockquote> 
+  <pre>&lt;SCRIPT LANGUAGE="JavaScript"&gt;
+/* Note that the logic below always launches the JNLP application<br> *if the browser is Gecko based. This is because it is not possible<br> *to detect MIME type application/x-java-jnlp-file on Gecko-based browsers. <br> */
+if (javawsInstalled || (navigator.userAgent.indexOf(&quot;Gecko&quot;) !=-1)) {
+    document.write("&lt;a href=http://www.yyy.zzz/app.jnlp&gt;Launch 
+        the application&lt;/a&gt;");
+} else {
+    document.write("Click ");
+    document.write("&lt;a href=http://java.sun.com/PluginBrowserCheck?
+        pass=http://www.yyy.zzz/download.html&
+        fail=http://java.sun.com/j2se/1.4.2/download.html&gt;here&lt;/a&gt; ");
+    document.write("to download and install JRE 1.4.2 and 
+        the application.");
+}
+&lt;/SCRIPT&gt;
+</pre>
+</blockquote>
+<table summary="layout" width="80%" border="1" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFCC">
+  <tr> 
+    <td><p><font size="+2"><strong><u>Notes:</u></strong></font></p>
+      <ol>
+        <li>The script only uses <code>javawsInstalled</code>, not <code>javaws12Installed</code> 
+          or <code>javaws142Installed</code>.</li>
+        <li>The line breaks following '<code>?</code>' and '<code>&</code>' are 
+          for readability purposes only; in an actual script there should be no 
+          breaks in the <code>href</code> string.</li>
+      </ol></td>
+  </tr>
+</table>
+<p> If <tt>javawsInstalled</tt> is 1, indicating that JAWS is already 
+  available on the client, then the script provides a link to the application's 
+  <code>jnlp</code> file. If JAWS is not installed on the client, the 
+  script instead provides a link to the <code>PluginBrowserCheck</code> program 
+  on the <code>java.sun.com</code> web site. <code>PluginBrowserCheck</code> checks 
+  whether the client uses Internet Explorer on a Microsoft Windows platform. If 
+  so, <code>PluginBrowserCheck</code> sends the user to the auto-install page 
+  <tt>http://www.yyy.zzz/download.html</tt>. (See the next section, <a href="#creating">Creating 
+  an auto-install page</a>, for how to create an auto-install page for IE running 
+  on Windows.) If <code>PluginBrowserCheck</code> determines the user is not using 
+  Internet Explorer on Microsoft Windows, the user is redirected to the 1.4.2 
+  JRE general download page on <code>java.sun.com</code>.</p>
+<h3><a name="creating"></a>Creating an auto-install page</h3>
+<table summary="layout" width="80%" border="1" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFCC">
+  <tr> 
+    <td><p><font size="+2"><strong><u>Note:</u></strong></font></p>
+      <p>For a complete list of JRE releases that can be autodownloaded via a 
+        <code>.cab</code> file, as mentioned below, see <a href="../../deployment/autodl/autodl-files.html">Autodownload 
+        Files (Windows Only)</a>. </p>
+      </td>
+  </tr>
+</table>
+<p>The <tt>download.html</tt> file should be staged on the server side. It contains 
+  special <tt>OBJECT</tt> and <tt>PARAM</tt> tags that will download to the client 
+  an auto-installer for J2RE 1.4.2. <font color="#000000">Along with JAWS, an 
+  ActiveX control will be downloaded to the client. The ActiveX control will launch 
+  the application using the newly installed JAWS. Here is a sample <tt>download.html</tt> 
+  file:</font></p>
+<blockquote> 
+  <pre>
+&lt;HTML&gt;
+&lt;BODY&gt;
+&lt;OBJECT CODEBASE="http://java.sun.com/products/plugin/autodl/jinstall-1_4_2-windows-i586.cab" 
+CLASSID="clsid:5852F5ED-8BF4-11D4-A245-0080C6F74284" HEIGHT=0 WIDTH=0&gt;
+&lt;PARAM NAME="app" VALUE="http://www.yyy.zzz/app.jnlp"&gt;
+&lt;PARAM NAME="back" VALUE="true"&gt;
+&lt;!-- Alternate HTML for browsers which cannot instantiate the object --&gt;
+&lt;A HREF="http://java.sun.com/j2se/1.4.2/download.html"&gt;
+Download Java Web Start&lt;/A&gt;
+&lt;/OBJECT&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre>
+</blockquote>
+<p> This <tt>OBJECT</tt> tag fetches a <code>.cab</code> file that contains an 
+  auto-installer for JRE 1.4.2. (Note that this <code>.cab</code> file will not 
+  be available until the GA release of the 1.4.2 SDK/JRE.) The <tt>PARAM</tt> 
+  tags specify the location of the application's <code>jnlp</code> file so that 
+  it may be automatically launched after the JRE is installed on the client. </p>
+<p>&nbsp;</p>
+</body>
+</html>

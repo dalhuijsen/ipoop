@@ -1,0 +1,243 @@
+<html><head><title>Java AWT: Printing</title></head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<a name="919687">
+<h1><img align=middle alt="Duke logo with magnifying glass" src="images/magnify.sm.gif"> Java AWT: Printing</h1>
+</a>
+<hr><p><a name="919692">
+<address>
+Last Updated: December 6, 1999
+</address>
+<h2>Purpose</h2>
+</a>
+The goal for the AWT printing API is to give developers an easy mechanism to 
+print the AWT components using native platform facilities. This API is designed 
+for use with the AWT Graphics model. Developers who prefer to work with 
+Graphics2D should use 2D printing, available in the <a 
+href="../../../../api/java/awt/print/package-summary.html">java.awt.print</a> 
+package.<a name="919694">
+<p>
+<h3>The Printing API</h3>
+</a>
+The printing API is very simple and consists primarily of one method in class 
+java.awt.Toolkit:
+<blockquote><pre>	
+<a href="../../../../api/java/awt/Toolkit.html#getPrintJob(java.awt.Frame, 
+java.lang.String, java.awt.JobAttributes, java.awt.PageAttributes)">PrintJob getPrintJob(Frame f, String jobtitle, JobAttributes jobAttributes,
+PageAttributes pageAttributes)</a>
+</pre></blockquote>
+
+<p>and a class responsible for encapsulating all the information associated with 
+a printing request:
+<pre><code>	<a 
+href="../../../../api/java/awt/PrintJob.html">java.awt.PrintJob</a>
+</code></pre>
+
+<p>The getPrintJob() method in Toolkit will take care of posting any platform 
+specific print dialogs so that when it returns, the PrintJob object has already 
+been configured to match the user's request. The <a 
+href="../../../../api/java/awt/JobAttributes.html">JobAttributes</a> and <a 
+href="../../../../api/java/awt/PageAttributes.html">PageAttributes</a> parameters 
+provide the ability to pass in default attribute values for the print job. This 
+allows the printing attributes appropriate for a particular application to be 
+stored and applied in individual circumstances. If the user changes the default 
+attributes in the print dialog, those changes are saved into the JobAttributes 
+and PageAttributes instances passed to the method (so the program can choose to 
+store those new defaults if desired).
+<p>The PrintJob object provides access to the relevant printing properties 
+chosen by the user (page size, etc) as well as the print graphics contexts used 
+to transparently render to the print device.<a name="919700">
+<p>
+<h3>Print Graphics Context</h3>
+</a>
+The print graphics context is provided by an interface:
+<blockquote><pre>
+<a href="../../../../api/java/awt/PrintGraphics.html">java.awt.PrintGraphics</a>
+</pre></blockquote>
+
+<p>The PrintJob object provides the method to obtain a handle to an object which 
+is a subclass of Graphics AND implements the PrintGraphics interface:
+<blockquote><pre>
+<a href="../../../../api/java/awt/PrintJob.html#getGraphics()">Graphics getGraphics()</a>
+</pre></blockquote>
+
+<p>Since this object is a subclass of the Graphics class, it can simply be 
+passed into existing paint() or print() methods (which use the standard Graphics 
+drawing methods) and the underlying AWT implementation takes care of translating 
+those calls to the appropriate print device (this is straightforward on 
+Mac/Windows which support graphic print devices; on Solaris, a PostScript 
+graphics object is required to generate appropriate PostScript).
+<p>It is often the case that from within a paint() or print() method, your 
+program may want to detect whether it is rendering to the screen or to a print 
+device (for example it would not necessarily want to print `highlighted' text 
+which has been selected by the user). Since the graphics object returned from 
+the PrintJob.getGraphics() method implements the PrintGraphics interface, this 
+can easily be detected with the following test:
+<pre><code>	public void paint(Graphics g) {
+</code></pre>
+
+<pre><code>		if (g instanceof PrintGraphics) 
+</code></pre>
+
+<pre><code>			// printing is occurring
+</code></pre>
+
+<pre><code>			...
+</code></pre>
+
+<p>The primary method in the PrintGraphics interface is a method to obtain a 
+handle to the associated PrintJob object:
+<blockquote><pre>
+<a href="../../../../api/java/awt/PrintGraphics.html#getPrintJob()">PrintJob getPrintJob()</a>
+</pre></blockquote>
+<a name="919704">
+<p>
+<h3>Pagination</h3>
+</a>
+It is the program's responsibility to handle pagination.  Each call to 
+getGraphics() will return a print graphics context for a single page;  when the 
+program calls dispose() on the print graphics context, that page is flushed to 
+the printer.  The program must take care of determining appropriate page content 
+and page breaking, given the specified page dimensions and resolution.
+<p>These printing attributes can be obtained by the following methods on 
+java.awt.PrintJob:
+<blockquote><pre>
+<a href="../../../../api/java/awt/PrintJob.html#getPageDimension()">Dimension getPageDimension()</a>
+</pre></blockquote>
+<blockquote><pre>
+<a href="../../../../api/java/awt/PrintJob.html#getPageResolution()">int getPageResolution()</a>
+</pre></blockquote>
+
+<a name="919708">
+<p>
+<h3>Printing Hierarchies of Components</h3>
+If a program needs to print an entire containment hierarchy of AWT components 
+(i.e. a Panel and any nested controls/containers within it), it should call the 
+following java.awt.Component method on the root of the containment hierarchy 
+(passing in the appropriate print graphics context):
+<blockquote><pre>
+<a href="../../../../api/java/awt/Component.html#printAll(java.awt.Graphics)">public void printAll(Graphics g)</a>
+</pre></blockquote>
+<p>
+Calling this method will result in the complete traversal of the containment 
+hierarchy such that the print() method will be called on all descendent 
+components.  The default implementation of the print() method simply calls 
+paint(), so if a program has created a component which renders itself in the 
+paint() method, printing should work "automagically".  Note that all the base 
+AWT components (Button, Scrollbar, etc.) are capable of printing themselves when 
+their printAll() method is called (even though their rendering does not take 
+place in the paint() method).
+<p>
+<h3>Print Dialogs</h3>
+</a>
+Although it is important for some programs to either extend or create their own 
+print dialogs, this capability is currently not available via AWT printing, nor 
+via 2D printing.
+<p>
+<h3>Security</h3>
+</a>
+Because it was considered dangerous to allow potentially untrusted applets to 
+initiate print job requests (and potentially quietly print anything devious to 
+the printer that they desire) the initiation of a PrintJob (via 
+Toolkit.getPrintJob) is defined to be an operation bound by the Applet security 
+restrictions implemented in a SecurityManager method. In addition, while 
+printing may be permitted, access to the file system may not. In such a case, 
+requests to print to a file programmatically will generate an exception and the 
+user will be unable to select print to file.
+<p>
+It's important to note that this restriction does not limit applets' capability 
+to render using a PrintGraphics object returned from a PrintJob; it just 
+disallows untrusted applets to initiate the job. A more reasonable policy will 
+be provided when the Java security architecture allows more customization.<a 
+name="919710">
+<h2>Sample Code</h2>
+</a>
+A VERY simple example of how a print job can be initiated to print an AWT 
+component:
+<pre><code>	
+import java.awt.*;
+import java.awt.event.*;
+
+public class PrintingTest extends Frame implements ActionListener {
+
+    PrintCanvas canvas;
+
+    public PrintingTest() {
+        super("Printing Test"); 
+        canvas = new PrintCanvas();
+        add("Center", canvas);
+        
+        Button b = new Button("Print");
+        b.setActionCommand("print");
+        b.addActionListener(this);
+        add("South", b);
+
+        pack();
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        String cmd = e.getActionCommand();
+        if (cmd.equals("print")) {
+            <b>PrintJob pjob = getToolkit().getPrintJob(this,
+                               "Printing Test", null, null);
+
+            if (pjob != null) {          
+                Graphics pg = pjob.getGraphics();
+
+                if (pg != null) {
+                    canvas.printAll(pg);
+                    pg.dispose(); // flush page
+                }
+                pjob.end();
+
+            }
+        }</b>
+    }
+
+    public static void main(String args[]) {
+        PrintingTest test = new PrintingTest();
+        test.show();
+    }
+}
+
+class PrintCanvas extends Canvas {
+
+    public Dimension getPreferredSize() {
+        return new Dimension(100, 100);
+    }
+  
+    public void paint(Graphics g) {
+        Rectangle r = getBounds();
+
+        g.setColor(Color.yellow);
+        g.fillRect(0, 0, r.width, r.height);
+
+        g.setColor(Color.blue);
+        g.drawLine(0, 0, r.width, r.height);
+
+        g.setColor(Color.red);
+        g.drawLine(0, r.height, r.width, 0);
+    }
+}
+</code></pre>
+
+<p>
+<hr><br>
+ 
+<address>
+Send feedback to:<a 
+href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1996, 1997, 1999 Sun Microsystems, Inc.   All rights
+reserved.</i
+
+<!-- This file was created with Quadralay WebWorks Publisher 3.0.5 -->
+<!-- -->
+<!-- For more information on how this document, and how the rest of -->
+<!-- this server was created, email yourEmail@xyzcorp.com -->
+<!-- -->
+<!-- Last updated: 12/06/99 14:04:35 -->
+
+</body>
+</html>

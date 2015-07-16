@@ -1,0 +1,66 @@
+<HTML>
+<HEAD><TITLE>JDK 1.1 Event Examples</TITLE></HEAD>
+
+<body bgcolor="#ffffff">
+
+<applet code="SlideShow.class"
+	width=750 height=700
+	alt="Your browser understands the &lt;APPLET&gt; tag but isn't running the applet, for some reason.">
+	<param name="titlesArray" value="Using Anonymous Classes to Implement an Event Listener;
+	                                 
+Using a Static Nested Class to Implement an Event Listener;
+
+Redispatching Events to Another Component;
+
+Complete Example">
+	<param name="imageHeight" value="338">
+	<param name="imageWidth" value="637">
+	<param name="imagesArray" value="slide1.gif;
+	      
+slide2.gif;
+
+slide3.gif;
+
+slide4.gif">
+	<param name="textArray" value="Since your browser is not running JDK 1.1, you cannot run
+this applet.  However, the applet you see now is an
+interactive slide show that will demonstrate what the 1.1
+version of this applet would do.
+	      
+The red box at the bottom of the screen would track the 
+mouse because the panel that contains it would handle 
+MouseMotion events. The handler is an anonymous class that 
+implements MouseMotionListener.;
+	      
+Each column of boxes, the targets, at the top of the game 
+screen is a Panel.  By adding a listener that handles 
+enter/exit events to each panel you would see highlights 
+when the mouse passes over each panel.  In this case we've used 
+instances of a static listener class to handle the 
+enter/exit events.  Unfortunately there would be a bug
+here: the red puck does not track the mouse correctly 
+anymore!;
+
+The reason for this bug is that the target panels would be consuming 
+(and discarding) the MouseMotion events that should be delivered 
+to the game Panel.  To redispatch the events you can translate their 
+coordinates to the Panels origin and pass them along with dispatchEvent().;
+
+In this final panel, you would be able to click the mouse as many times 
+as there are boxes in a column to get a satisfying beep and to make the 
+boxes disappear.  To win the game you would have to clear the entire panel.  
+If you find yourself seeking out the 1.1 JDK just to play this game,
+seek professional help immediately.">
+
+<param name="URLsArray" value="source1.html;
+source2.html;
+source3.html;
+source4.html">
+
+<param name="delimiter" value=";">
+Your browser is completely ignoring the &lt;APPLET&gt; tag!
+</applet>
+
+</body>
+</HTML>
+

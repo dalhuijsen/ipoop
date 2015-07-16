@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title></title>
+</head>
+<body bgcolor=#ffffff>
+
+<table summary="layout" width=600><tr>
+<td><font size=-1>
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="appendixA.html">[Prev]</a> [Next]
+</font></td>
+</tr></table>
+<hr>
+<br>
+ 
+<a name="418284"></a>
+<h1>Appendix B  - Sample Code</h1>
+<ul><pre><a name="418162"></a><font size=-1>// The following code can be used as a template.  Simply
+</font><a name="418163"></a><font size=-1>// substitute the appropriate url, login, and password, and then substitute the
+</font><a name="418280"></a><font size=-1>// SQL statement you want to send to the database.
+</font><a name="417928"></a><font size=-1>
+</font><a name="417929"></a><font size=-1>
+</font><a name="417931"></a><font size=-1>
+</font><a name="417932"></a><font size=-1>//----------------------------------------------------------------------------
+</font><a name="417933"></a><font size=-1>//
+</font><a name="417934"></a><font size=-1>// Module:	SimpleSelect.java
+</font><a name="417935"></a><font size=-1>//
+</font><a name="417936"></a><font size=-1>// Description:	Test program for ODBC API interface.  This java application
+</font><a name="417937"></a><font size=-1>// will connect to a JDBC driver, issue a select statement
+</font><a name="417938"></a><font size=-1>// and display all result columns and rows
+</font><a name="417939"></a><font size=-1>//
+</font><a name="417940"></a><font size=-1>// Product:	JDBC to ODBC Bridge
+</font><a name="417941"></a><font size=-1>//
+</font><a name="417942"></a><font size=-1>// Author:	Karl Moss
+</font><a name="417943"></a><font size=-1>//
+</font><a name="417944"></a><font size=-1>// Date:	February, 1996
+</font><a name="417945"></a><font size=-1>//
+</font><a name="417946"></a><font size=-1>// Copyright:	1990-1996 INTERSOLV, Inc.
+</font><a name="417947"></a><font size=-1>// This software contains confidential and proprietary
+</font><a name="417948"></a><font size=-1>// information of INTERSOLV, Inc.
+</font><a name="417949"></a><font size=-1>//----------------------------------------------------------------------------
+</font><a name="417950"></a><font size=-1>
+</font></pre></ul><pre><a name="417951"></a><font size=-1>import java.net.URL;
+</font><a name="417952"></a><font size=-1>import java.sql.*;
+</font><a name="417953"></a><font size=-1>
+</font><a name="417954"></a><font size=-1>class SimpleSelect {
+</font></pre><ul><pre><a name="417955"></a><font size=-1>
+</font><a name="417956"></a><font size=-1>public static void main (String args[]) {
+</font><a name="418150"></a><font size=-1>	String url   = "jdbc:odbc:my-dsn";
+</font><a name="417959"></a><font size=-1>	String query = "SELECT * FROM emp"; 
+</font><a name="417960"></a><font size=-1>
+</font><a name="417961"></a><font size=-1>	try {
+</font><a name="417962"></a><font size=-1>
+</font><a name="417963"></a><font size=-1>		// Load the jdbc-odbc bridge driver
+</font><a name="417964"></a><font size=-1>
+</font><a name="417965"></a><font size=-1>		Class.forName ("sun.jdbc.odbc.JdbcOdbcDriver");
+</font><a name="417966"></a><font size=-1>
+</font><a name="417967"></a><font size=-1>		DriverManager.setLogStream(System.out);
+</font><a name="417968"></a><font size=-1>
+</font><a name="417969"></a><font size=-1>		// Attempt to connect to a driver.  Each one
+</font><a name="417970"></a><font size=-1>		// of the registered drivers will be loaded until
+</font><a name="417971"></a><font size=-1>		// one is found that can process this URL
+</font><a name="417972"></a><font size=-1>
+</font><a name="417973"></a><font size=-1>		Connection con = DriverManager.getConnection (
+</font><a name="417974"></a><font size=-1>			url, "my-user", "my-passwd");
+</font><a name="417975"></a><font size=-1>
+</font><a name="417976"></a><font size=-1>		// If we were unable to connect, an exception
+</font><a name="417977"></a><font size=-1>		// would have been thrown.  So, if we get here,
+</font><a name="417978"></a><font size=-1>		// we are successfully connected to the URL
+</font><a name="417979"></a><font size=-1>
+</font><a name="417980"></a><font size=-1>		// Check for, and display and warnings generated
+</font><a name="417981"></a><font size=-1>		// by the connect.
+</font><a name="417982"></a><font size=-1>
+</font><a name="417983"></a><font size=-1>		checkForWarning (con.getWarnings ());
+</font><a name="417984"></a><font size=-1>
+</font><a name="417985"></a><font size=-1>		// Get the DatabaseMetaData object and display
+</font><a name="417986"></a><font size=-1>		// some information about the connection
+</font><a name="417987"></a><font size=-1>
+</font><a name="417988"></a><font size=-1>		DatabaseMetaData dma = con.getMetaData ();
+</font><a name="417989"></a><font size=-1>
+</font><a name="417990"></a><font size=-1>		System.out.println("\nConnected to " + dma.getURL());
+</font><a name="417991"></a><font size=-1>		System.out.println("Driver       " + 
+</font><a name="417992"></a><font size=-1>			dma.getDriverName());
+</font><a name="417993"></a><font size=-1>		System.out.println("Version      " +
+</font><a name="417994"></a><font size=-1>			dma.getDriverVersion());
+</font><a name="417995"></a><font size=-1>		System.out.println("");
+</font><a name="417996"></a><font size=-1>
+</font><a name="417997"></a><font size=-1>		// Create a Statement object so we can submit
+</font><a name="417998"></a><font size=-1>		// SQL statements to the driver
+</font><a name="417999"></a><font size=-1>
+</font><a name="418000"></a><font size=-1>		Statement stmt = con.createStatement ();
+</font><a name="418001"></a><font size=-1>
+</font><a name="418002"></a><font size=-1>		// Submit a query, creating a ResultSet object
+</font><a name="418003"></a><font size=-1>
+</font><a name="418004"></a><font size=-1>		ResultSet rs = stmt.executeQuery (query);
+</font><a name="418005"></a><font size=-1>
+</font><a name="418006"></a><font size=-1>		// Display all columns and rows from the result set
+</font><a name="418007"></a><font size=-1>
+</font><a name="418008"></a><font size=-1>		dispResultSet (rs);
+</font><a name="418009"></a><font size=-1>
+</font><a name="418010"></a><font size=-1>		// Close the result set
+</font><a name="418011"></a><font size=-1>
+</font><a name="418012"></a><font size=-1>		rs.close();
+</font><a name="418013"></a><font size=-1>
+</font><a name="418014"></a><font size=-1>		// Close the statement
+</font><a name="418015"></a><font size=-1>
+</font><a name="418016"></a><font size=-1>		stmt.close();
+</font><a name="418017"></a><font size=-1>
+</font><a name="418018"></a><font size=-1>		// Close the connection
+</font><a name="418019"></a><font size=-1>
+</font><a name="418020"></a><font size=-1>		con.close();
+</font><a name="418021"></a><font size=-1>	}
+</font><a name="418022"></a><font size=-1>	catch (SQLException ex) {
+</font><a name="418023"></a><font size=-1>
+</font><a name="418024"></a><font size=-1>		// A SQLException was generated.  Catch it and
+</font><a name="418025"></a><font size=-1>		// display the error information.  Note that there
+</font><a name="418026"></a><font size=-1>		// could be multiple error objects chained
+</font><a name="418027"></a><font size=-1>		// together
+</font><a name="418028"></a><font size=-1>
+</font><a name="418029"></a><font size=-1>	System.out.println ("\n*** SQLException caught ***\n");
+</font><a name="418030"></a><font size=-1>
+</font><a name="418031"></a><font size=-1>	while (ex != null) {
+</font><a name="418032"></a><font size=-1>		System.out.println ("SQLState: " +
+</font><a name="418033"></a><font size=-1>				ex.getSQLState ());
+</font><a name="418034"></a><font size=-1>		System.out.println ("Message:  " + ex.getMessage ());
+</font><a name="418036"></a><font size=-1>		System.out.println ("Vendor:   " +
+</font><a name="418037"></a><font size=-1>				ex.getErrorCode ());
+</font><a name="418038"></a><font size=-1>		ex = ex.getNextException ();
+</font><a name="418039"></a><font size=-1>		System.out.println ("");
+</font><a name="418040"></a><font size=-1>		}
+</font><a name="418041"></a><font size=-1>	}
+</font><a name="418042"></a><font size=-1>	catch (java.lang.Exception ex) {
+</font><a name="418043"></a><font size=-1>
+</font><a name="418044"></a><font size=-1>		// Got some other type of exception.  Dump it.
+</font><a name="418045"></a><font size=-1>
+</font><a name="418046"></a><font size=-1>		ex.printStackTrace ();
+</font><a name="418047"></a><font size=-1>	}
+</font><a name="418048"></a><font size=-1>}
+</font><a name="418049"></a><font size=-1>
+</font><a name="418050"></a><font size=-1>//-------------------------------------------------------------------
+</font><a name="418051"></a><font size=-1>// checkForWarning
+</font><a name="418052"></a><font size=-1>// Checks for and displays warnings.  Returns true if a warning
+</font><a name="418053"></a><font size=-1>// existed
+</font><a name="418054"></a><font size=-1>//-------------------------------------------------------------------
+</font><a name="418055"></a><font size=-1>
+</font><a name="418320"></a><font size=-1>private static boolean checkForWarning (SQLWarning warn) 	
+</font><a name="418321"></a><font size=-1>		throws SQLException  {
+</font><a name="418322"></a><font size=-1>	boolean rc = false;
+</font><a name="418060"></a><font size=-1>
+</font><a name="418061"></a><font size=-1>	// If a SQLWarning object was given, display the
+</font><a name="418062"></a><font size=-1>	// warning messages.  Note that there could be
+</font><a name="418063"></a><font size=-1>	// multiple warnings chained together
+</font><a name="418064"></a><font size=-1>
+</font><a name="418065"></a><font size=-1>	if (warn != null) {
+</font><a name="418066"></a><font size=-1>		System.out.println ("\n *** Warning ***\n");
+</font><a name="418067"></a><font size=-1>		rc = true;
+</font><a name="418068"></a><font size=-1>		while (warn != null) {
+</font><a name="418069"></a><font size=-1>			System.out.println ("SQLState: " +
+</font><a name="418070"></a><font size=-1>				warn.getSQLState ());
+</font><a name="418071"></a><font size=-1>			System.out.println ("Message:  " +
+</font><a name="418072"></a><font size=-1>				warn.getMessage ());
+</font><a name="418073"></a><font size=-1>			System.out.println ("Vendor:   " +
+</font><a name="418074"></a><font size=-1>				warn.getErrorCode ());
+</font><a name="418075"></a><font size=-1>			System.out.println ("");
+</font><a name="418076"></a><font size=-1>			warn = warn.getNextWarning ();
+</font><a name="418077"></a><font size=-1>		}
+</font><a name="418078"></a><font size=-1>	}
+</font><a name="418079"></a><font size=-1>	return rc;
+</font><a name="418080"></a><font size=-1>}
+</font><a name="418081"></a><font size=-1>
+</font><a name="418082"></a><font size=-1>//-------------------------------------------------------------------
+</font><a name="418083"></a><font size=-1>// dispResultSet
+</font><a name="418084"></a><font size=-1>// Displays all columns and rows in the given result set
+</font><a name="418085"></a><font size=-1>//-------------------------------------------------------------------
+</font><a name="418086"></a><font size=-1>
+</font><a name="418087"></a><font size=-1>private static void dispResultSet (ResultSet rs)
+</font><a name="418088"></a><font size=-1>	throws SQLException
+</font><a name="418089"></a><font size=-1>{
+</font><a name="418090"></a><font size=-1>	int i;
+</font><a name="418091"></a><font size=-1>
+</font><a name="418092"></a><font size=-1>	// Get the ResultSetMetaData.  This will be used for
+</font><a name="418093"></a><font size=-1>	// the column headings
+</font><a name="418094"></a><font size=-1>
+</font><a name="418095"></a><font size=-1>	ResultSetMetaData rsmd = rs.getMetaData ();
+</font><a name="418096"></a><font size=-1>
+</font><a name="418097"></a><font size=-1>	// Get the number of columns in the result set
+</font><a name="418098"></a><font size=-1>
+</font><a name="418099"></a><font size=-1>	int numCols = rsmd.getColumnCount ();
+</font><a name="418100"></a><font size=-1>
+</font><a name="418101"></a><font size=-1>	// Display column headings
+</font><a name="418102"></a><font size=-1>
+</font><a name="418103"></a><font size=-1>	for (i=1; i&lt;=numCols; i++) {
+</font><a name="418104"></a><font size=-1>		if (i &gt; 1) System.out.print(",");
+</font><a name="418105"></a><font size=-1>		System.out.print(rsmd.getColumnLabel(i));
+</font><a name="418106"></a><font size=-1>	}
+</font><a name="418107"></a><font size=-1>	System.out.println("");
+</font><a name="418108"></a><font size=-1>	
+</font><a name="418109"></a><font size=-1>	// Display data, fetching until end of the result set
+</font><a name="418110"></a><font size=-1>
+</font><a name="418111"></a><font size=-1>	boolean more = rs.next ();
+</font><a name="418112"></a><font size=-1>	while (more) {
+</font><a name="418113"></a><font size=-1>
+</font><a name="418114"></a><font size=-1>		// Loop through each column, getting the
+</font><a name="418115"></a><font size=-1>		// column data and displaying
+</font><a name="418116"></a><font size=-1>
+</font><a name="418117"></a><font size=-1>		for (i=1; i&lt;=numCols; i++) {
+</font><a name="418118"></a><font size=-1>			if (i &gt; 1) System.out.print(",");
+</font><a name="418119"></a><font size=-1>			System.out.print(rs.getString(i));
+</font><a name="418120"></a><font size=-1>		}
+</font><a name="418121"></a><font size=-1>		System.out.println("");
+</font><a name="418122"></a><font size=-1>
+</font><a name="418123"></a><font size=-1>		// Fetch the next result set row
+</font><a name="418124"></a><font size=-1>
+</font><a name="418125"></a><font size=-1>		more = rs.next ();
+</font><a name="418126"></a><font size=-1>	}
+</font><a name="418128"></a><font size=-1>}
+</font></pre></ul><pre><a name="418277"></a><font size=-1>}
+</font></pre>
+
+<br>
+<hr>
+<font size=-1>
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="appendixA.html">[Prev]</a> [Next]
+</font>
+<hr>
+
+
+<address>
+<a href="mailto:jdbc@wombat.eng.sun.com">jdbc@wombat.eng.sun.com</a>
+or
+<a href="mailto:jdbc-odbc@wombat.eng.sun.com">jdbc-odbc@wombat.eng.sun.com</a>
+</address>
+
+<font size=-1><i><a href="copyright.html">Copyright</a> &#169; 1999 Sun Microsystems, Inc.   All rights reserved.</i></font>
+
+<!-- HTML generated by dkramer on March 14, 1997 -->
+
+</body>
+</html>

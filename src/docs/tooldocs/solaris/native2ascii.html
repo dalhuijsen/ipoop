@@ -1,0 +1,84 @@
+<html>
+<head>
+<title>Native-to-ASCII Converter</title>
+<!-- Created by: Doug Kramer, 19-Aug-1996 -->
+</head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>native2ascii - Native-to-ASCII Converter</H1>
+<blockquote>
+        Converts a file with native-encoded characters (characters which are non-Latin 1 
+	and non-Unicode) to one with 
+	Unicode-encoded characters.
+
+</blockquote>
+
+<h2>SYNOPSIS</h2>
+<blockquote>
+<pre>
+<code><strong>native2ascii</strong> [options] [inputfile [outputfile]]</code>
+</pre>
+</blockquote>
+ 
+<h2>DESCRIPTION</h2>
+<blockquote>
+	The Java compiler and other Java tools can only process files which contain 
+	Latin-1 and/or Unicode-encoded (\udddd notation) characters.  <code>native2ascii</code>
+	converts files 
+	which contain other character encodings into files
+	containing Latin-1 and/or Unicode-encoded charaters.
+    
+<p>
+        If <code>outputfile</code> is omitted, standard output is used
+        for output.  If, in addition, <code>inputfile</code> is omitted,
+        standard input is used for input.
+</blockquote>
+
+<a name=Options></a>
+<h2>OPTIONS</h2>
+<blockquote>
+<dl>
+<dt><code><b>-reverse</b></code>
+   <dd>    Perform the reverse operation: convert a file with Latin-1 and/or Unicode encoded characters
+to one with native-encoded characters.
+<br><br>
+<dt><code><b>-encoding</b> encoding_name</code>
+   <dd>    Specify the encoding name which is used by the conversion procedure.
+           The default encoding is taken from System property <code>file.encoding</code>.  The <code>encoding_name</code> string must be taken from 
+           the first column of the table of supported encodings in the  
+           <a href=../../guide/intl/encoding.doc.html><b>Supported 
+           Encodings</b></a> document. 
+<p>
+    <dt><b>-J</b><i>option</i>
+        <dd>Pass <i>option</i> to the Java virtual machine, where 
+        <i>option</i> is one of the options described on the 
+        reference page for the <a href="java.html">java application 
+        launcher</a>.  For example, <b>-J-Xms48m</b> sets the startup
+        memory to 48 megabytes.
+</dl>
+</blockquote>
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>

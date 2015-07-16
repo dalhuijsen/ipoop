@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>JavaServer Pages</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>JavaServer Pages</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form> 
+<p>This chapter includes the following topics:</p>
+<ul>
+  <li><a href="#jsp">JSP Java Plug-in Action Element: &lt;jsp:plugin&gt;</a></li>
+  <li><a href="#deploying">Deploying Java Plug-in through JSP</a></li>
+</ul>
+<p>JavaServer Pages (JSP) is a technology for generating dynamic web-page content 
+  from a web/application server. JSP provides support for Java Plug-in HTML elements. 
+  This document tells how to use the JSP Plug-in action element for deploying 
+  applets with Java Plug-in. </p>
+<p> 
+<h3><a name="jsp"></a>JSP Java Plug-in Action Element: <code>&lt;jsp:plugin&gt;</code></h3>
+<p>The <code>&lt;jsp:plugin&gt;</code> action element enables a JSP page author 
+  to generate HTML for downloading the Java Plug-in, if it is not installed, and 
+  executing an applet. Specifically the action generates the OBJECT element for 
+  Internet Explorer or the EMBED element for Netscape Navigator.
+<p> When the JSP is executed, the <code>&lt;jsp:plugin&gt;</code> action element 
+  is replaced by either an <code>&lt;OBJECT&gt;</code> or <code>&lt;EMBED&gt;</code> 
+  HTML tag, depending on the browser.&nbsp; 
+<p>For example, an applet may be specified as follows in JSP: 
+<blockquote>
+  <pre>
+&lt;jsp:plugin type=applet code="Molecule" codebase="/html" &gt;
+&lt;jsp:params&gt;
+    &lt;jsp:param name="molecule" value="molecules/benzene.mol"/&gt; 
+&lt;/jsp:params&gt;
+&lt;jsp:fallback&gt;
+       &lt;p&gt; Unable to start Plug-in. &lt;/p&gt;
+&lt;/jsp:fallback&gt;
+&lt;/jsp:plugin&gt;
+</pre>
+</blockquote>
+<p>In the above example, the attributes of the <code>&lt;jsp:plugin&gt;</code> 
+  element provide configuration data for the applet itself. The <code>&lt;jsp:param&gt;</code> 
+  elements specify the parameters to the applet. The <code>&lt;jsp:fallback&gt;</code> 
+  element specifies content for the browser if Java Plug-in fails to start.
+  <p> 
+<p> Depending on the User Agent requesting the JSP page, the web server will generate 
+  either an <code>EMBED</code> or <code>OBJECT</code> tag. 
+<p> For example, if Netscape Navigator is the User Agent requesting the JSP page, 
+  the following <code>EMBED</code> tag will be produced by the server:
+<blockquote>
+  <pre>
+&lt;EMBED type=&quot;application/x-java-applet&quot; 
+        code=&quot;Molecule&quot; codebase=&quot;/html&quot; molecule=&quot;molecules/benzene.mol&quot;&gt;
+&lt;NOEMBED&gt;
+&lt;p&gt; Unable to start plug-in &lt;/p&gt;
+&lt;/NOEMBED&gt;</pre>
+</blockquote>
+<table summary="layout" width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr>
+    <td>
+      <h2><u>Note</u></h2>
+      <p> The above works for Netscape 4, as it supports the <code>EMBED</code> 
+        tag, but it does not work for Netscape 6.x, as it currently does not support 
+        the <code>EMBED</code> tag.</p>
+    </td>
+  </tr>
+</table>
+<p>For more information about the <code>&lt;jsp:plugin&gt;</code> element, see 
+  <a href="http://java.sun.com/products/jsp/">Java Server Pages Specification</a>. 
+<p><a name="deploying"></a> 
+<h3>Deploying Java Plug-in through JSP</h3>
+<p> JSP provides an alternative way to deploy applets through Java Plug-in, without 
+  converting the HTML pages through the HTML Converter. Because of the dynamic 
+  nature of JSP, developers will be able to generate HTML pages on-the-fly that 
+  take advantage of Java Plug-in much more easily than before. 
+<p> Although <code>&lt;jsp:plugin&gt;</code> tag support is part of the JSP specification, 
+  various web or application server vendors may provide different implementations 
+  and different levels of controls over this feature. For more information, contact 
+  your server vendor. 
+<p>&nbsp;
+</body>
+</html>

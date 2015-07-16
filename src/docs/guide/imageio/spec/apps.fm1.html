@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Image I/O API Guide: 3 - Writing Image I/O Applications
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="goals.fm2.html">PREV</a>
+ | <a href="apps.fm2.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Image I/O API Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+<br>
+<U><B><FONT FACE="ARIAL,HELVETICA,TIMES ROMAN">CHAPTER</FONT>
+3
+</B></U>
+
+<a name="5529"><!-- --></a>
+<h1>
+Writing Image I/O Applications
+</h1>
+
+<h2><a name="996883"><i>3.1	</i> Reading and Writing Images
+</a></h2>
+
+<blockquote>
+<a name="996884"><!-- --></a>
+The <code>javax.imageio.ImageIO</code> class provides a set of static convenience methods that perform most simple Image I/O operations.<p>
+<a name="996885"><!-- --></a>
+Reading an image that is in a standard format (GIF, PNG, or JPEG) is simple:<p>
+</blockquote><blockquote><pre>
+File f = new File(&#34;c:\images\myimage.gif&#34;);
+BufferedImage bi = ImageIO.read(f);
+</pre></blockquote><blockquote>
+<a name="996887"><!-- --></a>
+The format of the image will be auto-detected by the API based on the contents of the file. Most image files contain a &#34;magic number&#34; in their first few bytes that identifies the file format. For formats that do not have a magic number, auto-detection may fail and somewhat more sophisticated application code will be needed.<p>
+<a name="996888"><!-- --></a>
+Additional formats may be handled by installing JAR files containing plug-ins; the details are described in the next chapter. Once a plug-in has been installed, a new format will be understood automatically without any changes to the application code.<p>
+<a name="996889"><!-- --></a>
+The set of formats available for reading can be obtained by calling <code>ImageIO.getReaderFormatNames</code>. This will return an array of <code>String</code>s containing the names of the available formats, such as &#34;gif&#34; and &#34;png.&#34;<p>
+<a name="996890"><!-- --></a>
+Writing an image in a supported format is equally simple:<p>
+</blockquote><blockquote><pre>
+BufferedImage bi;
+File f = new File(&#34;c:\images\myimage.png&#34;);
+ImageIO.write(im, &#34;png&#34;, f);
+</pre></blockquote><blockquote>
+<a name="996892"><!-- --></a>
+The list of supported formats may be obtained by calling <code>ImageIO.getWriterFormatNames</code>.<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="goals.fm2.html">PREV</a>
+ | <a href="apps.fm2.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="copyright.fm.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

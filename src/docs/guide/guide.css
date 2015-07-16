@@ -1,0 +1,10 @@
+body { margin-left: 3%; margin-right: 3%; color: #000000; background: #FFFFFF }
+
+h1 { align: center; margin-top: 2em; margin-bottom: 1en; font-size: 200% }
+h2 { margin-left: -2%; margin-top: 2em; margin-bottom: 1en; font-size: 150% }
+h3,h4,h5 { margin-top: 1en; margin-bottom:1en; font-size: 100% }
+
+pre { text-indent: 2em }
+
+dt { font-weight: bold; margin-bottom: 1em }
+

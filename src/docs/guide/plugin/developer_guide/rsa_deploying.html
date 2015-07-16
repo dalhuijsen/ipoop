@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>How to Deploy RSA-Signed Applets in Java Plug-in</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>How to Deploy RSA-Signed Applets in Java Plug-in</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This section covers the following topics:</p>
+<ul>
+  <li> <a href="#deploy">How to deploy RSA Signed Applets</a></li>
+  <li> <a href="#certificate">Certificate Management</a></li>
+  <li> <a href="#disabling">Disabling RSA signed applet support</a></li>
+</ul>
+<h2><a name="deploy"></a>How to Deploy RSA Signed Applets </h2>
+<p>To deploy RSA signed applets:</p>
+<ol>
+  <li>Reference the JAR from the HTML page using <code>archive</code>, <code>cache_archive</code>, 
+    or <code>cache_archive_ex</code> format. See <a href="applet_caching.html">Applet 
+    Caching</a>.
+  <li>Place the JAR file and HTML page on the web server. 
+</ol>
+<p>When users of Java Plug-in encounter an RSA signed applet, the Plug-in will 
+  verify whether: </p>
+<ol>
+  <li>the applet is correctly signed</li>
+  <li>the RSA certificate chain and root CA are valid </li>
+</ol>
+<p>If both verify positive, the Plug-in will pop-up a security dialog telling 
+  the user and providing four options:</p>
+<ol>
+  <li><em>Grant always</em>: If selected, the applet will be granted the <code>AllPermission</code> 
+    permission. Any applet signed with the same certificate will be trusted automatically 
+    in the future, and no security dialog will pop up when the certificate is 
+    encountered again. This option selection can be changed from the Java Plug-in 
+    Control Panel.<br>
+  </li>
+  <li><em>Grant this session</em>: If selected, the applet will be granted the 
+    <code>AllPermission</code> permission. Any applet signed with the same certificate 
+    will be trusted automatically within the same browser session.<br>
+  </li>
+  <li><em>Deny</em>: If selected, the applet will be treated as untrusted.<br>
+  </li>
+  <li><em>View Issuer</em>: If selected, the user can examine the attributes of 
+    each certificate in the certificate chain in the JAR file.</li>
+</ol>
+<p>Once the user selects the options from the security dialog, the applet will 
+  be run in the corresponding security context. Note that all options are selected 
+  on the fly; no preconfiguration is required.</p>
+<p></p>
+<h2><a name="certificate"></a>Certificate Management</h2>
+<p>The Java Plug-in Control Panel provides a <a href="control_panel.html#certificates">Certificates 
+  Panel</a> for managing RSA signed applets. This panel contains a list of certificates 
+  that received &quot;<em>Grant always</em>&quot; permission when the Java Plug-in 
+  security dialog (pop-up) ran. Users can remove any certificate from the list, 
+  and if an applet signed by a removed certificates is encountered again, a security 
+  dialog pop-up will appear asking for permission. Users can also export and view 
+  certificates through the control Panel.</p>
+<h2><a name="disabling"></a>Disabling RSA Signed Applet Support</h2>
+<p>RSA signed applets can be entirely disabled in Java Plug-in by specifying the 
+  <code>usePolicy</code> permission in the policy file. If the <code>usePolicy</code> 
+  permission is among the permissions granted to the given codesource (by the 
+  configured security policy), user prompting will not take place, and only permissions 
+  specified in the security policy will be granted to the codesource. By default, 
+  RSA signed applets are enabled in the Java Plug-in. </p>
+<h2>&nbsp;</h2>
+</body>
+</html>

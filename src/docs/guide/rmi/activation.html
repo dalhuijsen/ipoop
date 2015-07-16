@@ -1,0 +1,121 @@
+<HTML>
+<HEAD>
+   <TITLE> Remote Object Activation </TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+&nbsp;
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR>
+<TD WIDTH="60"><IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 HEIGHT=88 WIDTH=52>&nbsp;</TD>
+
+<TD>
+<UL>
+<CENTER>
+<H1>
+Remote Object Activation</H1></CENTER>
+</UL>
+</TD>
+
+<TD width=15% ALIGN=center>
+   <font size="-1"><a href="../../index.html">
+	Documentation Comments</a>
+   </font>
+</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>Prior to the release of the Java<sup><font size=-2>TM</font></sup>
+2 SDK, an instance of a <code> UnicastRemoteObject</code> could be
+accessed from a program that (1) created an instance of the remote
+object, and (2) ran all the time. Now with the introduction of the
+class <code>java.rmi.activation.Activatable</code> and the RMI daemon,
+<code>rmid</code>, programs can be written to register information
+about remote object implementations that should be created and execute
+"on demand", rather than running all the time. The RMI daemon,
+<code>rmid</code>, provides a Java virtual machine* (JVM) from which
+other JVM instances may be spawned.
+
+<P><B><U><FONT SIZE=+1>Starting out with activation</FONT></U></B>
+<BR>None of the activation tutorials should be the first material you
+read on RMI. If you have never used RMI before, you should take a look
+at <A HREF="getstart.doc.html"><i>Getting Started</i></A> before you
+try these.&nbsp; The first three activation tutorials are intended for
+developers who have had some experience developing Java programs that
+access remote objects by means of the RMI classes provided as part of
+the Java 2 SDK.</UL>
+
+<UL>
+<UL>
+<LI>
+<FONT SIZE=+1><A HREF="activation/activation.1.html">Creating an Activatable
+Object</A></FONT></LI>
+
+<BR>This tutorial illustrates the process of creating a new class that
+extends <code>java.rmi.activation.Activatable</code>.
+<BR>&nbsp;
+<LI>
+<FONT SIZE=+1><A HREF="activation/activation.2.html">Making a UnicastRemoteObject
+Activatable</A></FONT></LI>
+
+<BR>This tutorial takes you through the process of moving an existing remote
+object implementation, that extends <code>UnicastRemoteObject</code>, to a class that
+extends <code>java.rmi.activation.Activatable</code>.
+<BR>&nbsp;
+<LI>
+<FONT SIZE=+1><A HREF="activation/activation.3.html">Activating an object
+that does not extend java.rmi.activation.Activatable</A></FONT></LI>
+
+<p>This tutorial shows you how to use the static method
+<code>Activatable.exportObject</code> in the constructor of a class
+that does not extend from <code>Activatable</code>, and how to create a
+remote interface, based on the methods that should be made available to
+remote clients.
+<BR>&nbsp;
+</UL>
+
+<B><U><FONT SIZE=+1>Going further with activation</FONT></U></B>
+<BR>This next tutorial on using a <code>MarshalledObject </code>is intended
+for developers who have gone through at least one of the first three activation
+tutorials. More tutorials may be added to this section in a future release,
+based on your feedback.
+<BR>&nbsp;
+<UL>
+<LI>
+<FONT SIZE=+1><A HREF="activation/activation.4.html">Using a MarshalledObject
+to create persistent data</A></FONT></LI>
+</UL>
+</UL>
+<P> For all of the source code used in the activation tutorials, you may choose
+from these formats:
+
+<UL>
+    <LI><A HREF="archives/activation.zip">activation.zip</A>
+    <LI><A HREF="archives/activation.tar">activation.tar</A>
+    <LI><A HREF="archives/activation.tar.Z">activation.tar.Z</A>
+</UL>
+
+For more information on object activation, you can also refer to the 
+<A HREF="spec/rmiTOC.html"><i>RMI Specification</i></A>.
+<P>We are very interested in knowing whether these tutorials are useful.
+Please send any comments or suggestions to: <A HREF="mailto:rmi-comments@java.sun.com">rmi-comments@java.sun.com</A>,
+with a subject of "activation tutorials".
+&nbsp;
+
+<P>*As used on this web site, the terms "Java virtual machine" or "JVM" 
+	mean a virtual machine for the Java platform.
+
+<!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../relnotes/SMICopyright.html">Copyright &copy;</A>
+2003 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:rmi-comments@java.sun.com">rmi-comments@java.sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>

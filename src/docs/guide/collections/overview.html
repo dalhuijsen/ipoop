@@ -1,0 +1,292 @@
+<HTML>
+<HEAD>
+<title>Collections Framework Overview</title>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH=60>
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+
+<TD>
+<center>
+           <h1>Collections Framework Overview</h1>
+</center>
+</TD>
+
+</TR>
+</TABLE>
+
+<!-- Body text begins here -->
+<h3>Introduction</h3>
+
+The Java 2 platform includes a new <i>collections
+framework</i>.  A <i>collection</i> is an object that represents a
+group of objects (such as the familiar <a
+href="../../api/java/util/Vector.html">Vector</a> class).  A
+collections framework is a unified architecture for representing and
+manipulating collections, allowing them to be manipulated
+independently of the details of their representation.
+
+<p>The primary advantages of a collections framework are that it:
+
+<ul>
+<li><strong>Reduces programming effort</strong> by providing useful
+data structures and algorithms so you don't have to write them
+yourself.
+
+<li><strong>Increases performance</strong> by providing
+high-performance implementations of useful data structures and
+algorithms.  Because the various implementations of each interface are
+interchangeable, programs can be easily tuned by switching
+implementations.
+
+<li><strong>Provides interoperability between unrelated APIs</strong>
+by establishing a common language to pass collections back and forth.
+
+<li><strong>Reduces the effort required to learn APIs</strong> by
+eliminating the need to learn multiple ad hoc collection APIs.
+
+<li><strong>Reduces the effort required to design and implement
+APIs</strong> by eliminating the need to produce ad hoc collections
+APIs.
+
+<li><strong>Fosters software reuse</strong> by providing a standard
+interface for collections and algorithms to manipulate them.
+</ul>
+
+<p>The collections framework consists of:
+
+<ul>
+<li><strong>Collection Interfaces</strong> - Represent different types
+of collections, such as sets, lists and maps.  These interfaces form
+the basis of the framework.
+
+<li><strong>General-purpose Implementations</strong> - Primary
+implementations of the collection interfaces.
+
+<li><strong>Legacy Implementations</strong> - The collection classes
+from earlier releases, <tt>Vector</tt> and <tt>Hashtable</tt>, have
+been retrofitted to implement the collection interfaces.
+
+<li><strong>Wrapper Implementations</strong> - Add functionality,
+such as synchronization, to other implementations.
+
+<li><strong>Convenience Implementations</strong> - High-performance
+"mini-implementations" of the collection interfaces.
+
+<li><strong>Abstract Implementations</strong> - Partial
+implementations of the collection interfaces to facilitate custom
+implementations.
+
+<li><strong>Algorithms</strong> - Static methods that perform
+useful functions on collections, such as sorting a list.
+
+<li><strong>Infrastructure</strong> - Interfaces that provide essential
+support for the collection interfaces.
+
+<li><strong>Array Utilities</strong> - Utility functions for arrays of
+primitives and reference objects.  Not, strictly speaking, a part of the
+Collections Framework, this functionality is being added to the Java
+platform at the same time and relies on some of the same infrastructure.
+</ul>
+
+<hr>
+<h3>Collection Interfaces</h3>
+
+There are six <i>collection interfaces</i>.  The most basic interface
+is <tt>Collection</tt>.  Three interfaces extend <tt>Collection</tt>:
+<tt>Set</tt>, <tt>List</tt>, and <tt>SortedSet</tt>.  The other two
+collection interfaces, <tt>Map</tt> and <tt>SortedMap</tt>, do not
+extend <tt>Collection</tt>, as they represent mappings rather than
+true collections.  However, these interfaces contain
+<i>collection-view</i> operations, which allow them to be manipulated
+as collections.<p>
+
+All of the modification methods in the collection interfaces are labeled
+<i>optional</i>.  Some implementations may not perform one or more of these
+operations, throwing a runtime exception
+(<tt>UnsupportedOperationException</tt>) if they are attempted.
+Implementations must specify in their documentation which optional
+operations they support.  Several terms are introduced to aid in this
+specification:
+
+<ul>
+<li>Collections that do not support any modification operations (such as
+<tt>add</tt>, <tt>remove</tt> and <tt>clear</tt>) are referred to as
+<i>unmodifiable</i>.  Collections that are not unmodifiable are referred to
+<i>modifiable.</i>
+
+<li>Collections that additionally guarantee that no change in the
+<tt>Collection</tt> object will ever be visible are referred to as
+<i>immutable</i>.  Collections that are not immutable are referred to
+as <i>mutable</i>.
+
+<li>Lists that guarantee that their size remains constant even though
+the elements may change are referred to as <i>fixed-size</i>.  Lists
+that are not fixed-size are referred to as <i>variable-size</i>.
+
+<li>Lists that support fast (generally constant time) indexed element
+access are known as <i>random access</i> lists.  Lists that do not support
+fast indexed element access are known as <i>sequential access</i> lists.
+The <tt><a href="../../api/java/util/RandomAccess.html">RandomAccess</a></tt>
+marker interface is provided to allow lists to advertise the fact that they
+support random access.  This allows generic algorithms to alter their behavior
+to provide good performance when applied to either random or sequential
+access lists.
+
+</ul><p>
+
+Some implementations may restrict what elements (or in the case of
+<tt>Maps</tt>, keys and values) may be stored.  Possible restrictions
+include requiring elements to:
+
+<ul>
+     <li>Be of a particular type.
+     <li>Be non-<tt>null</tt>.
+     <li>Obey some arbitrary predicate.
+</ul>
+
+<p>Attempting to add an element that violates an implementation's
+restrictions results in a runtime exception, typically a
+<tt>ClassCastException</tt>, an <tt>IllegalArgumentException</tt> or a
+<tt>NullPointerException</tt>.  Attempting to remove or test for the
+presence of an element that violates an implementation's restrictions
+may result in an exception, though some "restricted collections" may
+permit this usage.<p>
+
+<hr>
+<h3>Collection Implementations</h3>
+
+Class that implement the collection interfaces typically have names of
+the form
+&lt;<em>Implementation-style</em>&gt;&lt;<em>Interface</em>&gt;.  The
+general purpose implementations are summarized in the table below:
+<br>&nbsp;
+
+<table border=2 summary="general purpose implementations and interfaces" align=center>
+<thead><th colspan=2 rowspan=2 align=center border=0> &nbsp;</th>
+  <th colspan=5><font size=+1>Implementations</font></th></thead>
+<tr><th>Hash Table</th><th>Resizable Array</th>
+    <th>Balanced Tree</th><th>Linked List</th>
+    <th>Hash Table + Linked List</th>
+</tr>
+<tr><th rowspan=3><font size=+1>Interfaces</font></th>
+   <th>Set</th><td><a href="../../api/java/util/HashSet.html"><tt>HashSet</tt></a></td>
+   <td> &nbsp; </td>
+   <td><a href="../../api/java/util/TreeSet.html"><tt>TreeSet</tt></a> </td>
+   <td> &nbsp; </td>
+   <td><a href="../../api/java/util/LinkedHashSet.html"><tt>LinkedHashSet</tt></a> </td>
+</tr>
+
+<tr><th>List</th><td> &nbsp;</td>
+   <td><a href="../../api/java/util/ArrayList.html"><tt>ArrayList</tt></a></td>
+   <td> &nbsp;</td>
+   <td><a href="../../api/java/util/LinkedList.html"><tt>LinkedList</tt></a></td>
+   <td> &nbsp;</td>
+</tr>
+<tr><th>Map</th>
+   <td><a href="../../api/java/util/HashMap.html"><tt>HashMap</tt></a></td>
+   <td> &nbsp;</td>
+   <td><a href="../../api/java/util/TreeMap.html"><tt>TreeMap</tt></a></td>
+   <td> &nbsp;</td>
+   <td><a href="../../api/java/util/LinkedHashMap.html"><tt>LinkedHashMap</tt></a> </td>
+</tr>
+</table>
+
+<p>The general-purpose implementations support all of the <i>optional
+operations</i> in the collection interfaces, and have no restrictions on the
+elements they may contain.  They are unsynchronized, but the
+<tt>Collections</tt> class contains static factories called
+<a
+href="../../api/java/util/Collections.html#synchronizedCollection(java.util.Collection)">
+<em>synchronization wrappers</em></a> that may be used to add synchronization
+to any unsynchronized collection.  All of the new implementations have
+<i>fail-fast iterators</i>, which detect illegal concurrent modification, and
+fail quickly and cleanly (rather than behaving erratically).<p>
+
+The <tt>AbstractCollection</tt>, <tt>AbstractSet</tt>,
+<tt>AbstractList</tt>, <tt>AbstractSequentialList</tt> and
+<tt>AbstractMap</tt> classes provide skeletal implementations of the
+core collection interfaces, to minimize the effort required to
+implement them.  The API documentation for these classes describes
+precisely how each method is implemented so the implementer knows
+which methods should be overridden, given the performance of the
+"basic operations" of a specific implementation.
+
+<p>
+<hr>
+<h3>Design Goals</h3>
+
+<p>The main design goal was to produce an API that was reasonably
+small, both in size, and, more importantly, in &quot;conceptual
+weight.&quot;  It was critical that the new functionality not seem
+alien to current Java programmers; it had to augment current
+facilities, rather than replacing them.  At the same time, the new API
+had to be powerful enough to provide all the advantages described
+above.
+
+<p>To keep the number of core interfaces small, the interfaces do not
+attempt to capture such subtle distinctions as mutability,
+modifiability, resizability.  Instead, certain calls in the core
+interfaces are <i>optional</i>, allowing implementations to throw an
+<tt>UnsupportedOperationException</tt> to indicate that they do not
+support a specified optional operation.  Of course, collection
+implementers must clearly document which optional operations are
+supported by an implementation.
+
+<p>To keep the number of methods in each core interface small, an
+interface contains a method only if either:
+
+<ol>
+<li>It is a truly <i>fundamental operation</i>: a basic operations in
+terms of which others could be reasonably defined,
+
+<li>There is a compelling performance reason why an important
+implementation would want to override it.
+</ol>
+
+<p>It was critical that all reasonable representations of collections
+interoperate well.  This included arrays, which cannot be made to
+implement the <tt>Collection</tt> interface directly without changing
+the language.  Thus, the framework includes methods to allow
+collections to be dumped into arrays, arrays to be viewed as
+collections, and maps to be viewed as collections.<p>
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+
+<TD>
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-99
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+   <br>
+   <br>
+
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:collections-comments@java.sun.com">collections-comments@java.sun.com</a> 
+   </FONT>
+</TD>
+
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+
+</TR>
+</TABLE>
+
+</body>
+</html>

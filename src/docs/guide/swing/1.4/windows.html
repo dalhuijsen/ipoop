@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//IETF/DTD HTML//EN">
+<html>
+
+<head>
+<title>Windows Look and Feel Update</title>
+</head>
+
+<body bgcolor="white">
+
+<h1>Windows Look and Feel Update</h1>
+
+<h2>Overview</h2>
+
+<p>The ideal Swing application running under the Windows look and feel would be
+indistinguishable from its native running counterparts, however due to both
+changes in the native Windows look and feel (Windows 98, Windows 2000, etc.)
+and atrophy of our existing Windows look and feel implementation, this has not
+been the reality. However, for this release we have provided an updated Windows
+look and feel which integrates seamlessly into the Windows desktop.
+
+<p>This project was composed of a set of independent smaller projects, which
+involve either fixing a previous emulation deficiency or adding functionality to
+track 2000/98 features. In some cases the project spans both Swing and AWT:
+
+<ul>
+ <li><a href="#bugs">Fix Emulation Bugs</a>
+ <li><a href="#desktopprops">Desktop Property Support</a>
+ <li><a href="#lists">Column-Wrapping Lists</a> 
+ <li><a href="#hottrack">Hot-tracking Toolbar Buttons</a>
+ <li><a href="#gradient">Gradient Titlebars</a>
+ <li><a href="#keyboard">Keyboard Navigation Hiding</a>
+ <li><a href="#wheel">Scroll Wheel Support</a>
+ <li><a href="#transition">Menu/Tooltip Transition Effects</a>
+ <li><a href="#filechooser">FileChooser Makeover</a>
+</ul>
+
+<p>We chose to modify and enhance the <code>com.sun.java.swing.plaf.windows</code>
+look and feel package rather than introduce a new 'window2000' package.
+Almost all of the new functionality is keyed off of Windows native
+user preferences so that an updated windows look and feel package gracefully runs on
+eitherWindows 95, Windows 98, Windows NT or Windows 2000 machines. In other
+words, if a running Swing application detects that a particular user preference
+(such as Menu fading) doesn't exist, then the windows look and feel will not
+execute that feature.
+
+<p>The focus of this project was quality, not quantity. Where we deemed it
+difficult to implement a feature with a high quality result, we
+deferred that feature to a future release when we can emulate it with better
+fidelity.
+
+
+<h3><a name=bugs>Fix Emulation Bugs</a></h3>
+
+<p>There were many bugs filed against our Windows look and feel and
+we fixed many of these with this release.
+We are tracking these bugs witha &quot;w2k&quot; keyword. See
+<a href="w2k_bugs.html">Windows Look And Feel Buglist</a> for a list
+of these windows look and feel bugs.
+
+<h3><a name=desktopprops>Desktop Property Support</a></h3>
+
+<p>The current Windows look and feel in Swing only tracks the user's desktop
+colorscheme (via AWT's SystemColor mechanism). However, on the Windowsdesktop,
+the user can set many more GUI preferences, such as fonts, sounds, metrics,
+and can change them at any time and have Windows programs dynamically reflect
+those changes. We have revised Swing to honor a wider range of user preferences
+and to also support responding to dynamic changes made by the user. See
+<a href="w2k_props.html">Windows Desktop Properties Support
+Specification</a> for details.
+
+<h3><a name=lists>Column-Wrapping Lists</a></h3>
+
+<p>List was only capable of displaying a single column
+and has been updated to support wrapping into
+multiple columns (like the Windows Explorer pane).
+This feature is also used
+to better support the Windows filechooser. See
+<a href="../SwingChanges.html#4308384">JList Spec update</a> for details.
+
+<h3><a name=hottrack>Hot-Tracking Toolbar Buttons</a></h3>
+
+<p>Buttons contained inside toolbars have
+become flat in appearance and only when they are 'rolled over' do the borders
+appear. This feature is supported by the Metal look and feel, but will be added
+as a general Swing toolbar feature.
+
+<h3><a name=gradient>Gradient Titlebars</a></h3>
+
+<p>The titlebars on toplevel windows in Windows 2000 by default
+use a gradient pattern instead of a solid bar color. We
+get this for free on toplevel windows such as <code>JFrame</code>,
+however we will use Java2D to implement this rendering for
+<code>JInternalFrame</code>.
+
+
+<h3><a name=wheel>Scroll Wheel Support</a></h3>
+
+<p>Almost all PCs these days come with a
+scroll-wheel on the mouse and to support this AWT is adding support for scroll
+wheel input and Swing's scrolling components (<code>JScrollPane</code>,
+<code>JScrollbar</code>) are being modified to handle this new event type.
+See <a href="../SwingChanges.html#mouseWheel">MouseWheel API for details of AWT support</a> and
+see <a href="../SwingChanges.html#4356268">JScrollPane changes</a> for details of support
+in Swing.
+
+<h3><a name=keyboard>Keyboard Navigation Hiding</a></h3>
+
+<p>In windows the user can set a desktop property which causes
+applications to hide their keyboard navigation cues
+*until* ALT is pressed, at which time they magically appear. If the user has
+this option set on the desktop, Swing will implement this behavior in its menus.
+See <a href="keyboard_nav_hiding.html">Keyboard Navigation
+Spec</a> for more information.
+
+<h3><a name=transition>Menu/Tooltip Transition Effects</a></h3>
+
+<p>The most obvious feature addition to
+the Windows look and feel is the new stylistic menu animation.
+In Windows 98, menus can be set to appear by sliding out.
+Windows 2000 then introduced a very
+hip fade-in/fade-out for menus and tooltips.
+
+<p>In order to ensure the most accurate
+visual effect, this feature is implemented by forcing menus/tooltips to be true
+toplevel &quot;heavyweight&quot; windows which can take advantage of 
+Microsoft Windows native window animation functionality inside the AWT.
+
+<h3><a name=filechooser>File Chooser Makeover</a></h3>
+
+<p>Although Swing's <code>JFileChooser</code>
+component closely resembles the Windows file chooser, there are some
+deficiencies which limit its use on the Windows platform, such as the lack of
+support for network browsing and the Windows virtual desktop(&quot;My
+Computer&quot;, &quot;My Network&quot;, etc.). See
+<a href="../SwingChanges.html#JFileChooser">JFileChooser Spec update</a> for more
+information.</p>
+
+
+</body>
+</html>

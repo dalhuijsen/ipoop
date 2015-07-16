@@ -1,0 +1,170 @@
+<html>
+<head>
+<!-- <link type="text/css" rel="stylesheet" href="../guide.css"> -->
+<title>Java(TM) Deployment</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+  <TR>
+    <TD WIDTH=25%> <IMG SRC="../../images/javalogo52x88.gif" ALT="Java logo" BORDER=0 WIDTH=52 HEIGHT=88> 
+    </TD>
+    <TD width="50%"> 
+      <center>
+        <h1>Java<sup><font size="-2">TM</font></sup> Deployment</h1>
+</center>
+</TD>
+    <TD  WIDTH=25% ALIGN=RIGHT VALIGN=TOP> <font size=-1><a href="../../index.html">Documentation 
+      Contents</a></font> </TD>
+</TR>
+</TABLE>
+<p><br>
+  Java Deployment includes the following topics:</p>
+<ul>
+  <li><a href="#applets">Applets and Java Plug-in</a></li>
+  <li><a href="#jws">Java Web Start for Deploying Applications</a></li>
+  <li><a href="#autodownload">Autodownload</a></li>
+  <li><a href="#java_update">Java Update (1.4.2_01 and higher releases)</a></li>
+  <li><a href="#compatibility">Applet Compatibility</a></li>
+  <li><a href="#windows_installation">Windows Installation (IFTW) and Java Update FAQ</a></li>
+</ul>
+<a name="applets"></a><h2>Applets and Java Plug-in</h2>
+
+<em>Applets</em> are programs that extend the <tt>java.applet.Applet</tt> class. 
+Applets run inside web browsers rather than running in their own windows or frames. 
+See the <a href="../../relnotes/demos.html">Demonstration Applets and Applications</a> 
+page of the documentation for small example applets. 
+<p>
+A Java virtual machine must be available to the browser for use in 
+running applets.  Many browsers come with their own version of the 
+Java virtual machine built in.  However, such built-in virtual machines 
+are often based on the JDK 1.1 Java platform and therefore are not 
+capable of running applets that make use of new features added to 
+the Java platform since JDK 1.1.
+<p>
+To remedy this situation, the Java Plug-in provides an up-to-date 
+Java virtual machine and runtime environment for "plugging in" to a 
+browser.   The browser can use this up-to-date Java virtual machine to 
+run applets that use the latest functionality of the Java platform. 
+<p>
+Applets can be posted on a network for running in web browsers, so 
+they are obviously a powerful way for developers to deploy their 
+programs.  In addition, Java Plug-in provides technology that enables  
+developers to specify which version of the Java platform is 
+required to run their applet.  If the specified version of 
+the Java platform is not already installed on the client machine 
+then the applet is accessed, an automatic download of the correct
+Java platform can be triggered (on Microsoft Windows). 
+On the Solaris Operating Environment and on Linux, the developer 
+can automatically take the user to a download page for the 
+correct version of the Java platform.
+<p> On Microsoft Windows, Java Plug-in is automatically installed when the Java 
+  Runtime Environment or Java 2 SDK is installed. The Java Plug-in also comes 
+  with the Java 2 SDK and the Java Runtime Environment for Solaris and Linux, 
+  and it can be installed manually.
+<p>For more information on Java Plug-in, see <a href="../plugin/index.html">Java 
+  Plug-in Documentation</a>.
+<h2><a name="jws"></a>Java Web Start for Deploying Applications</h2>
+Applications written in the Java programming language can run in their own windows, 
+unlike applets which run inside a web browser. Applications are usually larger 
+and more full-featured than applets, and it is important that there be an effect 
+and robust method to deploy them widely, while ensuring that the correct version 
+of the Java platform is available to them. Java Web Start is designed for just 
+this purpose. 
+<p>
+With Java Web Start, a user launches an applications simply by clicking on 
+a Web page link. If the application is not present on the client computer, 
+Java Web Start automatically downloads all necessary files for 
+the application, including a new version of the Java platform if 
+needed. Java Web Start caches the application on client computer.  On 
+subsequent launches of the application, Java Web Start will check the 
+network for an updated version of the application, and if there isn't 
+an update, it will launch the cached version.  
+<p> On Microsoft Windows, Java Web Start is automatically installed when the Java 
+  Runtime Environment or Java 2 SDK is installed. The Java Web Start also comes 
+  with the Java 2 SDK and the Java Runtime Environment for Solaris and Linux, 
+  and it can be installed manually.
+<p>For more information on Java Web Start, see <a href="../jws/index.html">Java 
+  Web Start</a>.
+<h2><a name="autodownload"></a>Autodownload</h2>
+<p>Both the Windows versions of Java Plug-in and Java Web Start make use of the 
+  <code>codebase</code> attribute of the <code>OBJECT</code> element to autodownload 
+  and install a particular version of the JRE. See:</p>
+<ul>
+  <li><a href="../plugin/developer_guide/using_tags.html#in-ie">Java Plug-in in 
+    IE on Windows</a></li>
+  <li><a href="../jws/developersguide/launch.html#creating">Creating an auto-install 
+    page</a></li>
+</ul>
+<p>By specifying a particular <code>.cab</code> file in the <code>codebase</code>, 
+  a particular version of the JRE can be automatically downloaded and installed 
+  as required by an applet or application. For a list of the available <code>.cab</code> 
+  files, see <a href="autodl/autodl-files.html">Autodownload Files</a>. Note that 
+  not every release of the JRE has an associated <code>.cab</code> file for autodownload.</p>
+<h2><a name="java_update"></a>Java Update (1.4.2_01 and higher releases)</h2>
+<p>Installing the J2RE automatically installs the Java Update feature. Java Update 
+  can keep your computer up to date automatically with the latest J2RE releases. 
+  You no longer need to search for critical J2RE updates; Java Update delivers 
+  the latest version of the J2RE directly to your computer. Java Update recognizes 
+  when you are online and, using your Internet connection, searches for available 
+  updates from the Java Update web site. Whenever an update becomes available, 
+  an icon will appear in the status area of the taskbar.</p>
+<p>You can specify how and when you want Java Update to update your computer. 
+  For example, you can set up Java Update to automatically download and install 
+  updates on a schedule that you specify. And you can choose to be notified before 
+  the download and the installation of the update occurs, or only before the installation 
+  of the update. You can also disable the option for automatic updates altogether 
+  and do them manually. It's your choice, and you can reset the options anytime 
+  you want.</p>
+<p>For more detailed information, see <a href="../plugin/developer_guide/control_panel.html#update">Update 
+  Panel</a> in <a href="../plugin/developer_guide/control_panel.html">Using the 
+  Java Plug-in Control Panel to Set Plug-in Behavior/Options</a>.</p>
+<h2><a name="compatibility"></a>Applet Compatibility</h2>
+<p>For applet compatibility issues, see <a href="applet-compatibility/applet-compatibility.html">Applet 
+  Compatibility Guide&#8212;Microsoft vs Java 2 Virtual Machine</a>.</p>
+<h2><a name="windows_installation"></a>Windows Installation (IFTW) and Java Update 
+  FAQ</h2>
+<p>For questions on Windows Installation, which installs Java from the web while 
+  the user is online, and Java Update, see the <a href="installation/windows/iftw-update/faq.html">Windows 
+  Installation (IFTW) and Java Update FAQ</a>.</p>
+<p>
+
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER="0" WIDTH=100%>
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:java-plugin-feedback@sun.com">
+   java-plugin-feedback@sun.com</a> or <a href="mailto:javawebstart-feedback@sun.com">javawebstart-feedback@sun.com</a>
+</FONT>
+</TD>
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT=" Sun Microsystems, Inc " BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+</TR>
+</TABLE>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</BODY>
+</HTML>
+

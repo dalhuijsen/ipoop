@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>Overview </title>
+
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Overview </h1>
+<hr>
+<form name="form1">
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<h2><br>
+  <a name="jws"></a>Java Web Start Technology</h2>
+<p>Java Web Start is a helper application that gets associated with a Web browser. 
+  When a user clicks on a link that points to a special launch file (JNLP file), 
+  it causes the browser to launch Java Web Start, which then automatically downloads, 
+  caches, and runs the given Java Technology-based application. The entire process 
+  is typically completed without requiring any user interaction, except for the 
+  initial single click. </p>
+<p>JNLP URLs are also directly openable from the JAWS Application Manager and 
+  can be bookmarked. Moreover, they may be <code>.html </code>or <code>.jnlp</code> 
+  files. </p>
+<p>From a technology standpoint, Java Web Start has a number of key benefits that 
+  make it an attractive platform to use for deploying applications: </p>
+<ul>
+  <li> Java Web Start is built exclusively to launch applications written to the 
+    Java 2 SE platform. Thus, a single application can be made available on a 
+    Web server and then deployed on a wide variety of platforms, including Windows 
+    98/NT/2000/ME/XP, Linux, and the Solaris<sup><font size="-2">TM</font> </sup> 
+    Operating Environment. The Java platform has proven to be a very robust, productive, 
+    and expressive development platform, leading to a significant cost savings 
+    due to minimized development and testing costs.</li>
+  <li> Java Web Start supports multiple revisions of the Java 2 platform, Standard 
+    Edition. Thus, an application can request a particular version of the platform 
+    it requires, such as J2SE<sup><font size="-2">TM</font></sup> 1.4.0. Several 
+    applications can run at the same time on different platform revisions without 
+    causing conflicts, and Java Web Start can automatically download and install 
+    a revision of the platform if an application requests a version that is not 
+    installed on the client system.</li>
+  <li>Java Web Start allows applications to be launched independently of a Web 
+    browser. This can be used for off-line operation of an application, where 
+    launching through the browser is often inconvenient or impossible. The application 
+    can also be launched through desktop shortcuts, making launching the Web-deployed 
+    application similar to launching a native application.</li>
+  <li>Java Web Start takes advantage of the inherent security of the Java Platform. 
+    Applications are by default run in a protective environment (sandbox) with 
+    restricted access to local disk and network resources. It allows the user 
+    to safely run applications from sources that are not trusted.</li>
+  <li>Applications launched with Java Web Start are cached locally. Thus, an already-downloaded 
+    application is launched on par with a traditionally installed application.</li>
+</ul>
+<p>The technology underlying Java Web Start is the Java<sup><font size=-2> TM</font></sup> 
+  Network Launching Protocol &amp; API (JNLP). This technology is currently under 
+  development via the Java Community Process (JCP). Java Web Start is the reference 
+  implementation (RI) for the JNLP specification. The JNLP technology defines, 
+  among other things, a standard file format that describes how to launch an application 
+  called a JNLP file.</p>
+<a name="where"></a>
+<h2> Where to find Java Web Start</h2>
+<p>See the Java Web Start web site, <a href="http://java.sun.com/products/javawebstart/">http://java.sun.com/products/javawebstart/</a>, 
+  for availability of Java Web Start downloads. The JNLP specification can be 
+  found at <a href="http://java.sun.com/aboutJava/communityprocess/final-draft/jsr056/index.html">http://java.sun.com/aboutJava/communityprocess/final-draft/jsr056</a>.</p>
+<a name="requirements"></a>
+<h2> Requirements</h2>
+<h3> Desktop/Client requirements:</h3>
+<p>The client machine requires support for the Java Runtime Environment (JRE), 
+  version 1.2.2 or later. Java Web Start is available for Windows 98/NT/2000/ME/XP, 
+  the Solaris Operating Environment, and Linux. </p>
+<p>See the <a href="../Readme.html">README</a> document for details.<o> </p>
+<h3> Server requirements:</h3>
+<p>Applications can be deployed from any standard Web server. In order to use 
+  Java Web Start, the Web server must be configured with support for a new MIME type as explained below.</p>
+<p>&nbsp;</p>
+</body>
+</html>

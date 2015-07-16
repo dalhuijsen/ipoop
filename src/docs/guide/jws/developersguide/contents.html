@@ -1,0 +1,132 @@
+<html>
+<head>
+<title>Java Web Start 1.4.2 Developer Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL=STYLESHEET TYPE="text/css" HREF="styles/style1.css">  
+</head>
+<body bgcolor="#FFFFFF">
+<table summary="layout" width="100%" border="0" cellpadding="5">
+  <tr> 
+    <td width="10%">
+      <div align="center"><img src="images/javalogo52x88.gif" width="52" height="88"></div>
+    </td>
+    <td>&nbsp;</td>
+    <td width="10%">
+      <div align="center"></div>
+    </td>
+  </tr>
+</table>
+<table summary="layout" width="80%" border="2" align="center" bgcolor="#6495ed" height="100" cellpadding="5" cellspacing="0" bordercolor="#999999">
+  <tr>
+    <td> 
+      <div align="center"><font size="7"><b><font size="6">Java Web Start 1.4.2 
+        Developer Guide</font></b></font></div>
+    </td>
+  </tr>
+</table>
+<br>
+<table summary="layout" width="80%" border="0" cellpadding="5" align="center">
+  <tr> 
+    <td> 
+      <p><span class="bg"><font size="+2"><b>Note:</b></font></span> There are 
+        two ways to navigate this guide:</p>
+      <ul>
+        <li><a href="DevaSearch/search.html">Search</a> the guide</li>
+        <li>Select from the <a href="#overview">contents</a> below:</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+<p>
+<table summary="layout" width="80%" border="2" cellpadding="5" align="center" bordercolor="#000000" cellspacing="0">
+  <tr>
+    <td bordercolor="#FFFFFF">
+<table summary="layout" width="100%" border="0" cellpadding="5" align="center">
+        <tr> 
+          <td> 
+            <h2><a name="overview"></a><a href="overview.html">Overview</a></h2>
+            <dl>
+              <dd> <a href="overview.html#jws">Java Web Start Technology</a> </dd>
+              <dd> <a href="overview.html#where">Where to Find Java Web Start 
+                Technology</a></dd>
+              <dd> <a href="overview.html#requirements">Desktop and Server Requirements</a></dd>
+            </dl>
+            <h2> <a href="setup.html">Setting up the Web Site</a></h2>
+            <blockquote> 
+              <p>I<a href="setup.html#intro">ntroduction<br>
+                </a><a href="setup.html#steps">Basic Steps</a></p>
+              </blockquote>
+            <h2><a href="launch.html">Creating the Web Page That Launches the 
+              Application</a></h2>
+            <blockquote> 
+              <p><a href="launch.html#intro">Introduction</a><a href="launch.html#intro"><br>
+                </a><a href="launch.html#netscape">Detecting if Java Web Start 
+                is installed on Netscape<br>
+                </a><a href="launch.html#ie">Detecting if Java Web Start is installed 
+                on IE, and if so, the version number<br>
+                </a><a href="launch.html#launching">Launching the application 
+                if Java Web Start is Installed&#8212;or providing a link for auto-install 
+                or general download page<br>
+                </a><a href="launch.html#creating">Creating an auto-install page</a></p>
+            </blockquote>
+            <h2><a href="development.html">Application Development Considerations</a></h2>
+            <blockquote> 
+              <p><a href="development.html#intro">Introduction</a><br>
+                <a href="development.html#retrieving">Retrieving Resources from 
+                JAR files<br>
+                </a><a href="development.html#security">Security and Code Signing<br>
+                </a><a href="development.html#signing">Signing JAR Files with 
+                a Test Certificate<br>
+                </a><a href="development.html#how">How to Encode JNLP Files<br>
+                </a><a href="development.html#dynamic">Dynamic Download of HTTPS 
+                Certificates</a></p>
+              </blockquote>
+            <h2><a href="packaging.html">Packaging an Application for Easy Deployment</a></h2>
+            <h2><a href="syntax.html">JNLP File Syntax</a></h2>
+            <blockquote> 
+              <p><a href="syntax.html#intro">Introduction<br>
+                </a><a href="syntax.html#jnlp">The <code>jnlp</code> Element</a><br>
+                <a href="syntax.html#security">The <code>security</code> Element</a><br>
+                <a href="syntax.html#resources">The <code>resources</code> Element</a><br>
+                <a href="syntax.html#application_desc">The <code>application-desc</code> 
+                Element</a><br>
+                <a href="syntax.html#applet_desc">The <code>applet-desc</code> 
+                Element</a></p>
+              </blockquote>
+            <h2><a href="examples.html">JNLP API Examples</a></h2>
+            <blockquote> 
+              <p><a href="examples.html#Introduction">Introduction<br>
+                </a><a href="examples.html#BasicService">Using a <code>BasicService</code> 
+                Service</a><br>
+                <a href="examples.html#ClipboardService">Using a <code>ClipboardService</code> 
+                Service</a><br>
+                <a href="examples.html#DownloadService">Using a <code>DownloadService</code> 
+                Service</a><br>
+                <a href="examples.html#FileOpenService">Using a <code>FileOpenService</code> 
+                Service</a><br>
+                <a href="examples.html#FileSaveService">Using a <code>FileSaveService</code> 
+                Service</a><br>
+                <a href="examples.html#PrintService">Using a <code>PrintService</code> 
+                Service</a><br>
+                <a href="examples.html#PersistenceService">Using a <code>PersistenceService</code> 
+                Service</a><br>
+                <a href="examples.html#FileContents">Using <code>FileContents</code></a><br>
+                <a href="examples.html#JNLPRandomAccessFile">Using a <code>JNLPRandomAccessFile</code></a> 
+              </p>
+              </blockquote>
+            <h2>Appendices:</h2>
+            <blockquote> 
+              <p><a href="converting.html">Converting JNLP Files to Work With 
+                This Release</a><br>
+                <a href="../../../../../../products/javawebstart/faq.html">FAQ</a><br>
+                <a href="../jnlp/index.html">JNLP API (JavaDoc)</a></p>
+            </blockquote></td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<HTML>
+<HEAD>
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.02 [en] (X11; U; SunOS 5.6 sun4u) [Netscape]">
+   <TITLE>RMI Release Notes</TITLE>
+<!-- Changed by: Jen McGinn,  12-October-2001 -->
+<!-- Changed by: Ann Wollrath - SMI Software Development, 21-May-2002 -->
+<!-- Changed by: Susan Snyder - SMI Software Development, 23-June-2003 -->
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+&nbsp;
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR>
+<TD WIDTH="60"><IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 HEIGHT=88 WIDTH=52>&nbsp;</TD>
+
+<TD>
+<CENTER>
+<H1>
+RMI Release Notes<br>
+<font size="-1">for J2SE<sup>TM</sup> 1.4.2</font></H1></CENTER>
+</TD>
+
+<TD width=15% ALIGN=center>
+   <font size="-1"><a href="../../index.html">
+	Documentation Contents
+   </font>
+</TD>
+
+</TR>
+</TABLE>
+<!-- Body text begins here -->
+
+<B><FONT SIZE=+2>RMI Changes in J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> 1.4.2</FONT></B>
+<blockquote>
+<dl>
+<dt>Changes to RMI for J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> 1.4.2 included minor bug fixes.</dt>
+</dl>
+<p>
+<p>
+</blockquote>
+<B><FONT SIZE=+2>RMI Changes in J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> 1.4.1</FONT></B>
+<blockquote>
+<dl>
+<dt><b>HTTP Fallback Is More Configurable</b>
+<dd>The implementation-specific system property
+<a href="sunrmiproperties.html#eagerHttpFallback"><code>
+sun.rmi.transport.proxy.eagerHttpFallback</code></a>
+has been added to allow additional control over when RMI's default socket
+factory will fall back to HTTP tunneling.  This property configures the
+default socket factory so that any SocketException thrown by an initial
+(direct) connection attempt will trigger HTTP tunneling; this more "eager"
+fallback strategy can be useful when dealing with firewalls which deny
+instead of ignore connection attempts to unauthorized ports.
+
+<p>
+<dt><b><code><A HREF="../../api/java/rmi/Naming.html">java.rmi.Naming.list</code></a> Method No Longer Prepends a Scheme to Names Returned</b></dt>
+<dd>
+In previous releases, the <code>Naming.list</code> method prepended
+the scheme <code>rmi:</code> to each name contained in the returned
+array of strings.  The <code>Naming.list</code> implementation now
+matches the specification, returning an array of names that are
+URL-formatted, but without the scheme component.
+
+<p>
+<dt><b><code><A HREF="../../api/java/rmi/server/RemoteServer.html">java.rmi.server.RemoteServer.setLog</code></a> Method Now Requires a Permission</b></dt>
+<dd>
+The <code>RemoteServer.setLog</code> method now specifies that it
+throws a <code>SecurityException</code> if the caller does not have
+permission to set the global call log.  The method requires that the calling
+context has the permission
+<code>java.util.logging.LoggingPermission("control")</code> to set the log. 
+
+<p>
+<dt><b><code><A HREF="../../api/java/rmi/server/RMISocketFactory.html">java.rmi.server.RMISocketFactory.setFailureHandler</code></a> Method Now Requires a Permission</b></dt>
+<dd>
+The <code>RMISocketFactory.setFailureHandler</code> method now specifies that it
+throws a <code>SecurityException</code> if the caller does not have
+permission to set the global <A HREF="../../api/java/rmi/server/RMIFailureHandler.html"><code>java.rmi.server.RMIFailureHandler</code></a>.  The method requires that the calling
+context has the permission
+<code>java.lang.RuntimePermission("setFactory")</code> to set the failure handler. 
+</dl>
+</blockquote>
+
+<B><FONT SIZE=+2>RMI Enhancements in J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> 1.4</FONT></B>
+<blockquote>
+<dl>
+<dt><b>Server-side Stack Traces Now Retained in Remote Exceptions</b></dt>
+<dd>
+The RMI runtime implementation will now preserve the
+server-side stack trace information of an exception that is thrown from
+a remote call, in addition to filling in the client-side stack trace as
+it did in previous releases.  Therefore, when such an exception becomes
+accessible to client code, its stack trace will now contain all of its
+original server-side trace data followed by the client-side trace.
+<p>
+This feature is made possible by the new "programmatic access to stack
+trace information" feature of <tt>java.lang.Throwable</tt> in J2SE 1.4, which
+included making a <code>Throwable</code>'s stack trace data part of its
+default serialized form.  What the client-side RMI runtime implementation now
+does to cooperate with this feature is to append the client-side trace
+to the unmarshalled server-side trace, rather than simply overwriting
+with the client-side trace as it did in previous releases.
+<p>
+Certain RMI server applications may wish to prevent any server-side
+stack trace data from accompanying an exception to be marshalled as the
+result of a remote call (as part of the exception's default serialized
+form in J2SE 1.4), perhaps for reasons of performance or
+confidentiality.  In such cases, the implementation-specific system
+property
+<blockquote><pre>
+<a href="sunrmiproperties.html#suppressStackTraces">sun.rmi.server.suppressStackTraces</a>
+</pre></blockquote>
+can be set to "true" to cause the server-side RMI runtime
+implementation to clear the stack traces of all exceptions thrown from
+the current virtual machine as the result of remote method invocations.
+
+<p>
+<dt><b>Service Provider Interface for <code>RMIClassLoader</code></b>
+<dd>
+Certain static methods of <code>java.rmi.server.RMIClassLoader</code>
+now delegate their behavior to an instance of a new service provider
+interface, <code>java.rmi.server.RMIClassLoaderSpi</code>.  The service
+provider can be configured to augment RMI's dynamic class loading
+behavior for a given application.  By default, the service provider
+implements the standard behavior of all of the static methods in
+<code>RMIClassLoader</code>.  See the class documentation of
+<code><a href="../../api/java/rmi/server/RMIClassLoader.html">RMIClassLoader</a></code> and
+<code><a href="../../api/java/rmi/server/RMIClassLoaderSpi.html">RMIClassLoaderSpi</a></code> for more details.
+
+<p>
+<dt><b>Dynamic Server Host Name</b>
+<dd>The <code>java.rmi.server.hostname</code> property can now be
+dynamically updated to indicate that future exports should use a new
+host name.  Therefore, the new host name value will be contained in the stub
+for an object that is exported after the property is updated.
+<p>
+<dt><b>Serializing Primitive Class Objects</b> <dd>In previous
+releases, a <code>ClassNotFoundException</code> would be thrown if an
+attempt was made to pass a primitive <code>Class</code> object in an
+RMI call. Now, an object that contains <code>Class</code> objects for
+primitive types can be passed as a remote method parameter or return
+value, and can be stored in a <code>java.rmi.MarshalledObject</code>
+instance.
+
+<p>
+<dt><b>Enhanced RMI Implementation Logging</b>
+<dd>Sun's implementation of RMI in J2SE 1.4 now uses the new
+<a href="../util/logging/index.html">Logging APIs</a> to provide
+implemention-specific logging output. See the
+<a href="logging.html">RMI Implementation Logging page</a> for more information.
+
+<p>
+<dt><b>Serialization Enhancements</b>
+<dd>See the <A HREF="../serialization/relnotes14.html">Serialization Release Notes</a> for more information on enhancements and improvements to Object Serialization in J2SE 1.4.
+</dl>
+</blockquote>
+
+<B><FONT SIZE=+2>RMI Enhancements in Previous Releases</FONT></B>
+<blockquote>
+<dl>
+<dt>
+<b><code><A HREF="../../api/java/rmi/activation/ActivationGroupDesc.html">java.rmi.activation.ActivationGroupDesc</code></a> (since 1.3)</b></dt>
+<dd>
+The <code>getClassName</code> method, which returns the group's class
+name, can now return <code>null</code>, indicating the system's default group
+implementation.  Previously, the <code>getClassName</code> method would
+return the name of the internal implementation class if the default
+group implementation was chosen when the descriptor was constructed.
+<p>
+Due to this change, if an application running in a 1.3 JVM registers an
+new activatable object with the <code>ActivationSystem</code>,
+<code>rmid</code> must also be upgraded to run 1.3, since a pre-1.3
+<code>rmid</code> will not be able to activate the newly registered
+activatable object.
+<p>
+<dt><b>Constructors of activatable objects (since 1.3)</b></dt>
+<dd>
+An activatable object's "activation" constructor, which takes an
+<code>ActivationID</code> and a <code>MarshalledObject</code>as
+arguments and which is called by the
+<code>ActivationInstantiator</code> each time the object is activated,
+can now be <code>private</code> or <code>protected</code>.  Previously,
+the implementation only allowed <code>public</code> activation
+constructors.
+<p>
+<dt>
+<B><code><A HREF="../../api/java/rmi/server/RMIClassLoader.html">java.rmi.server.RMIClassLoader</A></code> (since 1.3)</B></dt>
+<dd>
+
+<code>java.rmi.server.RMIClassLoader</code> has a new method,
+<code>getClassLoader</code>. This method returns the class loader that
+RMI uses to load classes from a
+ specified codebase URL path.  This API can be used in an
+ implementation that requires complete RMI marshalling/unmarshalling
+behavior.  See <code><A
+HREF="../../api/java/rmi/server/RMIClassLoader.html">java.rmi.server.RMIClassLoader</A></code>
+for details.
+<p>
+<dt>
+<B>Serializing remote objects (since 1.2.2)</B></dt>
+<dd>Prior to 1.2.2, an attempt to pass an unexported remote object in a RMI
+call would result in a <code>java.rmi.StubNotFoundException</code>.
+This exception was a result of the RMI runtime's failure to locate a
+stub object during an attempt to replace a remote object implementation
+with its corresponding stub. In 1.2.2 and later releases, an unexported
+remote object passed in an RMI call will no longer result in an
+exception, but rather the remote object will be serialized instead of
+its stub.  If the remote object implementation is not serializable, an
+attempt to pass an unexported object in an RMI call will result in a
+<code>java.rmi.RemoteException</code> with the nested exception
+<code>java.io.NotSerializableException</code>.
+</dd> 
+</dl>
+</blockquote>
+
+<B><FONT SIZE=+2>Changes to RMI Tools (since 1.3)</FONT></B>
+<dl>
+<dt>
+<blockquote>
+<dt><b>The RMI Stub Compiler, <code><a href="../../tooldocs/solaris/rmic.html">rmic</code></a></B></dt>
+<ul>
+<li>By default, <code>rmic</code> now assumes that the destination
+directory for generated stubs is the package-named subdirectory of the
+current working directory. If the "<code>-d</code>" option is not
+specified, the result is the same as though it were specified with the
+current working directory "." as an argument. The "<code>-d</code>"
+may still be used to override the default destination directory.</li>
+
+<li>Two new options, "<code>-idl</code>" and "<code>-iiop</code>" have been added to generate IDL and stubs for IIOP, respectively. 
+</LI>
+</blockquote>
+</dl>
+</UL>
+<dl>
+<dt>
+<blockquote>
+<dt><b>The RMI Activation Daemon, <code><a href="../../tooldocs/solaris/rmid.html">rmid</code></a></B></dt>
+<dd> By default, <code>rmid</code> now requires a security policy file.
+</dl>
+<P>
+*As used on this web site, the terms "Java virtual machine" or "JVM" 
+	mean a virtual machine for the Java platform.
+
+
+<!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../relnotes/SMICopyright.html">Copyright &copy;</A>
+2003 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:rmi-comments@java.sun.com">rmi-comments@java.sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>

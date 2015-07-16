@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>Protocol Support</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1 align="left">Protocol Support</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>This chapter includes the following topics:</p>
+<ul>
+  <li><a href="#http">HTTP, FTP, and GOPHER </a></li>
+  <li><a href="#https">HTTPS</a></li>
+  <li><a href="#socks">Socks</a></li>
+  <li><a href="#ntlm">NTLM Authentication</a></li>
+</ul>
+<h2><a name="http"></a>HTTP, FTP, and GOPHER </h2>
+<p>Java Plug-in supports HTTP, FTP, and GOPHER protocols, including built-in proxy 
+  configuration support.</p>
+<h2><a name="https"></a>HTTPS</h2>
+<h3>Introduction</h3>
+<p>HTTPS is supported in Java Plug-in through Java Secure Socket Extension (JSEE), 
+  which provides a Java implementation of SSL and HTTPS for the Java platform. 
+</p>
+<h3>Error handling support </h3>
+<p>When accessing an HTTPS server, errors may occur. Java Plug-in has hooked into 
+  JSSE to provide the following types of error handling: </p>
+<ul>
+  <li><i>Hostname mismatch:</i> If the HTTPS server host name does not match the 
+    name on the server certificate, a warning dialog will appear.&nbsp;<br>
+  </li>
+  <li><i>Untrusted server certificate:</i> If the server certificate can not be 
+    verified during the SSL handshaking, a warning dialog will appear.<br>
+  </li>
+  <li><i>Untrusted client certificate:</i> In case client authentication is required 
+    by the server and the client certificate cannot be verified, a warning dialog 
+    will be appear.<br>
+  </li>
+  <li><i>Server authentication:</i> If the client accesses a protected directory 
+    on the HTTPS server, the users will be prompted for a username and password. 
+    <font size="4"> <b>Note:</b></font> Only basic authentication is currently 
+    supported. </li>
+</ul>
+<h3>Potential issues with HTTPS through JSSE </h3>
+<p>Although support of HTTPS through JSSE eliminates many browser-specific problems, 
+  there are several issues that developers should be aware of: </p>
+<ul>
+  <li><i>Untrusted server certificate: </i>When SSL handshaking takes place in 
+    establishing an HTTPS connection, the server certificate is verified against 
+    the root CA store in J2SE. However, J2SE supports fewer root CA certificates 
+    than does the browser. As a result, you may have problems with untrusted server 
+    certificates.<br>
+  </li>
+  <li><i>Client authentication:</i> An HTTPS server may require client authentication, 
+    in which case a local client certificate is sent to the server for authentication. 
+    In JSSE, client certificates are stored in a separate file and are independent 
+    of the browser. In order for client authentication to work, developers must 
+    import client certificates into JSSE through the keytool. See the <a href="http://java.sun.com/products/jsse/">JSSE 
+    documentation</a> for more information.<br>
+  </li>
+  <li><i>Level of error handling:</i> Java Plug-in currently handles the types 
+    of error listed in the previous section. However, if there are additional 
+    types of error that Java Plug-in doesn't recognize, the Java applet code may 
+    break.&nbsp;<br>
+  </li>
+</ul>
+<h2><a name="socks"></a>Socks</h2>
+<p>Java Plug-in currently supports SOCKS version 4. </p>
+<p><b><font size="4">Note:</font></b> For HTTP/HTTPS, a SOCKS proxy server may 
+  be used with a web proxy server to add caching. The behavior, however, may differ 
+  from that observed when running a similar configuration in a browser without 
+  Java Plug-in.</p>
+<h2><a name="ntlm"></a>NTLM Authentication</h2>
+<p>Java Plug-in supports NTLM authentication protocol for HTTP/HTTPS. When attempting 
+  to access a server requiring NTLM authentication, the user will be presented 
+  with a dialog requesting two items (fields) of information: username and password. 
+  If the user's domain is the same as the domain of the server to be accessed, 
+  only username and passwork need be entered. But when the domain of the user 
+  is different from that of the server, then the domain of the server must be 
+  entered as well. It should be entered in the username field with a separating 
+  backslash (<code>\</code>) as follows:</p>
+<blockquote>
+  <p><code>&lt;domain&gt;\&lt;username&gt;</code></p>
+</blockquote>
+<p>password is entered as it normally is in the password field.</p>
+<p>&nbsp;</p>
+</body>
+</html>

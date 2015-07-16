@@ -1,0 +1,96 @@
+<HTML>
+
+<HEAD>
+
+   <TITLE>Java IDL: Example 3</TITLE>
+
+<!-- Changed by: desoto, 1/29/98 -->
+
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+
+<H1 ALIGN=CENTER>Example 3: Hello World with Callback Object</H1>
+<i>This document was not updated for the 
+J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> release.  If you downloaded
+ this document as part of the 
+J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> documentation bundle, check the
+Web site at <a href="http://java.sun.com/j2se/1.4.2/docs/guide/idl/jidlExample3.html">
+http://java.sun.com/j2se/1.4.2/docs/guide/idl/jidlExample3.html</a> for updates.</i>
+<P>
+<HR>
+
+<p>
+Client programs often react to changes or updates that occur in 
+a server. For example, a client graph or spreadsheet program might
+need to be updated with each stock price update on a stock market
+server. The client has two options in this scenario: (1) periodically
+ask for the stock price via a method request on the stock server or
+(2) ask to be notified by the server whenever a price change occurs.
+The second option is referred to as a "callback".
+
+<p>
+Example 3 illustrates how a client program can pass a callback object
+to a server. The server then issues a method request on the callback
+object and thereby notifies the client.
+
+<p>
+Example 3 is identical to Example 1 except for the callback enhancements.
+This page only discusses <font color=red>the code necessary to 
+these enhancements.</font>
+
+<!-- <P>When updated, this page will contain:
+<UL>
+
+   <LI>The <A href="#IDL">IDL</A> for a "Hello world" program with a callback.
+
+   
+
+   <LI>A server implementation that callsback to a client.
+
+
+   <LI>A client that sends a callback object reference to a server.
+
+   
+   </UL>
+
+
+
+<P><A href="#instructions">Instructions</A> for compiling and running 
+
+the example are provided.  -->
+
+
+
+
+
+
+
+<CENTER><P><HR>
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html">Home</A></TD>
+</TR></TABLE>
+
+
+
+<HR><P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-98
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+</CENTER>
+
+
+
+</BODY>
+
+</HTML>

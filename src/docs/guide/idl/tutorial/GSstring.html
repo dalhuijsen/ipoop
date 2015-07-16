@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+   <TITLE>Getting Started with Java IDL: Using Stringified Object References</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1 ALIGN=CENTER>Getting Started with Java IDL: Using Stringified Object References</H1>
+<HR>
+
+
+<P><i>This document was not updated for the 
+J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> release.  If you downloaded
+ this document as part of the 
+J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> documentation bundle, check the
+Web site at <a href="http://java.sun.com/j2se/1.4.2/docs/guide/idl/tutorial/GSstring.html">
+http://java.sun.com/j2se/1.4.2/docs/guide/idl/tutorial/GSstring.html</a> for updates.</i>
+<P>
+<P>To invoke an operation on a CORBA object, a client application needs a
+reference to the object. You can get such references in a number of ways, 
+such as calling <TT>ORB.resolve_initial_references()</TT> or using another CORBA
+object (like the name service). In previous sections of this tutorial, you used both of these
+methods to get an initial object reference.
+
+<P>Often, however, there is no naming service available in the distributed
+environment.  In that situation, CORBA clients use a 
+<A href="../jidlGlossary.html#stringified object reference"><I>stringified</I> 
+object reference</A> to find their first object.
+
+<P>When updated, this lesson will teach you how to create a stringified object reference
+as a part of the server startup, and how the client gets that reference and
+destringifies it for use as a real object reference.
+
+
+<P><HR>
+<CENTER><P><A href="GSserver.html">Developing the Hello World Server</A> <BR> 
+<CENTER><P><A href="GSapp.html">Developing the Client Application</A> <BR> 
+<A href="../GShome.html">Tutorial home</A> 
+<!-- | 
+<A href="string/HelloClient.java"><TT>HelloClient.java</TT></A> | 
+<A href="string/HelloServer.java"><TT>HelloServer.java</TT></A> -->
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="../index.html">
+Home</A></TD>
+</TR></TABLE></CENTER
+
+<HR>
+<FONT
+SIZE="-2"><A HREF="http://www.sun.com/share/text/SMICopyright.html">Copyright
+&copy;</A></FONT><FONT SIZE="-2"> 2002 Sun Microsystems, Inc.,
+2550 Garcia Ave., Mtn. View, CA. 94043-1100 USA., All rights
+reserved.</FONT></P>
+
+</BODY>
+</HTML>
+
+

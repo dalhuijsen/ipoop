@@ -1,0 +1,574 @@
+<html>
+<head>
+<title>Java Plug-in Control Panel</title>
+
+<LINK REL=STYLESHEET TYPE="text/css" HREF="styles/style1.css">
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Using the Java Plug-in Control Panel to Set Plug-in Behavior/Options</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This section covers the following topics:</p>
+<ul>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#starting">Starting the Java Plug-in Control Panel</a></li>
+  <li><a href="#saving">Saving Options</a></li>
+  <li><a href="#help">Control Panel Help</a></li>
+  <li><a href="#setting">Setting Control Panel Option</a>s 
+    <ul>
+      <li><a href="#basic">Basic Panel</a></li>
+      <li><a href="#advanced">Advanced Panel</a></li>
+      <li><a href="#browser">Browser Panel</a> (Window only)</li>
+      <li><a href="#proxies">Proxies Panel</a></li>
+      <li><a href="#cache">Cache Panel</a></li>
+      <li><a href="#certificates">Certificates Panel</a></li>
+      <li><a href="#update">Update Panel</a> (Windows only, 1.4.2_01 and higher 
+        releases)</li>
+      <li><a href="#about">About Panel</a></li>
+    </ul>
+  </li>
+</ul>
+<h2><a name="overview"></a>Overview</h2>
+<p>The Java<font size="-2"><sup>TM</sup></font> Plug-in Control Panel enables 
+  you to change the default settings used by the Java Plug-in at startup. All 
+  applets running in an active instance of Java Plug-in use these settings. </p>
+<h2><a name="starting"></a>Starting the Java Plug-in Control Panel</h2>
+Start the Java Plug-in Control Panel as follows: 
+<p> <b>On Windows:</b> From the Windows Control Panel, double-click the Java coffee-cup 
+  icon labeled Java Plug-in to launch the Java Plug-in Control Panel. 
+<p> <b>On Solaris and Linux:</b> You can run the Control Panel by launching the 
+  ControlPanel executable file. In the Java 2 SDK, this file is located at: 
+<blockquote>
+  <pre>
+&lt;SDK installation directory&gt;/jre/bin/ControlPanel
+</pre>
+</blockquote>
+<p>It is also located at:</p>
+<blockquote>
+  <p><code>&lt;SDK installation directory&gt;/bin/ControlPanel</code></p>
+</blockquote>
+<p> For example, if your Java 2 SDK is installed at <tt>/usr/j2se</tt>, launch 
+  the Control Panel with this command: </p>
+<blockquote>
+  <pre>
+/usr/j2se/jre/bin/ControlPanel
+</pre>
+</blockquote>
+In a Java 2 Runtime Environment installation, the file is located at: 
+<blockquote>
+  <pre>
+&lt;JRE installation directory&gt;/bin/ControlPanel
+</pre>
+</blockquote>
+You can also use Netscape to visit the Control Panel applet page, which was installed 
+inside the JRE directory as the file <tt>ControlPanel.html</tt>. In the Java 2 
+SDK this file is located at: 
+<blockquote>
+  <pre>
+&lt;SDK installation directory&gt;/jre/ControlPanel.html
+</pre>
+</blockquote>
+In the JRE: 
+<blockquote>
+  <pre>
+&lt;JRE installation directory&gt;/ControlPanel.html
+</pre>
+</blockquote>
+<h2><a name="saving"></a>Saving Options</h2>
+<p>When you have completed your changes to the Control Panel options, click <b>Apply</b> 
+  to save the changes. Click <b>Reset</b> to cancel your changes and reload the 
+  last values that were entered and applied. Note that this is not the same as 
+  the set of default values that were originally set for Java Plug-in when it 
+  was installed.</p>
+<h2 align="left"><a name="help"></a>Control Panel Help</h2>
+<p align="left">Help for Java Plug-in is available from any panel in the Control 
+  Panel. Help comes up in its own window in response to pushing the <b>Help</b> 
+  button and looks like this:</p>
+<p align="center"><img src="images-1.4.2_01/help.gif" width="708" height="571"></p>
+<p>&nbsp; </p>
+<h2><a name="setting"></a>Setting Control Panel Options</h2>
+<p>There are eight sub-panels (tabs) in the Java Control Panel. From six of them 
+  you can set various options. The panels are labeled: </p>
+<ul>
+  <li><a href="#basic">Basic</a></li>
+  <li><a href="#advanced">Advanced</a></li>
+  <li><a href="#browser">Browser</a></li>
+  <li><a href="#proxies">Proxies</a></li>
+  <li><a href="#cache">Cache</a></li>
+  <li><a href="#certificates">Certificates</a></li>
+  <li><a href="#update">Update Panel</a></li>
+  <li><a href="#about">About</a></li>
+</ul>
+<p>Each is described separately below.</p>
+<table width="80%" border="1" cellpadding="5" bgcolor="#FFFFCC" align="center" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u>Note</u></h2>
+      <p>The settings shown for check boxes and radial buttons in each panel below, 
+        with the exception of the Browser panel, are the default (installation) 
+        settings. The check boxes for the Browser panel are determined according 
+        to user selection during installation.</p>
+    </td>
+  </tr>
+</table>
+<h3><a name="basic"></a>Basic Panel</h3>
+<p>The Basic panel looks like this:</p>
+<p align="center"><img src="images-1.4.2_01/basic.gif" width="651" height="335"></p>
+<p>Use the Basic panel to set the following options:</p>
+<h4> Show Java Console</h4>
+<blockquote> 
+  <p>Displays the Java Console while running applets. The console displays messages 
+    printed by <tt>System.out</tt> and <tt>System.err</tt> objects. It is useful 
+    for debugging problems. </p>
+</blockquote>
+<h4>Hide console</h4>
+<blockquote> 
+  <p>The console is running but hidden. This is the default setting (checked).</p>
+</blockquote>
+<h4>Do not start console</h4>
+<blockquote> 
+  <p>The console is not started.</p>
+</blockquote>
+<h4>Show Java in System Tray (Windows only)</h4>
+<blockquote> 
+  <p>The <b>Show Java in System Tray</b> option indicates to the user that a Java 
+    VM is running; it provides control over the Java Plug-in Control Panel and 
+    Java Console; and it provides information about the Java release. When enabled 
+    and Java Plug-in is started, the coffee-cup logo displays in the system tray. 
+    When Java Plug-in is shutdown, the icon is removed from the system tray. This 
+    option is enabled by default (checked).</p>
+  <table width="80%" border="1" cellpadding="3" align="center" cellspacing="0" bgcolor="#FFFFCC">
+    <tr> 
+      <td> 
+        <p><b><font size="+2"><u>Note</u></font></b></p>
+        <p>If <b>Show Java in System Tray</b> is checked, the icon will show up 
+          in the system tray even if <b>Do not start console</b> is selected.</p>
+      </td>
+    </tr>
+  </table>
+  <p>When Java Plug-in is first started and the mouse is pointed at the icon, 
+    a balloon toll tip will appear saying &quot;Java 2 Standard Edition&quot; 
+    along with a clickable link to http://java.sun.com/getjava. Thereafter, until 
+    Java Plug-in is shut down, when the mouse is pointd at the icon, a text box 
+    will say &quot;Java 2 Standard Edition.&quot;</p>
+  <p>When the system tray icon is left-double-clicked, the Java Plug-in Control 
+    Panel will appear. If it is already open, a second Java Plug-in Control Panel 
+    will appear. When the system tray icon is right-clicked, a popup menu will 
+    appear with following menu items:</p>
+  <ul>
+    <li>Open Control Panel</li>
+    <li>Open/Hide Console</li>
+    <li>About Java Technology</li>
+    <li>Hide Icon</li>
+  </ul>
+  <p><b>Open Control Panel</b> opens the Java Plug-in Control Panel. If it is 
+    already open, a second Java Plug-in Control Panel will appear.</p>
+  <p><b>Open/Hide Console</b>: <b>Open Console</b> opens the Java Console if it 
+    is closed; <b>Hide Console</b> hides the Java Console if it is open.</p>
+  <p><b>About Java Technology</b> brings up the <b>About - Java</b> box.</p>
+  <p><b>Hide Icon</b> removes the icon from the system tray until the user re-enables 
+    it and Java Plug-in is restarted (i.e., the browser is closed, then reopened 
+    on a page with an applet).</p>
+  <table width="80%" border="1" cellpadding="3" align="center" bgcolor="#FFFFCC" cellspacing="0">
+    <tr> 
+      <td> 
+        <p><b><font size="+2"><u>Note:</u></font></b> </p>
+        <p>To re-enable the icon, start the Java Plug-in Control Panel, check 
+          <b>Show Java in System Tray</b>, and press <b>Apply</b>.</p>
+      </td>
+    </tr>
+  </table>
+  
+</blockquote>
+<h4>Show Exception Dialog Box</h4>
+<blockquote>
+  <p>Show an exception dialog box when exceptions occur. The default setting is 
+    hide the exception dialog box (unchecked).</p>
+</blockquote>
+<h3><a name="advanced"></a>Advanced Panel</h3>
+<p>The Advanced panel looks like this:</p>
+<p align="center"><img src="images-1.4.2_01/advanced.gif" width="651" height="335"></p>
+<p>Use the Advanced panel to set the following options: </p>
+<h4>Java Runtime Environment </h4>
+<blockquote>
+  <p> Enables Java Plug-in to run with any Java 2 JRE or SDK, Standard Edition 
+    v 1.4 installed on your machine. Java Plug-in 1.4 is delivered with a default 
+    JRE. However, you can override the default JRE and use an older or newer version 
+    in the 1.4 family. The Control Panel automatically detects all versions of 
+    the Java 2 SDK or JRE installed on your machine, and it displays in a list 
+    box all versions which you can use. The first item in the list will always 
+    be the Java Plug-in default; the last item will always say Other. If you choose 
+    Other, you must specify the path to the Java 2 JRE or SDK, Standard Edition 
+    v 1.4 that you wish to use. Only advanced users should change this option. 
+  </p>
+</blockquote>
+<table width="80%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr>
+    <td>
+      <h2><u>Note</u></h2>
+      <p>Only advanced users should change this option. Changing the default JRE 
+        is not recommended.</p>
+    </td>
+  </tr>
+</table>
+<dl> 
+  <dt> 
+    <h4>Java Runtime Parameters </h4>
+    <blockquote> 
+      <p>You can override the Java Plug-in default startup parameters by specifying 
+        custom options in the Java Runtime Parameters field. The syntax is the 
+        same as used with parameters to the java command line invocation. See 
+        the Java 2 Standard Edition (J2SE) documentation for a full list of command 
+        line options. The URL below is subject to change:</p>
+      <blockquote> 
+        <p> <code>http://java.sun.com/j2se/1.4/docs/tooldocs/&lt;platform&gt;/java.html 
+          </code> </p>
+        <p>where <code>&lt;platform&gt;</code> is one of the operating systems: 
+          solaris, linux, windows. </p>
+      </blockquote>
+      <p> Below are some examples of Java runtime parameters</p>
+      <p><i><b>Enabling and disabling assertion support</b></i></p>
+      <blockquote> 
+        <p>To enable assertion support, the following system property must be 
+          specified in the Java Runtime Parameters:</p>
+        <blockquote> 
+          <p><code>-D[ enableassertions | ea ][:&lt;package name&gt;&quot;...&quot; 
+            | : &lt;class name&gt; ]</code></p>
+        </blockquote>
+        <p>To disable assertion in the Java Plug-in, specify the following in 
+          the Java Runtime Parameters: </p>
+        <blockquote> 
+          <p><code>-D[ disableassertions | da ][:&lt;package name&gt;&quot;...&quot; 
+            | : &lt;class name&gt; ]</code> </p>
+        </blockquote>
+        <p>See <a href="http://java.sun.com/j2se/1.4/docs/guide/lang/assert.html">Assertion 
+          Facility</a> for more details on <a href="http://java.sun.com/j2se/1.4/docs/guide/lang/assert.html#enable-disable">enabling/disabling 
+          assertions</a>.</p>
+        <p>Assertion is disabled in Java Plug-in code by default. Since the effect 
+          of assertion is determined during Java Plug-in startup, changing assertion 
+          settings in the Java Plug-in Control Panel will require a browser restart 
+          in order for the new settings to take effect. </p>
+        <p>Because Java code in Java Plug-in also has built-in assertion, it is 
+          possible to enable the assertion in Java Plug-in code through the following:</p>
+        <blockquote> 
+          <p><code>-D[ enableassertions | ea ]:sun.plugin</code> </p>
+        </blockquote>
+      </blockquote>
+      <p><i><b>Tracing and logging support</b></i></p>
+      <blockquote> 
+        <p>Tracing is a facility to redirect any output in the Java Console to 
+          a trace file (<code>.plugin&lt;version&gt;.trace</code>). </p>
+        <blockquote> 
+          <p><code>-Djavaplugin.trace=true<br>
+            -Djavaplugin.trace.option=basic|net|security|ext|liveconnect</code></p>
+        </blockquote>
+        <p>If you do not want to use the default trace file name:</p>
+        <blockquote> 
+          <p><code>-Djavaplugin.trace.filename=&lt;tracefilename&gt; </code></p>
+        </blockquote>
+        <p>Similar to tracing, logging is a facility to redirect any output in 
+          the Java Console to a log file <code>(.plugin&lt;version&gt;.log</code>) 
+          using the Java Logging API. Logging can be turned on by enabling the 
+          property <code>javaplugin.logging</code>.</p>
+        <blockquote> 
+          <p><code>-Djavaplugin.logging=true</code></p>
+        </blockquote>
+        <p>If you do not want to use the default log file name, enter:</p>
+        <blockquote> 
+          <p><code>-Djavaplugin.log.filename=&lt;logfilename&gt;</code> </p>
+        </blockquote>
+        <p>Furthermore, if you do not want to overwrite the trace and log files 
+          each session, you can set the property: </p>
+        <blockquote> 
+          <p><code>-Djavaplugin.outputfiles.overwrite=false</code>. </p>
+        </blockquote>
+        <p>If the property is set to <code>false</code>, then trace and log files 
+          will be uniquely named for each session. If the default trace and log 
+          file names are used, then the files would be named as follows</p>
+        <blockquote> 
+          <p><code>.plugin&lt;username&gt;&lt;date hash code&gt;.trace<br>
+            .plugin&lt;username&gt;&lt;date hash code&gt;.log</code></p>
+        </blockquote>
+        <p>Tracing and logging set through the Control Panel will take effect 
+          when the Plug-in is launched, but changes made through the Control Panel 
+          while a Plug-in is running will have no effect until a restart.</p>
+        <p>For more information about tracing and logging, see the chapter called 
+          <a href="tracing_logging.html">Tracing and Logging</a>.</p>
+      </blockquote>
+      <p><i><b>Debugging applets in Java Plug-in</b></i></p>
+      <blockquote> 
+        <p>The following options are used when debugging applets in the Java Plug-in. 
+          For more information on this topic see the <a href="http://java.sun.com/j2se/1.4/docs/guide/plugin/developer_guide/debugger.html">Debugging 
+          Support</a> in the <a href="http://java.sun.com/j2se/1.4/docs/guide/plugin/developer_guide/contents.html">Java 
+          Plug-in Developer Guide</a>.</p>
+        <blockquote> 
+          <p><code>-Djava.compiler=NONE<br>
+            -Xnoagent<br>
+            -Xdebug <br>
+            -Xrunjdwp:transport=dt_shmem,address=&lt;connect-address&gt;,server=y,suspend=n</code></p>
+        </blockquote>
+        <p>The <code>&lt;connect-address&gt;</code> can be any string (example: 
+          <code>2502</code>) which is used by the Java Debugger (<code>jdb</code>) 
+          later to connect to the JVM</p>
+      </blockquote>
+      <p><b><i>Default connection timeout</i></b></p>
+      <blockquote> 
+        <p>When a connection is made by an applet to a server and the server doesn't 
+          respond properly, the applet may appear to hang and may also cause the 
+          browser to hang because, since by default there is no network connection 
+          timeout.</p>
+        <p>To avoid this problem, Java Plug-in 1.4 has added a default network 
+          timeout value (2 minutes) for all HTTP connections. You can override 
+          this setting in the Java Runtime Parameters:</p>
+        <blockquote> 
+          <p><code>-Dsun.net.client.defaultConnectTimeout=&lt;value in milliseconds&gt;</code></p>
+        </blockquote>
+        <p>Another networking property that you can set is <code>sun.net.client.defaultReadTimeout</code>.</p>
+        <blockquote> 
+          <p><code>-Dsun.net.client.defaultReadTimeout=&lt;value in milliseconds&gt;</code></p>
+        </blockquote>
+        <table width="80%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+          <tr> 
+            <td> 
+              <h2><u>Note</u></h2>
+              <p>Java Plug-in does not set <code>sun.net.client.defaultReadTimeout</code> 
+                by default. If you want to set it, do so through the Java Runtime 
+                Parameters as shown above. </p>
+            </td>
+          </tr>
+        </table>
+        <p><b>Networking properties description:</b></p>
+        <p><code>sun.net.client.defaultConnectTimeout</code><code><br>
+          sun.net.client.defaultReadTimeout</code></p>
+        <blockquote> 
+          <p>These properties specify, respectively, the default connect and read 
+            timeout values for the protocol handlers used by <code>java.net.URLConnection</code>. 
+            The default values set by the protocol handlers is <code>-1</code>, 
+            which means there is no timeout set.</p>
+          <p><code>sun.net.client.defaultConnectTimeout</code> specifies the timeout 
+            (in milliseconds) to establish the connection to the host. For example, 
+            for http connections it is the timeout when establishing the connection 
+            to the http server. For ftp connections it is the timeout when establishing 
+            the connection to ftp servers. </p>
+          <p><code>sun.net.client.defaultReadTimeout</code> specifies the timeout 
+            (in milliseconds) when reading from an input stream when a connection 
+            is established to a resource. </p>
+        </blockquote>
+        <p>For the official description of these properties, see <a href="http://java.sun.com/j2se/1.4/docs/guide/net/properties.html">Networking 
+          Properties</a>.<br>
+        </p>
+        <p></p>
+      </blockquote>
+    </blockquote>
+</dl>
+<h3><a name="browser"></a>Browser Panel (Windows only)</h3>
+<p align="center"><img src="images-1.4.2_01/browser.gif" width="651" height="335"></p>
+<p align="left">This panel relates only to Microsoft Windows installations; it 
+  does not appear in other installations. Check any browser for which you want 
+  Java Plug-in to be the default Java runtime, instead of the internal JVM of 
+  that browser. This is to enable <code>APPLET</code> tag support in Internet 
+  Explorer and Netscape 6 via Java Plug-in.</p>
+<h3><a name="proxies"></a>Proxies Panel</h3>
+<p>The Proxies panel looks like this:</p>
+<p align="center"><img src="images-1.4.2_01/proxies.gif" width="651" height="335"></p>
+<p>Use the Proxies panel to use the browser default settings or to override the 
+  proxy address and port for the different protocols. </p>
+<h4>Use browser settings </h4>
+<blockquote>
+  <p> Check this to use the browser default proxy settings. This is the default 
+    setting (checked). </p>
+</blockquote>
+<h4>Proxy information table</h4>
+<blockquote>
+  <p>You can override the default settings by unchecking the &quot;Use browser 
+    settings&quot; check box, then completing the proxy information table beneath 
+    the check box. You can enter the proxy address and port for each of the supported 
+    protocols: HTTP, Secure (HTTPS), FTP, Gopher, and Socks. </p>
+</blockquote>
+<h4>No proxy host</h4>
+<blockquote>
+  <p>This is a host or list of hosts for which no proxy/proxies are to be used. 
+    No proxy host is usually used for an internal host in an intranet environment.</p>
+</blockquote>
+<h4>Automatic proxy configuration URL</h4>
+<blockquote>
+  <p> This is the URL for the JavaScript file (.js or .pac extension) that contains 
+    the <code>FindProxyForURL</code> function. <code>FindProxyForURL</code> has 
+    the logic to determine the proxy server to use for a connection request.</p>
+</blockquote>
+<p>For additional details about proxy configuration, see the chapter called <a href="proxie_config.html">Proxy 
+  Configuration.</a></p>
+<h3><a name="cache"></a>Cache Panel</h3>
+<p>The Cache panel looks like this:</p>
+<p align="center"><img src="images-1.4.2_01/cache.gif" width="651" height="335"></p>
+<table width="80%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr>
+    <td>
+      <h2><u>Note</u></h2>
+      <p>The cache referred to here is the <i>sticky</i> cache; i.e., the disk 
+        cache created and controlled by Java Plug-in which the browser cannot 
+        overwrite. See <a href="applet_caching.html">Applet Caching</a>.</p>
+    </td>
+  </tr>
+</table>
+<dl> 
+  <h4>Enable Caching </h4>
+  <blockquote> 
+    <p>Check this to enable caching. This is the default setting (checked). With 
+      applet caching enabled, performance is improved because once an applet is 
+      cached it no longer needs to be downloaded when referenced again.</p>
+    <p>The Java Plug-in caches files of the following types downloaded via HTTP/HTTPS:</p>
+    <blockquote> 
+      <p><code>.jar</code> (jar file)<br>
+        <code>.zip</code> (zip file)<br>
+        <code>.class</code> (java class file)<br>
+        <code>.au</code> (audio file)<br>
+        <code>.wav</code> (audio file)<br>
+        <code>.jpg</code> (image file)<br>
+        <code>.gif</code> (image file)</p>
+    </blockquote>
+  </blockquote>
+  <h4>View files in Cache </h4>
+  <blockquote> 
+    <p>Press this to view the cached files. Another dialog (Java Plug-in Cache 
+      Viewer) will pop up and display the cached files. The Cache Viewer displays 
+      the following information about the files in cache: Name, Type, Size, Expire 
+      Date, Last Modified, Version, and URL. In the Cache Viewer you can also 
+      selectively delete files in the cache. This is an alternative to the Clear 
+      Cache option described below, which deletes all files in the cache.</p>
+  </blockquote>
+  <h4>Clear Cache </h4>
+  <blockquote> 
+    <p>Press this to clear all files in the cache. You will be prompted (<i>Erase 
+      all files in ... _cache?</i>) before the files are removed. </p>
+  </blockquote>
+  <h4> Location </h4>
+  <blockquote> 
+    <p>You can use this to specify the location of the cache. The default location 
+      of the cache is <code>&lt;user home&gt;/.jpi_cache</code>, where <code>&lt;user 
+      home&gt;</code> is the value of the system property <code>user.home</code>. 
+      Its value depends on the OS.</p>
+  </blockquote>
+  <h4>Size </h4>
+  <blockquote> 
+    <p>You can check Unlimited to make the cache unlimited in size; or you can 
+      set the Maximum size of the cache. If the cache size exceeds the specified 
+      limit, the oldest files cached will be removed until the cache size is within 
+      the limit. </p>
+  </blockquote>
+  <h4>Compression </h4>
+  <blockquote> 
+    <p>You can set the compression of the JAR cache files between None and High. 
+      While you will save memory by specifying higher compression, performance 
+      will be degraded; best performance will be achieved with no compression. 
+    </p>
+  </blockquote>
+</dl>
+<h3><a name="certificates"></a>Certificates Panel</h3>
+<p>The Certificates panel looks like this:</p>
+<p align="center"><img src="images-1.4.2_01/certificates.gif" width="651" height="335"></p>
+<p align="left">Four types of certificates may be selected:</p>
+<ul>
+  <li><a href="#signed">Signed applet</a></li>
+  <li><a href="#secure">Secure site</a></li>
+  <li><a href="#signer">Signer CA</a></li>
+  <li><a href="#secure_ca">Secure site CA</a></li>
+</ul>
+<h4><a name="signed"></a>Signed applet</h4>
+<blockquote> 
+  <p>These are certificates for signed applets that are trusted by the user. The 
+    certificates that appear in the signed applet list are read from the certificate 
+    file <code>jpicerts&lt;version&gt;</code> located in the <code>&lt;user home&gt;/.java</code> 
+    directory.</p>
+</blockquote>
+<h4><a name="secure"></a>Secure site</h4>
+<blockquote> 
+  <p>These are certificates for secure sites. The certificates that appear in 
+    the Secure site list are read from the certificate file<code> jpihttpscerts&lt;version&gt;</code> 
+    located in the <code>&lt;user home&gt;/.java</code> directory. </p>
+</blockquote>
+<h4><a name="signer"></a>Signer CA</h4>
+<blockquote> 
+  <p>These are certificates of Certificate Authorities (CAs) for signed applets; 
+    they are the ones who issue the certificates to the signers of signed applets. 
+    The certificates that appear in the Signer CA list are read from the certificate 
+    file <code>cacerts</code>, located in the <code>&lt;jre&gt;/lib/security</code> 
+    directory.</p>
+</blockquote>
+<h4><a name="secure_ca"></a>Secure site CA</h4>
+<blockquote> 
+  <p>These are certificates of Certificate Authorities (CAs) for secure sites; 
+    they are the ones who issue the certificates for secure sites. The certificates 
+    that appear in the Secure site CA list are read from the certificate file 
+    <code>jssecacerts</code>, located in the <code>&lt;jre&gt;/lib/security</code> 
+    directory</p>
+</blockquote>
+<p>For <b>Signed applet</b> and <b>Secure site</b> certificates, there are four 
+  options: <b>Import</b>, <b>Export</b>, <b>Remove</b>, and <b>Detail</b>. The 
+  user can import, export, remove and view the details of a certificate.</p>
+<p>For <b>Signer CA</b> and <b>Secure site CA</b>, there is only one option: <b>Detail</b>. 
+  The user can only view the details of a certificate.</p>
+<h3><a name="update"></a>Update Panel (Windows only, 1.4.2_01 and higher releases)</h3>
+<table width="80%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u>Note</u></h2>
+      <p>This panel is only available on Windows for 1.4.2_01 and higher releases 
+        and only for users with Administrative privileges.</p>
+    </td>
+  </tr>
+</table>
+<p align="left">The Update panel looks like this:</p>
+<h3 align="center"><img src="images-1.4.2_01/update.gif" width="651" height="335" align="middle"></h3>
+<p align="left">The Update panel, in conjunction with the Java Update Scheduler 
+  (<code>jusched.exe</code>), is used to provide the latest Java updates to the 
+  end user. </p>
+<h4 align="left">Update Panel Options</h4>
+<p align="left">There are two basic options on the Update tab:</p>
+<ul>
+  <li>Automatic update&#151;available only on Windows XP, 2003, 2000 (SP2 or higher) 
+    and set by default for those operating systems</li>
+  <li>Manual update</li>
+</ul>
+<p>Automatic update is performed on a scheduled basis and it is selected by checking 
+  the <b>Check for Updates Automatically</b> check box.</p>
+<p>Manual update is performed by pressing the <b>Update Now</b> button.</p>
+<p>If you select automatic update, you can then set the notification via the <b>Notify 
+  Me:</b> drop-down menu, and you can set the update schedule via the <b>Advanced...</b> 
+  button.</p>
+<p>With notification, you can chose to be notified before an update is downloaded 
+  and before it is installed; or you can chose to be notified only before an update 
+  is installed (i.e., the download is automatic).</p>
+<p>The <b>Advanced...</b> allows you to select the desired frequency for updates: 
+  daily, weekly (default), or montly. For daily updates, you can select the time 
+  of the day for the udpate; for weekly updates, you can select the day of the 
+  week and the time of the day; for montly updates, you can select the day of 
+  the month and the time of the day.</p>
+<p>You can do manual updates at any time by presseing the <b>Update Now</b> button. 
+  This allows you to do immediate, unscheduled upates.</p>
+<h4>Java Update Scheduler</h4>
+<p>The Java Update Scheduler (<code>jusched.exe</code>) is used for launching 
+  automatic updates when <b>Update Automatically</b> is selected in the Update 
+  tab. <code>jusched.exe</code> runs as a background process that launches the 
+  Update Manager at predefined intervals set by the user through the <b>Advanced 
+  ...</b> button of the Update tab. The Update Manager coordinates the update 
+  process. </p>
+<p><code>jusched.exe</code> is launched when the user reboots the computer after 
+  installing the SDK/JRE. It is normally tranparent to the user but can be viewed 
+  in the Processes tab of the Windows Task Manager. Should a user for some reason 
+  not want the scheduler to run, it can be killed via <b>End Process</b> button 
+  of the Processes tab.</p>
+<p></p>
+<h3><a name="about"></a>About Panel</h3>
+<p>The About panel looks like this:</p>
+<p align="center"><img src="images-1.4.2_01/about.gif" width="651" height="335"></p>
+<p align="left">&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,23 @@
+[Desktop Entry]
+Name=Audacity
+Name[de]=Audacity
+Name[ru]=Audacity
+Name[uk]=Audacity
+GenericName=Sound Editor
+GenericName[de]=Audio-Editor
+GenericName[ru]=Редактор звуковых файлов
+GenericName[uk]=Редактор звукових файлів
+Comment=Record and edit audio files
+Comment[de]=Audio-Dateien aufnehmen und bearbeiten
+Comment[ru]=Запись и редактирование звуковых файлов
+Comment[uk]=Запис і редагування звукових файлів
+
+Icon=@AUDACITY_NAME@
+
+Type=Application
+Categories=AudioVideo;Audio;AudioVideoEditing;
+
+Exec=env UBUNTU_MENUPROXY=0 @AUDACITY_NAME@ %F
+StartupNotify=false
+Terminal=false
+MimeType=application/x-audacity-project;@MIMETYPES@

@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Suppressing Reflective Access Control</TITLE>
+
+</HEAD>
+
+   
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+
+Certain sophisticated clients of the Java Core Reflection API require
+a means to suppress default Java language access control checks when <i>using</i> reflected members and constructors.  These checks--for public, default (package) access, protected, and private members--are performed when Fields, Methods or Constructors are used to set or get fields, to invoke methods, or to create new instances of classes, respectively.<p>
+Examples of such clients are the Java Object Serialization service,
+development tools such as object inspectors and debuggers, and other
+applications such as database persistence mechanisms.
+<br>
+<br>
+<b>SOLUTION</b><p>
+In Java 1.2, a Field, Method or Constructor object may be explicitly
+flagged as suppressing default Java language access control.  When the
+reflective object is used, this flag--a new instance field--is
+consulted as part of access checking.  If the flag is true, access
+checks are disabled and the requested operation proceeds; otherwise,
+normal access checks are performed as in Java 1.1.  The flag is false
+by default in a reflected member or constructor.<p>
+The act of setting the flag is security-checked using the new Java 1.2
+security mechanisms.  A client's calling context must have sufficient
+privilege to perform this operation.
+<p>
+Thus, in Java 1.2 each concrete reflected class (Field, Method and
+Constructor) extends a new base class, AccessibleObject, defined
+below.  This class provides the necessary state and methods to set and
+get an "accessible" flag for a reflected object.  A new
+ReflectPermission class, also defined below, provides the ability to
+grant the necessary permission via the security policy file.
+<br>
+<br>
+<b>PROGRAMMING INTERFACE</b><p>
+<pre>package java.lang.reflect;</pre>
+<blockquote>
+<pre>/**
+ * The AccessibleObject class is the base class for Field, Method and
+ * Constructor objects.  It provides the ability to flag a reflected
+ * object as suppressing default Java language access control checks
+ * when it is used.  The access checks--for public, default (package)
+ * access, protected, and private members--are performed when Fields,
+ * Methods or Constructors are used to set or get fields, to invoke
+ * methods, or to create and initialize new instances of classes,
+ * respectively.
+ *
+ * &lt;p&gt;Setting the &lt;tt&gt;accessible&lt;/tt&gt; flag in a reflected object
+ * permits sophisticated applications with sufficient privilege, such
+ * as Java Object Serialization or other persistence mechanisms, to
+ * manipulate objects in a manner that would normally be prohibited.
+ *
+ * @see Field
+ * @see Method
+ * @see Constructor
+ * @see ReflectPermission
+ *
+ * @since JDK1.2
+ */
+public
+class AccessibleObject {
+
+    /**
+     * Convenience method to set the &lt;tt&gt;accessible&lt;/tt&gt; flag for an
+     * array of objects with a single security check (for efficiency).
+     *
+     * @param array the array of AccessibleObjects
+     * @param flag the new value for the &lt;tt&gt;accessible&lt;/tt&gt; flag in each object
+     * @throws SecurityException if the request is denied
+     */
+    public static void setAccessible(AccessibleObject[] array, boolean flag)
+	throws SecurityException;
+
+    /**
+     * Set the &lt;tt&gt;accessible&lt;/tt&gt; flag for this object to
+     * the indicated boolean value.  A value of &lt;tt&gt;true&lt;/tt&gt; indicates that
+     * the reflected object should suppress Java language access
+     * checking when it is used.  A value of &lt;tt&gt;false&lt;/tt&gt; indicates 
+     * that the reflected object should enforce Java language access checks.
+     *
+     * @param flag the new value for the &lt;tt&gt;accessible&lt;/tt&gt; flag
+     * @throws SecurityException if the request is denied
+     */
+    public void setAccessible(boolean flag) throws SecurityException;
+
+    /**
+     * Get the value of the &lt;tt&gt;accessible&lt;/tt&gt; flag for this object.
+     */
+    public boolean isAccessible();
+
+    /**
+     * Constructor: only used by the Java Virtual Machine.
+     */
+    protected AccessibleObject();
+
+}
+
+package java.lang.reflect;
+
+/**
+ * The Permission class for reflective operations.  A
+ * ReflectPermission is a &lt;em&gt;named permission&lt;/em&gt; and has no
+ * actions.  The only name currently defined is &lt;tt&gt;access&lt;/tt&gt;,
+ * which allows suppressing the standard Java language access checks
+ * --for public, default (package) access, protected, and private
+ * members--performed by reflected objects at their point of use.
+ *
+ * &lt;p&gt;An example of permitting the identity "Duke" to suppress the
+ * language access checking for reflected members might be:
+ * &lt;code&gt;
+ *	grant signedBy "Duke" {
+ *		java.lang.reflect.ReflectPermission "access";
+ *	}
+ * &lt;/code&gt;
+ *
+ * @see java.security.Permission
+ * @see java.security.BasicPermission
+ * @see AccessibleObject
+ * @see Field#get
+ * @see Field#set
+ * @see Method#invoke
+ * @see Constructor#newInstance
+ *
+ * @since JDK1.2
+ */
+public final
+class ReflectPermission extends java.security.BasicPermission {
+
+    /**
+     * Constructs a ReflectPermission with the specified name.
+     *
+     * @param name the name of the ReflectPermission
+     */
+    public ReflectPermission(String name);
+
+    /**
+     * Constructs a ReflectPermission with the specified name and actions.
+     * The actions should be null; they are ignored.
+     *
+     * @param name the name of the ReflectPermission
+     * @param actions should be null.
+     */
+    public ReflectPermission(String name, String actions);
+}
+</pre>
+</blockquote>
+
+
+<!--
+
+<font size="+2"><b>For More Information</b></font><br>
+
+<p>
+
+<blockquote>
+
+<b>Located on the JavaSoft website:</b>
+
+</blockquote>
+
+<ul>
+
+<b>Located on the JavaSoft website:</b>
+
+<li><!a href="http://java.sun.com/products/xxx"><b>The Xxxx Home Page</b></a>.
+
+</ul>
+
+<p>
+
+-->
+
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-97
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <br>
+
+
+
+
+   <FONT SIZE="-1">
+
+<!--
+
+   Please send comments to: <a href="mailto:reflection@eng.sun.com">reflection@eng.sun.com</a> 
+
+-->
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

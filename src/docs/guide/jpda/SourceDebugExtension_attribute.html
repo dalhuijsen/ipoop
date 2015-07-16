@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>SourceDebugExtension Class File Attribute</title>
+</head>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+<center>
+<h1><code>SourceDebugExtension Class File Attribute</code></h1>
+</center>
+
+Java virtual machine class file attributes are described in
+<a href="http://java.sun.com/docs/books/vmspec/2nd-edition/html/ClassFile.doc.html#43817">section
+4.7</a> 
+of the <a href="http://java.sun.com/docs/books/vmspec/2nd-edition/html/VMSpecTOC.doc.html">The Java
+Virtual Machine Specification</a>.
+The definition of the added attribute is in the context of 
+The Java Virtual Machine Specification:
+<P>
+<table summary="layout" width="85%" align="center"><tr><td>
+The <code>SourceDebugExtension</code> attribute is an optional attribute in the
+<code>attributes</code> 
+table of the <code>ClassFile</code>  structure. There can be no more than one 
+<code>SourceDebugExtension</code> &#32;attribute in the <code>attributes</code> table of a given
+<code>ClassFile</code> structure. 
+<p>
+The <code>SourceDebugExtension</code> attribute has the following format:<p>
+<pre><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>SourceDebugExtension_attribute {
+</code>&nbsp;&nbsp;&nbsp;&nbsp;<code>   u2 attribute_name_index;
+</code>&nbsp;&nbsp;&nbsp;&nbsp;<code>   u4 attribute_length;
+</code>&nbsp;&nbsp;&nbsp;&nbsp;<code>   u1 debug_extension[attribute_length];
+</code>&nbsp;&nbsp;&nbsp;&nbsp;<code>}
+</code><br></pre>
+The items of the <code>SourceDebugExtension_attribute</code> structure are as follows:
+<p>
+<dl><dt><code>attribute_name_index</code>
+<dd> The value of the <code>attribute_name_index</code> item must be a valid index into the
+<code>constant_pool</code> table. The <code>constant_pool</code> entry at that index must be a
+<code>CONSTANT_Utf8_info</code>  structure representing the string
+<code>"SourceDebugExtension"</code>.<p>
+
+<dt><code>attribute_length</code>
+<dd> The value of the <code>attribute_length</code> item indicates the length of
+the attribute, excluding the initial six bytes.  The value of the 
+<code>attribute_length</code> item is thus the number of bytes in 
+the <code>debug_extension[]</code> item.<p>
+
+<dt><code>debug_extension[]</code>
+<dd> The <code>debug_extension</code> array holds a string, which must be 
+in UTF-8 format.  There is no terminating zero byte. <p>
+
+The string in the <code>debug_extension</code> item will be interpreted as 
+extended debugging information.  The content of this string has no semantic 
+effect on the Java Virtual Machine.<p>
+</dl>
+</td></tr></table>
+
+
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2>Copyright &copy; 2001 <A HREF="http://www.sun.com/">Sun
+Microsystems, Inc.</A> All Rights Reserved.</FONT>&nbsp;
+
+<P><FONT SIZE=-1>Please send comments to: <A HREF="mailto:java-debugger@sun.com">java-debugger@sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30></TD>
+</TR>
+</TABLE>
+
+</body></html>

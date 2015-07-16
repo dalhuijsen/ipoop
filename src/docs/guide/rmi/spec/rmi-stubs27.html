@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 8 - Stub/Skeleton Interfaces
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-stubs26.html">PREV</a>
+ | <a href="rmi-dgc2a.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="6598"><i>	8.6	</i> The <code>Operation</code> Class
+</a></h2>
+
+<blockquote>
+<a name="5255"><!-- --></a>
+The class <code>Operation</code> holds a description of a method in the Java programming language for a remote object.<p>
+</blockquote>
+<blockquote>
+<blockquote><hr noshade size="1">
+<b><a name="6742">Note - </a></b>The <code>Operation</code> interface is deprecated as of the Java 2 SDK, Standard Edition, v1.2. The 1.2 stub protocol no longer uses the old <code>RemoteRef.invoke</code> method which takes an <code>Operation</code> as one of its arguments. As of the Java 2 SDK, Standard Edition, v1.2, stubs now use the new <code>invoke</code> method which does not require <code>Operation</code> as a parameter. 
+<hr noshade size="1">
+</blockquote>
+</blockquote>
+<blockquote><pre>package java.rmi.server;
+
+public class Operation {
+	public Operation(String op) {...}
+	public String getOperation() {...}
+	public String toString() {...}
+}
+
+
+</pre></blockquote><blockquote>
+<a name="6280"><!-- --></a>
+An <code>Operation</code> object is typically constructed with the method signature.<p>
+<a name="6601"><!-- --></a>
+The method <code>getOperation</code> returns the contents of the operation descriptor (the value with which it was initialized).<p>
+<a name="6278"><!-- --></a>
+The method <code>toString</code> also returns the string representation of the operation descriptor (typically the method signature).<p>
+</blockquote>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-stubs26.html">PREV</a>
+ | <a href="rmi-dgc2a.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>
+

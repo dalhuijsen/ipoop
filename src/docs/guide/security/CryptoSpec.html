@@ -1,0 +1,4476 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<HEAD>
+
+<TITLE>          Java Cryptography Architecture</TITLE>
+
+<META NAME="AUTHOR" CONTENT="br">
+<META NAME="OPERATOR" CONTENT="br">
+</HEAD>
+
+<BODY BGCOLOR="white">
+<HR>
+
+<center>
+<H1>Java<font size=-1><sup>TM</sup></font> Cryptography Architecture </H1>
+
+<H1>API Specification &amp; Reference</H1>
+<br>
+
+<H3><I>Last Modified: 4 August 2002</I></H3>
+
+</center>
+
+<HR>
+
+<p>
+
+<DL>
+  <DT><B><FONT SIZE="+2"><A HREF="#Introduction">Introduction</A></FONT></B>
+  <DD><A HREF="#Design"><B>Design Principles</B></A>
+  <DD><A HREF="#Architecture"><B>Architecture</B></A>
+  <DD><A HREF="#Concepts"><B>Concepts</B></A>
+  <DD>&nbsp;
+  <DT><A HREF="#CoreClasses"><B><FONT SIZE="+2">Core Classes and
+  Interfaces</FONT></B></A>
+  <DD><A HREF="#Provider"><B>The <CODE>Provider</CODE> Class</B></A>
+  <DL>
+    <DD><A HREF="#ProviderImplReq"><B>How Provider Implementations
+    are Requested and Supplied</B></A>
+    <DD><A HREF="#ProviderInstalling"><B>Installing Providers</B></A>
+  </DL>
+  <DD><A HREF="#Security"><B>The <CODE>Security</CODE> Class</B></A>
+  <DD><A HREF="#MessageDigest"><B>The <CODE>MessageDigest</CODE>
+  Class</B></A>
+  <DD><A HREF="#Signature"><B>The <CODE>Signature</CODE> Class</B></A><!--SELECTION--><!--/SELECTION-->
+  <DD><A HREF="#AlgParms"><B>Algorithm Parameters Classes</B></A>
+  <UL>
+    <DL>
+      <DT><A HREF="#AlgSpec"><B>Algorithm Parameter Specification Interfaces
+      and Classes</B></A>
+      <DD><A HREF="#AlgorithmParameterSpec"><B>The <CODE>AlgorithmParameterSpec</CODE>
+      Interface</B></A>
+      <DD><A HREF="#DSAParameterSpec"><B>The <CODE>DSAParameterSpec</CODE>
+      Class</B></A>
+      <DT><A HREF="#AlgorithmParameters"><B>The <CODE>AlgorithmParameters</CODE>
+      Class</B></A>
+      <DT><A HREF="#AlgorithmParameterGenerator"><B>The <CODE>AlgorithmParameterGenerator</CODE>
+      Class</B></A>
+      <DT><A HREF="#Key"><B><CODE>Key</CODE> Interfaces</B></A>
+      <DT><A HREF="#KeySpecs"><B><CODE>Key</CODE> Specification Interfaces
+      and Classes</B></A>
+      <DD><A HREF="#KeySpec"><B>The <CODE>KeySpec</CODE> Interface</B></A>
+      <DL>
+        <DD><A HREF="#DSAPrivateKeySpec"><B>The <CODE>DSAPrivateKeySpec</CODE>
+        Class</B></A>
+        <DD><A HREF="#DSAPublicKeySpec"><B>The <CODE>DSAPublicKeySpec</CODE>
+        Class</B></A>
+        <DD><A HREF="#RSAPrivateKeySpec"><B>The <CODE>RSAPrivateKeySpec</CODE>
+        Class</B></A>
+        <DD><A HREF="#RSAPrivateCrtKeySpec"><B>The <CODE>RSAPrivateCrtKeySpec</CODE>
+        Class</B></A>
+        <DD><A HREF="#RSAMultiPrimePrivateCrtKeySpec"><B>The <CODE>RSAMultiPrimePrivateCrtKeySpec</CODE>
+        Class</B></A>
+        <DD><A HREF="#RSAPublicKeySpec"><B>The <CODE>RSAPublicKeySpec</CODE>
+        Class</B></A>
+        <DD><A HREF="#EncodedKeySpec"><B>The <CODE>EncodedKeySpec</CODE>
+        Class</B></A>
+        <DL>
+          <DD><A HREF="#PKCS8EncodedKeySpec"><B>The <CODE>PKCS8EncodedKeySpec</CODE>
+          Class</B></A>
+          <DD><A HREF="#X509EncodedKeySpec"><B>The <CODE>X509EncodedKeySpec</CODE>
+          Class</B></A>
+        </DL>
+      </DL>
+      <DT><A HREF="#KeyFactory"><B>The <CODE>KeyFactory</CODE> Class</B></A>
+      <DT><A HREF="#CertificateFactory"><B>The <CODE>CertificateFactory</CODE>
+      Class</B></A>
+      <DT><A HREF="#KeyPair"><B>The <CODE>KeyPair</CODE> Class</B></A>
+      <DT><A HREF="#KPG"><B>The <CODE>KeyPairGenerator</CODE> Class</B></A>
+      <DT><A HREF="#KeyManagement"><B>Key Management</B></A>
+      <DD><A HREF="#KeystoreLocation"><B>Keystore Location</B></A>
+      <DD><A HREF="#KeystoreImplementation"><B>Keystore Implementation</B></A>
+      <DD><A HREF="#KeyStore"><B>The <CODE>KeyStore</CODE> Class</B></A>
+      <DT><A HREF="#SecureRandom"><B>The <CODE>SecureRandom</CODE>
+      Class</B></A><BR>
+    </DL>
+  </UL>
+</DL>
+
+<DL>
+  <DT><A HREF="#Examples"><B><FONT SIZE="+2">Code Examples</FONT></B></A>
+    <DD><A HREF="#MDEx"><B>Computing a <CODE>MessageDigest</CODE>
+    Object</B></A>
+    <DD><A HREF="#KPGEx"><B>Generating a Pair of Keys</B></A>
+    <DD><A HREF="#SigEx"><B>Generating and Verifying a Signature
+    Using Generated Keys</B></A>
+    <DD><A HREF="#KeyFactoryEx"><B>Generating/Verifying Signatures
+    Using <CODE>Key</CODE> Specifications and <CODE>KeyFactory</CODE></B></A>
+    <DD><A HREF="#Equal"><B>Determining If Two Keys Are Equal</B></A>
+    <DD><A HREF="#ReadCert"><B>Reading Base64-Encoded Certificates</B></A>
+    <DD><A HREF="#ParseCert"><B>Parsing a Certificate Reply</B></A>
+</DL>
+
+<DL>
+<DT><A HREF="#AppA"><B><FONT SIZE="+2">Appendix A: Standard Names
+  </FONT></B></A><BR>
+<BR>
+  <DT><A HREF="#AppB"><B><FONT SIZE="+2">Appendix B: Algorithms</FONT></B></A>
+</DL>
+
+
+
+<HR>
+
+<H1><a name="Introduction">Introduction</a></H1>
+
+<blockquote>
+
+<P>
+The Security API is a core API of the Java programming language, 
+built around the
+<code>java.security</code> package (and its subpackages). 
+This API is designed to allow developers to incorporate both 
+low-level and high-level security functionality into their programs. 
+
+<p>The first release of Security API in JDK 1.1 introduced the
+"Java Cryptography Architecture" (JCA), a framework for
+accessing and developing cryptographic functionality for the Java platform.
+In JDK 1.1, the JCA included APIs for digital signatures
+and message digests.
+
+<p>In subsequent releases, the Java 2 SDK significantly extended 
+the Java Cryptography Architecture, as described in this document. 
+It also upgraded the certificate management 
+infrastructure to support X.509 v3 certificates, and introduced a new 
+Java Security Architecture for fine-grain, highly configurable, flexible, 
+and extensible access control.
+
+<p>The Java Cryptography Architecture encompasses the parts of the 
+Java 2 SDK Security API related to cryptography, as well
+as a set of conventions and specifications provided in this document.
+It includes a <a href = "#ProviderArch">"provider"</a> architecture 
+that allows for multiple and interoperable cryptography implementations.
+
+<p>The Java Cryptography Extension (JCE) extends the JCA API 
+to include APIs for encryption, key exchange, and Message
+Authentication Code (MAC). Together, the JCE and the 
+cryptography aspects of the SDK 
+provide a complete, platform-independent cryptography API.
+JCE was previously an optional package (extension) to the Java 2 SDK, 
+Standard Edition, versions 1.2.x and 1.3.x. JCE has now been integrated 
+into the Java 2 SDK, v 1.4. 
+
+
+<p>
+This document is both a high-level description and a specification
+of the Java Cryptography Architecture API and its default provider, 
+as shipped in the Java 2 SDK. 
+A separate document describing the JCE API is provided with the JCE release.
+
+See the <a href="spec/security-spec.doc.html"> "Java Security Architecture
+Specification"</a> for
+information about the Java Security Architecture aspects of
+the Security API.
+
+<BLOCKQUOTE>
+<HR>
+<B>Note:</B> The most recent version of this JCA specification can be found
+online at: 
+<a href = "http://java.sun.com/j2se/1.4.2/docs/guide/security/CryptoSpec.html">
+http://java.sun.com/j2se/1.4.2/docs/guide/security/CryptoSpec.html</a>.
+<HR>
+</BLOCKQUOTE>
+
+</blockquote>
+
+
+<H2><a name="Design">Design Principles</a></H2>
+
+<blockquote>
+
+<P>
+The Java Cryptography Architecture (JCA) was designed around these 
+principles:
+<UL>
+<LI>implementation independence and interoperability<p>
+<LI>algorithm independence and extensibility
+</UL>
+
+<P>
+Implementation independence and algorithm independence are complementary; 
+you can use cryptographic services, 
+such as digital signatures and message digests,
+without worrying about the implementation details or even the algorithms
+that form the basis for these concepts. When complete algorithm-independence
+is not possible, the JCA provides standardized, 
+algorithm-specific APIs. When implementation-independence is not
+desirable, the JCA lets developers indicate a specific implementation.
+
+<P>
+Algorithm independence is achieved by defining types of cryptographic
+"engines" (services), and defining classes that provide the 
+functionality of these cryptographic engines.  These classes are called 
+<I>engine classes</I>, and examples are the 
+<a href="#MessageDigest"><code>MessageDigest</code></a>, 
+<a href="#Signature"><code>Signature</code></a>, 
+<a href="#KeyFactory"><code>KeyFactory</code></a>, and 
+<a href="#KPG"><code>KeyPairGenerator</code></a> classes.
+<P>
+Implementation independence is achieved using a "provider"-based
+architecture. The term <a href = "#ProviderArch">Cryptographic Service 
+Provider</a> (used interchangeably with "provider" in this document) 
+refers to a package or set of packages that implement one or more
+cryptographic services, such as digital signature algorithms,
+message digest algorithms, and key conversion services.
+A program may simply request a particular type of object
+(such as a <code>Signature</code> object) implementing a particular
+service (such as the DSA signature algorithm) and get an 
+implementation from one of the installed providers.
+If desired, a program may instead request an implementation from 
+a specific provider. Providers may be updated transparently to the 
+application, for example when faster or more secure versions are
+available.
+
+<P>
+Implementation interoperability means that various implementations
+can work with each other, use each other's keys, or verify each
+other's signatures. This would mean, for example, that for the
+same algorithms, a key generated by one provider would be
+usable by another, and a signature generated
+by one provider would be verifiable by another.
+
+<P>
+Algorithm extensibility means that new algorithms that fit in
+one of the supported engine classes can be added easily.
+
+</blockquote>
+
+
+<H2><a name="Architecture">Architecture</a></H2>
+
+<blockquote>
+
+
+<H4><a name="ProviderArch">Cryptographic Service Providers</a></H4>
+
+<p>The Java Cryptography Architecture introduced the notion of a 
+<em>Cryptographic Service Provider</em> 
+(used interchangeably with "provider" in this document). This term refers to
+a package (or a set of packages) that supplies 
+a concrete implementation of a subset of the cryptography aspects of
+the Security API.  
+
+<p>For example, in JDK 1.1 a provider could contain an implementation 
+of one or more digital signature
+algorithms, message digest algorithms, and key generation
+algorithms. Java 2 SDK adds five additional types of services:
+key factories, keystore creation and management, 
+algorithm parameter management,
+algorithm parameter generation, and certificate factories.
+It also enables a provider to
+supply a random number generation (RNG) algorithm. Previously, 
+RNGs were not provider-based; a particular algorithm was
+hard-coded in the JDK.
+
+<p>As previously noted, a program may simply request a particular type of 
+object (such as a <code>Signature</code> object) for a particular service (such as the 
+DSA signature algorithm) and get an implementation from one of 
+the installed providers. Alternatively, the program can request
+the objects from a specific provider. (Each provider has a name used to refer to it.)
+
+<A NAME="j2sdkenginelist"></A>
+<p>Sun's version of the Java runtime environment comes
+standard with a default provider, named <code>SUN</code>.
+Other Java runtime environments may not necessarily supply the
+<code>SUN</code> provider. The <code>SUN</code> provider package includes:
+
+<ul>
+
+<li>An implementation of the Digital Signature Algorithm (DSA), described
+in NIST FIPS 186.<p>
+
+<li>An implementation of the MD5 (RFC 1321) and SHA-1 (NIST FIPS 180-1)
+message digest algorithms.<p>
+
+<li>A DSA key pair generator for generating a pair of public and private
+keys suitable for the DSA algorithm.<p>
+
+<li>A DSA algorithm parameter generator.<p>
+
+<li>A DSA algorithm parameter manager.<p>
+
+<li>A DSA key factory providing bi-directional conversions between
+(opaque) DSA private and public key objects and their underlying key
+material.<p>
+
+<li>An implementation of the proprietary "SHA1PRNG" 
+pseudo-random number generation algorithm, following the recommendations
+in the IEEE P1363 standard (Appendix G.7).<p>
+
+<li>A certificate path builder and validator for PKIX, as defined in the 
+Internet X.509 Public Key Infrastructure Certificate and CRL Profile</I> 
+(available as a draft from <A HREF="http://www.ietf.org/">Internet Engineering Task 
+Force</A> at the time of this writing.).<P>
+
+<li>A certificate store implementation for retrieving certificates and CRLs 
+from Collection and LDAP directories, using the PKIX LDAP V2 Schema 
+(<A HREF="http://www.ietf.org/rfc/rfc2587.txt?number=2587">RFC 2587</A>).<P>
+      
+<li>A certificate factory for X.509 certificates and Certificate
+Revocation Lists (CRLs).<p>
+
+<li>A keystore implementation for the proprietary keystore
+type named <code>JKS</code>.
+
+</ul>
+
+<p>Each SDK installation has one or more provider packages installed. 
+New providers may be added statically or dynamically (see
+the <a href = "#Provider">Provider</a> and 
+<a href = "#Security">Security</a> classes). The 
+Java Cryptography Architecture offers a 
+set of APIs that allow users to query
+which providers are installed and what services they support.
+<P>
+Clients may configure their runtime with different providers,
+and specify a <i>preference order</i> for each of them. The preference
+order is the order in which providers are searched for requested 
+services when no specific provider is requested. 
+
+<H4><a name="KeyManagement">Key Management</a></H4>
+
+<P>
+A database called a "keystore" can be used to 
+manage a repository of keys and certificates. 
+A keystore is available to
+applications that need it for authentication or signing purposes.
+
+<p>Applications can access a keystore via an implementation of the
+<code>KeyStore</code> class, which is in the <code>java.security</code> package.
+A default <code>KeyStore</code> implementation is provided by Sun Microsystems.
+It implements the keystore as a file, using a proprietary 
+keystore type (format) named "JKS".
+
+<p>Applications can choose different types of keystore implementations
+from different providers, using the <code>getInstance</code> factory method supplied
+in the <code>KeyStore</code> class.
+
+<p>See the <a href = "#KeyManagement">Key Management</a> section for more 
+information.
+
+
+
+</blockquote>
+
+
+<H2><a name="Concepts">Concepts</a></H2>
+
+<blockquote>
+
+<P>
+This section covers the major concepts introduced in the API.
+
+
+<H4><a name="Engine">Engine Classes and Algorithms</a></H4>
+
+<P>
+An <I>engine class</I> defines a cryptographic service
+in an abstract fashion (without a concrete implementation).
+
+<p>A cryptographic service is always 
+associated with a particular algorithm or type,
+and it either provides cryptographic operations 
+(like those for digital
+signatures or message digests), generates or supplies the
+cryptographic material (keys or parameters) 
+required for cryptographic 
+operations, or generates data objects
+(keystores or certificates) that encapsulate cryptographic
+keys (which can be used in a cryptographic operation)
+in a secure fashion. For example, two of the engine classes are the <code>Signature</code>
+and <code>KeyFactory</code> classes. The <code>Signature</code> 
+class provides access to the functionality of a
+digital signature algorithm.
+A DSA <code>KeyFactory</code> supplies a DSA private
+or public key (from its encoding or transparent specification)
+in a format usable by the <code>initSign</code> or <code>initVerify</code> methods,
+respectively, of a DSA <code>Signature</code> object.
+
+<p>The Java Cryptography Architecture encompasses the classes of the
+Java 2 SDK Security package related to cryptography, including the
+engine classes. Users of the API request and use 
+instances of the engine classes to carry out corresponding operations. 
+The following engine classes are defined in Java 2 SDK:
+
+<ul>
+
+<li><a href = "#MessageDigest"><code>MessageDigest</code></a>: used 
+to calculate the message digest (hash) of specified data.<p>
+
+<li><a href = "#Signature"><code>Signature</code></a>: used to sign data
+and verify digital signatures.<p>
+
+<li><a href = "#KPG"><code>KeyPairGenerator</code></a>: used to generate a pair of 
+public and private keys suitable for a specified algorithm.<p>
+
+<li><a href = "#KeyFactory"><code>KeyFactory</code></a>: used to
+convert opaque cryptographic keys of type <a href = "#Key"><code>Key</code></a> 
+into <i>key specifications</i> (transparent representations of the underlying
+key material), and vice versa.<p>
+
+<li><a href = "#CertificateFactory"><code>CertificateFactory</code></a>: used to
+create public key certificates and Certificate Revocation Lists (CRLs).<p>
+
+<li><a href = "#KeyStore"><code>KeyStore</code></a>: used to create and manage a 
+<i>keystore</i>.A keystore is a database of keys. Private keys in a keystore 
+have a certificate chain associated with them, which authenticates 
+the corresponding public key.
+A keystore also contains certificates from trusted entities.
+<p>
+
+<li><a href = "#AlgorithmParameters"><code>AlgorithmParameters</code></a>: used 
+to manage the parameters for a particular algorithm, including
+parameter encoding and decoding.<p>
+
+<li><a href = "#AlgorithmParameterGenerator"><code>AlgorithmParameterGenerator</code></a>: 
+ used to generate a set of parameters suitable for a
+specified algorithm.<p>
+
+<li><a href = "#SecureRandom"><code>SecureRandom</code></a>: used to generate random
+or pseudo-random numbers.
+
+</ul>
+
+In the 1.4 release of the Java 2 SDK, the following new engines were  added:
+<UL>
+<li><A HREF="../../api/java/security/cert/CertPathBuilder.html"><code>CertPathBuilder</code></A>: 
+used to build certificate chains (also known as certification paths).<P>
+
+<li><A HREF="../../api/java/security/cert/CertPathValidator.html"><code>CertPathValidator</code></A>: 
+used to validate certificate chains.<P>
+
+<li><A HREF="../../api/java/security/cert/CertStore.html"><code>CertStore</code></A>: 
+used to retrieve <code>Certificate</code>s and <code>CRL</code>s from a repository. 
+</UL>
+
+<blockquote>
+<hr>
+<B>Note:</B> A <I>generator</I> creates objects with brand-new contents, whereas 
+a <i>factory</i> creates objects from existing material (for example, an 
+encoding).
+<hr>
+</blockquote>
+
+An engine class provides the interface to the functionality of a
+specific type of cryptographic service (independent
+of a particular cryptographic algorithm). 
+It defines Application Programming Interface (API)
+methods that allow applications to access the specific type
+of cryptographic service it provides. The actual implementations 
+(from one or more providers) are those for specific
+algorithms.  The <code>Signature</code> engine
+class, for example, provides access to the functionality of a
+digital signature algorithm. The actual implementation supplied
+in a <code>SignatureSpi</code>  subclass would be that 
+for a specific kind of signature
+algorithm, such as SHA-1 with DSA, SHA-1 with RSA, or MD5 with RSA. 
+
+<p>
+The application interfaces supplied by an engine class are
+implemented in terms of a Service Provider Interface (SPI).
+That is, for each engine class, there is a corresponding
+abstract SPI class, which defines the SPI methods that 
+cryptographic service providers must implement.
+
+<p>An instance of an engine class, the API object, encapsulates (as a
+private field) an instance of the corresponding SPI class, the SPI
+object.  All API methods of an API object are declared final and
+their implementations invoke the corresponding SPI methods of the
+encapsulated SPI object. An instance of an engine class (and of its
+corresponding SPI class) is created by a call to
+the <code>getInstance</code> factory method of the engine class.
+
+<p>The name of each SPI class is the same as that of the corresponding 
+engine class, followed by <code>Spi</code>. For example,
+the SPI class corresponding to the <code>Signature</code> engine class is the
+<code>SignatureSpi</code>  class.
+
+<p>
+Each SPI class is abstract. To supply the implementation of a 
+particular type of service, for a specific algorithm,
+a provider must subclass the corresponding SPI class and provide
+implementations for all the abstract methods.
+
+<p>
+Another example of an engine class is the <code>MessageDigest</code> class, which
+provides access to a message digest algorithm. Its implementations, 
+in <code>MessageDigestSpi</code> subclasses, may be those of various
+message digest algorithms such as SHA-1, MD5, or MD2.
+
+<p>
+As a final example, the <code>KeyFactory</code> engine class supports the conversion 
+from opaque keys to transparent key specifications, and vice versa.
+(See the <a href = "#KeySpecs">Key Specification Interfaces and Classes</a>
+section.) 
+The <code>KeyFactorySpi</code> subclass supplies an actual implementation  
+for a specific type of keys, for example, DSA public and private keys.
+
+
+<H4>Implementations and Providers</H4>
+
+<P>
+Implementations for various cryptographic services are provided by JCA
+<a href = "#ProviderArch">Cryptographic Service Providers.</a> Cryptographic 
+service providers 
+are essentially packages that supply one or more cryptographic service
+implementations. 
+The <I>Engine Classes and Algorithms</I> section includes a 
+<A HREF="#j2sdkenginelist">list of implemenations supplied by SUN</A>, 
+the Java 2 SDK's default provider.
+
+<p>Other providers may define their own implementations of
+these services or of other services,
+such as one of the RSA-based signature algorithms or the 
+MD2 message digest algorithm.
+
+<H4>Factory Methods to Obtain Implementation Instances</H4>
+
+<P>
+
+For each engine class in the API, a particular implementation is 
+requested and instantiated
+by calling a <i>factory method</i> on the engine class. 
+A factory method
+is a static method that returns an instance of a class.
+
+<p>The basic mechanism for obtaining an appropriate <code>Signature</code> object,
+for example,
+is as follows: A user requests such an object by calling the 
+<code>getInstance</code> method in the <code>Signature</code> class, specifying 
+the name of a 
+signature algorithm (such as "SHA1withDSA"), and, optionally, the name
+of the provider or the <code>Provider</code> class. The <code>getInstance</code> method finds an implementation
+that satisfies the supplied algorithm and provider parameters. If no
+provider is specified, <code>getInstance</code> searches the
+registered providers, in preference order, for one with an 
+implementation of the specified algorithm. See <a href=
+"#Provider">The <code>Provider</code> Class</a> for more
+information about registering providers.
+
+
+</blockquote>
+
+
+<H1><a name="CoreClasses">Core Classes and Interfaces</a></H1>
+
+<blockquote>
+
+<P>
+This section discusses the core classes and interfaces 
+provided in the Java Cryptography Architecture: 
+
+<ul>
+
+<li>the <a href = "#Provider"><code>Provider</code></a> and 
+<a href = "#Security"><code>Security</code></a> classes<p>
+
+<li>the <a href = "#MessageDigest"><code>MessageDigest</code></a>, 
+<a href = "#Signature"><code>Signature</code></a>, 
+<a href = "#KPG"><code>KeyPairGenerator</code></a>, 
+<a href = "#KeyFactory"><code>KeyFactory</code></a>, 
+<a href = "#AlgorithmParameters"><code>AlgorithmParameters</code></a>, 
+<a href = "#AlgorithmParameterGenerator"><code>AlgorithmParameterGenerator</code></a>,
+<a href = "#CertificateFactory"><code>CertificateFactory</code></a>, 
+<a href = "#KeyStore"><code>KeyStore</code></a>, 
+<a href = "#SecureRandom"><code>SecureRandom</code></a>, 
+<A HREF="../../../api/java/security/cert/CertPathBuilder.html"><code>CertPathBuilder</code></A>, 
+<A HREF="../../../api/java/security/cert/CertPathValidator.html"><code>CertPathValidator</code></A>, and
+<A HREF="../../../api/java/security/cert/CertStore.html"><code>CertStore</code></A>.
+</UL>
+
+
+engine classes<p>
+
+<li>the <a href = "#Key"><code>Key</code></a> interfaces and classes<p>
+
+<li>the <a href = "#AlgSpec">Algorithm Parameter Specification Interfaces and 
+Classes</a> and the 
+<a href = "#KeySpecs">Key Specification Interfaces and Classes</a>
+
+</ul>
+
+<p>
+This section shows the signatures of the main methods in each class
+and interface. Examples for some of these classes
+(<code>MessageDigest</code>, <code>Signature</code>, <code>KeyPairGenerator</code>, 
+<code>SecureRandom</code>, <code>KeyFactory</code>,
+and key specification classes)
+are supplied in the corresponding 
+<a href = "#Examples">Examples</a> sections.
+
+The complete reference documentation for the relevant Security API packages
+can be found in:
+<ul>
+   <LI><a href="../../api/java/security/package-summary.html">
+<code>java.security package summary</code></a>
+   <LI><a href="../../api/java/security/spec/package-summary.html">
+<code>java.security.spec package summary</code></a>
+   <LI><a href="../../api/java/security/interfaces/package-summary.html">
+<code>java.security.interfaces package summary</code></a>
+   <LI><a href="../../api/java/security/cert/package-summary.html">
+<code>java.security.cert package summary</code></a>
+</ul><p>
+
+
+</blockquote>
+
+
+<H2><a name="Provider">The <code>Provider</code> Class</a></H2>
+
+<blockquote>
+
+<p>The term "Cryptographic Service Provider" (used interchangeably 
+with "provider" in this document) refers to a package or  
+set of packages that supply a concrete implementation of a subset 
+of the Java 2 SDK Security API cryptography features. 
+The <code>Provider</code> <em>class</em> is the interface to such 
+a package or set of packages.  It has methods for accessing the 
+provider name, version number, and other information. Please note 
+that in addition to registering implementations of cryptographic 
+services, the <code>Provider</code> class can
+also be used to register implementations of other security services that might 
+get defined as part of the Java 2 SDK Security API or one of its extensions.
+
+<p>To supply implementations of cryptographic services, 
+an entity (e.g., a development group) 
+writes the implementation code and creates a subclass of the 
+<code>Provider</code> class. The constructor of the <code>Provider</code>
+subclass sets the values of various properties; the Java 2 SDK 
+Security API uses these values to look up the services 
+that the provider implements. In other words, the subclass 
+specifies the names of the classes implementing the services. 
+
+<p>There are several types of services that can be implemented by 
+provider packages; for more information, 
+see <a href = "#Engine">Engine Classes and Algorithms</a>.
+
+<p>The different implementations may have different
+characteristics. Some may be software-based, while others may be
+hardware-based. Some may be platform-independent, while others may be
+platform-specific. Some provider source code may be available for
+review and evaluation, while some may not.
+The Java Cryptography Architecture (JCA) lets both end-users and 
+developers decide what their needs
+are. 
+
+<P>In this section we explain how end-users install the
+cryptography implementations that fit their needs, and how developers
+request the implementations that fit theirs.
+
+<blockquote>
+<hr>
+<B>Note:</B> For information about implementing a provider, see
+the guide <a href = "HowToImplAProvider.html">How To Implement a Provider for
+the Java Cryptography Architecture</a>.
+<hr>
+</blockquote>
+
+
+<H3><a name="ProviderImplReq">How Provider Implementations Are Requested 
+and Supplied</a></H3>
+
+<blockquote>
+
+For each <a href = "#Engine">engine class</a> in the API, a particular 
+implementation is requested and instantiated by calling a 
+<code>getInstance</code> method on the engine class, specifying 
+the name of the desired algorithm and, optionally, the name
+of the provider (or the <code>Provider</code> class) whose implementation is desired.
+
+<p>If no provider is specified, <code>getInstance</code> 
+searches the registered providers for an
+implementation of the requested cryptographic service 
+associated with the named algorithm.
+In any given Java Virtual Machine (JVM), providers are 
+<a href = "#ProviderInstalling">installed</a> in a 
+given <i>preference order</i>, the order in which 
+the provider list is searched if a specific provider is not 
+requested. For example, suppose there are two providers 
+installed in a JVM, <code>PROVIDER_1</code> and 
+<code>PROVIDER_2</code>. Assume that: 
+
+<ul>
+<li><code>PROVIDER_1</code> implements SHA1withDSA, SHA-1, MD5, DES, and DES3. <BR>
+<code>PROVIDER_1</code> 
+has preference order 1 (the highest priority).<p>
+<li><code>PROVIDER_2</code> implements SHA1withDSA, MD5withRSA, MD2withRSA, MD2, MD5, 
+RC4, RC5, DES, and RSA. 
+<BR><code>PROVIDER_2</code> has preference order 2.
+</ul>
+
+Now let's look at three scenarios:
+<OL>
+<LI>If we are looking for an MD5 implementation. Both providers
+supply such an implementation. The <code>PROVIDER_1</code> implementation is returned
+since <code>PROVIDER_1</code> has the highest priority and is searched first.
+
+<LI>If we are looking for an MD5withRSA signature
+algorithm, <code>PROVIDER_1</code> is first searched for it. No implementation is
+found, so <code>PROVIDER_2</code> is searched. Since an implementation is found, it
+is returned.
+
+<LI>
+Suppose we are looking for a SHA1withRSA signature
+algorithm. Since no installed provider implements it, a 
+<code>NoSuchAlgorithmException</code> is thrown.
+</OL>
+
+<p>
+The <code>getInstance</code> methods that include a provider argument 
+are for developers who want to specify which provider they want 
+an algorithm from. A federal agency, for example, will want 
+to use a provider implementation that has received federal certification. 
+Let's assume that the SHA1withDSA implementation from
+<code>PROVIDER_1</code> has not received such certification, while the DSA
+implementation of <code>PROVIDER_2</code> has received it.
+
+<p>A federal agency program would then have the following call, specifying
+<code>PROVIDER_2</code> since it has the certified implementation:
+
+<blockquote>
+<pre>
+Signature dsa = Signature.getInstance("SHA1withDSA", "PROVIDER_2");
+</pre>
+</blockquote>
+
+<p>In this case, if <code>PROVIDER_2</code> was not installed, a
+<code>NoSuchProviderException</code> would be thrown, even if another 
+installed provider implements the algorithm requested. 
+
+<p>A program also has the option of getting a list of all 
+the installed providers
+(using the <code>getProviders</code> method in the 
+<a href = "#Security"><code>Security</code></a> class) 
+and choosing one from the list.
+
+</blockquote>
+
+<H3><a name="ProviderInstalling">Installing Providers</a></H3>
+
+<blockquote>
+
+<p>There are two parts to installing a provider: installing the provider
+package classes, and configuring the provider.
+
+<H4>Installing the Provider Classes</H4>
+
+<p>There are two possible ways to install the provider classes:
+
+<ol>
+
+<li>Place a zip or JAR file containing the classes
+anywhere in your classpath.<p>
+
+<li>Supply your provider JAR file as an "installed" or "bundled"
+extension. For more information on how to deploy an extension, 
+see <a href = "../extensions/spec.html#deployment">
+How is an extension deployed?</a>.
+
+</ol>
+
+<H4>Configuring the Provider</H4>
+
+<p>The next step is to add the provider to your list of approved
+providers. This step can be done statically by editing the 
+<code>java.security</code> file in the <code>lib/security</code> 
+directory of the SDK; therefore, if the SDK is installed in a directory 
+called <code>j2sdk1.2</code>, the file would be 
+<code>j2sdk1.2/lib/security/java.security</code>.
+
+One of the types of properties you can set in <code>java.security</code>
+has the following form:
+
+<blockquote>
+<pre>
+security.provider.<i>n</i>=<i>masterClassName</i>
+</pre>
+</blockquote>
+
+<p>This declares a provider, and specifies its preference order
+<i>n</i>. The preference order is the order in which providers are
+searched for requested algorithms (when no specific provider is 
+requested). The order is 1-based: 1 is the most preferred, followed
+by 2, and so on.
+
+<p><i><code>masterClassName</code></i> must specify  the provider's master
+class. The provider's documentation will specify its master
+class. This class is always a subclass of the <code>Provider</code>
+class. The subclass constructor sets the values of various properties that are 
+required for the Java Cryptography API to look up the algorithms or other 
+facilities the provider implements.
+
+<p>Suppose that the master class is <code>COM.acme.provider.Acme</code>,
+and that you would like to configure <code>Acme</code> as your third preferred
+provider. To do so, you would add the following line to the <code>java.security</code>
+file:
+
+<blockquote>
+<pre>
+security.provider.3=COM.acme.provider.Acme
+</pre>
+</blockquote>
+
+Providers may also be registered dynamically. To do so, call either 
+the <code>addProvider</code> or
+<code>insertProviderAt</code> method in the <code>Security</code> class.
+This type of registration is not persistent and can only be
+done by "trusted" programs. See <a href = "#Security">Security</a>.
+
+
+</blockquote>
+
+<H3><code>Provider</code> Class Methods</H3>
+
+<blockquote>
+
+<p>Each <code>Provider</code>class instance has a (currently case-sensitive) name, 
+a version number, and a string 
+description of the provider and its services. You can query the <code>Provider</code>
+instance for this information by calling the following methods:
+
+<blockquote>
+<pre>
+public String getName()
+public double getVersion()
+public String getInfo()
+</pre>
+</blockquote>
+
+</blockquote>
+</blockquote>
+
+<H2><a name="Security">The <code>Security</code> Class</a></H2>
+
+<blockquote>
+
+<p>
+The <code>Security</code> class manages installed providers and security-wide
+properties. It only contains static methods and is never instantiated.
+
+The methods for adding or removing providers, and for 
+setting <code>Security</code> properties, can only be executed by a
+trusted program. Currently, a "trusted program" is either 
+
+<ul>
+
+<li>a local application not running under a security manager, or<p>
+
+<li>an applet or application with permission to execute the 
+specified method (see below).
+
+</ul>
+
+The determination that code is considered trusted to perform
+an attempted action (such as adding a provider)
+requires that the applet is granted permission for that particular
+action. 
+
+<p>For example, in the Policy reference implementation, 
+the policy configuration file(s) for a SDK installation
+specify what permissions (which types of system resource accesses) are
+allowed by code from specified code sources.
+(See below and the 
+<a href="PolicyFiles.html">
+"Default Policy Implementation and Policy File Syntax"</a> and 
+<a href="spec/security-spec.doc.html"> 
+"Java Security Architecture Specification"</a> files 
+for more information.)
+
+<p>Code being executed is always considered to come from a particular
+"code source". The code source includes not only the location (URL)
+where the applet originated from, but also a reference to the public key(s) 
+corresponding to the private key(s) used to sign the code.
+Public keys in a code source are referenced by (symbolic) alias
+names from the user's <a href = "#KeyManagement">keystore</a> .
+
+<p>In a policy configuration file, a code source is represented by two components:
+a code base (URL), and an alias name (preceded by <code>signedBy</code>), where
+the alias name identifies the keystore entry containing the public key 
+that must be used to verify the code's signature.
+
+<p>Each "grant" statement in such a file grants a specified code source 
+a set of permissions, specifying which actions are allowed.
+
+<p>Here is a sample policy configuration file:
+  
+<blockquote>
+<pre>
+grant codeBase "file:/home/sysadmin/", signedBy "sysadmin" {
+    permission java.security.SecurityPermission "insertProvider.*";
+    permission java.security.SecurityPermission "removeProvider.*";
+    permission java.security.SecurityPermission "putProviderProperty.*";
+};
+</pre>
+</blockquote>
+
+This configuration file specifies that <i>only</i> code 
+loaded from a signed JAR file from beneath the <code>/home/sysadmin/</code> 
+directory on the local file system can add or remove providers 
+or set provider properties. 
+(Note that the signature of the JAR file can be verified using the public key 
+referenced by the alias name <code>sysadmin</code> in the user's keystore.) 
+
+<p>Either component of the code source (or both) may be missing. Here's an  
+example of a configuration file where <code>codeBase</code> is missing:
+<blockquote>
+<pre>
+grant signedBy "sysadmin" {
+    permission java.security.SecurityPermission "insertProvider.*";
+    permission java.security.SecurityPermission "removeProvider.*";
+};
+</pre>
+</blockquote>
+If this policy is in effect, code that comes in a JAR File signed by <code>sysadmin</code> 
+can add/remove providers--regardless of where the JAR File originated.
+
+<p>Here's an example without a signer:
+
+<blockquote>
+<pre>
+grant codeBase "file:/home/sysadmin/" {
+    permission java.security.SecurityPermission "insertProvider.*";
+    permission java.security.SecurityPermission "removeProvider.*";
+};
+</pre>
+</blockquote>
+
+In this case, code that comes from anywhere within the <code>/home/sysadmin/</code> 
+directory on the local filesystem can add/remove providers. The code does
+not need to be signed.
+
+<p>An example where neither <code>codeBase</code> nor <code>signedBy</code> is included is:
+
+<blockquote>
+<pre>
+grant {
+    permission java.security.SecurityPermission "insertProvider.*";
+    permission java.security.SecurityPermission "removeProvider.*";
+};
+</pre>
+</blockquote>
+
+Here, with both code source components missing, any code (regardless of where
+it originates, or whether or not it is signed, or who signed
+it) can add/remove providers.
+
+
+<H3>Managing Providers</H3>
+
+<BLOCKQUOTE>
+  <P>The following tables summarize the methods in the <CODE>Security</CODE>
+  class you can use to query which <CODE>Provider</CODE>s are installed,
+  as well as to install or remove providers at runtime.</P>
+
+  <P><TABLE summary="querying providers" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD COLSPAN="2" BGCOLOR="#dedeef">
+      <P><CENTER><B>Quering Providers</B></CENTER></TD>
+    </TR>
+	<thead>
+    <TR>
+      <TH WIDTH="280">
+      <B>Method</B></TH> 
+      <TH WIDTH="420">
+      <B>Description</B></TH> 
+    </TR>
+	</thead>
+    <TR>
+      <TD WIDTH="280">
+      <CODE>static Provider[] getProviders()</CODE></TD> 
+      <TD WIDTH="420">
+      Returns an array containing all the installed providers
+      (technically, the <CODE>Provider</CODE>
+      subclass for each package provider). The order of the <CODE>
+      Provider</CODE>s in the array is their preference
+      order.</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="280">
+      <CODE>static Provider getProvider<BR>
+      (String providerName)</CODE></TD> 
+      <TD WIDTH="420">
+      Returns the <CODE>Provider</CODE> named
+      <CODE>providerName</CODE>. It returns
+      <CODE>null</CODE> if the <CODE>Provider</CODE>
+      is not found.</TD> 
+    </TR>
+  </TABLE></P>
+  <P><TABLE WIDTH="700" summary="adding providers" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD COLSPAN="2" BGCOLOR="#dedeef">
+      <P><CENTER><B>Adding Providers</B></CENTER></TD>
+    </TR>
+	<thead>
+    <TR>
+      <TH WIDTH="280">
+      <B>Method</B></TH> 
+      <TH WIDTH="420">
+      <B>Description</B></TH> 
+    </TR>
+	</thead>
+    <TR>
+      <TD>
+      <PRE><CODE>static int <BR>addProvider(Provider provider)</CODE></PRE>
+</TD>
+      <TD>
+      Adds a <CODE>Provider</CODE>
+      to the end of the list of installed <CODE>Provider</CODE>s.
+      It returns the preference position in which the <CODE>Provider</CODE>
+      was added, or <CODE>-1</CODE> if the <CODE>Provider</CODE> was not added because it was
+      already installed.</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <CODE>static int insertProviderAt<BR>
+      (Provider provider, int position)</CODE>
+</TD>
+      <TD>
+      <P>Adds a new <CODE>Provider</CODE> at
+      a specified position. If the given provider
+      is installed at the requested position, the provider formerly
+      at that position and all providers with a position greater than
+      <CODE>position</CODE> are shifted up one
+      position (towards the end of the list). 
+      This method returns the preference position in which
+      the <CODE>Provider</CODE> was added, or
+      <CODE>-1</CODE> if the <CODE>Provider</CODE>
+      was not added because it was already installed.</TD> 
+    </TR>
+  </TABLE></P>
+  <P><TABLE WIDTH="700" summary="removing providers" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD COLSPAN="2" BGCOLOR="#dedeef">
+      <P><CENTER><B>Removing Providers</B></CENTER></TD>
+    </TR>
+	<thead>
+    <TR>
+      <TH WIDTH="280">
+      &nbsp;<B>Method</B></TH> 
+      <TH WIDTH="420">
+      &nbsp;<B>Description</B></TH> 
+    </TR>
+	</thead>
+    <TR>
+      <TD WIDTH="280">
+      <CODE>static void removeProvider(String name)</CODE>
+</TD>
+      <TD WIDTH="420">
+      Removes the <CODE>Provider</CODE> with
+      the specified name. It returns silently if the provider is not
+      installed. When the specified provider is removed, all providers
+      located at a position greater than where the specified provider
+      was are shifted down one position (towards the head of the list
+      of installed providers).</TD> 
+    </TR>
+  </TABLE></P>
+
+  <blockquote>
+  <HR ALIGN=LEFT>
+  <B>Note:</B> If you want to change the preference position
+  of a provider, you must first remove it, and then insert it back
+  in at the new preference position.
+  <HR ALIGN=LEFT>
+  </BLOCKQUOTE>
+
+  </BLOCKQUOTE>
+
+<H3>Security Properties</H3>
+
+<blockquote>
+
+<p>The <code>Security</code> class maintains a list of system-wide security
+properties. These properties are accessible and settable by a
+trusted program via the following methods:
+
+<BLOCKQUOTE>
+<pre>
+static String getProperty(String key)
+static void setProperty(String key, String datum)
+</pre>
+</BLOCKQUOTE>
+
+
+</blockquote>
+
+</blockquote>
+
+
+<H2><a name="MessageDigest">The <code>MessageDigest</code> Class</a></H2>
+
+<blockquote>
+
+<P>
+The <code>MessageDigest</code> class is an <a href = "#Engine">engine class</a> 
+designed to provide
+the functionality of cryptographically secure message digests
+such as SHA-1 or MD5. A cryptographically secure message digest
+takes arbitrary-sized input (a byte array), and generates a fixed-size
+output, called a <I>digest</I> or hash. A digest has two 
+properties:
+<UL>
+<LI>It should be computationally infeasible to find two messages that
+hashed to the same value.<p>
+<LI>The digest should not reveal anything about the input that was
+used to generate it.
+</UL>
+
+<P>
+Message digests are used to produce unique and reliable identifiers
+of data. They are sometimes called the "digital fingerprints"
+of data.
+
+
+<H3>Creating a <code>MessageDigest</code> Object</H3>
+
+<blockquote>
+
+<P>
+The first step for computing a digest is to create a message digest
+instance. As with all engine classes, the 
+way to get a <code>MessageDigest</code> object for a particular type of message 
+digest algorithm is to call the <code>getInstance</code>
+static factory method on the <code>MessageDigest</code> class:
+
+<blockquote>
+<pre>
+static MessageDigest getInstance(String algorithm) 
+</pre>
+</blockquote>
+
+<blockquote>
+<HR>
+<B>Note:</B> The algorithm name is not case-sensitive. For example, all the
+following calls are equivalent:
+
+<blockquote>
+<pre>
+MessageDigest.getInstance("SHA-1")
+MessageDigest.getInstance("sha-1")
+MessageDigest.getInstance("sHa-1")
+</pre>
+</blockquote>
+<HR>
+</blockquote>
+
+<p>A caller may optionally specify the name of a provider or a  
+<code>Provider</code> instance, 
+which guarantees that the implementation of the algorithm requested is from the
+specified provider:
+<P>
+
+<blockquote>
+<pre>
+static MessageDigest getInstance(String algorithm, String provider)
+static MessageDigest getInstance(String algorithm, Provider provider)
+</pre>
+</blockquote>
+
+<P>
+A call to <code>getInstance</code> returns an initialized message 
+digest object. It thus does not need further initialization.
+
+
+</blockquote>
+
+<H3>Updating a Message Digest Object</H3>
+
+<blockquote>
+
+<P>
+The next step for calculating the digest of some data is to supply
+the data to the initialized
+message digest object. This is done by calling one of 
+the <code>update</code> methods:
+<P>
+
+<blockquote>
+<pre>
+void update(byte input)
+void update(byte[] input)
+void update(byte[] input, int offset, int len)
+</pre>
+</blockquote>
+
+
+</blockquote>
+
+<H3>Computing the Digest</H3>
+
+<blockquote>
+
+<P>
+After the data has been supplied by calls to <code>update</code> methods,
+the digest is computed using a call to one of the
+<code>digest</code> methods:
+<P>
+
+<blockquote>
+<pre>
+byte[] digest()
+byte[] digest(byte[] input)
+int digest(byte[] buf, int offset, int len)
+</pre>
+</blockquote>
+
+<P>The first two methods return the computed digest.
+The latter method stores the computed digest in the provided buffer
+<code>buf</code>, starting at <code>offset</code>. <code>len</code> is
+the number of bytes in <code>buf</code> allotted for the digest.
+The method returns the number of bytes actually stored in <code>buf</code>.
+
+<P>
+A call to the <code>digest</code> method that takes an input byte array 
+argument is equivalent to making a call to
+
+<blockquote>
+<pre>
+void update(byte[] input)
+</pre>
+</blockquote>
+
+with the specified input, followed by a call to the <code>digest</code>
+method without any arguments.
+
+<p>
+Please see the <a href = "#MDEx">Examples</a> section for more details.
+
+</blockquote>
+
+</blockquote>
+
+
+<H2><a name="Signature">The <code>Signature</code> Class</a></H2>
+
+<blockquote>
+
+The <code>Signature</code> class is an <a href = "#Engine">engine class</a> 
+designed to provide the
+functionality of a cryptographic digital signature algorithm such as DSA or
+RSA with MD5. A cryptographically secure signature algorithm takes
+arbitrary-sized input and a private key and generates a relatively
+short (often fixed-size) string of bytes, called the <i>signature</i>, 
+with the following properties:
+
+<UL>
+<LI>Given the public key corresponding to the private key used
+to generate the signature, it should be possible to verify the
+authenticity and integrity of the input.<p>
+<LI>The signature and the public key do not reveal anything about
+the private key.
+</UL>
+
+<P>
+A <code>Signature</code> object can be used to sign data. It can also be used to 
+verify whether or not an alleged signature is in fact the authentic 
+signature of the data associated with it. 
+
+Please see the <a href = "#SigEx">Examples</a> section for an example
+of signing and verifying data.
+
+<H3><code>Signature</code> Object States</H3>
+
+<blockquote>
+
+<code>Signature</code> objects are modal objects. This means that a <code>Signature</code> 
+object is always in a given state, where it may only do
+one type of operation. States are represented as final integer constants
+defined in their respective classes.
+<P>
+The three states a <code>Signature</code> object may have are:
+<UL>
+<LI><code>UNINITIALIZED</code>
+<LI><code>SIGN</code>
+<LI><code>VERIFY</code>
+</UL>
+
+When it is first created, a <code>Signature</code> object is in the 
+<code>UNINITIALIZED</code> state. 
+The <code>Signature</code> class defines two initialization methods,
+<code>initSign</code> and <code>initVerify</code>, which change the
+state to <code>SIGN</code> and <code>VERIFY</code>, respectively.
+
+</blockquote>
+
+<H3>Creating a <code>Signature</code> Object</H3>
+
+<blockquote>
+
+The first step for signing or verifying a signature is to create a 
+<code>Signature</code> instance.  As with all engine classes, the 
+way to get a <code>Signature</code> object for a particular type of signature
+algorithm is to call the <code>getInstance</code>
+static factory method on the <code>Signature</code> class:
+
+<blockquote>
+<pre>
+static Signature getInstance(String algorithm)
+</pre>
+</blockquote>
+
+<blockquote>
+<HR>
+<B>Note:</B> The algorithm name is not case-sensitive.
+<HR>
+</blockquote>
+
+A caller may optionally specify the name of a provider or the 
+<code>Provider</code> class, which will 
+guarantee that the implementation of the algorithm requested is from the
+named provider:
+<P>
+
+<blockquote>
+<pre>
+static Signature getInstance(String algorithm, String provider)
+static Signature getInstance(String algorithm, Provider provider)
+
+</pre>
+</blockquote>
+
+</blockquote>
+
+<H3>Initializing a <code>Signature</code> Object</H3>
+
+<blockquote>
+<P>
+A <code>Signature</code> object must be initialized before it is used. The 
+initialization method depends on whether the object is going 
+to be used for signing or for verification.
+
+<p>If it is going to be used for signing, the object 
+must first be initialized with the private key of the entity whose 
+signature is going to be generated. This initialization is done by 
+calling the method:
+
+<blockquote>
+<pre>
+final void initSign(PrivateKey privateKey)
+</pre>
+</blockquote>
+
+This method puts the <code>Signature</code> object in the <code>SIGN</code> state.
+
+<p>If instead the <code>Signature</code> object is going to be used for verification, 
+it must first be initialized with the public key of the entity whose 
+signature is going to be verified. This initialization is done by 
+calling either of these methods:
+<P>
+
+<pre>
+    final void initVerify(PublicKey publicKey)
+
+    final void initVerify(Certificate certificate)
+</pre>
+
+<P>
+This method puts the <code>Signature</code> object in the 
+<code>VERIFY</code> state.
+
+</blockquote>
+
+<H3>Signing</H3>
+
+<blockquote>
+
+<P>
+If the <code>Signature</code> object has been initialized for signing (if it
+is in the <code>SIGN</code> state), the data to be signed can then be supplied 
+to the object. This is done by making one or more calls to
+one of the <code>update</code> methods:
+<P>
+
+<blockquote>
+<pre>
+final void update(byte b)
+final void update(byte[] data)
+final void update(byte[] data, int off, int len)
+</pre>
+</blockquote>
+
+<P>
+Calls to the <code>update</code> method(s) should be made until 
+all the data to be signed has been supplied to the 
+<code>Signature</code> object.
+
+<P>
+To generate the signature, simply call one of the <code>sign</code> methods:
+
+<blockquote>
+<pre>
+final byte[] sign()
+final int sign(byte[] outbuf, int offset, int len)
+</pre>
+</blockquote>
+
+<P>
+The first method returns the signature result in a byte array. 
+The second stores the signature result in the provided buffer
+<i>outbuf</i>, starting at <i>offset</i>. <i>len</i> is
+the number of bytes in <i>outbuf</i> allotted for the signature.
+The method returns the number of bytes actually stored.
+
+<p>Signature encoding is algorithm specific. 
+See <a href = "#AppB">Appendix B</a> for 
+more information about
+the use of ASN.1 encoding in the Java Cryptography Architecture. 
+
+<p>A call to a <code>sign</code> method resets the signature object to 
+the state it was in when previously initialized for signing via a
+call to <code>initSign</code>. That is, the object is 
+reset and available to generate another signature with the same
+private key, if desired, via new calls to <code>update</code> and 
+<code>sign</code>. 
+
+<p>Alternatively, a new call can be made to <code>initSign</code>
+specifying a different private key, or
+to <code>initVerify</code> (to initialize the <code>Signature</code> object to 
+verify a signature).
+  
+
+</blockquote>
+
+
+<H3>Verifying</H3>
+
+<blockquote>
+
+<P>
+If the <code>Signature</code> object has been initialized for verification (if it
+is in the <code>VERIFY</code> state), it can then verify
+if an alleged signature is in fact the authentic signature 
+of the data associated with it. To start the process, the data to be 
+verified (as opposed to the signature itself) is supplied
+to the object. The data is passed to the object by calling 
+one of the <code>update</code> methods:
+
+<blockquote>
+<pre>
+final void update(byte b)
+final void update(byte[] data)
+final void update(byte[] data, int off, int len)
+</pre>
+</blockquote>
+
+<P>
+Calls to the <code>update</code> method(s) should be made until 
+all the data to be verified has been supplied to the 
+<code>Signature</code> object. 
+The signature can now be verified by calling one of 
+the <code>verify</code> methods:
+
+<blockquote>
+<pre>
+final boolean verify(byte[] signature)
+
+final boolean verify(byte[] signature, int offset, int length)
+</pre>
+</blockquote>
+
+<P>
+The argument must be a byte array containing the signature. 
+The argument must be a byte array containing the 
+signature. This byte array would hold the signature bytes 
+which were returned by a previous call to one of the <code>sign</code> methods.
+
+<p>
+The <code>verify</code> method returns a <code>boolean</code> indicating
+whether or not the 
+encoded signature is the authentic signature of the data
+supplied to the <code>update</code> method(s).
+
+<p>A call to the <code>verify</code> method resets the signature object to 
+its state when it was initialized for verification via a 
+call to <code>initVerify</code>. That is, the object is 
+reset and available to verify another signature from the identity
+whose public key was specified in the call to <code>initVerify</code>.     
+
+<p>Alternatively, a new call can be made to <code>initVerify</code>
+specifying a different public key (to initialize the <code>Signature</code> 
+object for verifying a signature from a different entity), or
+to <code>initSign</code> (to initialize the <code>Signature</code> object for 
+generating a signature).
+
+</blockquote>
+
+</blockquote>
+
+
+<H2><a name="AlgParms">Algorithm Parameters Classes</a></H2>
+
+<blockquote>
+
+
+<H3><a name="AlgSpec">Algorithm Parameter Specification Interfaces and 
+Classes</a></H3>
+
+<blockquote>
+
+<P>An algorithm parameter specification is a transparent representation of 
+the sets of parameters used with an algorithm.
+
+<p>A <i>transparent</i> representation of a set of parameters 
+means that you can access each parameter value in the set individually. You can 
+access these values  through one of the <code>get</code> methods defined
+in the corresponding specification class (e.g., <code>DSAParameterSpec</code>
+defines <code>getP</code>, <code>getQ</code>, and
+<code>getG</code> methods, to access <code>p</code>, <code>q</code>, 
+and <code>g</code>, respectively).
+
+<p>In contrast, the 
+<a href = "#AlgorithmParameters"><code>AlgorithmParameters</code></a> class supplies 
+an <i>opaque</i> representation, in which
+you have no direct access to the parameter fields. 
+You can only get the name of the algorithm associated with the
+parameter set (via <code>getAlgorithm</code>) and some kind of encoding for the 
+parameter set (via <code>getEncoded</code>).
+
+<p>The algorithm parameter specification interfaces and classes in 
+the <code>java.security.spec</code> package are described in the following sections.
+
+
+<H3><a name="AlgorithmParameterSpec">The <code>AlgorithmParameterSpec</code> Interface</a></H3>
+
+<blockquote>
+
+<code>AlgorithmParameterSpec</code>  is an interface to a transparent specification of
+cryptographic parameters.
+
+<p>This interface contains no methods or constants. Its only purpose
+is to group (and provide type safety for) all parameter specifications.
+All parameter specifications must implement this interface.
+
+</blockquote>
+
+
+<H3><a name="DSAParameterSpec">The <code>DSAParameterSpec</code> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <code>AlgorithmParameterSpec</code> interface) 
+specifies the set of parameters used with the DSA algorithm.
+It has the following methods:
+
+<blockquote>
+<pre>
+BigInteger getP()
+BigInteger getQ()
+BigInteger getG()
+</pre>
+</blockquote>
+
+These methods return the DSA algorithm
+parameters: the prime <code>p</code>, 
+the sub-prime <code>q</code>, and the base <code>g</code>.
+
+</blockquote>
+
+</blockquote>
+
+
+<H3><a name="AlgorithmParameters">The <code>AlgorithmParameters</code>  Class</a></H3>
+
+<blockquote>
+
+The <code>AlgorithmParameters</code> class is an <a href = "#Engine">engine class</a> 
+that provides an opaque representation of cryptographic parameters.
+
+<p>An <i>opaque</i> representation is one in which
+you have no direct access to the parameter fields;
+you can only get the name of the algorithm associated with the
+parameter set and some kind of encoding for the 
+parameter set. This is in contrast to a
+<i>transparent</i> representation of parameters, in which you can access
+each value individually, through one of the <code>get</code> methods defined
+in the corresponding <a href = "#AlgSpec">specification class</a>.
+Note that you can call the <code>AlgorithmParameters</code>  <code>getParameterSpec</code> method to
+convert an <code>AlgorithmParameters</code> object to a transparent
+specification (see the following section).
+
+
+<H3>Creating an <code>AlgorithmParameters</code> Object</H3>
+
+<blockquote>
+
+<P>
+As with all engine classes, the 
+way to get an <code>AlgorithmParameters</code> object for a particular type of 
+algorithm is to call the <code>getInstance</code>
+static factory method on the <code>AlgorithmParameters</code> class:
+<P>
+
+<blockquote>
+<pre>
+static AlgorithmParameters getInstance(String algorithm) 
+</pre>
+</blockquote>
+
+<blockquote>
+<hr>
+<B>Note:</B> The algorithm name is not case-sensitive.
+<hr>
+</blockquote>
+
+A caller may optionally specify the name of a provider or the 
+<code>Provider</code> class, which will 
+guarantee that the algorithm parameter implementation requested is from
+the named provider:
+
+<blockquote>
+<pre>
+static AlgorithmParameters getInstance(String algorithm, String provider)
+static AlgorithmParameters getInstance(String algorithm, Provider provider)
+
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+<H3>Initializing an <code>AlgorithmParameters</code>  Object</H3>
+
+<blockquote>
+
+<p>Once an <code>AlgorithmParameters</code>  object is instantiated, it must be
+initialized via a call to <code>init</code>, using an appropriate parameter
+specification or parameter encoding:
+
+<blockquote>
+<pre>
+void init(AlgorithmParameterSpec paramSpec) 
+void init(byte[] params)
+void init(byte[] params, String format)
+</pre>
+</blockquote>
+
+In these <code>init</code> methods, 
+<code>params</code> is an array containing the encoded parameters, 
+and <code>format</code> is the name of the decoding format. In the 
+<code>init</code> method with a <code>params</code> argument but 
+no <code>format</code> argument, the
+primary decoding format for parameters is used. The primary decoding
+format is ASN.1, if an ASN.1 specification for the parameters
+exists.
+
+<blockquote>
+<hr>
+<B>Note:</B> <code>AlgorithmParameters</code> objects can 
+be initialized only once. They are not reusable.
+<hr>
+</blockquote>
+
+</blockquote>
+
+<H3>Obtaining the Encoded Parameters</H3>
+
+<blockquote>
+
+<p>A byte encoding of the parameters represented in an <code>AlgorithmParameters</code> 
+object may be obtained via a call to <code>getEncoded</code>:
+
+<blockquote>
+<pre>
+byte[] getEncoded() 
+</pre>
+</blockquote>
+
+This method returns the parameters in their primary encoding format.
+The primary encoding format for parameters is ASN.1, if an ASN.1
+specification for this type of parameters exists.
+
+<p>If you want the parameters returned in a specified encoding format,
+use
+<blockquote>
+<pre>
+byte[] getEncoded(String format)
+</pre>
+</blockquote>
+
+If <code>format</code> is null, the primary encoding format for parameters is used,
+as in the other <code>getEncoded</code> method.
+
+<blockquote>
+<hr>
+<B>Note:</B> In the default <code>AlgorithmParameters</code> 
+ implementation, supplied 
+ by the "SUN" provider, the <code>format</code> argument 
+ is currently ignored.
+<hr>
+</blockquote>
+
+
+</blockquote>
+
+
+<H3>Converting an <code>AlgorithmParameters</code> Object to a Transparent Specification</H3>
+
+<blockquote>
+
+<p>A transparent parameter specification for the algorithm parameters
+may be obtained from an <code>AlgorithmParameters</code> object via a call to
+<code>getParameterSpec</code>:
+
+<blockquote>
+<pre>
+AlgorithmParameterSpec getParameterSpec(Class paramSpec)
+</pre>
+</blockquote>
+
+<code>paramSpec</code> identifies the specification class in which 
+the parameters should be returned. The specification class could be, 
+for example, <code>DSAParameterSpec.class</code> to indicate that the
+parameters should be returned in an instance of the 
+<a href = "#DSAParameterSpec"><code>DSAParameterSpec</code></a> class.
+(This class is in the <code>java.security.spec</code> package.)
+
+</blockquote>
+
+</blockquote>
+
+<H3><a name="AlgorithmParameterGenerator">The 
+<code>AlgorithmParameterGenerator</code> Class</a></H3>
+
+<blockquote>
+
+The <code>AlgorithmParameterGenerator</code> class 
+is an <a href = "#Engine">engine class</a> 
+used to generate a set of parameters suitable for a certain algorithm
+(the algorithm specified when an <code>AlgorithmParameterGenerator</code> instance
+is created).
+
+<H3>Creating an <code>AlgorithmParameterGenerator</code> Object</H3>
+
+<blockquote>
+
+<P>
+As with all engine classes, the 
+way to get an <code>AlgorithmParameterGenerator</code> object for a particular type of 
+algorithm is to call the <code>getInstance</code>
+static factory method on the <code>AlgorithmParameterGenerator</code>  class:
+<P>
+
+<blockquote>
+<pre>
+static AlgorithmParameterGenerator getInstance(
+                                   String algorithm)
+</pre>
+</blockquote>
+
+<blockquote>
+<hr>
+<b>Note:</b> The algorithm name is not case-sensitive. 
+<hr>
+</blockquote>
+
+<P>
+A caller may optionally specify the name of a provider 
+or the <code>Provider</code> class, which will 
+guarantee that the algorithm parameter generator implementation is from the
+named provider:
+
+<blockquote>
+<pre>
+static AlgorithmParameterGenerator getInstance(
+                                   String algorithm, 
+                                   String provider)
+
+static AlgorithmParameterGenerator getInstance(
+                                   String algorithm, 
+                                   Provider provider)
+</pre>
+</blockquote>
+</blockquote>
+
+
+<H3>Initializing an <code>AlgorithmParameterGenerator</code> Object</H3>
+
+<blockquote>
+
+<P>The <code>AlgorithmParameterGenerator</code> object can be initialized
+in two different ways: an algorithm-independent manner or an
+algorithm-specific manner. 
+
+<P>The algorithm-independent approach uses the fact that all parameter
+generators share the concept of a "size" and a
+source of randomness. The measure of size is universally shared 
+by all algorithm parameters, though it is interpreted differently
+for different algorithms. For example, in the case of parameters
+for the DSA algorithm, "size" corresponds to the size of the
+prime modulus, in bits.
+(See <a href = "#AppB">Appendix B</a>: Algorithms for 
+information about the sizes for specific algorithms.) 
+When using this approach, algorithm-specific parameter generation
+values--if any--default to some standard values. 
+
+One <code>init</code> method that
+takes these two universally shared types of arguments:
+
+<blockquote>
+<pre>
+void init(int size, SecureRandom random);
+</pre>
+</blockquote>
+
+Another <code>init</code> method takes only a <code>size</code>
+argument and uses a system-provided source of randomness:
+
+<blockquote>
+<pre>
+void init(int size)
+</pre>
+</blockquote>
+
+<P>A third approach initializes a parameter generator object
+using algorithm-specific semantics, which are represented by a set of
+algorithm-specific parameter generation values supplied in an
+<code>AlgorithmParameterSpec</code> object:
+
+<blockquote>
+<pre>
+void init(AlgorithmParameterSpec genParamSpec,
+                          SecureRandom random)
+
+void init(AlgorithmParameterSpec genParamSpec)
+</pre>
+</blockquote>
+
+To generate Diffie-Hellman system parameters, for example, the 
+parameter generation values usually
+consist of the size of the prime modulus and the size of the
+random exponent, both specified in number of bits.
+(The Diffie-Hellman algorithm has been part of the JCE since  
+JCE 1.2.)
+
+</blockquote>
+
+
+<H3>Generating Algorithm Parameters</H3>
+
+<blockquote>
+
+Once you have created and initialized an <code>AlgorithmParameterGenerator</code> 
+object, you can use the
+<code>generateParameters</code> method to generate the algorithm parameters:
+
+<blockquote>
+<pre>
+AlgorithmParameters generateParameters()
+</pre>
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+
+
+
+<H2><a name="Key"><code>Key</code> Interfaces</a></H2>
+
+<blockquote>
+
+<P>
+The <code>Key</code> interface is the top-level interface for all opaque keys. It
+defines the functionality shared by all opaque key objects. 
+
+<p>An <i>opaque</i> key representation is one in which
+you have no direct access to the key material that constitutes a key.
+In other words: "opaque" gives you limited access to the key--just
+the three methods defined by the <code>Key</code> interface (see below): 
+<code>getAlgorithm</code>, <code>getFormat</code>, and <code>getEncoded</code>.
+
+This is in contrast to a
+<i>transparent</i> representation, in which you can access
+each key material value individually, through one of the <code>get</code> 
+methods defined in the corresponding <a href = "#KeySpec">specification class</a>.
+
+<p>All opaque keys have three characteristics:
+
+<blockquote>
+<DL>
+<DT><b>An Algorithm</b></DT>
+
+<DD>
+The key algorithm for that key. The key algorithm is usually
+an encryption or asymmetric operation algorithm (such as DSA or
+RSA), which will work with those algorithms and with related
+algorithms (such as MD5 with RSA, SHA-1 with RSA, etc.)
+The name of the algorithm of a key is obtained using this method:
+
+<blockquote>
+<pre>
+String getAlgorithm()
+</pre>
+</blockquote>
+
+
+<DT><B>An Encoded Form</b></DT>
+
+<DD>
+The external encoded form for the key used when a standard
+representation of the key is needed outside the Java Virtual Machine,
+as when transmitting the key to some other party. The key
+is encoded according to a standard format (such as X.509
+or PKCS #8), and is returned using the method:
+<P>
+
+<blockquote>
+<pre>
+byte[] getEncoded()
+</pre>
+</blockquote>
+
+
+<DT><B>A Format</b></DT>
+
+<DD>
+The name of the format of the encoded key. It is returned by 
+the method:
+<blockquote>
+<pre>
+String getFormat()
+</pre>
+</blockquote>
+</DL>
+</blockquote>
+
+Keys are generally obtained through key generators, certificates,
+key specifications (using a <a href = "#KeyFactory"><code>KeyFactory</code></a>),
+or a <a href = "#KeyStore"><code>KeyStore</code></a> implementation accessing 
+a keystore database used to manage keys. 
+
+<p>It is possible to parse encoded keys, in an algorithm-dependent 
+manner, using a <a href = "#KeyFactory"><code>KeyFactory</code></a>.
+
+<p>It is also possible to parse certificates, using a
+<a href = "#CertificateFactory"><code>CertificateFactory</code></a>.
+
+
+<P>
+Here is a list of interfaces which extend the <code>Key</code> 
+interface in the <code>java.security.interfaces</code> package: 
+<TABLE summary="layout" >
+<TR>
+
+<TD>
+<UL>
+<LI><a href = "../../api/javax/crypto/interfaces/DHPrivateKey.html">DHPrivateKey</A>
+<LI><a href = "../../api/javax/crypto/interfaces/DHPublicKey.html">DHPublicKey</A>
+<LI><a href = "../../api/java/security/interfaces/DSAPrivateKey.html">DSAPrivateKey</A> 
+<LI><a href = "../../api/java/security/interfaces/DSAPublicKey.html">DSAPublicKey</A> 
+<LI><a href = "../../api/javax/crypto/interfaces/PBEKey.html">PBEKey</A> 
+<LI><a href = "../../api/java/security/PrivateKey.html">PrivateKey</A> 
+</UL>
+</TD>
+<TD>
+<UL>
+<LI><a href = "../../api/java/security/PublicKey.html">PublicKey</A> 
+<LI><a href = "../../api/java/security/interfaces/RSAMultiPrimePrivateCrtKey.html">RSAMultiPrimePrivateCrtKey</A> 
+<LI><a href = "../../api/java/security/interfaces/RSAPrivateCrtKey.html">RSAPrivateCrtKey</A> 
+<LI><a href = "../../api/java/security/interfaces/RSAPrivateKey.html">RSAPrivateKey</A> 
+<LI><a href = "../../api/java/security/interfaces/RSAPublicKey.html">RSAPublicKey</A> 
+<LI><a href = "../../api/javax/crypto/SecretKey.html">SecretKey</A> 
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>The <code>PublicKey</code> and <code>PrivateKey</code> Interfaces</H3>
+
+<blockquote>
+
+<P>
+The <code>PublicKey</code> and <code>PrivateKey</code> interfaces 
+(which both extend the <code>Key</code> 
+interface) are methodless interfaces,
+used for type-safety and type-identification.
+
+</blockquote>
+
+</blockquote>
+
+
+
+<H2><a name="KeySpecs">Key Specification Interfaces and Classes</a></H2>
+
+<blockquote>
+
+<P> Key specifications are transparent representations of the key material
+that constitutes a key. If the key is stored on a hardware device, its
+specification may contain information that helps identify the key on the
+device.
+
+<p>A <i>transparent</i> representation of keys means that you can access
+each key material value individually, through one of the <code>get</code> 
+methods defined 
+in the corresponding specification class. For example, <code>DSAPrivateKeySpec</code>
+defines <code>getX</code>, <code>getP</code>, <code>getQ</code>, and
+<code>getG</code> methods, to access the private key <code>x</code>, 
+and the DSA algorithm
+parameters used to calculate the key: the prime <code>p</code>, 
+the sub-prime <code>q</code>, and the base <code>g</code>.
+
+<p>This representation is contrasted with an <i>opaque</i> representation, 
+as defined by the 
+<a href = "#Key"><code>Key</code></a> interface, in which
+you have no direct access to the key material fields.
+In other words, an "opaque" representation gives you limited access to the 
+key--just the three methods defined by the <code>Key</code> interface: 
+<code>getAlgorithm</code>, <code>getFormat</code>, and <code>getEncoded</code>.
+
+<P> A key may be specified in an algorithm-specific way, or in an
+algorithm-independent encoding format (such as ASN.1).
+For example, a DSA private key may be specified by its components
+<code>x</code>, <code>p</code>, <code>q</code>, and <code>g</code>
+(see <a href = "#DSAPrivateKeySpec"><code>DSAPrivateKeySpec</code></a>), or it may be
+specified using its DER encoding
+(see <a href = "#PKCS8EncodedKeySpec"><code>PKCS8EncodedKeySpec</code></a>).
+
+<p>In the following sections, we discuss the key specification interfaces 
+and classes in the <code>java.security.spec</code> package.
+
+
+<H3><a name="KeySpec">The <code>KeySpec</code> Interface</a></H3>
+
+<blockquote>
+
+<P> This interface contains no methods or constants. Its only purpose
+is to group and provide type safety for all key specifications.
+All key specifications must implement this interface.
+
+</blockquote>
+
+
+<H3><a name="DSAPrivateKeySpec">The <code>DSAPrivateKeySpec</code> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <a href = "#KeySpec"><code>KeySpec</code></a> interface) 
+specifies a DSA private key with its associated parameters.
+<code>DSAPrivateKeySpec</code> has the following methods:
+
+<blockquote>
+<pre>
+BigInteger getX()
+BigInteger getP()
+BigInteger getQ()
+BigInteger getG()
+</pre>
+</blockquote>
+
+These methods return the private key <code>x</code>, and the DSA algorithm
+parameters used to calculate the key: the prime <code>p</code>, 
+the sub-prime <code>q</code>, and the base <code>g</code>.
+
+</blockquote>
+
+
+<H3><a name="DSAPublicKeySpec">The <code>DSAPublicKeySpec</code> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <a href = "#KeySpec"><code>KeySpec</code></a> interface) 
+specifies a DSA public key with its associated parameters.
+<code>DSAPublicKeySpec</code> has the following methods:
+
+<blockquote>
+<pre>
+BigInteger getY()
+BigInteger getP()
+BigInteger getQ()
+BigInteger getG()
+</pre>
+</blockquote>
+
+
+These methods return the public key <code>y</code>, and the DSA algorithm
+parameters used to calculate the key: the prime <code>p</code>, 
+the sub-prime <code>q</code>, and the base <code>g</code>.
+
+</blockquote>
+
+
+<H3><a name="RSAPrivateKeySpec">The <code>RSAPrivateKeySpec</code> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <a href = "#KeySpec"><code>KeySpec</code></a> interface) 
+specifies an RSA private key. <code>RSAPrivateKeySpec</code> has the following methods:
+
+<blockquote>
+<pre>
+BigInteger getModulus()
+BigInteger getPrivateExponent()
+</pre>
+</blockquote>
+
+These methods return the RSA modulus <code>n</code>
+and private exponent <code>d</code> values that constitute
+the RSA private key.
+
+</blockquote>
+
+
+<H3><a name="RSAPrivateCrtKeySpec">The <code>RSAPrivateCrtKeySpec</code> Class</a></H3>
+
+<blockquote>
+
+This class (which extends the 
+<a href = "#RSAPrivateKeySpec"><code>RSAPrivateKeySpec</code></a> class)
+specifies an RSA private key, as
+defined in the PKCS #1 standard, using the
+<i>Chinese Remainder Theorem</i> (CRT) information values.
+<code>RSAPrivateCrtKeySpec</code> has the following methods (in addition to the 
+methods inherited from its superclass <code>RSAPrivateKeySpec</code>):
+
+<blockquote>
+<pre>
+BigInteger getPublicExponent()
+BigInteger getPrimeP()
+BigInteger getPrimeQ()
+BigInteger getPrimeExponentP()
+BigInteger getPrimeExponentQ()
+BigInteger getCrtCoefficient()
+</pre>
+</blockquote>
+
+These methods return the public exponent <code>e</code>
+and the CRT information integers:
+the prime factor <code>p</code> of the modulus <code>n</code>,
+the prime factor <code>q</code> of <code>n</code>, the
+exponent <code>d mod (p-1)</code>,
+the exponent <code>d mod (q-1)</code>, and the Chinese
+Remainder Theorem coefficient <code>(inverse of q) mod p</code>.
+   
+<p>An RSA private key logically consists of only the modulus
+and the private exponent. The presence of the CRT values is
+intended for efficiency.
+
+</blockquote>
+
+
+<H3>
+<a name="RSAMultiPrimePrivateCrtKeySpec">
+The <code>RSAMultiPrimePrivateCrtKeySpec</code> Class</a></H3>
+
+<blockquote>
+
+This class (which extends the 
+<a href = "#RSAPrivateKeySpec"><code>RSAPrivateKeySpec</code></a> class) 
+specifies an RSA multi-prime private key, 
+as defined in the PKCS#1 v2.1, 
+using the Chinese Remainder Theorem (CRT) 
+information values. 
+
+<code>RSAMultiPrimePrivateCrtKeySpec</code> 
+has the following methods (in addition to the 
+methods inherited from its superclass <code>RSAPrivateKeySpec</code>):
+
+<blockquote>
+<pre>
+BigInteger getPublicExponent()
+BigInteger getPrimeP()
+BigInteger getPrimeQ()
+BigInteger getPrimeExponentP()
+BigInteger getPrimeExponentQ()
+BigInteger getCrtCoefficient()
+RSAOtherPrimeInfo[] getOtherPrimeInfo()
+</pre>
+</blockquote>
+
+These methods return the public exponent <code>e</code>
+and the CRT information integers:
+the prime factor <code>p</code> of the modulus <code>n</code>,
+the prime factor <code>q</code> of <code>n</code>, the
+exponent <code>d mod (p-1)</code>,
+the exponent <code>d mod (q-1)</code>, and the Chinese
+Remainder Theorem coefficient <code>(inverse of q) mod p</code>.
+<P> 
+Method <code>getOtherPrimeInfo</code> returns a copy of the  
+<code>otherPrimeInfo</code> (defined in 
+<A HREF="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-1/">PKCS#1 v 2.1</A>) 
+or null if there are  
+only two prime factors (<code>p</code> and <code>q</code>). 
+
+   
+<p>An RSA private key logically consists of only the modulus
+and the private exponent. The presence of the CRT values is
+intended for efficiency.
+
+</blockquote>
+
+
+<H3><a name="RSAPublicKeySpec">The <code>RSAPublicKeySpec</code> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <a href = "#KeySpec"><code>KeySpec</code></a> interface) 
+specifies an RSA public key. <code>RSAPublicKeySpec</code> has the following methods:
+
+<blockquote>
+<pre>
+BigInteger getModulus()
+BigInteger getPublicExponent()
+</pre>
+</blockquote>
+
+These methods return the RSA modulus <code>n</code>
+and public exponent <code>e</code> values
+that constitute the RSA public key.
+
+</blockquote>
+
+
+
+<H3><a name="EncodedKeySpec">The <code>EncodedKeySpec</code> Class</a></H3>
+
+<blockquote>
+
+This abstract class (which implements the <a href = "#KeySpec"><code>KeySpec</code></a>
+interface) represents a public or private key in encoded format.
+Its <code>getEncoded</code> method returns the encoded key:
+
+<blockquote>
+<pre>
+abstract byte[] getEncoded();
+</pre>
+</blockquote>
+
+and its <code>getFormat</code> method returns the name of the encoding 
+format:
+
+<blockquote>
+<pre>
+abstract String getFormat();
+</pre>
+</blockquote>
+
+<p>See the next sections for the concrete implementations <code>PKCS8EncodedKeySpec</code> and
+<code>X509EncodedKeySpec</code>.
+
+
+<H4><a name="PKCS8EncodedKeySpec">The <code>PKCS8EncodedKeySpec</code> Class</a></H4>
+
+<blockquote>
+
+This class, which is a subclass of <code>EncodedKeySpec</code>, represents the DER encoding 
+of a private key, according to the
+format specified in the PKCS #8 standard.
+
+Its <code>getEncoded</code> method returns the key bytes, encoded according to
+the PKCS #8 standard. Its <code>getFormat</code> method returns the string 
+"PKCS#8".
+
+</blockquote>
+
+
+<H4><a name="X509EncodedKeySpec">The <code>X509EncodedKeySpec</code> Class</a></H4>
+
+<blockquote>
+
+This class, which is a subclass of <code>EncodedKeySpec</code>, represents the DER 
+encoding of a public key, according to the format specified 
+in the X.509 standard.
+
+Its <code>getEncoded</code> method returns the key bytes, encoded according to
+the X.509 standard. Its <code>getFormat</code> method returns the string 
+"X.509".
+
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+
+
+
+<H2><a name="KeyFactory">The <code>KeyFactory</code> Class</a></H2>
+
+<blockquote>
+
+The <code>KeyFactory</code> class is an <a href = "#Engine">engine class</a> 
+designed to provide conversions between opaque cryptographic keys
+(of type <a href = "#Key"><code>Key</code></a>) and 
+<a href = "#KeySpecs">key specifications</a> (transparent representations 
+of the underlying key material).
+
+<P> Key factories are bi-directional. They allow you to build an opaque
+key object from a given key specification (key material), or to retrieve
+the underlying key material of a key object in a suitable format.
+
+<P> Multiple compatible key specifications can exist for the same key.
+For example, a DSA public key may be specified by its components
+<code>y</code>, <code>p</code>, <code>q</code>, and <code>g</code>
+(see <a href = "#DSAPublicKeySpec"><code>DSAPublicKeySpec</code></a>), or it may be
+specified using its DER encoding according to the X.509 standard
+(see <a href = "#X509EncodedKeySpec"><code>X509EncodedKeySpec</code></a>).
+
+<p>A key factory can be used to translate
+between compatible key specifications.
+Key parsing can be achieved
+through translation between compatible key specifications, e.g., when you
+translate from <code>X509EncodedKeySpec</code> to <code>DSAPublicKeySpec</code>, 
+you basically 
+parse the encoded key into its components. For an example, see 
+the end of the 
+<a href = "#KeyFactoryEx">Generating/Verifying Signatures Using Key 
+Specifications and <code>KeyFactory</code></a> section.
+
+
+<H3>Creating a <code>KeyFactory</code> Object</H3>
+
+<blockquote>
+
+<P>
+As with all engine classes, the 
+way to get a <code>KeyFactory</code> object for a particular type of key
+algorithm is to call the <code>getInstance</code>
+static factory method on the <code>KeyFactory</code> class:
+<P>
+
+<blockquote>
+<pre>
+static KeyFactory getInstance(String algorithm) 
+</pre>
+</blockquote>
+
+<blockquote>
+<hr>
+<b>Note:</B> The algorithm name is not case-sensitive.
+<hr>
+</blockquote>
+
+
+A caller may optionally specify the name of a provider or the 
+<code>Provider</code> class, which will 
+guarantee that the implementation of the key factory
+requested is from the named provider.
+
+
+<blockquote>
+<pre>
+static KeyFactory getInstance(String algorithm, String provider)
+static KeyFactory getInstance(String algorithm, Provider provider)
+</pre>
+</blockquote>
+
+</blockquote>
+
+<H3>Converting Between a Key Specification and a Key Object</H3>
+
+<blockquote>
+
+<p>If you have a key specification for a public key, you can
+obtain an opaque <code>PublicKey</code> object from the specification by using
+the <code>generatePublic</code> method:
+
+<blockquote>
+<pre>
+PublicKey generatePublic(KeySpec keySpec)
+</pre>
+</blockquote>
+
+<p>Similarly, if you have a key specification for a private key, you can
+obtain an opaque <code>PrivateKey</code> object from the specification by using
+the <code>generatePrivate</code> method:
+
+<blockquote>
+<pre>
+PrivateKey generatePrivate(KeySpec keySpec)
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+<H3>Converting Between a Key Object and a Key Specification</H3>
+
+<blockquote>
+
+<p>If you have a <code>Key</code> object, you can get a corresponding key
+specification object by calling the <code>getKeySpec</code> method:
+
+<blockquote>
+<pre>
+KeySpec getKeySpec(Key key, Class keySpec)
+</pre>
+</blockquote>
+
+<code>keySpec</code> identifies the specification class in which 
+the key material should be returned. It could, for example, be
+<code>DSAPublicKeySpec.class</code>, to indicate that the
+key material should be returned in an instance of the 
+<a href = "#DSAPublicKeySpec"><code>DSAPublicKeySpec</code></a> class.
+
+<p>
+Please see the <a href = "#KeyFactoryEx">Examples</a> section for more details.
+
+
+</blockquote>
+
+</blockquote>
+
+
+
+<H2><a name="CertificateFactory">The <code>CertificateFactory</code> Class</a></H2>
+
+<blockquote>
+
+The <code>CertificateFactory</code> class is an <a href = "#Engine">engine class</a> 
+that defines the functionality of a certificate factory, which is
+used to generate certificate and certificate revocation list (CRL) objects
+from their encodings.
+
+<p>A certificate factory for X.509 must return certificates that are an
+instance of <code>java.security.cert.X509Certificate</code>, and CRLs
+that are an instance of <code>java.security.cert.X509CRL</code>.
+
+
+<H3>Creating a <code>CertificateFactory</code> Object</H3>
+
+<blockquote>
+
+<P>
+As with all engine classes, the 
+way to get a <code>CertificateFactory</code> object for a particular certificate or CRL
+type is to call the <code>getInstance</code>
+static factory method on the <code>CertificateFactory</code> class:
+<P>
+
+<blockquote>
+<pre>
+static CertificateFactory getInstance(String type) 
+</pre>
+</blockquote>
+
+<blockquote>
+<hr>
+<B>Note:</B> The type name is not case-sensitive.
+<hr>
+</blockquote>
+
+A caller may optionally specify the name of a provider 
+or the <code>Provider</code> class, which will 
+guarantee that the implementation of the certificate factory
+requested is from the named provider.
+
+
+<blockquote>
+<pre>
+static CertificateFactory getInstance(String type, String provider)
+
+static CertificateFactory getInstance(String type, Provider provider)
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+<H3>Generating Certificate Objects</H3>
+
+<blockquote>
+
+To generate a certificate object and initialize it with
+the data read from an input stream, use the
+<code>generateCertificate</code> method:
+
+<blockquote>
+<pre>
+final Certificate generateCertificate(InputStream inStream)
+</pre>
+</blockquote>
+
+To return a (possibly empty) collection view of the certificates read
+from a given input stream, use the
+<code>generateCertificates</code> method:
+
+<blockquote>
+<pre>
+final Collection generateCertificates(InputStream inStream)
+</pre>
+</blockquote>
+
+</blockquote>
+
+<H3>Generating CRL Objects</H3>
+
+<blockquote>
+
+To generate a certificate revocation list (CRL) object and initialize it with
+the data read from an input stream, use the
+<code>generateCRL</code> method:
+
+<blockquote>
+<pre>
+final CRL generateCRL(InputStream inStream)
+</pre>
+</blockquote>
+
+To return a (possibly empty) collection view of the CRLs read
+from a given input stream, use the
+<code>generateCRLs</code> method:
+
+<blockquote>
+<pre>
+final Collection generateCRLs(InputStream inStream)
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+
+
+<H3>Generating <code>CertPath</code> Objects</H3>
+
+<blockquote>
+
+To generate a <code>CertPath</code> object and 
+initialize it with data read from an input stream, 
+use one of the following <code>generateCertPath</code> methods 
+(with or without specifying the encoding to be used for the data):    
+
+<blockquote>
+<pre>
+final CertPath generateCertPath(InputStream inStream)
+
+final CertPath generateCertPath(InputStream inStream, 
+                                String encoding)
+</pre>
+</blockquote>
+
+To generate a <code>CertPath</code> object and 
+initialize it with a list of certificates, 
+use the following method:
+
+<blockquote>
+<pre>
+final CertPath generateCertPath(List certificates)
+</pre>
+</blockquote>
+
+To retrieve a list of the <code>CertPath</code>  
+encodings supported by this certificate factory, 
+you can call the <code>getCertPathEncodings</code> method:
+
+<blockquote>
+<pre>
+final Iterator getCertPathEncodings()
+</pre>
+</blockquote>
+
+The default encoding will be listed first.
+
+</blockquote>
+
+</blockquote>
+
+<H2><a name="KeyPair">The <code>KeyPair</code> Class</a></H2>
+
+<blockquote>
+
+<P>
+The <code>KeyPair</code> class is a simple holder for a key pair (a public key and a
+private key). It has two public methods, one for returning the private
+key, and the other for returning the public key:
+
+<blockquote>
+<pre>
+PrivateKey getPrivate()
+PublicKey getPublic()
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+
+<H2><a name="KPG">The <code>KeyPairGenerator</code> Class</a></H2>
+
+<blockquote>
+
+<P>
+The <code>KeyPairGenerator</code> class is an <a href = "#Engine">engine class</a> 
+used to generate pairs of public and private keys. 
+
+<P>
+There are two ways to generate a key pair: in an 
+algorithm-independent
+manner, and in an algorithm-specific manner. The only difference
+between the two is the initialization of the object. 
+
+<P>
+Please see the <a href = "#KPGEx">Examples</a> section for examples
+of calls to the methods documented below.
+
+<H3>Creating a <code>KeyPairGenerator</code></H3>
+
+<blockquote>
+
+<P>
+All key pair generation starts with a <code>KeyPairGenerator</code>. This generation 
+is done using one of the factory methods on <code>KeyPairGenerator</code>:
+<P>
+
+<blockquote>
+<pre>
+static KeyPairGenerator getInstance(String algorithm)
+static KeyPairGenerator getInstance(String algorithm, 
+                                    String provider)
+static KeyPairGenerator getInstance(String algorithm, 
+                                    Provider provider)
+</pre>
+</blockquote>
+
+<blockquote>
+<hr><B>Note:</B> The algorithm name is not case-sensitive. 
+<hr>
+</blockquote>
+
+</blockquote>
+
+
+<H3>Initializing a <code>KeyPairGenerator</code></H3>
+
+<blockquote>
+
+A key pair generator for a particular algorithm
+creates a public/private key pair that can be used with
+this algorithm. 
+It also associates algorithm-specific parameters with 
+each of the generated keys.
+
+<P>
+A key pair generator needs to be initialized before it can generate
+keys. In most cases,
+algorithm-independent initialization is sufficient. But in other
+cases, algorithm-specific initialization is used.
+
+<H4>Algorithm-Independent Initialization</H4>
+
+<P>
+All key pair generators share the concepts of a keysize and a
+source of randomness. The keysize is 
+interpreted differently for different algorithms.
+For example, in the case of the DSA algorithm, the keysize
+corresponds to the length of the modulus.
+(See <a href = "#AppB">Appendix B: Algorithms</a> for 
+information about the keysizes for specific algorithms.) 
+
+<p>An <code>initialize</code> method 
+takes two universally shared types of arguments:
+
+<blockquote>
+<pre>
+void initialize(int keysize, SecureRandom random)
+</pre>
+</blockquote>
+
+Another <code>initialize</code> method 
+takes only a <code>keysize</code> 
+argument; it uses a system-provided source of randomness:
+
+<blockquote>
+<pre>
+void initialize(int keysize)
+</pre>
+</blockquote>
+
+<P>
+Since no other parameters are specified when you call the above
+algorithm-independent <code>initialize</code>
+methods, it is up to the provider what to do about the algorithm-specific
+parameters (if any) to be associated with each of the keys.
+
+<p>If the algorithm is a "DSA" algorithm, and the modulus size (keysize)
+is 512, 768, or 1024, then the "SUN" provider uses a set of precomputed
+values for the <code>p</code>, <code>q</code>, and 
+<code>g</code> parameters. If the modulus size is
+not one of the above values, the "SUN" provider creates a new
+set of parameters. Other providers might have
+precomputed parameter sets for more than just the three modulus sizes
+mentioned above. Still others might not have a list of precomputed 
+parameters at all and instead always create new parameter sets. 
+
+
+<H4>Algorithm-Specific Initialization</H4>
+
+<p>For situations where a set of algorithm-specific parameters already
+exists (such as "community parameters" in DSA),
+there are two <code>initialize</code> methods that have an 
+<a href = "#AlgorithmParameterSpec"><code>AlgorithmParameterSpec</code></a> argument.
+One also has a <code>SecureRandom</code> argument, while the source of
+randomness is system-provided for the other:
+
+<blockquote>
+<pre>
+void initialize(AlgorithmParameterSpec params,
+                SecureRandom random)
+
+void initialize(AlgorithmParameterSpec params)
+</pre>
+</blockquote>
+
+See the <a href = "#KPGEx">Examples</a> section for more details.
+
+</blockquote>
+
+
+<H3>Generating a Key Pair</H3>
+
+<blockquote>
+
+<P>
+The procedure for generating a key pair is always the same, regardless 
+of initialization (and of the algorithm). You always call the following 
+method from <code>KeyPairGenerator</code>:
+
+<blockquote>
+<pre>
+KeyPair generateKeyPair()
+</pre>
+</blockquote>
+
+Multiple calls to <code>generateKeyPair</code> will yield different key pairs.
+
+</blockquote>
+
+</blockquote>
+
+
+
+<H2><a name="KeyManagement">Key Management</a></H2>
+
+<blockquote>
+
+A database called a "keystore" can be used to 
+manage a repository of keys and certificates. 
+(A <i>certificate</i> is a digitally signed statement
+from one entity, saying that the public key of some other entity has a 
+particular value.)
+
+<H3><a name="KeystoreLocation">Keystore Location</a></H3>
+
+      <blockquote>
+        <p>The keystore is by default stored in a file 
+          named <code>.keystore</code> in the user's home directory, as determined by the 
+          &quot;user.home&quot; system property. On Solaris systems &quot;user.home&quot; 
+          defaults
+          to the user's home directory. On Win32 systems, given user name 
+          <i>uName</i>,
+          &quot;user.home&quot; defaults to: 
+        <blockquote>
+          <ul>
+              <li><tt>C:\Winnt\Profiles\uName</tt> on multi-user Windows NT systems
+              <li><tt>C:\Windows\Profiles\uName</tt> on multi-user Windows 95/98/2000 systems
+              <li><tt>C:\Windows on single-user</tt> Windows 95/98/2000 systems
+          </ul> 
+        </blockquote> 
+      </blockquote>
+
+<H3><a name=KeystoreImplementation>Keystore Implementation</a></H3>
+
+<blockquote>
+
+The <a href = "#KeyStore"><code>KeyStore</code></a> class supplies
+well-defined interfaces to access and modify the information
+in a keystore. It is possible for there to be
+multiple different concrete implementations, where each 
+implementation is that for a particular <i>type</i> of keystore.
+
+<p>Currently, there are two command-line tools that make use of <code>KeyStore</code>:
+<b><code>keytool</code></b> and <b><code>jarsigner</code></b>, 
+and also a GUI-based tool named <b><code>policytool</code></b>. 
+It is also used by the <code>Policy</code> reference
+implementation when it processes policy files specifying the
+permissions (allowed accesses to system resources) to be granted
+to code from various sources.
+Since <code>KeyStore</code>
+is publicly available, SDK users can write additional security applications
+that use it.
+
+<p>There is a built-in default implementation, provided by 
+Sun Microsystems. It implements the keystore as a file, utilizing
+a proprietary keystore type (format) named "JKS". 
+It protects each private key with its individual password, and also protects 
+the integrity of the entire keystore with a
+(possibly different) password.
+
+<p>Keystore implementations are provider-based. More specifically, 
+the application interfaces supplied by <code>KeyStore</code> are
+implemented in terms of a "Service Provider Interface" (SPI).
+That is, there is a corresponding abstract <code>KeystoreSpi</code> class, 
+also in the <code>java.security</code> package, which defines the SPI 
+methods that "providers" must implement.
+(The term "provider" refers to a package or a set of packages that supply
+a concrete implementation of a subset of services that can be accessed
+by the Java 2 SDK Security API.)
+Therefore, to provide a keystore implementation clients must implement a
+"provider" and supply a <code>KeystoreSpi</code> subclass implementation, as described in
+<a href="HowToImplAProvider.html">How to Implement a 
+Provider for the Java Cryptography Architecture</a>.
+
+<p>Applications can choose different <i>types</i> of keystore implementations
+from different providers, using the <code>getInstance</code> factory method 
+in the <code>KeyStore</code> class.
+A keystore type defines the storage and data format of the keystore
+information, and the algorithms used to
+protect private keys in the keystore and the integrity of the keystore
+itself. Keystore implementations of different types are not compatible. 
+
+<p>The default keystore type is "jks" (the proprietary type of the
+keystore implementation provided by the "SUN" provider). This is specified by
+the following line in the security properties file:
+
+<blockquote>
+<pre>
+keystore.type=jks
+</pre>
+</blockquote>
+
+To have tools and other applications use a keystore implementation 
+other than the default keystore, you can change that line to specify a different 
+keystore type. Another solution would be to let users of your tools
+and applications specify a keystore type, and pass that value to the
+<code>getInstance</code> method of KeyStore. 
+
+<p>An example of the former approach is the following: 
+If you have a provider package that supplies a
+keystore implementation for a keystore type called <code>pkcs12</code>,
+change the line to
+
+<blockquote>
+<pre>
+keystore.type=pkcs12
+</pre>
+</blockquote>
+
+<blockquote>
+<hr>
+<b>Note:</B> Keystore type designations are not case-sensitive. For example,
+"JKS" would be considered the same as "jks".
+<hr>
+</blockquote>
+
+</blockquote>
+
+
+<H3><a name="KeyStore">The <code>KeyStore</code> Class</a></H3>
+
+<blockquote>
+
+The <code>KeyStore</code> class is an <a href = "#Engine">engine class</a> 
+that supplies well-defined interfaces to access and modify the information
+in a keystore.
+
+<p>This class represents an in-memory collection of keys and certificates.
+<code>KeyStore</code> manages two types of entries:
+
+
+<blockquote>
+<dl>
+
+<dt><b>Key Entry</b></dt>
+<dd>
+<p>This type of keystore entry holds very sensitive cryptographic key
+information, which is stored in a protected format to prevent unauthorized
+access.
+Typically, a key stored in this type of entry is a secret key, or a
+private key accompanied by the certificate chain authenticating the
+corresponding public key.
+
+<p>Private keys and certificate chains are used by a given entity for
+self-authentication using digital signatures. For example, software
+distribution organizations digitally sign JAR files as part of releasing
+and/or licensing software.<p>
+
+<dt><b>Trusted Certificate Entry</b></dt>
+<dd>
+<p>This type of entry contains a single public key certificate belonging to
+another party. It is called a <i>trusted certificate</i> because the
+keystore owner trusts that the public key in the certificate indeed belongs
+to the identity identified by the <i>subject</i> (owner) of the
+certificate. 
+
+<p>This type of entry can be used to authenticate other parties.
+
+</dl>
+</blockquote>
+
+Each entry in a keystore is identified by an "alias" string. In the
+case of private keys and their associated certificate chains, these strings
+distinguish among the different ways in which the entity may authenticate
+itself. For example, the entity may authenticate itself using different
+certificate authorities, or using different public key algorithms.
+
+<p>Whether keystores are persistent, and the mechanisms used by the
+keystore if it is persistent, are not specified here. This convention allows
+use of a variety of techniques for protecting sensitive (e.g., private or
+secret) keys. Smart cards or other integrated cryptographic engines
+(SafeKeyper) are one option, and simpler mechanisms such as files may also
+be used (in a variety of formats).
+
+<p>The main <code>KeyStore</code> methods are described below.
+
+
+<H3>Creating a <code>KeyStore</code> Object</H3>
+
+<blockquote>
+
+<P>
+As with all engine classes, the 
+way to get a <code>KeyStore</code> object is to call the <code>getInstance</code>
+static factory method on the <code>KeyStore</code> class:
+<P>
+
+<blockquote>
+<pre>
+static KeyStore getInstance(String type) 
+</pre>
+</blockquote>
+
+<p>
+A caller may optionally specify the name of a provider or the 
+<code>Provider</code> class, which will 
+guarantee that the implementation of the type requested is from the
+named provider:
+<P>
+
+<blockquote>
+<pre>
+static KeyStore getInstance(String type, String provider)
+static KeyStore getInstance(String type, Provider provider)
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+<H3>Loading a Particular Keystore into Memory</H3>
+
+<blockquote>
+
+Before a <code>KeyStore</code> object can be used, the actual keystore data
+must be loaded into memory via the <code>load</code> method:
+
+<blockquote>
+<pre>
+final void load(InputStream stream, char[] password)
+</pre>
+</blockquote>
+
+The optional password is used to check the integrity of the keystore
+data. If no password is supplied, no integrity check
+is performed.
+
+<p>To create an empty keystore, you pass <code>null</code>
+as the <code>InputStream</code> argument to the <code>load</code> method.
+
+</blockquote>
+
+
+<H3>Getting a List of the Keystore Aliases</H3>
+
+<blockquote>
+
+<p>All keystore entries are accessed via unique <i>aliases</i>. 
+The <code>aliases</code> method returns an enumeration of the alias names
+in the keystore:
+
+<blockquote>
+<pre>
+final Enumeration aliases()
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+<H3>Determining Keystore Entry Types</H3>
+
+<blockquote>
+
+As stated in <a href = "#KeyStore">The <code>KeyStore</code> Class</a>, there are 
+two different types of entries in a keystore.
+
+<p>The following methods determine whether the entry specified by the
+given alias is a key/certificate or a trusted certificate entry,
+respectively:
+
+<blockquote>
+<pre>
+final boolean isKeyEntry(String alias)
+final boolean isCertificateEntry(String alias)
+</pre>
+</blockquote>
+</blockquote>
+
+
+<H3>Adding/Setting/Deleting Keystore Entries</H3>
+
+<blockquote>
+
+The <code>setCertificateEntry</code> method assigns a certificate to a specified
+alias:
+
+<blockquote>
+<pre>
+final void setCertificateEntry(String alias, Certificate cert)
+</pre>
+</blockquote>
+
+If <code>alias</code> doesn't exist, a trusted certificate entry with
+that alias is created. If <code>alias</code> exists and identifies 
+a trusted certificate entry, the certificate associated
+with it is replaced by <code>cert</code>.
+
+<p>The <code>setKeyEntry</code> methods add (if <code>alias</code> doesn't 
+yet exist) or set key entries:
+
+<blockquote>
+<pre>
+final void setKeyEntry(String alias,
+                       Key key, 
+                       char[] password,
+                       Certificate[] chain)
+
+final void setKeyEntry(String alias,
+                       byte[] key,
+                       Certificate[] chain)
+</pre>
+</blockquote>
+In the method with <code>key</code> as a byte array, it is the bytes for a
+key in protected format.  For
+example, in the keystore implementation supplied by the "SUN" provider, 
+the <code>key</code> byte array is expected to contain a protected private
+key, encoded as an <code>EncryptedPrivateKeyInfo</code> as defined in the 
+PKCS #8 standard. In the other method, the <code>password</code> is
+the password used to protect the key.
+
+<p>The <code>deleteEntry</code> method deletes an entry:
+
+<blockquote>
+<pre>
+final void deleteEntry(String alias)
+</pre>
+</blockquote>
+</blockquote>
+
+
+<H3>Getting Information from the Keystore</H3>
+
+<blockquote>
+
+The <code>getKey</code> method returns the key associated with the 
+given alias. The key is recovered using the given password:
+
+
+<blockquote>
+<pre>
+final Key getKey(String alias, char[] password)
+</pre>
+</blockquote>
+
+The following methods return the certificate, or certificate chain,
+respectively, associated with the given alias:
+
+<blockquote>
+<pre>
+final Certificate getCertificate(String alias)
+final Certificate[] getCertificateChain(String alias)
+</pre>
+</blockquote>
+
+You can determine the name (<code>alias</code>) of the first entry whose
+certificate matches a given certificate via the following:
+
+<blockquote>
+<pre>
+final String getCertificateAlias(Certificate cert)
+</pre>
+</blockquote>
+</blockquote>
+
+
+
+<H3>Saving the KeyStore</H3>
+
+<blockquote>
+
+The in-memory keystore can be saved via the <code>store</code> method:
+
+<blockquote>
+<pre>
+final void store(OutputStream stream, char[] password)
+</pre>
+</blockquote>
+
+The password is used to calculate an integrity
+checksum of the keystore data, which is appended to the
+keystore data.
+
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+
+
+
+<H2><a name="SecureRandom"> The <code>SecureRandom</code> Class</a></H2>
+
+<blockquote>
+
+<P>
+The <code>SecureRandom</code> class is an <a href = "#Engine">engine class</a> 
+that provides the functionality
+of a random number generator. 
+
+<H3>Creating a <code>SecureRandom</code> Object</H3>
+
+<blockquote>
+
+As with all engine classes, the 
+way to get a <code>SecureRandom</code> object is to call the <code>getInstance</code>
+static factory method on the <code>SecureRandom</code> class:
+<P>
+
+<blockquote>
+<pre>
+static SecureRandom getInstance(String algorithm)
+</pre>
+</blockquote>
+<p>A caller may optionally specify the name of a provider or the 
+<code>Provider</code> class, which will 
+guarantee that the implementation of the random number 
+generation (RNG) algorithm requested is from the
+named provider:
+
+<blockquote>
+<pre>
+static final SecureRandom getInstance(String algorithm,
+                                      String provider)
+static final SecureRandom getInstance(String algorithm,
+                                      Provider provider)
+</pre>
+</blockquote>
+</blockquote>
+
+
+<H3>Seeding or Re-Seeding the <code>SecureRandom</code> Object</H3>
+
+<blockquote>
+
+<p>The <code>SecureRandom</code> implementation attempts to completely
+randomize the internal state of the generator itself unless
+the caller follows the call to a <code>getInstance</code> method
+with a call to one of the <code>setSeed</code> methods:
+<blockquote>
+<pre>
+synchronized public void setSeed(byte[] seed)
+public void setSeed(long seed)
+</pre>
+</blockquote>
+
+Once the <code>SecureRandom</code> object has 
+been seeded, it will produce bits as random
+as the original seeds.
+
+<p>At any time a <code>SecureRandom</code> object may be re-seeded using one of the
+<code>setSeed</code> methods. The given seed supplements, 
+rather than replaces, the existing seed; therefore, repeated calls 
+are guaranteed never to reduce randomness.
+
+</blockquote>
+
+
+<H3>Using a <code>SecureRandom</code> Object</H3>
+
+<blockquote>
+
+<P>
+To get random bytes, a caller simply passes an array of any length,
+which is then filled with random bytes:
+
+
+<blockquote>
+<pre>
+synchronized public void nextBytes(byte[] bytes)
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+
+<H3>Generating Seed Bytes</H3>
+
+<blockquote>
+
+If desired, it is possible to invoke the <code>generateSeed</code> method
+to generate a given number of seed bytes (to seed other random number
+generators, for example):
+
+<blockquote>
+<pre>
+byte[] generateSeed(int numBytes)
+</pre>
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+
+
+
+
+<H1><a name="Examples">Code Examples</a></H1>
+
+<blockquote>
+
+
+<H3><a name="MDEx">Computing a <code>MessageDigest</code> Object</a></H3>
+
+<blockquote>
+
+<P>
+First create the <a href = "#MessageDigest">message digest</a> object, as in the following example:
+<P>
+
+<blockquote>
+<pre>
+MessageDigest sha = MessageDigest.getInstance("SHA-1");
+</pre>
+</blockquote>
+
+This call assigns a properly initialized message digest object
+to the <code>sha</code> variable. The implementation implements the Secure
+Hash Algorithm (SHA-1), as defined in the National Institute for
+Standards and Technology's (NIST) FIPS 180-1 document. See 
+<a href = "#AppA">Appendix A</a> for a complete discussion of 
+standard names and algorithms.
+
+<P>
+Next, suppose we have three byte arrays, <code>i1</code>, <code>i2</code>
+and <code>i3</code>, which form the total input whose message digest we
+want to compute. This digest (or "hash") could be calculated via the
+following calls:
+
+<blockquote>
+<pre>
+sha.update(i1);
+sha.update(i2);
+sha.update(i3);
+byte[] hash = sha.digest();
+</pre>
+</blockquote>
+
+<P>
+An equivalent alternative series of calls would be:
+
+<blockquote>
+<pre>
+sha.update(i1);
+sha.update(i2);
+byte[] hash = sha.digest(i3);
+</pre>
+</blockquote>
+After the message digest has been calculated, the message digest object 
+is automatically reset and ready to receive new data and calculate its 
+digest. All former state (i.e., the data supplied to <code>update</code> 
+calls) is lost.
+
+<P>
+Some hash implementations may support intermediate hashes through
+cloning. Suppose we want to calculate separate hashes for:
+
+<ul>
+<li><code>i1</code>
+<li><code>i1 and i2</code>
+<li><code>i1, i2, and i3</code>
+
+</ul>
+
+<p>
+A way to do it is:
+
+<blockquote>
+<pre>
+/* compute the hash for i1 */
+sha.update(i1); 
+byte[] i1Hash = sha.clone().digest();
+
+/* compute the hash for i1 and i2 */
+sha.update(i2); 
+byte[] i12Hash = sha.clone().digest(); 
+
+/* compute the hash for i1, i2 and i3 */
+sha.update(i3); 
+byte[] i123hash = sha.digest();
+</pre>
+</blockquote>
+
+This code works only if the SHA-1 implementation 
+is cloneable. While some implementations of message digests are cloneable, 
+others are not. To determine whether or not cloning is possible, attempt
+to clone the <code>MessageDigest</code> object and catch the
+potential exception as follows:
+
+<blockquote>
+<pre>
+try {
+    // try and clone it
+    /* compute the hash for i1 */
+    sha.update(i1); 
+    byte[] i1Hash = sha.clone().digest();
+    . . .
+    byte[] i123hash = sha.digest();
+} catch (CloneNotSupportedException cnse) {
+    // do something else, such as the code shown below
+}
+</pre>
+</blockquote>
+
+If a message digest is not cloneable, the other, less elegant
+way to compute intermediate digests is to create several digests. 
+In this case, the number of intermediate digests
+to be computed must be known in advance:
+
+<blockquote>
+<pre>
+<code>MessageDigest</code> sha1 = MessageDigest.getInstance("SHA-1");
+<code>MessageDigest</code> sha12 = MessageDigest.getInstance("SHA-1"); 
+<code>MessageDigest</code> sha123 = MessageDigest.getInstance("SHA-1");
+
+byte[] i1Hash = sha1.digest(i1);
+
+sha12.update(i1);
+byte[] i12Hash = sha12.digest(i2);
+
+sha123.update(i1);
+sha123.update(i2);
+byte[] i123Hash = sha123.digest(i3);
+</pre>
+</blockquote>
+
+
+</blockquote>
+
+
+<H3><a name="KPGEx">Generating a Pair of Keys</a></H3>
+
+<blockquote>
+
+<P>
+In this example we will generate a public-private key pair for the
+algorithm named
+"DSA" (Digital Signature Algorithm). We will generate keys
+with a 1024-bit modulus, using a user-derived seed, 
+called <code>userSeed</code>. We don't care which provider supplies
+the algorithm implementation.
+
+<H4>Creating the <a href = "#KPG">Key Pair Generator</a></H4>
+
+<blockquote>
+
+<P>
+The first step is to get a key pair generator object for generating
+keys for the DSA algorithm:
+<blockquote>
+<pre>
+KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");
+</pre>
+</blockquote>
+</blockquote>
+
+<H4>Initializing the Key Pair Generator</H4>
+
+<blockquote>
+
+The next step is to initialize the key pair generator. In most cases,
+algorithm-independent initialization is sufficient, but in some
+cases, algorithm-specific initialization is used.
+
+<H5>Algorithm-Independent Initialization</H5>
+
+<P>
+All key pair generators share the concepts of a keysize and a
+source of randomness. A <code>KeyPairGenerator</code> class 
+<code>initialize</code> method has these two types of arguments. Thus,
+to generate keys with a keysize of 1024 and a new
+<a href = "#SecureRandom"><code>SecureRandom</code></a> object seeded by 
+the <code>userSeed</code> value, you can
+use the following code: 
+
+<blockquote>
+<pre>
+SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+random.setSeed(userSeed);
+keyGen.initialize(1024, random);
+</pre>
+</blockquote>
+
+Since no other parameters are specified when you call the above
+algorithm-independent <code>initialize</code>
+method, it is up to the provider what to do about the algorithm-specific
+parameters (if any) to be associated with each of the keys.
+The provider may use precomputed parameter values or may
+generate new values.
+
+    
+<H5>Algorithm-Specific Initialization</H5>
+
+<p>For situations where a set of algorithm-specific parameters already
+exists (such as "community parameters" in DSA),
+there are two <code>initialize</code> methods that have an 
+<a href = "#AlgorithmParameterSpec"><code>AlgorithmParameterSpec</code></a> argument.
+Suppose your key pair generator is for the "DSA" algorithm, and you have a 
+set of DSA-specific parameters, <code>p</code>, 
+<code>q</code>, and <code>g</code>, that you would like to 
+use to generate your key pair. You could execute the following code
+to initialize your key pair generator (recall that 
+<a href = "#DSAParameterSpec"><code>DSAParameterSpec</code></a> 
+is an AlgorithmParameterSpec):
+
+<blockquote>
+<pre>
+DSAParameterSpec dsaSpec = new DSAParameterSpec(p, q, g);
+SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+random.setSeed(userSeed);
+keyGen.initialize(dsaSpec, random);
+</pre>
+</blockquote>
+
+<blockquote>
+<hr>
+<b>Note:</B> The parameter named <code>p</code> is a prime 
+number whose length is the modulus length ("size"). Therefore, 
+you don't need to call any other method to
+specify the modulus length.
+<hr>
+</blockquote>
+
+</blockquote>
+
+
+<H4>Generating the Pair of Keys</H4>
+
+<blockquote>
+
+The final step is generating the key pair. No matter which type of
+initialization was used (algorithm-independent or 
+algorithm-specific), the same code is used to generate the
+<a href = "#KeyPair">key pair</a>:
+
+<blockquote>
+<pre>
+KeyPair pair = keyGen.generateKeyPair();
+</pre>
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+
+
+<H3><a name="SigEx">Generating and Verifying a Signature Using Generated Keys</a></H3>
+
+<blockquote>
+
+<p>The following signature generation and verification examples
+use the key pair generated in the <a href = "#KPGEx">key pair example</a>
+above.
+
+
+<H4>Generating a Signature</H4>
+
+<blockquote>
+
+<P>
+We first create a <a href = "#Signature">signature</a> object:
+
+<blockquote>
+<pre>
+Signature dsa = Signature.getInstance("SHA1withDSA"); 
+</pre>
+</blockquote>
+
+Next, using the key pair generated in the 
+key pair example, we initialize
+the object with the private key, then sign a byte array called
+<code>data</code>.
+
+<blockquote>
+<pre>
+/* Initializing the object with a private key */
+PrivateKey priv = pair.getPrivate();
+dsa.initSign(priv);
+
+/* Update and sign the data */
+dsa.update(data);
+byte[] sig = dsa.sign();
+</pre>
+</blockquote>
+
+
+</blockquote>
+
+<H4><a name="VerifyEx">Verifying a Signature</a></H4>
+
+<blockquote>
+
+Verifying the signature is straightforward. (Note that here we also use
+the key pair generated in the key pair example.)
+
+<blockquote>
+<pre>
+/* Initializing the object with the public key */
+PublicKey pub = pair.getPublic();
+dsa.initVerify(pub);
+
+/* Update and verify the data */
+dsa.update(data);
+boolean verifies = dsa.verify(sig);
+System.out.println("signature verifies: " + verifies);
+</pre>
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+<H3><a name="KeyFactoryEx">Generating/Verifying Signatures Using Key 
+Specifications and <code>KeyFactory</code></a></H3>
+
+<blockquote>
+
+Suppose that, rather than having a public/private key pair (as, for example, was
+generated in the <a href = "#KPGEx">key pair example</a> above), 
+you simply have the components of 
+your DSA private key: <code>x</code> (the private
+key), <code>p</code> (the prime), <code>q</code> (the sub-prime), 
+and <code>g</code> (the base).
+
+<p>Further suppose you want to use your private key to digitally sign 
+some data, which is in a byte array named <code>someData</code>.
+You would do the following steps, which also illustrate creating a
+key specification and using a key
+factory to obtain a <code>PrivateKey</code> from the key specification
+(<code>initSign</code> requires a <code>PrivateKey</code>):
+
+<blockquote>
+<pre>
+DSAPrivateKeySpec dsaPrivKeySpec = new DSAPrivateKeySpec(x, p, q, g);
+
+KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+PrivateKey privKey = keyFactory.generatePrivate(dsaPrivKeySpec);
+
+Signature sig = Signature.getInstance("SHA1withDSA");
+sig.initSign(privKey);
+sig.update(someData);
+byte[] signature = sig.sign();
+</pre>
+</blockquote>
+
+Suppose Alice wants to use the data you signed. In order for her to
+do so, and to verify your signature, you need to send her three things:
+
+<ol>
+
+<li>the data,
+
+<li>the signature, and
+
+<li>the public key corresponding to the private key you used to sign
+the data.
+
+</ol>
+
+You can store the <code>someData</code> bytes in one file, and
+the <code>signature</code> bytes in another, and send those to Alice. 
+
+<p>For the public key,
+assume, as in the signing example above, you have the components of the 
+DSA public key
+corresponding to the DSA private key used to sign the data. Then you can 
+create a DSAPublicKeySpec from those components:
+
+<blockquote>
+<pre>
+DSAPublicKeySpec dsaPubKeySpec = new DSAPublicKeySpec(y, p, q, g);
+</pre>
+</blockquote>
+
+You still need to extract the key bytes so that you can put
+them in a file. To do so, you can first call the <code>generatePublic</code> method
+on the DSA key factory already created
+in the example above:
+
+<blockquote>
+<pre>
+PublicKey pubKey = keyFactory.generatePublic(dsaPubKeySpec);
+</pre>
+</blockquote>
+
+Then you can extract the (encoded) key bytes via the following:
+
+<blockquote>
+<pre>
+byte[] encKey = pubKey.getEncoded();
+</pre>
+</blockquote>        
+
+You can now store these bytes in a file, and send it to Alice along with
+the files containing the data and the signature. 
+
+<p>Now, assume Alice has received these files, and she copied the data
+bytes from the data file to a byte array named <code>data</code>, the signature
+bytes from the signature file to a byte array named <code>signature</code>,
+and the encoded public key bytes from the public key file to a byte
+array named <code>encodedPubKey</code>.
+
+<P>Alice can now execute the following code to verify the
+signature. The code also illustrates how to use a key factory in order to
+instantiate a DSA public key from its encoding (<code>initVerify</code>
+requires a <code>PublicKey</code>).
+
+<pre>
+    X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encodedPubKey);
+
+    KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+    PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+
+    Signature sig = Signature.getInstance("SHA1withDSA");
+    sig.initVerify(pubKey);
+    sig.update(data);
+    sig.verify(signature);
+</pre>
+
+Note: In the above, Alice needed to generate a <code>PublicKey</code> from the
+encoded key bits, since <code>initVerify</code> requires a <code>PublicKey</code>.
+Once she has a <code>PublicKey</code>, she could also use the <code>KeyFactory</code>
+<code>getKeySpec</code> method to convert it to a <code>DSAPublicKeySpec</code> so that 
+she can access the components, if desired, as in:
+
+<pre>
+    DSAPublicKeySpec dsaPubKeySpec =
+        (DSAPublicKeySpec)keyFactory.getKeySpec(pubKey,
+            DSAPublicKeySpec.class)
+</pre>
+
+Now she can access the DSA public key components <code>y</code>, 
+<code>p</code>, <code>q</code>, and <code>g</code> through the 
+corresponding "get" methods on the <code>DSAPublicKeySpec</code> class 
+(<code>getY</code>, <code>getP</code>, <code>getQ</code>, and 
+<code>getG</code>).
+
+</blockquote>
+
+
+<a name = "Equal"></a>
+<H3>Determining If Two Keys Are Equal</H3>
+<blockquote>
+
+<P>
+ In many cases you would like to know if two keys are equal; however,  
+the default method <code>java.lang.Object.equals</code> may not give the 
+desired result. The most provider-independent approach is to compare the 
+encoded keys. If this comparison isn't appropriate (for example, when  
+comparing an <code>RSAPrivateKey</code> and an <code>RSAPrivateCrtKey</code>), 
+you should compare each component. The following code demonstrates this idea: 
+
+<blockquote>
+<pre>
+static boolean keysEqual(Key key1, Key key2) {
+    if (key1.equals(key2)) {
+        return true;
+    }
+ 
+    if (Arrays.equals(key1.getEncoded(), key2.getEncoded())) {
+        return true;
+    }
+
+    // More code for different types of keys here.
+    // For example, the following code can check if
+    // an RSAPrivateKey and an RSAPrivateCrtKey are equal:
+    // if ((key1 instanceof RSAPrivateKey) &&
+    //     (key2 instanceof RSAPrivateKey)) {
+    //     if ((key1.getModulus().equals(key2.getModulus())) &&
+    //         (key1.getPrivateExponent().equals(
+    //                                      key2.getPrivateExponent()))) {
+    //         return true;
+    //     }
+    // }
+
+    return false;
+}
+</pre>
+</blockquote>
+</blockquote>
+
+
+<H3><a name="ReadCert">Reading Base64-Encoded Certificates</a></H3>
+
+<blockquote>
+
+<p>The following example reads a file with Base64-encoded certificates,
+which are each bounded at the beginning by 
+
+<pre>
+-----BEGIN CERTIFICATE-----
+</pre>
+
+and at the end by 
+
+<pre>
+-----END CERTIFICATE-----
+</pre>
+
+We convert the
+<code>FileInputStream</code> (which does not support <code>mark</code>
+and <code>reset</code>) to a <code>ByteArrayInputStream</code> (which
+supports those methods), so that each call to
+<code>generateCertificate</code> consumes only one certificate, and the
+read position of the input stream is positioned to the next certificate in
+the file:<p>
+
+<pre>
+FileInputStream fis = new FileInputStream(filename);
+BufferedInputStream bis = new BufferedInputStream(fis);
+
+CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+while (bis.available() > 0) {
+    Certificate cert = cf.generateCertificate(bis);
+    System.out.println(cert.toString());
+}
+</pre>
+
+</blockquote>
+
+
+<H3><a name="ParseCert">Parsing a Certificate Reply</a></H3>
+
+<blockquote>
+
+<p>The following example parses a PKCS #7-formatted certificate reply stored
+in a file and extracts all the certificates from it:<p>
+
+<pre>
+FileInputStream fis = new FileInputStream(filename);
+CertificateFactory cf = CertificateFactory.getInstance("X.509");
+Collection c = cf.generateCertificates(fis);
+Iterator i = c.iterator();
+while (i.hasNext()) {
+   Certificate cert = (Certificate)i.next();
+   System.out.println(cert);
+}
+</pre>
+
+</blockquote>
+
+
+
+</blockquote>
+
+</blockquote>
+
+
+
+
+<HR>
+
+
+<H1><a name="AppA">Appendix A: Standard Names</a></H1>
+
+<blockquote>
+
+<P>
+The Java 2 SDK Security API requires and uses a set of standard names
+for algorithms, certificate and keystore types. This specification
+establishes the following names as standard names.  
+
+<p>In some cases naming conventions are suggested for forming names that 
+are not explicitly listed, to facilitate name consistency across
+provider implementations. 
+Such suggestions use items in angle brackets
+(such as &lt;digest&gt; and &lt;encryption&gt;)
+as placeholders to be replaced by specific message digest, encryption algorithm, 
+and other names.
+
+<blockquote>
+<hr>
+<B>Note:</B> Algorithm names are not case-sensitive.
+<hr>
+</blockquote>
+
+This appendix includes corresponding lists of standard names relevant to the 
+various security subareas:
+
+<ul>
+<li><a href="certpath/CertPathProgGuide.html#AppA">
+<b>Java Certification Path API Programmer's Guide</b></a> <p>
+
+<li><a href="jce/JCERefGuide.html#AppA"><b>
+JCE Reference Guide</b></a> <p>
+
+<li><a href="jsse/JSSERefGuide.html#AppA"><b>JSSE Reference Guide</b></a>
+
+</ul>
+
+<p>See <a href="#AppB">Appendix B</A> for algorithm specifications.
+
+<H3>Message Digest Algorithms</H3>
+
+<blockquote>
+
+<P>
+The algorithm names in this section can be specified when
+generating an instance of <code>MessageDigest</code>.
+<P>
+<b>MD2</b>: The MD2 message digest algorithm as defined in RFC 1319.
+<P>
+<b>MD5</b>: The MD5 message digest algorithm as defined in RFC 1321.
+
+<P>
+<b>SHA-1</b>: The Secure Hash Algorithm, as defined in Secure
+Hash Standard, NIST FIPS 180-1.
+
+<P>
+<b>SHA-256</b>, <b>SHA-384</b>, and <b>SHA-512</b>: New hash algorithms for 
+which the 
+<A HREF="http://csrc.nist.gov/encryption/shs/dfips-180-2.pdf">
+draft Federal Information Processing Standard 180-2, 
+<I>Secure Hash Standard (SHS)</I></A> 
+is now available. 
+SHA-256 is a 256-bit hash function intended to provide 128 bits of
+security against collision attacks, while SHA-512 is a 512-bit
+hash function intended to provide 256 bits of security.
+A 384-bit hash may be obtained by truncating the SHA-512 output.
+
+</blockquote>
+
+<H3>Key and Parameter Algorithms</H3>
+
+<blockquote>
+
+<P>
+The algorithm names in this section can be specified when
+generating an instance of <code>KeyPairGenerator</code>,
+<code>KeyFactory</code>, <code>AlgorithmParameterGenerator</code>, and
+<code>AlgorithmParameters</code>.
+<P>
+<b>DSA</b>: The Digital Signature Algorithm as defined in FIPS PUB 186.
+<P>
+<b>RSA</b>: The RSA encryption algorithm as defined in PKCS #1.
+
+</blockquote>
+
+<H3>Digital Signature Algorithms</H3>
+
+<blockquote>
+
+<P>
+The algorithm names in this section can be specified when
+generating an instance of <code>Signature</code>.
+<P>
+<b>MD2withRSA</b>: The MD2 with RSA Encryption signature algorithm
+which uses the MD2 digest algorithm and RSA to create and verify RSA
+digital signatures as defined in PKCS #1.
+<P>
+<b>MD5withRSA</b>: The MD5 with RSA Encryption signature algorithm
+which uses the MD5 digest algorithm and RSA to create and verify RSA
+digital signatures as defined in PKCS #1.
+<P>
+<b>SHA1withDSA</b>: The DSA with SHA-1 signature algorithm which uses the
+SHA-1 digest algorithm and DSA to create and verify DSA digital
+signatures as defined in FIPS PUB 186.
+<P>
+<b>SHA1withRSA</b>: The signature algorithm with SHA-1 and the RSA encryption 
+algorithm as defined in the OSI Interoperability Workshop, using the
+padding conventions described in PKCS #1.
+
+<P>
+<b>&lt;digest&gt;with&lt;encryption&gt;</b>: Use this to form a name for a
+signature algorithm with a particular message digest (such as MD2 or MD5) and
+algorithm (such as RSA or DSA), just as was done for the explicitly-defined
+standard names in this section (MD2withRSA, etc.).
+For the new signature schemes defined in PKCS #1 v 2.0, for which the
+&lt;digest&gt;with&lt;encryption&gt; form is insufficient,
+<b>&lt;digest&gt;with&lt;encryption&gt;and&lt;mgf&gt;</b> can be used to
+form a name. Here,
+&lt;mgf&gt; should be replaced by a mask generation function such as MGF1.
+Example: MD5withRSAandMGF1.
+
+</blockquote>
+
+<H3>Random Number Generation (RNG) Algorithms</H3>
+
+<blockquote>
+
+<P>
+The algorithm names in this section can be
+specified when generating an instance of <code>SecureRandom</code>.
+<P>
+<b>SHA1PRNG</b>: The name of the pseudo-random number generation
+(PRNG) algorithm supplied by the SUN provider. This implementation
+follows the IEEE P1363 standard, Appendix G.7: "Expansion of source
+bits", and uses SHA-1 as the foundation of the PRNG. It computes the
+SHA-1 hash over a true-random seed value concatenated with a 64-bit
+counter which is incremented by 1 for each operation. From the 160-bit
+SHA-1 output, only 64 bits are used.
+
+</blockquote>
+
+<H3>Certificate Types</H3>
+
+<blockquote>
+
+<P>
+The types in this section can be specified when generating an
+instance of <code>CertificateFactory</code>.
+<P>
+<b>X.509</b>: The certificate type defined in X.509.
+
+</blockquote>
+
+<H3>Keystore Types</H3>
+
+<blockquote>
+<P>
+The types in this section can be specified when generating an
+instance of <code>KeyStore</code>.
+<P>
+<b>JKS</b>: The name of the keystore implementation provided by the
+SUN provider.
+<P>
+<b>PKCS12</b>: The transfer syntax for personal identity information
+as defined in PKCS #12.
+</blockquote>
+
+<H3>Service Attributes</H3>
+<blockquote>
+A cryptographic service is always associated with a particular
+        algorithm or type. For example, a digital signature service is
+        always associated with a particular algorithm (e.g., DSA),
+        and a <code>CertificateFactory</code> service is always associated with
+        a particular certificate type (e.g., X.509).
+<P>
+The attributes in this section are for cryptographic services.
+        The service attributes can be used as filters for selecting
+providers.  
+<P>
+Both the attribute name and value are case insensitive.
+<P>
+<b>KeySize</b>: The maximum key size that the provider supports for
+        the cryptographic service. 
+<P>
+<b>ImplementedIn</b>: Whether the implementation for the cryptographic 
+        service is done by software or hardware. The value of this
+        attribute 
+is "software" or "hardware".
+</blockquote>
+
+
+
+
+</blockquote>
+
+
+<HR>
+
+<H1><a name="AppB">Appendix B: Algorithms</a></H1>
+
+<blockquote>
+
+<p>This appendix specifies details concerning some of the algorithms
+defined in Appendix A. Any provider supplying an implementation of the
+listed algorithms must comply with the specifications in
+this appendix. 
+
+<blockquote>
+<hr>
+<B>Note:</B> The most recent version of this document is
+available online at: 
+<a href="http://java.sun.com/j2se/1.4.2/docs/guide/security/index.html">
+http://java.sun.com/j2se/1.4.2/docs/guide/security/index.html</a>.
+<hr>
+</blockquote>
+
+<p>To add a new algorithm not specified here, you should first 
+survey other people or companies supplying provider
+packages to see if they
+have already added that algorithm, and, if so, use
+the definitions they published, if available. Otherwise, you
+should create and make available a
+template, similar to those found in this Appendix B, 
+with the specifications for the algorithm you
+provide. 
+
+<H3>Specification Template</H3>
+
+<blockquote>
+
+The following table shows the fields of the algorithm specifications.
+
+<blockquote>
+<TABLE summary="algorithm specification fields" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="2">
+  <thead>
+  <TR>
+    <TH WIDTH="23%" BGCOLOR="#dedeef">
+    <B>Field</B> </TH>
+    <TH WIDTH="77%" BGCOLOR="#dedeef">
+    <B>Description</B></TH>
+  </TR>
+  </thead>
+  <TR>
+    <TD WIDTH="23%">
+    Name</TD>
+    <TD WIDTH="77%">
+    The name by which the algorithm is known. This is the name passed
+    to the <CODE>getInstance</CODE> method (when requesting the algorithm),
+    and returned by the <CODE>getAlgorithm</CODE> method to determine
+    the name of an existing algorithm object. These methods are in
+    the relevant engine classes: <CODE><A HREF="#Signature">Signature</A></CODE>,
+    <CODE><A HREF="#MessageDigest">MessageDigest</A></CODE>, <CODE><A
+    HREF="#KPG">KeyPairGenerator</A></CODE>, and <CODE><A HREF="#AlgorithmParameterGenerator">AlgorithmParameterGenerator</A></CODE>.</TD>
+  </TR>
+  <TR>
+    <TD WIDTH="23%">
+    Type</TD>
+    <TD WIDTH="77%">
+    The type of algorithm: <CODE>Signature</CODE>, <CODE>MessageDigest</CODE>,
+    <CODE>KeyPairGenerator</CODE>, or <CODE>ParameterGenerator</CODE>.</TD>
+  </TR>
+  <TR>
+    <TD WIDTH="23%">
+    Description</TD>
+    <TD WIDTH="77%">
+    General notes about the algorithm, including any standards implemented
+    by the algorithm, applicable patents, etc.</TD>
+  </TR>
+  <TR>
+    <TD WIDTH="23%">
+    <CODE>KeyPair</CODE> Algorithm (<I>optional</I>)</TD>
+    <TD WIDTH="77%">
+    The keypair algorithm for this algorithm.</TD>
+  </TR>
+  <TR>
+    <TD WIDTH="23%">
+    Keysize (<I>optional</I>)</TD>
+    <TD WIDTH="77%">
+    For a keyed algorithm or key generation algorithm: the legal
+    keysizes.</TD>
+  </TR>
+  <TR>
+    <TD WIDTH="23%">
+    <P>Size (<I>optional</I>)</TD>
+    <TD WIDTH="77%">
+    For an algorithm parameter generation algorithm: the legal &quot;sizes&quot;
+    for algorithm parameter generation.</TD>
+  </TR>
+  <TR>
+    <TD WIDTH="23%">
+    <P>Parameter Defaults (<I>optional</I>)</TD>
+    <TD WIDTH="77%">
+    For a key generation algorithm: the default parameter values.</TD>
+  </TR>
+  <TR>
+    <TD WIDTH="23%">
+    <P><CODE>Signature</CODE> Format (<I>optional</I>)</TD>
+    <TD WIDTH="77%">
+    For a <CODE>Signature</CODE> algorithm, the format of the signature,
+    that is, the input and output of the verify and sign methods,
+    respectively.</TD>
+  </TR>
+</TABLE>
+</blockquote>
+</BLOCKQUOTE>
+
+<H3>Algorithm Specifications</H3>
+
+<blockquote>
+
+
+<H4>SHA-1 Message Digest Algorithm</H4>
+
+<BLOCKQUOTE>
+  <TABLE summary="layout" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD WIDTH="28%">
+      <B>Name</B></TD> 
+      <TD WIDTH="72%">
+      SHA-1</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      <B>Type</B></TD> 
+      <TD WIDTH="72%">
+      <CODE>MessageDigest</CODE></TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Description</B></TD> 
+      <TD WIDTH="72%">
+      The message digest algorithm as defined in NIST's FIPS
+      180-1. The output of this algorithm is a 160-bit digest.</TD> 
+    </TR>
+  </TABLE>
+</BLOCKQUOTE>
+
+<H4>MD2 Message Digest Algorithm</H4>
+
+<BLOCKQUOTE>
+  <TABLE summary="layout" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD WIDTH="28%">
+      <B>Name</B></TD> 
+      <TD WIDTH="72%">
+      MD2</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      &nbsp;<B>Type</B></TD> 
+      <TD WIDTH="72%">
+      <CODE>MessageDigest</CODE></TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Description</B></TD> 
+      <TD WIDTH="72%">
+      The message digest algorithm as defined in RFC 1319. The output
+      of this algorithm is a 128-bit (16 byte) digest.</TD> 
+    </TR>
+  </TABLE>
+</BLOCKQUOTE>
+
+<H4>MD5 Message Digest Algorithm</H4>
+
+<BLOCKQUOTE>
+  <P><TABLE summary="layout" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD WIDTH="28%">
+      <B>Name</B></TD> 
+      <TD WIDTH="72%">
+      MD5</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      <B>Type</B></TD> 
+      <TD WIDTH="72%">
+      <CODE>MessageDigest</CODE></TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Description</B></TD> 
+      <TD WIDTH="72%">
+      The message digest algorithm as defined in RFC 1321. The output
+      of this algorithm is a 128-bit (16 byte) digest.</TD> 
+    </TR>
+  </TABLE>
+</BLOCKQUOTE>
+
+<H4>The Digital Signature Algorithm</H4>
+
+<BLOCKQUOTE>
+<TABLE summary="layout" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD WIDTH="28%">
+      <B>Name</B></TD> 
+      <TD WIDTH="72%">
+      SHA1withDSA</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      <B>Type</B></TD> 
+      <TD WIDTH="72%">
+      <CODE>Signature</CODE></TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Description</B></TD> 
+      <TD WIDTH="72%">
+      This algorithm is the signature algorithm described in NIST FIPS
+      186, using DSA with the SHA-1 message digest algorithm.</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      <B><CODE>KeyPair</CODE> Algorithm</B></TD> 
+      <TD WIDTH="72%">
+      DSA</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Signature Format</B></TD> 
+      <TD WIDTH="72%">
+      ASN.1 sequence of two INTEGER values: <CODE>r</CODE> and <CODE>s</CODE>,
+      in that order:<BR>
+      <CODE>SEQUENCE ::= { r INTEGER, s INTEGER }</CODE></TD> 
+    </TR>
+  </TABLE></P>
+</BLOCKQUOTE>
+
+<H4>RSA-based Signature Algorithms, with MD2, MD5 or SHA-1</H4>
+
+<BLOCKQUOTE>
+  <P><TABLE summary="layout" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD WIDTH="28%">
+      <B>Names</B></TD> 
+      <TD WIDTH="72%">
+      MD2withRSA, MD5withRSA and SHA1withRSA</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      <B>Type</B></TD> 
+      <TD WIDTH="72%">
+      <CODE>Signature</CODE></TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Description</B></TD> 
+      <TD WIDTH="72%">
+      These are the signature algorithms that use the MD2, MD5, and
+      SHA-1 message digest algorithms (respectively) with RSA encryption.</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      <B><CODE>KeyPair</CODE> Algorithm</B></TD> 
+      <TD WIDTH="72%">
+      <BLOCKQUOTE>
+        RSA</BLOCKQUOTE>
+</TD>
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Signature Format</B></TD> 
+      <TD WIDTH="72%">
+      DER-encoded PKCS #1 block as defined in RSA Laboratory's <I>Public
+      Key Cryptography Standards Note #1</I>. The data encrypted is
+      the digest of the data signed.</TD> 
+    </TR>
+  </TABLE>
+  </BLOCKQUOTE>
+
+  <H4>DSA KeyPair Generation Algorithm</H4>
+
+<BLOCKQUOTE>
+<TABLE summary="layout" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD WIDTH="28%" HEIGHT="23">
+      <B>Name</B></TD> 
+      <TD WIDTH="72%" HEIGHT="23">
+      DSA</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" HEIGHT="23">
+      <B>Type</B></TD> 
+      <TD WIDTH="72%" HEIGHT="23">
+      <CODE>KeyPairGenerator</CODE></TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP" HEIGHT="42">
+      <B>Description</B></TD> 
+      <TD WIDTH="72%" HEIGHT="42">
+      This algorithm is the key pair generation algorithm described
+      in NIST FIPS 186 for DSA.</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" HEIGHT="41">
+      <B>Keysize</B></TD> 
+      <TD WIDTH="72%" HEIGHT="41">
+      The length, in bits, of the modulus <CODE>p</CODE>. This must
+      range from 512 to 1024, and must be a multiple of 64. The default
+      keysize is 1024.</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" HEIGHT="23" VALIGN="TOP">
+      <B>Parameter Defaults</B></TD> 
+      <TD WIDTH="72%" HEIGHT="23">
+      <P>The following default parameter values are used for keysizes
+      of 512, 768, and 1024 bits:</P>
+
+      <H5>512-bit Key Parameters</H5>
+
+      <PRE>SEED = b869c82b 35d70e1b 1ff91b28 e37a62ec dc34409b
+counter = 123
+p = fca682ce 8e12caba 26efccf7 110e526d b078b05e decbcd1e b4a208f3
+    ae1617ae 01f35b91 a47e6df6 3413c5e1 2ed0899b cd132acd 50d99151
+    bdc43ee7 37592e17
+q = 962eddcc 369cba8e bb260ee6 b6a126d9 346e38c5
+         
+g = 678471b2 7a9cf44e e91a49c5 147db1a9 aaf244f0 5a434d64 86931d2d
+    14271b9e 35030b71 fd73da17 9069b32e 2935630e 1c206235 4d0da20a
+    6c416e50 be794ca4</PRE>
+
+      <H5>768-bit key parameters</H5>
+
+      <PRE>SEED = 77d0f8c4 dad15eb8 c4f2f8d6 726cefd9 6d5bb399
+counter = 263
+p = e9e64259 9d355f37 c97ffd35 67120b8e 25c9cd43 e927b3a9 670fbec5
+    d8901419 22d2c3b3 ad248009 3799869d 1e846aab 49fab0ad 26d2ce6a
+    22219d47 0bce7d77 7d4a21fb e9c270b5 7f607002 f3cef839 3694cf45
+    ee3688c1 1a8c56ab 127a3daf
+q = 9cdbd84c 9f1ac2f3 8d0f80f4 2ab952e7 338bf511
+g = 30470ad5 a005fb14 ce2d9dcd 87e38bc7 d1b1c5fa cbaecbe9 5f190aa7
+    a31d23c4 dbbcbe06 17454440 1a5b2c02 0965d8c2 bd2171d3 66844577
+    1f74ba08 4d2029d8 3c1c1585 47f3a9f1 a2715be2 3d51ae4d 3e5a1f6a
+    7064f316 933a346d 3f529252</PRE>
+
+      <H5>1024-bit key parameters</H5>
+
+      <PRE>SEED = 8d515589 4229d5e6 89ee01e6 018a237e 2cae64cd
+counter = 92
+p = fd7f5381 1d751229 52df4a9c 2eece4e7 f611b752 3cef4400 c31e3f80
+    b6512669 455d4022 51fb593d 8d58fabf c5f5ba30 f6cb9b55 6cd7813b
+    801d346f f26660b7 6b9950a5 a49f9fe8 047b1022 c24fbba9 d7feb7c6
+    1bf83b57 e7c6a8a6 150f04fb 83f6d3c5 1ec30235 54135a16 9132f675
+    f3ae2b61 d72aeff2 2203199d d14801c7
+q = 9760508f 15230bcc b292b982 a2eb840b f0581cf5
+         
+g = f7e1a085 d69b3dde cbbcab5c 36b857b9 7994afbb fa3aea82 f9574c0b
+    3d078267 5159578e bad4594f e6710710 8180b449 167123e8 4c281613
+    b7cf0932 8cc8a6e1 3c167a8b 547c8d28 e0a3ae1e 2bb3a675 916ea37f
+    0bfa2135 62f1fb62 7a01243b cca4f1be a8519089 a883dfe1 5ae59f06
+    928b665e 807b5525 64014c3b fecf492a</PRE>
+</TD>
+    </TR>
+  </TABLE></P>
+</BLOCKQUOTE>
+
+<H4>RSA KeyPair Generation Algorithm</H4>
+
+<BLOCKQUOTE>
+  <P><TABLE summary="layout" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD WIDTH="28%">
+      <B>Names</B></TD> 
+      <TD WIDTH="72%">
+      RSA</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      <B>Type</B></TD> 
+      <TD WIDTH="72%">
+      <CODE>KeyPairGenerator</CODE></TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Description</B></TD> 
+      <TD WIDTH="72%">
+      This algorithm is the key pair generation algorithm described
+      in PKCS #1.</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Strength</B></TD> 
+      <TD WIDTH="72%">
+        Any integer that is a multiple of 8, greater than or equal to
+        512. 
+</TD>
+    </TR>
+  </TABLE>
+</BLOCKQUOTE>
+
+<H4>DSA Parameter Generation Algorithm</H4>
+
+<BLOCKQUOTE>
+  <TABLE summary="layout" WIDTH="700" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+    <TR>
+      <TD WIDTH="28%">
+      <B>Names</B></TD> 
+      <TD WIDTH="72%">
+      DSA</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%">
+      <B>Type</B></TD> 
+      <TD WIDTH="72%">
+      <CODE>ParameterGenerator</CODE></TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Description</B></TD> 
+      <TD WIDTH="72%">
+      This algorithm is the parameter generation algorithm described
+      in NIST FIPS 186 for DSA.</TD> 
+    </TR>
+    <TR>
+      <TD WIDTH="28%" VALIGN="TOP">
+      <B>Strength</B></TD> 
+      <TD WIDTH="72%">
+  
+        The length, in bits, of the modulus <CODE>p</CODE>. This must
+        range from 512 to 1024, and must be a multiple of 64. The default
+        size is 1024.
+</TD>
+    </TR>
+  </TABLE>
+</BLOCKQUOTE>
+
+</BLOCKQUOTE>
+
+</BLOCKQUOTE>
+
+
+<p>
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+<TD>
+
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1996-2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:java-security@sun.com">java-security@sun.com</a>. This is not a subscription list.
+   </FONT>
+
+</TD>
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+</BODY>
+
+</HTML>
+

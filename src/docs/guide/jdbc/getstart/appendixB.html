@@ -1,0 +1,411 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="mapping.html">[Prev]</a> [Next] [Bottom]
+<hr><br>
+ 
+<a name="1006294"> </a>
+<h2> </a>Summary of New Features</h2>
+<p><a name="1006353"> </a>
+NOTE: Some of the material in this chapter is based on <em>JDBC</em>tm<em> API Tutorial and Reference, Second Edition: Universal Data Access for the Java</em>tm<em> 2 Platform</em>, published by Addison Wesley as part of the Java series, ISBN 0-201-43328-1.
+</p><p><a name="1006356"> </a>
+
+</p><p><a name="999758"> </a>
+This appendix summarizes the new features that have been added to the JDBC API over time. Note that in order to use a feature, you must be using a driver that supports that feature.
+</p><a name="1006300"> </a>
+<h3>A.1	 Overview of JDBC 3.0 API Changes</h3>
+<p><a name="1006541"> </a>
+One of the major changes in the JDBC 3.0 API is that it includes the package <code>javax.sql</code> (the JDBC Optional Package) as well as the package <code>java.sql</code>. This overview is divided into two sections, the first giving new features introduced in the JDBC 3.0 API for both packages, and the second giving the features introduced in the JDBC 2.0 Optional Package. See the JDBC 3.0 API Specification for more detailed information.
+</p><a name="1006535"> </a>
+<h4>A.1.1	 Features Introduced in the JDBC 3.0 API</h4>
+<p><a name="1006372"> </a>
+The JDBC 3.0 API introduces new material and changes in these areas:
+</p><ul><a name="1006373"> </a>
+<li>Savepoint support
+<a name="1006374"> </a>
+<blockquote>Added the <code>Savepoint</code> interface, which contains new methods to set a savepoint, to release a savepoint, and to roll back a transaction to a designated savepoint.</blockquote>
+<a name="1006375"> </a>
+<li>Reuse of prepared statements by connection pools
+<a name="1006376"> </a>
+<blockquote>Added the ability for deployers to control how prepared statements are pooled and reused by connections.</blockquote>
+<a name="1006377"> </a>
+<li>Connection pool configuration
+<a name="1006378"> </a>
+<blockquote>Defined a number of properties for the <code>ConnectionPoolDataSource</code> interface. These properties can be used to describe how <code>PooledConnection</code> objects created by <code>DataSource</code> objects should be pooled.</blockquote>
+<a name="1006379"> </a>
+<li>Retrieval of parameter metadata
+<a name="1006380"> </a>
+<blockquote>Added the new interface <code>ParameterMetaData</code>, which describes the number, type, and properties of parameters to prepared statements.</blockquote>
+<a name="1006381"> </a>
+<li>Retrieval of auto-generated keys
+<a name="1006382"> </a>
+<blockquote>Added a means of retrieving values from columns containing automatically generated values.</blockquote>
+<a name="1006383"> </a>
+<li>Ability to have multiple open <code>ResultSet</code> objects
+<a name="1006384"> </a>
+<blockquote>Added the new method <code>getMoreResults(int)</code> that takes an argument that specifies whether <code>ResultSet</code> objects returned by a <code>Statement</code> should be closed before returning any subsequent <code>ResultSet</code> objects.</blockquote>
+<a name="1006385"> </a>
+<li>Passing parameters to <code>CallableStatement</code> objects by name
+<a name="1006386"> </a>
+<blockquote>Added methods to allow a string to identify the parameter to be set for a <code>CallableStatement</code> object.</blockquote>
+<a name="1006387"> </a>
+<li>Holdable cursor support
+<a name="1006388"> </a>
+<blockquote>Added the ability to specify whether a <code>ResultSet</code> object is kept open after a transaction has been committed.</blockquote>
+<a name="1006389"> </a>
+<li><code>BOOLEAN</code> data type
+<a name="1006390"> </a>
+<blockquote>Added the data type <code>java.sql.Types.BOOLEAN</code>. <code>BOOLEAN</code> is logically equivalent to <code>BIT</code>.</blockquote>
+<a name="1006391"> </a>
+<li>Making internal updates to the data in <code>Blob</code> and <code>Clob</code> objects
+<a name="1006392"> </a>
+<blockquote>Added methods to allow the data contained in <code>Blob</code> and <code>Clob</code> objects to be altered.</blockquote>
+<a name="1006393"> </a>
+<li>Retrieving and updating the object referenced by a <code>Ref</code> object
+<a name="1006394"> </a>
+<blockquote>Added methods to retrieve the object referenced by a <code>Ref</code> object. Also added the ability to update a referenced object through the <code>Ref</code> object.</blockquote>
+<a name="1006395"> </a>
+<li>Updating of columns containing <code>BLOB</code>, <code>CLOB</code>, <code>ARRAY</code> and <code>REF</code> types
+<a name="1006396"> </a>
+<blockquote>Addition of the <code>updateBlob</code>, <code>updateClob</code>, <code>updateArray</code>, and <code>updateRef</code> methods to the <code>ResultSet</code> interface.</blockquote>
+<a name="1006397"> </a>
+<li><code>DATALINK/URL</code> data type
+<a name="1006398"> </a>
+<blockquote>Added the data type <code>java.sql.Types.DATALINK</code>, allowing JDBC drivers to store and retrieve references to external data.</blockquote>
+<a name="1006399"> </a>
+<li>Transform groups and type mapping
+<a name="1006400"> </a>
+<blockquote>Described the effect of transform groups and how this is reflected in the metadata.</blockquote>
+<a name="1006401"> </a>
+<li>Relationship between the JDBC SPI (Service Provider Interface) and the <code>Connector</code> architecture
+<a name="1006402"> </a>
+<blockquote>Described the relationship between the JDBC SPI and the connector architecture.</blockquote>
+<a name="1006406"> </a>
+<li><code>DatabaseMetadata</code> APIs
+<a name="1006407"> </a>
+<blockquote>Added metadata for retrieving SQL type hierarchies and various other kinds of information relating to new features. </blockquote>
+<a name="1006451"> </a>
+<blockquote></blockquote>
+</ul><a name="1006536"> </a>
+<h4>A.1.2	 Features Introduced in the JDBC 2.0 Optional Package</h4>
+<p><a name="1006537"> </a>
+The following features, which were introduced in the <code>javax.sql</code> package, are now part of the JDBC 3.0 API and are included in the J2SE version 1.4:
+</p><ul><a name="1006551"> </a>
+<li>Using a <code>DataSource</code> Object to Get a Connection</a>
+<p><a name="1006552"> </a>
+Using the JNDI API and the new <code>DataSource</code> interface, an application does not need to specify a driver name in its code to make a connection to a data source. It can specify a logical name that has been registered with a JNDI naming service and retrieve a <code>DataSource</code> object that will get a connection to the desired data source. This capability makes code more portable and much easier to maintain.
+</p><a name="1006554"> </a>
+<li>Connection Pooling</a>
+<p><a name="1006555"> </a>
+Connection pooling allows an application to (re)use database connections that have already been established instead of always having to create new connections. Because creating and destroying database connections is expensive, this feature is important for good performance, especially for server applications.
+</p><p><a name="1006556"> </a>
+The JDBC 2.0 Optional Package API provides hooks that allow connection pooling to be implemented on top of the JDBC driver layer. This makes it possible to have a single cache of connections available for all of the JDBC drivers in use. 
+</p><a name="1006557"> </a>
+<li>Support for Distributed Transactions
+<p><a name="1006558"> </a>
+The JDBC 2.0 Optional Package API allows a JDBC driver to support the standard two-phase commit protocol defined in the Java Transaction API (JTA). This means that a transaction may be distributed over multiple servers, which lets developers write enterprise applications using Enterprise JavaBeanstm components that are transactional across multiple DBMS servers.
+</p><a name="1006576"> </a>
+<li>Rowsets</a>
+<p><a name="1006577"> </a>
+<code>RowSet</code> objects are simply containers for tabular data that can be implemented on top of the JDBC API. Rowsets make it possible to pass rows of data across a network, so they are likely to be used extensively in distributed applications. Rowsets may be very lean by being disconnected from a data source, making it possible to display data on a thin client. They also make it possible to use scrolling when the underlying DBMS does not support scrollable result sets. A rowset is a JavaBeanstm component and consequently easy to use in building an application, especially with a development tool.
+</p><p><a name="1006578"> </a>
+Typically, a third party will provide a <code>RowSet</code> implementation, and the application programmer just uses it. The API for a <code>RowSet</code> implementation is generally very easy to use because most of a rowset's functionality is inherited from the <code>ResultSet</code> interface. The more complicated aspects of a rowset take place internally and are invisible to the application programmer. There are currently three Early Access implementations of the <code>RowSet</code> interface available from the Java Developer Connection (<code>http://developer.java.sun.com/developer</code>).
+</p></ul><a name="1006363"> </a>
+<h3>A.2	 Overview of JDBC 2.0 Core API Changes</h3>
+<p><a name="1005997"> </a>
+The JDBC 2.0 core API includes the JDBC 1.0 API and adds enhancements and new functionality to it. These additions put the Java programming language at the forefront of database computing, providing both universal data access and improved performance.
+</p><p><a name="1001420"> </a>
+Applications that use earlier versions of the JDBC API can be run using the Java 2 platform with no problem, in keeping with the goal of <a backward compatibility of Java 2 platform>backward compatibility. However, an application that takes advantage of the new 2.0 features must be run with a driver that implements those features.
+</p><p><a name="1002119"> </a>
+
+</p><p><a name="1001421"> </a>
+The </a>new features in the JDBC 2.0 core API fall into two broad categories: support for new functionality and support for the SQL99 data types.
+</p><ol>
+<a name="1001850"> </a>
+<li>Support for new functionality
+<ul>
+<a name="1001851"> </a>
+<li>scrollable result sets
+<a name="1001853"> </a>
+<li>batch updates
+<a name="1001854"> </a>
+<li>programmatic inserts, deletes, and updates
+<a name="1002080"> </a>
+<li>other
+<ul>
+<a name="1002668"> </a>
+<li>performance hints
+<a name="1005156"> </a>
+<li>character streams for streams of internationalized Unicode characters
+<a name="1002670"> </a>
+<li>full precision for <code>java.math.BigDecimal</code> values
+<a name="1002671"> </a>
+<li>support for time zones in <code>Date</code>, <code>Time</code>, and <code>Timestamp</code> values
+<p><a name="1002682"> </a>
+
+</p></ul>
+</ul>
+<a name="1001422"> </a>
+<li>Support for </a>advanced data types
+<ul>
+<a name="1001423"> </a>
+<li>new SQL data types (SQL99 types)
+<a name="1001424"> </a>
+<li>increased support for storing persistent objects in the Java programming language
+<p><a name="1002687"> </a>
+
+</p><p><a name="1002688"> </a>
+In addition to making the retrieval, storage, and manipulation of data more convenient, the new features make JDBC applications more efficient. For example, batch updates can increase performance dramatically. The new interfaces <code>Blob</code>, <code>Clob</code>, and <code>Array</code> allow applications to operate on large amounts of data without having to materialize the data on the client, which can mean a significant savings in transfer time and the amount of memory needed. Also, new methods for setting the fetch size and fetch direction let a programmer fine tune an application for more efficient data retrieval and processing.
+</p></ul>
+</ol>
+<a name="1002684"> </a>
+<h3>A.3	 Summary of New Functionality</h3>
+<p><a name="1001834"> </a>
+The JDBC 2.0 core API adds important new functionality. The following sections briefly explain each new area of functionality and summarize the supporting API.
+</p><a name="1001835"> </a>
+<h4>A.3.1	 Scrollable Result Sets</h4>
+<p><a name="1004166"> </a>
+Scrollable result sets provide the ability to move the cursor forward and backward to a specified position or to a position relative to the current position. The following interfaces have new methods that support scrollable result sets.
+</p><ul><a name="1001879"> </a>
+<li>ResultSet 
+<ul><a name="1001889"> </a>
+<li>methods for moving the cursor to a particular row or to a relative position (either forward or backward)
+<a name="1002298"> </a>
+<li>methods for ascertaining the current position of the cursor
+<a name="1001890"> </a>
+<li>constants indicating the scrollability of a result set
+</ul><a name="1001893"> </a>
+<li>Connection
+<ul><a name="1001901"> </a>
+<li>new versions of the methods for creating <code>Statement</code>, <code>PreparedStatement</code>, and <code>CallableStatement</code> objects that make the result sets they produce scrollable
+</ul><a name="1001994"> </a>
+<li>DatabaseMetaData
+<ul><a name="1001995"> </a>
+<li>method indicating whether the DBMS and driver support scrollable result sets
+</ul></ul><a name="1004175"> </a>
+<h4>A.3.2	 Batch Updates</a></h4>
+<p><a name="1004181"> </a>
+The new batch update facility provides the ability to send multiple updates to the database to be executed as a batch rather than sending each update separately. The following interfaces add methods that support batch updates, and the exception <code>BatchUpdateException</code> is new.
+</p><ul><a name="1002113"> </a>
+<li>Statement, PreparedStatement, and CallableStatement
+<ul><a name="1002114"> </a>
+<li>methods for adding update statements to a batch, clearing all update statements, and executing a batch
+</ul><a name="1004185"> </a>
+<li>DatabaseMetaData
+<ul><a name="1004186"> </a>
+<li>method indicating whether the DBMS and driver support batch updates
+</ul><a name="1002262"> </a>
+<li>BatchUpdateException
+<ul><a name="1002263"> </a>
+<li>exception thrown when an error occurs in a batch update
+</ul></ul><a name="1001839"> </a>
+<h4>A.3.3	 Programmatic Updates</a></h4>
+<p><a name="1004194"> </a>
+Programmatic updates provide the ability to make updates using the JDBC API rather than SQL statements. The following interfaces have new methods and constants that support programmatic updates.
+</p><ul><a name="1001919"> </a>
+<li>ResultSet
+<ul><a name="1001934"> </a>
+<li>an <code>updater</code> method for updating each data type
+<a name="1001939"> </a>
+<li>methods for inserting, deleting, or updating a row
+<a name="1002047"> </a>
+<li>methods indicating whether a row was inserted, deleted, or updated
+<a name="1002051"> </a>
+<li>method for cancelling a row update
+<a name="1001941"> </a>
+<li>constants indicating the updatability of a result set
+</ul><a name="1001927"> </a>
+<li>DatabaseMetaData
+<ul><a name="1001965"> </a>
+<li>methods indicating the visibility of changes to a result set
+<a name="1001968"> </a>
+<li>methods indicating whether a result set detects inserts, deletes, or updates
+<a name="1002002"> </a>
+<li>method indicating whether the DBMS and driver support updatable result sets
+</ul></ul><a name="1005056"> </a>
+<h4>A.3.4	 Other New Features</h4>
+<p><a name="1004199"> </a>
+The JDBC 2.0 core API provides various other new features, which are summarized in the following list.
+</p><ul><a name="1005117"> </a>
+<li></a>Performance enhancements-new methods that allow a programmer to fine tune the retrieval of rows from the database. These methods provide the ability to specify (1) the number of result set rows fetched from the database when more rows are needed and (2) the direction in which rows are fetched from the database.
+<ul><a name="1005121"> </a>
+<li><code>ResultSet</code> methods for getting and setting the current fetch size and fetch direction
+<a name="1005123"> </a>
+<li><code>Statement</code>, <code>PreparedStatement</code>, and <code>CallableStatement</code> methods for getting and setting the default fetch size and default fetch direction that result sets generated by executing a query will have when they are first created
+</ul><a name="1002712"> </a>
+<li></a>Character streams-new methods that allow character data to be retrieved or sent to the database as a stream of internationalized Unicode characters. These methods replace the deprecated <code>getUnicodeStream</code> and <code>setUnicodeStream</code> methods.
+<ul><a name="1002722"> </a>
+<li><code>ResultSet.getCharacterStream</code>
+<a name="1002732"> </a>
+<li><code>CallableStatement.getCharacterStream</code>
+<a name="1002739"> </a>
+<li><code>PreparedStatement.setCharacterStream</code>
+</ul><a name="1002713"> </a>
+<li></a>Full precision for <code>java.math.BigDecimal</code> values-new versions of themethods that retrieve a<code> java.math.BigDecimal</code> value with full precision. Unlike the deprecated versions they replace, these new versions do not take a specified precision.
+<ul><a name="1002782"> </a>
+<li><code>ResultSet.getBigDecimal</code>
+<a name="1002740"> </a>
+<li><code>CallableStatement.getBigDecimal</code>
+</ul><a name="1002748"> </a>
+<li>Support for </a></a>time zones-methods with new versions that take a <code>Calendar</code> object as a parameter, which allows the driver to use a specified time zone rather than the default when calculating a value for a date, time, or timestamp
+<ul><a name="1002747"> </a>
+<li><code>ResultSet.getDate</code>
+<a name="1002749"> </a>
+<li><code>ResultSet.getTime</code>
+<a name="1002750"> </a>
+<li><code>ResultSet.getTimestamp</code>
+<a name="1002768"> </a>
+<li><code>CallableStatement.getDate</code>
+<a name="1002769"> </a>
+<li><code>CallableStatement.getTime</code>
+<a name="1002770"> </a>
+<li><code>CallableStatement.getTimestamp</code>
+<a name="1002751"> </a>
+<li><code>PreparedStatement.setDate</code>
+<a name="1002754"> </a>
+<li><code>PreparedStatement.setTime</code>
+<a name="1002755"> </a>
+<li><code>PreparedStatement.setTimestamp</code>
+</ul></ul><a name="1001702"> </a>
+<h3>A.4	 Support for Advanced Data Types</h3>
+<p><a name="1002459"> </a>
+The JDBC 2.0 core API adds support for using advanced data types, making it as easy to use them as it is to use simple data types. This support includes the ability to store, retrieve, and update even the new SQL data types that are essentially objects, blurring the distinction between object databases and relational databases. The next four sections (<a href="appendixB.html#1002458">"What Are the SQL99 Data Types?" on page &#32;145</a>, <a href="appendixB.html#1001430">"Summary of Support for the SQL99 Data Types" on page &#32;146</a>, <a href="appendixB.html#1001475">"Mapping of the SQL99 Types" on page &#32;148</a>, and <a href="appendixB.html#1001484">"SQL Locators" on page &#32;149</a>) describe how the JDBC 2.0 core API provides support for these advanced data types.
+</p><p><a name="1002464"> </a>
+In addition to being able to store objects defined in SQL as values in a database table, programmers writing Java applications can also store objects defined in the Java programming language as values in a database table. The section <a href="appendixB.html#1002502">"Support for Storing Java Objects" on page &#32;149</a> describes this capability.
+</p><p><a name="1002550"> </a>
+Note that a driver is not required to implement functionality that its DBMS does not support, so not all drivers necessarily implement the functionality described here. <code>DatabaseMetaData</code> methods such as <code>getTypeInfo</code>, <code>getColumns</code>, and <code>getUDTs</code> may be called to get information about which data types a driver supports.
+</p><a name="1002458"> </a>
+<h4>A.4.1	 What Are the </a>SQL99 Data Types?</h4>
+<p><a name="1001703"> </a>
+This section briefly describes the new SQL99 data types. Their mapping to types in the Java programming language is described in <a href="appendixB.html#1001475">section A.4.3 on page 148</a>.
+</p><p><a name="1001769"> </a>
+
+</p><p><a name="1002534"> </a>
+The SQL99 data types can be categorized as follows:
+</p><a name="1006131"> </a>
+<blockquote></blockquote>
+<ul><a name="1001704"> </a>
+<li>New built-in types-types for storing large objects. These are in addition to the standard built-in data types, such as <code>CHAR</code>, <code>FLOAT</code>, <code>DATE</code>, and so on.
+<ul><a name="1001705"> </a>
+<li><code>BLOB</code> (Binary Large Object)
+<a name="1001706"> </a>
+<li><code>CLOB</code> (Character Large Object)
+</ul><a name="1001707"> </a>
+<li>Constructed types-types based on a given base type
+<ul><a name="1001708"> </a>
+<li><code>REF(</code>structured type<code>)</code>-a reference to the specified SQL structured type
+<a name="1001709"> </a>
+<li><code>ARRAY[n]</code>-an array of <code>n</code> elements that are all one data type
+</ul><a name="1001710"> </a>
+<li>User-defined types (UDTs)-new types created with the SQL command&thorn;<code>CREATE TYPE</code>
+<ul><a name="1001711"> </a>
+<li>Distinct type-a new type based on the representation of a single built-in type
+<a name="1001712"> </a>
+<li>Structured type-a new type containing multiple attributes, each of which may be either a built-in or a user-defined data type
+</ul><a name="1001713"> </a>
+<li>Locator types-types that are logical pointers to data that resides on the database server
+<ul><a name="1001714"> </a>
+<li><code>LOCATOR(structured type)</code>
+<a name="1001715"> </a>
+<li><code>LOCATOR(array)</code>
+<a name="1001716"> </a>
+<li><code>LOCATOR(blob)</code>
+<a name="1001717"> </a>
+<li><code>LOCATOR(clob)</code>
+</ul></ul><a name="1001430"> </a>
+<h4>A.4.2	 Summary of </a>Support for the SQL99 Data Types</h4>
+<p><a name="1001431"> </a>
+The JDBC 2.0 core API supports the SQL 99 data types by means of the following new interfaces, methods, and fields.
+</p><ul><a name="1001432"> </a>
+<li>New interfaces for the new data types. The SQL99 types are mapped by the following JDBC 2.0 core API interfaces:
+<ul><a name="1001433"> </a>
+<li><code>java.sql.Array</code>
+<a name="1001434"> </a>
+<li><code>java.sql.Blob</code>
+<a name="1001435"> </a>
+<li><code>java.sql.Clob</code>
+<a name="1001436"> </a>
+<li><code>java.sql.Ref</code>
+<a name="1001437"> </a>
+<li><code>java.sql.Struct</code>
+</ul><a name="1001438"> </a>
+<li>Interfaces that support customizing the mapping of UDTs (SQL structured and distinct types) into classes in the Java programming language
+<ul><a name="1001439"> </a>
+<li><code>SQLData</code>
+<a name="1001440"> </a>
+<li><code>SQLInput</code>
+<a name="1001441"> </a>
+<li><code>SQLOutput</code>
+</ul><a name="1001442"> </a>
+<li>Methods added to existing interfaces in order to retrieve, store, and update the SQL99 types
+<ul><a name="1001443"> </a>
+<li>new <code>getter</code> methods in the <code>ResultSet</code> interface<code> </code>to retrieve SQL99 type column values from a result set
+<a name="1001444"> </a>
+<li>new <code>getter</code> methods in the <code>CallableStatement</code> interface<code> </code>to retrieve SQL99 type values in output parameters
+<a name="1001445"> </a>
+<li>new <code>setter</code> methods in the <code>PreparedStatement</code> interface to set a SQL99 type column value
+<a name="1006026"> </a>
+<li>new <code>updater</code> methods in the <code>ResultSet</code> interface<code> </code>to update values programmatically
+</ul><a name="1006027"> </a>
+<li>Methods in the <code>DatabaseMetaData</code> and <code>ResultSetMetaData</code> interfaces for getting metadata about the SQL99 data types
+<a name="1001448"> </a>
+<li>Fields (constants) added to the class <code>java.sql.Types</code> to support new data types and persistent storage
+<ul><a name="1001449"> </a>
+<li><code>DISTINCT</code>
+<a name="1001450"> </a>
+<li><code>STRUCT</code>
+<a name="1001451"> </a>
+<li><code>ARRAY</code>
+<a name="1001452"> </a>
+<li><code>BLOB</code>
+<a name="1001453"> </a>
+<li><code>CLOB</code>
+<a name="1001454"> </a>
+<li><code>REF</code>
+<a name="1001455"> </a>
+<li><code>JAVA_OBJECT</code>
+</ul></ul><a name="1001475"> </a>
+<h4>A.4.3	 Mapping</a> of the SQL99 Types</h4>
+<p><a name="1001660"> </a>
+The JDBC API does not try to replicate the SQL99 types exactly; rather, its goal is to map them to types in the Java programming language so that they retain their functionality and are convenient to use. For example, SQL99 has what are called <em>locator types</em>, which are used on a client to designate data that is stored on a database server. Locators can be very useful for dealing with data that is large because they allow the data to be manipulated without having to be materialized on the client machine. SQL99 includes locators for the types <code>ARRAY</code>, <code>BLOB</code>, <code>CLOB</code> and structured types. The JDBC API does not include locators for these types directly (and not at all for structured types) but rather provides interfaces that are implemented such that the driver and DBMS use the appropriate locators behind the scenes. The result is that a developer using the JDBC API to access an SQL <code>ARRAY</code>, <code>BLOB</code>, or <code>CLOB</code> value need not even be aware of locators.
+</p><p><a name="1001664"> </a>
+The following SQL99 types are mapped to interfaces in the Java programming language:
+</p><ul><a name="1001478"> </a>
+<li><code>ARRAY</code>-mapped to <code>java.sql.Array</code>
+<a name="1001479"> </a>
+<li><code>BLOB</code>-mapped to <code>java.sql.Blob</code>
+<a name="1001480"> </a>
+<li><code>CLOB</code>-mapped to <code>java.sql.Clob</code>
+<a name="1001481"> </a>
+<li><code>REF</code>-mapped to <code>java.sql.Ref</code>
+</ul><ul><a name="1001482"> </a>
+<li>an SQL structured type-mapped to <code>java.sql.Struct</code>
+</ul><p><a name="1001483"> </a>
+Distinct types are not mapped to an interface because they are based on a single built-in type and thus can simply be mapped to the standard mapping for that built-in type. For example, the following is an SQL statement that creates the new type <code>MONEY</code>.
+</p></ul><blockquote><pre>
+CREATE TYPE MONEY AS NUMERIC(10, 2)
+</pre></blockquote><p><a name="1002576"> </a>
+This new UDT is based on the data type <code>NUMERIC</code>, which maps to <code>java.math.BigDecimal</code>, so the type <code>MONEY</code> maps to <code>java.math.BigDecimal</code>. This means that a value of type <code>MONEY</code> would be retrieved with the method <code>getBigDecimal</code>, stored with the method <code>setBigDecimal</code>, and updated with the method <code>updateBigDecimal</code>. 
+</p><a name="1001484"> </a>
+<h4>A.4.4	 SQL </a></a>Locators</h4>
+<p><a name="1001485"> </a>
+An SQL <code>LOCATOR</code> is a logical pointer to data that resides on a database server. It typically refers to data that is too large to materialize on the client, such as images or audio. Locators exist only in a client environment, and their existence is transient. A standard implementation will use locators internally for instances of the <code>Blob</code>, <code>Clob</code>, and <code>Array </code>interfaces. This means that <code>Blob</code>, <code>Clob</code>, and <code>Array</code> objects contain a locator that points to the data on the server rather than containing the data itself. Programmers operating on <code>Blob</code>, <code>Clob</code>, and <code>Array</code> instances are actually operating on the database objects they represent. This ability to operate on large database objects without bringing their data to the client is a major plus in performance.
+</p><p><a name="1001747"> </a>
+Note that the JDBC API does not call for using the SQL <code>LOCATOR(</code>structured type<code>)</code>. In a standard implementation, a <code>Struct</code> object contains the data of the structured type that it maps and is not implemented internally as a locator, as are <code>Blob</code>, <code>Clob</code>, and <code>Array</code> objects.
+</p><a name="1002502"> </a>
+<h4>A.4.5	 Support for Storing Java Objects</h4>
+<p><a name="1002503"> </a>
+The JDBC API has always supported persistent storage of objects defined in the Java programming language through the methods <code>getObject</code> and <code>setObject</code>. But, of course, persistent storage of Java objects does not actually occur unless a DBMS also supports it. Up to this point, support was limited, but a new generation of DBMSs that recognize Java objects as a data type is emerging. In these DBMSs, termed Java relational DBMSs, an instance of a Java class can be stored as a column value in a database table.
+</p>
+<hr><br>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="mapping.html">[Prev]</a> [Next] [Bottom]
+<hr><br>
+
+
+
+<i><a href="copyright.html">Copyright</a> &#169; 2001, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

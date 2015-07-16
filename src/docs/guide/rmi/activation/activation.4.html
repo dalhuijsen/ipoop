@@ -1,0 +1,652 @@
+<HTML>
+<HEAD>
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.02 [en] (X11; U; SunOS 5.6 sun4u) [Netscape]">
+   <TITLE> Using a MarshalledObject to create persistent data </TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<CENTER>
+<H1>
+Using a MarshalledObject to create persistent data</H1></CENTER>
+
+<HR WIDTH="100%">
+
+<p>This tutorial should not be the first activation tutorial that you read.
+This tutorial assumes that you have already read one or more of the
+three introductory activation tutorials:
+<UL>
+	<LI><A HREF="activation.1.html">Creating an Activatable Object</A>
+
+	<LI><A HREF="activation.2.html">Making a UnicastRemoteObject
+	Activatable</A>
+
+	<LI><A HREF="activation.3.html">Activating an object that does
+	not extend java.rmi.activation.Activatable</A>
+</UL>
+
+<p>In the case of a <code>UnicastRemoteObject</code>, it is easy to pass command-line arguments to the implementation class, because the server
+program that received those arguments is always running during the
+lifetime of the remote object implementation. For activatable objects,
+however, the setup class may exit immediately after registering the
+activation descriptor with the RMI daemon and registering the stub with
+the <code>rmiregistry</code>.
+
+<P>The <code>MarshalledObject </code>class provides a flexible
+mechanism for passing persistence or initialization data through the
+<code>ActivationDesc</code>, registered with <code>rmid</code>, rather
+than hard-coding values into the implementation's class file.
+
+<p>
+<HR WIDTH="100%">
+
+<P><B>Note:</B><I>&nbsp; For the remainder of this tutorial, the terms
+"activatable object implementation", "activatable object," and
+"implementation" may be used interchangeably to refer to the class,
+</I><code>examples.activation.MyPersistentClass</code><I>, which
+implements a remote interface and is activatable.</I>
+
+<P>In this tutorial the setup class,
+<code>examples.activation.Setup4</code>, does two new things:
+
+<UL>
+	<LI>It constructs a <code>java.util.Properties</code> object to
+	pass the location of the <code>java.security.properties</code>
+	file to the constructor of an
+	<code>ActivationGroupDescriptor</code>, which in turn, gets
+	passed to the constructor of the <code>ActivationDesc.</code>
+
+	<LI>It uses the <code>MarshalledObject</code>, that it passes
+	to the <code>ActivationDesc</code> constructor, to store a
+	<code>java.io.File </code>object that represents the location
+	of the persistent data storage.
+</UL>
+
+<p>In this example, if the <code>persistentObjectStore.ser </code>file
+exists, the activatable object implementation is initialized with the
+persistent data from the file. Otherwise, if the file does not exist,
+the activatable object initializes itself as though this is the first
+time a client has tried to send data.
+
+<P>The client program, <code>examples.activation.Client4</code>, passes
+a vector of transaction-like data to the activatable object, and that
+data is added to the implementation object's vector. Each time a client
+calls the implementation (to add more transaction data), the
+activatable implementation stores its state (writes the vector) out to
+the file specified by the <code>MarshalledObject</code>.
+
+<P>This tutorial is organized as follows:
+<UL>
+	<LI><A HREF="#A">The steps to create a remote interface</A>
+
+	<LI><A HREF="#B">The steps to create the implementation
+	class</A>
+
+	<LI><A HREF="#C">The steps to create the setup class</A>
+
+	<LI><A HREF="#D">The steps to compile and run the example
+	code</A>
+</UL>
+
+The files needed for this tutorial are:
+<UL>
+	<LI><code><A HREF="code/Client4.java">Client4.java</A></code>,
+	the class which will invoke a method on an activatable object
+
+	<LI><code><A HREF="code/YetAnotherRemoteInterface.java">
+	YetAnotherRemoteInterface.java</A></code>, the interface that
+	extends <code>java.rmi.Remote</code>, implemented by:
+
+	<LI><code><A HREF="code/MyPersistentClass.java"> 
+	MyPersistentClass.java</A></code>, the class which is activatable
+
+	<LI><code><A HREF="code/Setup4.java">Setup4.java</A></code>,
+	the class which registers information about the activatable
+	class with the RMI registry and the RMI daemon
+
+</UL>
+
+<P>You may notice that while the client code is included, it is not
+discussed in a step-by-step manner, like the implementation and setup
+classes. The reason for this omission, is that the client code for
+activatable objects is no different than the RMI client code for
+accessing non-activatable remote objects. Activation is strictly a
+server-side implementation decision.
+
+<P> For all of the source code used in the activation tutorials, you
+may choose from these formats:
+
+<UL>
+    <LI><A HREF="../archives/activation.zip">activation.zip</A>
+    <LI><A HREF="../archives/activation.tar">activation.tar</A>
+    <LI><A HREF="../archives/activation.tar.Z">activation.tar.Z</A>
+</UL>
+
+<P>
+<HR WIDTH="100%">
+
+<P><A NAME="A"></A><B><FONT SIZE=+1>Creating the remote interface</FONT></B>
+
+<P>Create an interface that describes each of the methods that you
+would like to call remotely. For this example, the remote interface
+will be <code><A HREF="code/YetAnotherRemoteInterface.java">
+examples.activation.YetAnotherRemoteInterface</A></code>. There are
+three steps to create a remote interface:
+<BR>
+<OL>
+	<LI>Make the appropriate imports in the interface
+
+	<LI>Extend <code>java.rmi.Remote</code>
+	
+	<LI>Declare each of the methods that may be called remotely
+</OL>
+<blockquote>
+
+
+<B><FONT SIZE=+1>Step 1:</FONT></B>
+<BR><B><FONT SIZE=+1>Make the appropriate imports in your interface</FONT></B>
+<pre>
+import java.rmi.*;
+import java.util.Vector;</pre>
+
+<B><FONT SIZE=+1>Step 2:</FONT></B>
+<BR><B><FONT SIZE=+1>Extend java.rmi.Remote</FONT></B>
+
+<pre>public interface YetAnotherRemoteInterface extends Remote {</pre>
+
+<B><FONT SIZE=+1>Step 3:</FONT></B>
+<BR><B><FONT SIZE=+1>Declare each of the methods that may be called remotely</FONT></B>
+
+<pre>public Vector calltheServer(Vector v) throws RemoteException;</pre>
+</blockquote>
+
+<HR WIDTH="100%">
+
+<P><A NAME="B"></A><B><FONT SIZE=+1>Creating the implementation class</FONT></B>
+
+<P>For this example, the implementation class will be <code> <A
+HREF="code/MyPersistentClass.java">
+examples.activation.MyPersistentClass</A></code>. There are five steps
+to create an activatable implementation class that uses a
+<code>MarshalledObject</code>:
+<BR>
+<OL>
+	<LI><A HREF="#A1">Make the appropriate imports in the
+	implementation class</A>
+
+	<LI><A HREF="#A2">Extend your class from<code>
+	java.rmi.activation.Activatable</code></A>
+	
+	<LI><A HREF="#A3">Declare a two-argument constructor in the
+	implementation class</A>
+
+	<LI><A HREF="#A4">Write the methods that use the
+	<code>MarshalledObject</code>, to save and restore the object's
+	data state</A>
+
+	<LI><A HREF="#A5">Implement the remote interface method(s)</A>
+
+</OL>
+
+<blockquote>
+<BR><A NAME="A1"></A><B><FONT SIZE=+1>Step 1:</FONT></B>
+<BR><B><FONT SIZE=+1>Make the appropriate imports in the implementation
+class</FONT></B>
+<pre>
+import java.io.*; 
+import java.rmi.*; 
+import java.rmi.activation.*; 
+import java.util.Vector; </pre>
+
+<P><A NAME="A2"></A><B><FONT SIZE=+1>Step 2:</FONT></B>
+<BR><B><FONT SIZE=+1>Extend your class from <code>java.rmi.activation.Activatable</code></FONT></B>
+
+<pre>
+public class MyPersistentClass extends Activatable
+    implements examples.activation.YetAnotherRemoteInterface {</pre>
+
+
+<A NAME="A3"></A><B><FONT SIZE=+1>Step 3:</FONT></B> <BR><B><FONT
+SIZE=+1>Declare a two-argument constructor in the implementation
+class</FONT></B>
+
+<P>In the constructor, in addition to the normal call to the
+superclass's constructor, in this example the <code>MarshalledObject
+</code>is used to specify the file name of the persistent data store.
+If the file exists, it's used to initialize this object's variable, a
+<code>Vector </code>named "<code>transactions</code>". If the file
+object doesn't exist, then the vector is manually initialized.  If
+there is any error reading the file, then object construction fails.
+<pre>
+private Vector transactions; 
+private File holder; 
+
+public MyPersistentClass(ActivationID id, MarshalledObject data) 
+    throws RemoteException, ClassNotFoundException, java.io.IOException { 
+
+    // Register the object with the activation system 
+    // then export it on an anonymous port 
+    super(id, 0); 
+
+    // Extract the File object from the MarshalledObject that was 
+    // passed to the constructor 
+    // 
+    holder = (File)data.get(); 
+    
+    if (holder.exists()) { 
+        // Use the MarshalledObject to restore my state 
+	// 
+	this.restoreState(); 
+    } else { 
+	transactions = new Vector(1,1); 
+	transactions.addElement("Initializing transaction vector"); 
+    } 
+
+} 
+</pre>
+
+<P><A NAME="A4"></A><B><FONT SIZE=+1>Step 4:</FONT></B>
+<BR><B><FONT SIZE=+1>Write the methods that use the
+<code>MarshalledObject</code>, to save and restore the object's data
+state</FONT></B>
+
+<pre>
+// If the MarshalledObject that was passed to the constructor was 
+// a file, then use it to recover the vector of transaction data 
+// 
+private void restoreState() throws IOException, ClassNotFoundException { 
+    File f = holder; 
+    FileInputStream fis = new FileInputStream(f); 
+    ObjectInputStream ois = new ObjectInputStream(fis); 
+    transactions = (Vector)ois.readObject(); 
+    ois.close(); 
+} 
+    
+private void saveState() { 
+    try { 
+	File f  = holder; 
+	FileOutputStream fos = new FileOutputStream(f); 
+	ObjectOutputStream oos = new ObjectOutputStream(fos); 
+	oos.writeObject(getTransactions()); 
+	oos.close(); 
+    } catch (Exception e) { 
+	throw new RuntimeException("Error saving vector of data"); 
+    } 
+} 
+</pre>
+
+<P><A NAME="A5"></A><B><FONT SIZE=+1>Step 5:</FONT></B> <BR><B><FONT
+SIZE=+1>Implement the remote interface method(s)</FONT></B>
+
+<P>Add each of the vector elements passed from the client to the object
+instance and save the updated vector out to a file.
+<pre>
+public Vector calltheServer(Vector v) throws RemoteException { 
+        
+     int limit = v.size(); 
+     for (int i = 0; i < limit; i++) { 
+         transactions.addElement(v.elementAt(i)); 
+     } 
+        
+     // Save this object's data out to file 
+     // 
+     this.saveState(); 
+     return transactions; 
+}
+</pre
+</blockquote>
+</blockquote>
+
+<HR WIDTH="100%">
+
+<P><A NAME="C"></A><B><FONT SIZE=+1>Creating the "setup" class</FONT></B>
+
+<P>The job of the "setup" class is to create all the information
+necessary for the activatable class, without necessarily creating an
+instance of the remote object. For this example, the setup class will
+be <code><A
+HREF="code/Setup4.java">examples.activation.Setup4</A></code>.
+
+<P>The setup class passes information about the activatable class to
+<code>rmid</code>, registers a remote reference (an instance of the
+activatable class's stub class) and an identifier (name) with the
+<code>rmiregistry</code>, and then the setup class may exit. There are
+seven steps to create a setup class:
+<OL>
+	<LI><A HREF="#B1">Make the appropriate imports</A>
+
+	<LI><A HREF="#B2">Install a <code>SecurityManager</code></A>
+
+	<LI><A HREF="#B7">Create an <code>ActivationGroup</code>
+	instance</A>
+
+	<LI><A HREF="#B3">Create an <code>ActivationDesc</code> instance</A>
+
+	<LI><A HREF="#B4">Remove the reference to the implementation
+	class creation, and register with <code>rmid</code></A>
+
+	<LI><A HREF="#B5">Bind the stub to a name in the
+	<code>rmiregistry</code></A>
+
+	<LI><A HREF="#B6">Quit the setup application</A>
+</OL>
+<blockquote>
+
+<P><A NAME="B1"></A><B><FONT SIZE=+1>Step 1:</FONT></B>
+<BR><B><FONT SIZE=+1>Make the appropriate imports in the setup class</FONT></B>
+<pre>
+import java.io.File; 
+import java.rmi.*; 
+import java.rmi.activation.*; 
+import java.util.Properties; 
+</pre>
+
+<P><A NAME="B2"></A><B><FONT SIZE=+1>Step 2:</FONT></B>
+<BR><B><FONT SIZE=+1>Install a <code>SecurityManager</code></FONT></B>
+
+<pre>System.setSecurityManager(new RMISecurityManager());</pre>
+
+<P><A NAME="B7"></A><B><FONT SIZE=+1>Step 3:</FONT></B>
+<BR><B><FONT SIZE=+1>Create an <code>ActivationGroup</code> instance
+</FONT></B>
+
+<P><B>Note</B>: In this example, for simplicity, we will use a <A
+HREF="code/policy">policy </A>file that gives global permission to
+anyone from anywhere. <B><I>Do not use this policy file in a production
+environment</I></B>. For more information on how to properly open up
+permissions using a <code>java.security.policy</code> file, please
+refer to to the following documents:
+
+<UL><code><A HREF="../../security/PolicyFiles.html">Default Policy Implementation and Policy File Syntax</A></code><p>
+
+<code><A HREF="../../security/permissions.html">Permissions in the Java 2 SDK</A></code>
+</UL>
+
+<P>In the setup application, the job of the activation group descriptor
+is to provide all the information that <code>rmid </code>will require
+to contact the appropriate existing Java<SUP><FONT
+SIZE=-2>TM</FONT></SUP> virtual machine* (JVM) or spawn a new JVM for the
+activatable object.
+
+<P><B>Note</B><I>: In order to run this code on your system, you'll
+need to change the policy file location to be the absolute path to
+where you've installed the example policy file that came with the
+source code.</I>
+
+<pre>
+// Because of the Java 2 security model, a security policy should 
+// be specified for the ActivationGroup VM. The first argument
+// to the Properties put method, inherited from Hashtable, is 
+// the key and the second is the value 
+// 
+Properties props = new Properties(); 
+props.put("java.security.policy", 
+   "/home/rmi_tutorial/activation/policy"); 
+
+ActivationGroupDesc.CommandEnvironment ace = null; 
+ActivationGroupDesc exampleGroup = new ActivationGroupDesc(props, ace);
+
+// Once the ActivationGroupDesc has been created, register it 
+// with the activation system to obtain its ID
+//
+ActivationGroupID agi = 
+   ActivationGroup.getSystem().registerGroup(exampleGroup);
+</pre>
+
+<P><A NAME="B3"></A><B><FONT SIZE=+1>Step 4:</FONT></B>
+<BR><B><FONT SIZE=+1>Create an <code>ActivationDesc</code> instance</FONT></B>
+
+<P>In the setup application, the job of the activation descriptor is to
+provide all the information that <code>rmid </code>will require to
+create a new instance of the implementation class.
+
+<P><B>Note</B><I>: In order to run this code on your system, you'll
+need to change the file URL location to be the location of the
+directory on your system, where you've installed the example source
+code.</I>
+
+<pre>
+// Don't forget the trailing slash at the end of the URL
+// or your classes won't be found
+//	
+String location = "file:/home/rmi_tutorial/activation/";
+
+// Pass the file that we want to persist to as the Marshalled
+// object
+MarshalledObject data =  new MarshalledObject (new File(
+    "/home/rmi_tutorial/activation/persistentObjectStore.ser"));
+
+// The location argument to the ActivationDesc constructor will be used 
+// to uniquely identify this class; it's location is relative to the 
+// URL-formatted String, location.
+//
+ActivationDesc desc = new ActivationDesc 
+    (agi, "examples.activation.ActivatableImplementation", 
+      location, data);
+</pre>
+
+<P><A NAME="B4"></A><B><FONT SIZE=+1>Step 5:</FONT></B>
+<BR><B><FONT SIZE=+1>Declare an instance of your remote interface and register
+the activation descriptor with&nbsp; <code>rmid</code></FONT></B>
+<pre>
+YetAnotherRemoteInterface yari = 
+    (YetAnotherRemoteInterface)Activatable.register(desc);
+System.out.println("Got the stub for MyPersistentClass");
+</pre>
+
+
+<P><A NAME="B5"></A><B><FONT SIZE=+1>Step 6:</FONT></B>
+<BR><B><FONT SIZE=+1>Bind the stub, that was returned by the
+<code>Activatable.register</code> method, to a name in the
+<code>rmiregistry</code></FONT></B>
+<pre>
+Naming.rebind("MyPersistentClass", yari);
+System.out.println("Exported MyPersistentClass");
+</pre>
+
+<P><A NAME="B6"></A><B><FONT SIZE=+1>Step 7:</FONT></B>
+<BR><B><FONT SIZE=+1>Quit the setup application</FONT></B>
+
+<pre>System.exit(0);</pre>
+</blockquote>
+<HR WIDTH="100%">
+
+<P><A NAME="D"></A><B><FONT SIZE=+1>Compile and run the code</FONT></B>
+
+<P>There are six steps to compile and run the code:
+<OL>
+	<LI><A HREF="#C1">Compile the remote interface, implementation,
+	client and setup classes</A>
+
+	<LI><A HREF="#C2">Run <code>rmic</code> on the implementation class</A>
+
+	<LI><A HREF="#C3">Start the <code>rmiregistry</code></A>
+
+	<LI><A HREF="#C4">Start the activation daemon, <code>rmid</code></A>
+
+	<LI><A HREF="#C5">Run the setup program</A>
+
+	<LI><A HREF="#C6">Run the client</A>
+</OL>
+<blockquote>
+
+<P><A NAME="C1"></A><B><FONT SIZE=+1>Step 1:</FONT></B>
+<BR><B><FONT SIZE=+1>Compile the remote interface, implementation, client
+and setup classes</FONT></B>
+<pre>
+% javac -d . YetAnotherRemoteInterface.java 
+% javac -d . MyPersistentClass.java 
+% javac -d . Client4.java 
+% javac -d . Setup4.java 
+</pre>
+
+<P><A NAME="C2"></A><B><FONT SIZE=+1>Step 2:</FONT></B>
+<BR><B><FONT SIZE=+1>Run <code>rmic </code>on the implementation class</FONT></B>
+
+<pre>% rmic -d . examples.activation.MyPersistentClass</pre>
+
+<P><A NAME="C3"></A><B><FONT SIZE=+1>Step 3:</FONT></B>
+<BR><B><FONT SIZE=+1>Start the<code> rmiregistry</code></FONT></B>
+
+<P><code>% rmiregistry &amp;</code>
+
+<BR>
+<p><A NAME="registryNote"></A><B>Note:&nbsp; </B><I>Before you start the
+rmiregistry, you must make sure that the shell or window in which you
+will run the </I><code>registry</code><I>, either has no CLASSPATH set
+or has a CLASSPATH that does not include the path to any classes that
+you want downloaded to your client, including the stubs for your remote
+object implementation classes.</I>
+
+<P><I>If you start the </I><code>rmiregistry</code><I>, and it
+</I>can<I> find your stub classes in its CLASSPATH, it will ignore the
+server's </I><code>java.rmi.server.codebase</code><I> property, and as
+a result, your client(s) will not be able to download the stub code for
+your remote object.</I>
+
+<P><A NAME="C4"></A><B><FONT SIZE=+1>Step 4:</FONT></B>
+<BR><B><FONT SIZE=+1>Start the activation daemon,<code> rmid</code></FONT></B>
+
+<pre>% rmid -J-Djava.security.policy=rmid.policy &amp;</pre>
+Where <code>rmid.policy</code> is the name of the security policy file for <code>rmid</code>.
+<p>
+<b>Note:</b> By default, <code>rmid</code> now requires a security
+policy file, that is used to verify whether or not the information in
+each <code>ActivationGroupDescriptor</code> is allowed to be used to
+launch a JVM for an activation group. For complete details, please
+refer to the <a
+href="../../../tooldocs/solaris/rmid.html"><code>rmid</code> man
+page for the Solaris operating environment</a> and the <a
+href="../../../tooldocs/windows/rmid.html"><code>rmid</code> man
+page for the Microsoft Windows platform</a>.
+
+<P><A NAME="C5"></A><B><FONT SIZE=+1>Step 5:</FONT></B>
+<BR><B><FONT SIZE=+1>Run the setup program</FONT></B>
+
+<P>Run the setup, setting the codebase property to be the location of
+the implementation stubs. There are four things that need to go on the
+same command line:
+
+<OL>
+	<LI>The "<code>java</code>" command
+
+	<LI>A property <I>name</I>=<I>value </I>pair that specifies the
+	location of the security policy file
+
+	<LI> A property to specify where the stub code lives (no spaces
+	from the "-D" all the way though the last "/")
+
+	<LI>The fully-qualified package name of the setup program.
+</OL>
+
+There should be one space just after the word "<code>java</code>", one
+between the two properties, and a third one just before the word
+"<code>examples</code>" (which is very hard to see when you view this
+as text, in a browser, or on paper).
+
+<P><code>% java&nbsp; -Djava.security.policy=/home/rmi_tutorial/activation/policy&nbsp;
+-Djava.rmi.server.codebase=file:/home/rmi_tutorial/activation/ &nbsp;examples.activation.Setup4</code>
+
+<P>The codebase property will be resolved to a URL, so it must have the
+form of "<code>http://aHost/somesource/"</code> or
+"<code>file:/myDirectory/location/</code>" or, due to the requirements
+of some operating systems, "<code>file:///myDirectory/location/</code>"
+(three slashes after the "<code>file:</code>"). 
+
+<p>While a <code>file:</code> URL is sometimes easier to use for
+running example code, using the <code>file:</code> URL will mean that
+the only clients that will be able to access the server are those that
+can access the same files system as the server  (either by virtue of
+running on the same machine as the server or by using a shared
+filesystem, such as NFS). If you wish to use an HTTP server, but don't
+have one available to you, please feel free to <a
+href="http://java.sun.com/products/jdk/rmi/class-server.zip"><i>download
+our HTTP server</i></a>.
+
+<P>Please note that each of these sample URL strings has a trailing
+"/".  The trailing slash is a requirement for the URL set by the
+<code>java.rmi.server.codebase</code> property, so the implementation
+can resolve (find) your class definition(s) properly. For more
+information on setting the <code>java.rmi.server.codebase</code>
+property from the command line, please take a look at our tutorial on
+<i><a href="../codebase.html"> dynamic code downloading using the
+<code>java.rmi.server.codebase</code></i> property</a>.
+
+<P>If you forget the trailing slash on the property, or if the class
+files can't be located at the source (they aren't really being made
+available for download) or if you misspell the property name, you'll
+get thrown a <B><code>java.lang.ClassNotFoundException</code></B>. This
+exception will be thrown when you try to bind your remote object to the
+<code>rmiregistry</code>, or when the first client attempts to access
+that object's stub. If the latter case occurs, you have another problem
+as well because the <i><A HREF="#registryNote"><code>rmiregistry</code>
+was finding the stubs in its CLASSPATH</A></i>.
+
+<P>The server output should look like this:
+
+<pre>
+     Got the stub for MyPersistentClass
+     Exported MyPersistentClass
+</pre>
+
+<A NAME="C6"></A><B><FONT SIZE=+1>Step 6:</FONT></B>
+<BR><B><FONT SIZE=+1>Run the client</FONT></B>
+
+<P>The argument to the client program is the hostname of the implementation
+server, in this case, "<code>vector</code>".
+
+<pre>% java&nbsp;-Djava.security.policy=/home/rmi_tutorial/activation/policy&nbsp;
+examples.activation.Client4 vector</pre>
+
+<p>The <I>first</I> time that the client is run against this implementation,
+the output should look like this:
+<pre>
+	Got a remote reference to the class MyPersistentClass 
+        Called the remote method 
+	Result: 
+	Initializing transaction vector 
+	Deposited money 
+	Withdrew money 
+	Transferred money from Savings 
+	Check cleared 
+	Point-of-sale charge at grocery store </pre>            
+
+The <I>second </I>time that the client is run against this implementation,
+the output will include five additional "transactions", so it should
+look like this:
+
+<pre>
+        Got a remote reference to the class MyPersistentClass 
+	Called the remote method 
+	Result: 
+	Initializing transaction vector 
+	Deposited money 
+	Withdrew money 
+	Transferred money from Savings 
+	Check cleared 
+	Point-of-sale charge at grocery store 
+	Deposited money 
+	Withdrew money 
+	Transferred money from Savings 
+	Check cleared 
+	Point-of-sale charge at grocery store 
+</pre>
+Additionally, you should see the size of the <code>persistentObjectStore.ser</code>
+file increase, with each subsequent client call.</UL>
+<p>
+*As used on this web site, the terms "Java virtual machine" or "JVM" 
+	mean a virtual machine for the Java platform.
+
+<!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../../relnotes/SMICopyright.html">Copyright &copy;</A>
+2003 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:rmi-comments@java.sun.com">rmi-comments@java.sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+</BODY>
+</HTML>

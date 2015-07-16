@@ -1,0 +1,87 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation:  - Exceptions In RMI
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td><a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-exceptions3.html">PREV</a>
+ | <a href="rmi-exceptions5.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	A.3	</i> Exceptions or Errors During Return
+</a></h2>
+
+<blockquote>
+<a name="5102"><!-- --></a>
+<br><br>
+<Table Border="1" Cellpadding="5"
+	Summary="Exceptions or Errors During Return">
+<caption></caption>
+
+<tr>
+	<th>Exception<br></th>
+	<th>Context<br></th>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.UnmarshalException</code></td>
+	<td><p>Corrupted stream leads to either an I/O or protocol error when:
+		<p><dd><li>Marshaling return header</li></p>
+
+		<p><dd><li>Checking return type</li></p>
+
+		<p><dd><li>Checking return code</li></p>
+
+		<p><dd><li>Unmarshaling return</li></p>
+
+	<dl><p><p>Return value class not found.</dl></td>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.UnexpectedException</code></td>
+	<td><p>An exception not mentioned in the method signature occurred (excluding runtime exceptions). The <code>UnexpectedException</code> exception object contains the underlying exception that was thrown by the server.</td>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.ServerError</code></td>
+	<td><p>Any error that occurs while the server is executing a remote method. The <code>ServerError</code> exception object contains the underlying error that was thrown by the server,</td>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.ServerException</code></td>
+	<td><p>Any remote exception that occurs while the server is executing a remote method. For examples, see <a href="rmi-exceptions5.html">Section&#160;A.3.1, &#34;Possible Causes of java.rmi.ServerException&#34;</a>.</td>
+</tr>
+<tr valign="top">
+	<td><p><code>java.rmi.ServerRuntimeException</code><p><em>note: this exception is deprecated as of </em>Java 2 SDK, Standard Edition, v1.2</td>
+	<td><p>This exception is not thrown by servers running Java 2 SDK, Standard Edition, v1.2-compatible versions. A <code>RuntimeException</code> are propagated to clients in tact.</td>
+</tr>
+</Table>
+ 
+
+</ul>
+<br>
+<hr>
+<a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-exceptions3.html">PREV</a>
+ | <a href="rmi-exceptions5.html">NEXT</a> 
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Monday, October 7, 2002 -->
+ 
+
+
+</body>
+</html>

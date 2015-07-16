@@ -1,0 +1,82 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="spicover.frame.html">[Top]</a> <a href="legend.frame.html">[Prev]</a> [Next] [Bottom]
+<hr><br>
+ 
+<p><a name="150244"> </a>
+<center>
+<h1>Appendix C:  JNDI Change History</h1>
+</center>
+</p><a name="151997"> </a>
+<h1> JNDI 1.2: JNDI Changes Since JNDI 1.1</h1>
+<ul><a name="152001"> </a>
+<li>Added <code>javax.naming.event</code> package.
+<a name="152002"> </a>
+<li>Added <code>javax.naming.ldap</code> package.
+<a name="152004"> </a>
+<li>Added support for configuration using resource files. See Chapter 6 of the <strong>JNDI API</strong> document.
+</ul><a name="152008"> </a>
+<h2> API-related Changes</h2>
+<ul><a name="152003"> </a>
+<li>Added <code>NamingEnumeration.close()</code> for cancelling or terminating enumerations.
+<a name="152014"> </a>
+<li>Added <code>ReferralException.getReferralContext(Hashtable env)</code> and <code>ReferralException.retryReferral()</code> to allow creation and retry of referral context with different environment properties.
+<a name="152015"> </a>
+<li>Clarified how context methods that accept <code>Name</code> argument should deal with <code>CompositeName</code> and non<code>CompositeName</code> arguments. Specifically, instances of <code>CompositeName</code> are treated as composite name, while al
+
+
+l others are treated as compound name.
+<a name="152016"> </a>
+<li>Added <code>Context.getNameInNamespace()</code> for retrieving the full name of a context within its own namespace.
+<a name="152018"> </a>
+<li>Clarified definition of the class factory location of a <code>Reference</code> object. Specifically, the location is a codebase, which consists of a list space-separated URLs.
+<a name="152019"> </a>
+<li>Added support for ordered multivalued attributes to <code>Attribute</code> and <code>BasicAttribute</code>.
+<a name="152053"> </a>
+<li>Added <code>BasicAttributes.equals()</code> and <code>BasicAttributes.hashCode()</code>.
+<a name="152020"> </a>
+<li>Redefined semantics of <code>DirContext.getSchemaClassDefinition()</code> so that it returns a context that contains the <code>DirContext</code> objects of class definitions, rather than returning one (arbitrary) class definition.
+<a name="152037"> </a>
+<li>Added protected <code>InitialContext</code>/<code>InitialDirContext</code> constructors to allow lazy initialization. Useful for subclass implementations.
+</ul><a name="152011"> </a>
+<h2> SPI-related Changes</h2>
+<ul><a name="152061"> </a>
+<li>Added <code>StateFactory</code>/<code>NamingManager.getStateToBind()</code>, analogous to <code>ObjectFactory</code>/<code>NamingManager.getObjectInstance()</code>, for transforming an object's state before the object is bound in the naming/directory 
+
+
+service.
+<a name="152060"> </a>
+<li>Added interfaces <code>DirObjectFactory</code> and <code>DirStateFactory</code> to better support service providers that implement the <code>DirContext</code> interface. Added 
+<code>DirectoryManager.getObjectInstance()</code> and 
+<code>DirectoryManager.getStateToStore()</code> to use these interfaces.
+<a name="152009"> </a>
+<li>Refined definition of <code>NamingManager.getObjectInstance()</code> to not treat URL strings specially. Instead, the URL should be wrapped inside a <code>Reference</code> whose <code>RefAddr</code> type is "URL".
+<a name="152058"> </a>
+<li>Made <code>ResolveResult</code> implement <code>Serializable</code>.
+<a name="152073"> </a>
+<li>Defined a special form of <code>Reference</code> called a next naming system (nns) reference for supporting "dynamic federation". This reference has a <code>RefAddr</code> type of "nns" and a content consisting of the resolved object.
+<a name="152085"> </a>
+<li>Added the string constant <code>NamingManager.CPE</code> which names a property set by <code>NamingManager.getContinuationContext()</code>/<code>DirectoryManager.getContinuationContext()</code>. The value of this property is an instance of 
+<code>CannotProceedException</code>. 
+This is useful to service providers that implement federation by chaining the CPEs.
+<a name="152100"> </a>
+<li>Defined a convention for service providers to use when naming environment properties. See Section 6.1.
+</ul>
+<hr><br>
+ 
+<a href="spicover.frame.html">[Top]</a> <a href="legend.frame.html">[Prev]</a> [Next] [Bottom]
+<hr><br>
+
+
+
+<address>
+<a href="mailto:jndi@java.sun.com">jndi@java.sun.com</a>
+</address>
+
+<i><a href="copyright.html">Copyright</a> &#169; 1999, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+
+</body>
+</html>

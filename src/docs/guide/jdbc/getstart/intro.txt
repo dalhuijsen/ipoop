@@ -1,0 +1,7 @@
+An application written in the Java programming language uses the JDBC
+DriverManager class API to access a driver based on JDBC technology
+("JDBC driver"). There are various JDBC driver alternatives. A JDBC-Net
+driver connects to a middle tier server and translates JDBC calls into a
+DBMS-independent net protocol.  The server then translates this to a DBMS
+protocol.  Other driver implementations access a DBMS directly using
+proprietary database access protocols.

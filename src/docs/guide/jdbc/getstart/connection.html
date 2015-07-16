@@ -1,0 +1,245 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="intro.html">[Prev]</a> <a href="drivermanager.html">[Next]</a> 
+<hr><br>
+ 
+<a name="1001869"> </a>
+<h2> Connection</a></h2>
+<p><a name="1008256"> </a>
+NOTE: The material in this chapter is based on <em>JDBC</em>tm<em> API Tutorial and Reference, Second Edition: Universal Data Access for the Java</em>tm<em> 2 Platform</em>, published by Addison Wesley as part of the Java series, ISBN 0-201-43328-1.
+</p><a name="996856"> </a>
+<h3>2.1	 Connection Overview</h3>
+<p><a name="1003865"> </a>
+A <code>Connection</code> object represents a connection with a database. A connection </a>session includes the SQL statements that are executed and the results that are returned over that connection. A single application can have one or more connections with a single database, or it can have connections with many different databases.
+</p><p><a name="1003868"> </a>
+</a>A </a>user can get information about a <code>Connection</code> object's database by invoking the </a><code>Connection.getMetaData</code> </a>method. This method returns a <code>DatabaseMetaData</code> object that contains information about the database's tables, the SQL grammar it supports, its stored procedures, the capabilities of this connection, and so on. 
+</p><a name="999299"> </a>
+<h4>2.1.1	 </a>Opening</a> a </a>Connection</a>&#32;</a></h4>
+<p><a name="997470"> </a>
+</a>The traditional way to establish a connection with a database is to call the method <code>DriverManager.getConnection</code>. This method takes a string containing a </a>URL. The <code>DriverManager</code> class, referred to as the </a>JDBC management layer, </a>attempts to locate a driver that can connect to the database represented by that URL. The </a><code>DriverManager</code> class maintains a list of registered <code>Driver</code> classes, and when the method <code>getConnection</code> is called, it checks with each driver in the list until it finds one that can connect to the database specified in the URL. The <code>Driver</code> method <code>connect</code> uses this URL to actually establish the connection.
+</p><p><a name="999842"> </a>
+A user can bypass the JDBC management layer and call <code>Driver</code> methods directly. This could be useful in the rare case that two drivers can connect to a database and the user wants to explicitly select a particular driver. Normally, however, it is much easier to just let the <code>DriverManager</code> class handle opening a connection. 
+</p><p><a name="997495"> </a>
+The following code exemplifies opening a connection to a database located at the URL <code>jdbc:odbc:wombat</code> with a user ID of <code>oboy</code> and <code>12Java</code> as the password:
+</p><blockquote><pre>
+</a>String url = "jdbc:odbc:wombat";
+Connection con = DriverManager.getConnection(url, "oboy", "12Java");
+
+</pre></blockquote><p><a name="1007366"> </a>
+The JDBC 2.0 Standard Extension API provides the <code>DataSource</code> interface as an alternative to the <code>DriverManager</code> for establishing a connection. When a <code>DataSource</code> class has been implemented appropriately, a <code>DataSource</code> object can be used to produce <code>Connection</code> objects that participate in connection pooling and/or <code>Connection</code> objects that can participate in distributed transactions. See the chapter "DataSource" for more information and to see example code for creating a connection using a <code>DataSource</code> object. This chapter also explains why using a <code>DataSource</code> object is the preferred alternative for creating a connection.
+</p><p><a name="1007412"> </a>
+An application uses a <code>Connection</code> object produced by a <code>DataSource</code> object in essentially the same way it uses a <code>Connection</code> object produced by the <code>DriverManager</code>. There are some differences, however. If the <code>Connection</code> object is a pooled connection, an application should include a <code>finally</code> block to assure that the connection is closed even if an exception is thrown. That way a valid connection will always be put back into the pool of available connections.
+</p><p><a name="1007399"> </a>
+If a <code>Connection</code> object is part of a distributed transaction, an application should not call the methods <code>Connection.commit</code> or <code>Connection.rollback</code>, nor should it turn on the connection's auto-commit mode. These would interfere with the transaction manager's handling of the distributed transaction. 
+</p><a name="997625"> </a>
+<h4>2.1.2	 URLs in General Use</h4>
+<p><a name="1002117"> </a>
+When an application uses the <code>DriverManager</code> to create a <code>Connection</code> object, it must supply a URL to the <code>DriverManager.getConnection</code> method. Since URLs often cause some confusion, we will first give a brief explanation of URLs in general and then go on to a discussion of JDBC URLs.
+</p><p><a name="999325"> </a>
+</a>A URL (Uniform Resource Locator) gives information for locating a resource on the Internet. It can be thought of as an address.
+</p><p><a name="1001980"> </a>
+</a>The first part of a URL specifies the protocol used to access information, and it is always followed by a colon. </a>Some common protocols are </a><code>ftp</code>, which specifies "file transfer protocol," and </a><code>http</code>, which specifies "hypertext transfer protocol." If the protocol is <code>file</code>, it indicates that the resource is in a local file system rather than on the Internet. 
+</p><blockquote><pre>
+      ftp://javasoft.com/docs/JDK-1_apidocs.zip
+      http://java.sun.com/products/JDK/CurrentRelease
+      file:/home/haroldw/docs/tutorial.html
+
+</pre></blockquote><p><a name="1002005"> </a>
+</a>The rest of a URL, everything after the first colon, gives information about where the data source is located. If the protocol is <code>file</code>, the rest of the URL is the path for the file. For the protocols <code>ftp</code> and <code>http</code>, the rest of the URL identifies the host and may optionally give a path to a more specific site. For example, here is the URL for the Java Software home page. This URL identifies only the host:
+</p><blockquote><pre>
+http://www.java.sun.com
+</pre></blockquote><p><a name="1002059"> </a>
+By navigating from this home page, you can go to many other pages, one of which is the JDBC home page. The URL for the JDBC home page is more specific and looks like this:
+</p><blockquote><pre>
+http://www.java.sun.com/products/jdbc
+</pre></blockquote><a name="997649"> </a>
+<h4>2.1.3	 JDBC URLs </h4>
+<p><a name="999448"> </a>
+A JDBC URL provides a way of identifying a data source so that the appropriate driver will recognize it and establish a connection with it. Driver writers are the ones who actually determine what the JDBC URL that identifies a particular driver will be. Users do not need to worry about how to form a JDBC URL; they simply use the URL supplied with the drivers they are using. JDBC's role is to recommend some conventions for driver writers to follow in structuring their JDBC URLs.
+</p><p><a name="999726"> </a>
+Since JDBC URLs are used with various kinds of drivers, the conventions are, of necessity, very flexible. First, they allow different drivers to use different schemes for naming databases. The <code>odbc</code> subprotocol, for example, lets the URL contain attribute values (but does not require them). 
+</p><p><a name="1000694"> </a>
+Second, JDBC URLs allow driver writers to encode all necessary connection information within them. This makes it possible, for example, for an applet that wants to talk to a given database to open the database connection without requiring the user to do any system administration chores.
+</p><p><a name="1000695"> </a>
+</a>Third, JDBC URLs allow a level of indirection. This means that the JDBC URL may refer to a logical host or database name that is dynamically translated to the actual name by a </a>network naming system. This allows system administrators to avoid specifying particular hosts as part of the JDBC name. There are a number of different </a>network name services (such as </a>DNS, </a>NIS, and </a>DCE), and there is no restriction about which ones can be used.
+</p><p><a name="999724"> </a>
+</a>The</a> standard syntax for JDBC URLs is shown here. It has three parts, which are separated by colons.
+</p><blockquote><pre>
+	jdbc:&lt;subprotocol&gt;:&lt;subname&gt;
+</pre></blockquote><p><a name="997705"> </a>
+The three parts of a JDBC URL are broken down as follows:
+</p><ol>
+<a name="997711"> </a>
+<li><code>jdbc</code>-the protocol. The protocol in a JDBC URL is always <code>jdbc</code>.
+<blockquote><pre>
+</pre></blockquote>
+<a name="997724"> </a>
+<li> <code>&lt;subprotocol&gt;</code>-</a>the name of the driver or the name of a database connectivity mechanism, which may be supported by one or more drivers. A prominent example of a subprotocol name is <code>odbc</code>, which has been reserved for URLs that specify ODBC-style data source names. </a>For</a> example, to access a database through a JDBC-ODBC bridge, one might use a URL such as the following:
+<blockquote><pre>
+	jdbc:odbc:fred
+</pre></blockquote><p><a name="999362"> </a>
+In this example, the subprotocol is <code>odbc</code>, and the subname <code>fred</code> is a local ODBC data source.
+</p><a name="1000710"> </a>
+<p>If one wants to use a network name service (so that the database name in the </a>JDBC URL does not have to be its actual name), the naming service can be the subprotocol. So, for example, one might have a URL like:
+<blockquote><pre>
+	jdbc:dcenaming:accounts-payable
+</pre></blockquote><a name="1002043"> </a>
+In this example, the URL specifies that the local DCE naming service should resolve the database name <code>accounts-payable</code> into a more specific name that can be used to connect to the real database.
+<a name="1002066"> </a>
+<blockquote></blockquote>
+<a name="999645"> </a>
+<li><code>&lt;subname&gt;</code>-</a>a way to identify the data source. The subname can vary, depending on the subprotocol, and it can have any internal syntax the driver writer chooses, including a subsubname. The point of a subname is to give enough information to locate the data source. In the previous example, <code>fred</code> is enough because ODBC provides the remainder of the information. A data source on a remote server requires more information, however. If the data source is to be accessed over the Internet, for example, the network address should be included in the JDBC URL as part of the subname and should adhere to the following standard URL naming convention:
+<blockquote><pre>
+ 	<code>//hostname:port/subsubname</code> 
+</pre></blockquote><p><a name="1002045"> </a>
+Supposing that <code>dbnet</code> is a protocol for connecting to a host on the Internet, a JDBC URL might look like this:
+</p><blockquote><pre>
+	jdbc:dbnet://wombat:356/fred
+</pre></blockquote><a name="999416"> </a>
+</ol>
+<h4>2.1.4	 </a>The odbc Subprotocol</h4>
+<p><a name="1002221"> </a>
+The subprotocol <code>odbc</code> is a special case. It has been reserved for URLs that specify ODBC-style data source names and has the special feature of allowing any number of attribute values to be specified after the subname (the data source name). The full syntax for the odbc subprotocol is:
+</p><blockquote><pre>
+  jdbc:odbc:&lt;data-source-name&gt;[;&lt;attribute-name&gt;=&lt;attribute-value&gt;]*
+</pre></blockquote>
+<p><a name="999379"> </a>
+Thus all of the following are valid jdbc:odbc names:
+</p><blockquote><pre>
+     jdbc:odbc:qeor7
+     jdbc:odbc:wombat
+     jdbc:odbc:wombat;CacheSize=20;ExtensionCase=LOWER
+     jdbc:odbc:qeora;UID=kgh;PWD=fooey
+
+</pre></blockquote><a name="997777"> </a>
+<h4>2.1.5	 </a>Registering Subprotocols</a></h4>
+<p><a name="997793"> </a>
+</a>A driver developer can reserve a name to be used as the subprotocol in a JDBC URL. When the <code>DriverManager</code> class presents this name to its list of registered drivers, the driver for which this name is reserved should recognize it and establish a connection to the database it identifies. For example, "odbc" is reserved for the JDBC-ODBC Bridge. If there were a Miracle Corporation, it might want to register "miracle" as the subprotocol for the JDBC driver that connects to its Miracle DBMS so that no one else would use that name. 
+</p><p><a name="999716"> </a>
+</a>Java Soft</a>ware is acting as an informal registry for JDBC subprotocol names. To register a subprotocol name, send email to:
+</p><blockquote><pre>
+	jdbc@eng.sun.com
+</pre></blockquote><a name="999213"> </a>
+<h4>2.1.6	 </a>Sending SQL Statements</a></h4>
+<p><a name="997505"> </a>
+Once a connection is established, it is used to pass SQL statements to its underlying database. The JDBC API does not put any restrictions on the kinds of SQL statements that can be sent; this provides a great deal of flexibility, allowing the use of database-specific statements or even non-SQL statements. It requires, however, that the user be responsible for making sure that the underlying database can process the SQL statements being sent and suffer the consequences if it cannot. </a>For example, an application that tries to send a stored procedure call to a DBMS that does not support stored procedures will be unsuccessful and will generate an exception.
+</p><p><a name="999579"> </a>
+The JDBC API provides three interfaces for sending SQL statements to the database, and corresponding methods in the <code>Connection</code> interface create instances of them. The interfaces for sending SQL statements and the <code>Connection</code> methods that create them are as follows:
+</p><ol>
+<a name="999584"> </a>
+<li><code>Statement</code>-</a>created</a> by the</a> <code>Connection.createStatement</code> methods. A </a><code>Statement</code> object is used for sending SQL statements with no parameters. 
+<a name="997854"> </a>
+<li><code>PreparedStatement</code>-</a>created</a> by the </a><code>Connection.prepareStatement</code> methods. </a>A <code>PreparedStatement</code> object is used for precompiled SQL statements. These can take one or more parameters as input arguments (IN parameters). <code>PreparedStatement</code> has a group of methods that set the value of IN parameters, which are sent to the database when the statement is executed. <code>PreparedStatement</code> extends <code>Statement</code> and therefore includes <code>Statement</code> methods. A <code>PreparedStatement</code> object has the potential to be more efficient than a <code>Statement</code> object because it has been precompiled and stored for future use. Therefore, in order to improve performance, a <code>PreparedStatement</code> object is sometimes used for an SQL statement that is executed many times. 
+<a name="997877"> </a>
+<li><code></a>CallableStatement</code>-created by the <code></a>Connection.prepareCall</a></code> methods. <code>CallableStatement</code> objects are used to execute SQL </a>stored </a>procedures-a group of SQL statements that is called by name, much like invoking a function. A <code>CallableStatement</code> object inherits methods for handling IN parameters from </a><code>PreparedStatement</code>; it adds methods for handling OUT and INOUT parameters.
+<p><a name="997892"> </a>
+
+</p><p><a name="1003044"> </a>
+</a>The following list gives a quick way to determine which <code>Connection</code> method is appropriate for creating different types of SQL statements:
+</p></ol>
+<ul><a name="1002999"> </a>
+<li><code>createStatement</code> methods-for a simple SQL statement (no parameters)
+<a name="1003000"> </a>
+<li><code>prepareStatement</code> methods-for an SQL statement that is executed frequently
+</ul><ul><a name="1003001"> </a>
+<li><code>prepareCall</code> methods-for a call to a stored procedure
+</ul><p><a name="1004662"> </a>
+The versions of these methods that take no arguments create statements that will produce default <code>ResultSet</code> objects; that is, they produce result sets that are not scrollable and that cannot be updated. With the JDBC 2.0 API, it is possible to create statements that will produce result sets that are scrollable and/or updatable. This is done by using new versions of the methods <code>createStatement</code>, <code>prepareStatement</code>, and <code>prepareCall</code> that take additional parameters for specifying the type of result set and the concurrency level of the result set being created. In <a href="resultset.html">Chapter 5</a>, "ResultSet," the section on the types of <code>ResultSet</code> objects on <a href="resultset.html#1011815">page 52</a> explains the different types of <code>ResultSet</code> objects and the constants that specify them. The section <a href="resultset.html#1011841">"Concurrency Types" on page &#32;53</a> does the same for concurrency levels. <a href="resultset.html#1012735">"Creating Different Types of Result Sets" on page &#32;55</a> gives examples of how to create <code>ResultSet</code> objects using the new versions of the <code>Connection</code> methods for creating statements.
+</p></ul><a name="1004665"> </a>
+<h4>2.1.7	 Transactions</a></h4>
+<p><a name="998913"> </a>
+</a>A transaction consists of one or more statements that have been executed, completed, and then either committed or rolled back. When the method <code>commit</code> or </a><code>rollback</code> is called, the current transaction ends and another one begins.
+</p><p><a name="1000438"> </a>
+</a>Generally a new <code>Connection</code> object is in auto-commit mode by default, meaning that when a statement is completed, the method <code>commit</code> will be called on that statement automatically. In this case, since each statement is committed individually, a transaction consists of only one statement. </a>If </a>auto-commit mode has been disabled, a transaction will not terminate until the method <code>commit</code> or </a><code>rollback</code> is called explicitly, so it will include all the statements that have been executed since the last invocation of either <code>commit</code> or <code>rollback</code>. In this second case, all the statements in the transaction are committed or rolled back as a group.
+</p><p><a name="1001945"> </a>
+The beginning of a transaction requires no explicit call; it is implicitly initiated after disabling auto-commit mode or after calling the methods <code>commit</code> or <code>rollback</code>. </a>The method <code>commit</code> makes permanent any changes an SQL statement makes to a database, and it also releases any locks held by the transaction. The method <code>rollback</code> will discard those changes.
+</p><p><a name="1000469"> </a>
+ Sometimes a user doesn't want one change to take effect unless another one does also. </a>This can be accomplished by disabling auto-commit and grouping both updates into one transaction. If both updates are successful, then the <code>commit</code> method is called, making the effects of both updates permanent; if one fails or both fail, then the <code>rollback</code> method is called, restoring the values that existed before the updates were executed. 
+</p><p><a name="1001105"> </a>
+Most JDBC drivers will support transactions. In order to be designated JDBC Compliant, a JDBC driver must support transactions.
+</p><p><a name="1007503"> </a>
+The JDBC 2.0 Standard Extension API makes it possible for <code>Connection</code> objects to be part of a distributed transaction, a transaction that involves connections to more than one DBMS server. When a <code>Connection</code> object is part of a distributed transaction, a transaction manager determines when the methods <code>commit</code> or <code>rollback</code> are called on it. Thus, when a <code>Connection</code> object is participating in a distributed transaction, an application should not do anything that affects when a connection begins or ends. 
+</p><p><a name="1007548"> </a>
+In order to be able to participate in distributed transactions, a <code>Connection</code> object must be produced by a <code>DataSource</code> object that has been implemented to work with the middle tier server's distributed transaction infrastructure. Unlike <code>Connection</code> objects produced by the <code>DriverManager</code>, a <code>Connection</code> object produced by such a <code>DataSource</code> object will have its auto-commit mode </a>disabled by default. A standard implementation of a <code>DataSource</code> object, on the other hand, will produce <code>Connection</code> objects that are exactly the same as those produced by the <code>DriverManager</code> class.
+</p><a name="998958"> </a>
+<h4>2.1.8	 Transaction Isolation Levels</a></h4>
+<p><a name="998959"> </a>
+</a>If a DBMS supports transaction processing, it will have some way of managing potential conflicts that can arise when two transactions are operating on a database at the same time. </a>A </a>user </a>can specify a transaction isolation level to indicate what level of care the DBMS should exercise in resolving potential conflicts. For example, what happens when one transaction changes a value and a second transaction reads that value before the change has been committed or rolled back? Should that be allowed, given that the changed value read by the second transaction will be invalid if the first transaction is rolled back? A JDBC user can instruct the DBMS to allow a value to be read before it has been committed </a>(a "dirty read") with the following code, where con is the current connection:
+</p><blockquote><pre>
+con.setTransactionIsolation(TRANSACTION_READ_UNCOMMITTED);
+</pre></blockquote><p><a name="998983"> </a>
+The higher the transaction isolation level, the more care is taken to avoid conflicts. </a>The <code>Connection</code> interface defines five levels, with the lowest specifying that transactions are not supported at all and the highest specifying that while one transaction is operating on a database, no other transactions may make any changes to the data read by that transaction. <code></a>TRANSACTION_READ_UNCOMMITTED</code>, used in the previous example, is one level up from the lowest level. Typically, the higher the level of isolation, the slower the application executes (due to increased locking overhead and decreased concurrency between users). </a>The </a>developer must balance the need for performance with the need for data consistency when making a decision about what isolation level to use. Of course, the level that can actually be supported depends on the capabilities of the underlying DBMS.
+</p><p><a name="998986"> </a>
+When a new <code>Connection</code> object is created, its transaction isolation level depends on the driver, but normally it is the default for the underlying data source. A user may call the method <code>setIsolationLevel</code> to change the transaction isolation level, and the new level will be in effect for the rest of the connection session. To change the transaction isolation level for just one transaction, one needs to set it before executing any statements in the transaction and then reset it after the transaction terminates. </a>Changing the transaction isolation level during a transaction is not recommended, for it will trigger an immediate call to the method <code>commit</code>, causing any changes up to that point to be made permanent. 
+</p><a name="1001832"> </a>
+<h4>2.1.9	 Freeing DBMS Resources</h4>
+<p><a name="1001833"> </a>
+It is recommended that programmers explicitly close connections and statements they have created when they are no longer needed. 
+</p><p><a name="1001870"> </a>
+A programmer writing code in the Java programming language and not using any outside resources does not need to worry about memory management. The garbage collector automatically removes objects when they are no longer being used and frees the memory they were using. When memory is running low, it will recycle discarded objects, making the memory they currently occupy available for quick reuse.
+</p><p><a name="1003709"> </a>
+</a>However, </a>if </a>an application uses </a>external resources, as it does when it accesses a DBMS with the JDBC API, the garbage collector has no way of knowing the status of those resources. It will still recycle discarded objects, but if there is lots of free memory in the Java heap, it may garbage collect infrequently, even though the (small) amount of Java garbage is holding open large amounts of expensive database resources. </a>Therefore,</a> it </a>is recommended that programmers explicitly close all connections (with the method <code>Connection.close</code>) and statements (with the method <code>Statement.close</code>) as soon as they are no longer needed, thereby freeing DBMS resources as early as possible. This applies especially to applications that are intended to work with different DBMSs because of variations from one DBMS to another.
+</p><p><a name="1005230"> </a>
+Note that the method <code>Connection.isClosed</code> is guaranteed to return <code>true</code> only when it is called after the method <code>Connection.close</code> has been called. As a result, a programmer cannot depend on this method to indicate whether a connection is valid or not. Instead, a typical JDBC client can determine that a connection is invalid by catching the exception that is thrown when a JDBC operation is attempted.
+</p><a name="1008452"> </a>
+<h4>2.1.10	 Using Type Maps</h4>
+<p><a name="1004682"> </a>
+The two new SQL3 data types that are user-defined types (UDTs), SQL structured types and <code>DISTINCT</code> types, can be </a>custom mapped to a class in the Java programming language. Like all the SQL3 data types, they have standard mappings, but a programmer may create a custom mapping as well. The fact that there is a custom mapping for a particular UDT is declared in a <code>java.util.Map</code> object. This <code>Map</code> object may be the one that is associated with a connection, or it may be one that is passed to a method.
+</p><p><a name="1005291"> </a>
+A programmer declares a </a>custom mapping by adding an entry to a <code>Map</code> object. This entry must contain two things: (1) the name of the UDT to be mapped and (2) the <code>Class</code> object for the class in the Java programming language to which the UDT is to be mapped. The class itself, which must implement the <code>SQLData</code> interface, will contain the specific mappings.
+</p><p><a name="1005409"> </a>
+</a>Each <code>Connection</code> object created using a JDBC 2.0 driver that supports custom mapping will have an empty type map to which custom mappings may be added. This type map is an instance of the interface <code>java.util.Map</code>, which is new in the Java 2 platform and replaces <code>java.util.Dictionary.</code> Until custom map entries are added to this type map, all operations for <code>STRUCT</code> and <code>DISTINCT</code> values will use the standard mappings (the <code>Struct</code> interface for <code>STRUCT</code> values and the underlying type for <code>DISTINCT</code> values). 
+</p><p><a name="1005414"> </a>
+The following code fragment, in which con is a <code>Connection</code> object and <code>ADDRESSES</code> is an SQL structured type, demonstrates retrieving the type map associated with con and adding a new entry to it. After the type map is modified, it is set as the new type map for con.
+</p><blockquote><pre>
+java.util.Map map = con.getTypeMap();
+map.put("SchemaName.ADDRESSES", Class.forName("Addresses"));
+con.setTypeMap();
+</pre></blockquote><p><a name="1005417"> </a>
+The <code>Map</code> object map, the type map associated with con, now contains at least one custom mapping (or more if any mappings have already been added). The programmer will have previously created the class <code>Addresses</code>, probably using a tool to generate it. Note that it is an error to supply a class that does not implement the interface <code>SQLData</code>. The class <code>Addresses</code>, which does implement <code>SQLData</code>, will have a field for each attribute in <code>ADDRESSES</code>, and whenever a value of type <code>ADDRESSES</code> is operated on by a method in the Java programming language, the default will be to map it to an instance of the class <code>Addresses</code>. The type map associated with a connection is the default type map in the sense that a method will use it if no other type map is explicitly passed to it.
+</p><p><a name="1005418"> </a>
+Note that the </a>name of the UDT should be the fully-qualified name. For some DBMSs, this will be of the form <code>catalogName.schemaName.UDTName.</code> Many DBMSs, however, do not use this form and, for example, use a schema name but no catalog name. The important thing is to use the form appropriate for a particular DBMS. The <code>DatabaseMetaData</code> methods <code>getCatalogs</code>, <code>getCatalogTerm</code>, <code>getCatalogSeparator</code>, <code>getSchemas</code> and <code>getSchemaTerm</code> give information about a DBMS's catalogs, schemas, preferred terms, and the separator it uses.
+</p><p><a name="1005421"> </a>
+Instead of modifying the existing type map, an application can replace it with a completely different type map. This is done with the <code>Connection</code> </a>method <code>setTypeMap</code>, as shown in the following code fragment. It </a>creates a new type map, gives it two entries (each with an SQL UDT name and the class to which values of that type should be mapped), and then installs the new type map as the one associated with the <code>Connection</code> con.
+</p><blockquote><pre>
+java.util.Map newConnectionMap = new java.util.HashTable();
+newConnectionMap.put(
+     "SchemaName.UDTName1", Class.forName("className1"));
+newConnectionMap.put(
+     "SchemaName.UDTName2", Class.forName("className2"));
+con.setTypeMap(newConnectionMap);
+
+</pre></blockquote><p><a name="1005428"> </a>
+The <code>Map</code> object newConnectionMap now replaces the type map originally associated with the <code>Connection</code> con, and it will be used for custom type mappings unless it is itself replaced. Note that the example uses the default constructor for the class <code>HashTable</code> to create the new type map. This class is one of many implementations of <code>java.util.Map</code> provided in the Java 2 platform API, and one of the others could have been used as well. 
+</p><p><a name="1005429"> </a>
+In the previous examples, the type map associated with a connection was modified to contain additional mappings or set to be a different type map altogether. In either case, though, the connection's type map is the default for custom mapping JDBC types to types in the Java programming language. The next example will show how to supersede the connection's type map by supplying a method with a different type map.
+</p><p><a name="1005549"> </a>
+Methods whose implementations may involve a custom mapping for UDTs have two versions, one that takes a </a>type map and one that does not. If a type map is passed to one of these methods, the given type map will be used instead of the one associated with the connection. For example, the <code>Array</code> methods <code>getArray</code> and <code>getResultSet</code> have versions that take a type map and versions that do not. If a type map is passed to a method, it will map the array elements using the given type map. If no type map is specified, the method will use the type map associated with the connection.
+</p><p><a name="1005430"> </a>
+The </a>capability for supplying a type map to a method makes it possible for values of the same user-defined type to have different mappings. For example, if two applications are using the same connection and operating on the same column value, one could use the type map associated with the connection, and the other could use a different type map by supplying it as an argument to the appropriate method.
+</p><p><a name="1005431"> </a>
+The following code fragment creates a new type map and provides it as a parameter to the <code>Array</code> method <code>getArray</code>.
+</p><blockquote><pre>
+java.util.Map arrayMap = new java.util.HashTable();
+arrayMap.put("SchemaName.DIMENSIONS", Class.forName("Dimensions"));
+Dimensions [] d = (Dimensions [])array.getArray(arrayMap);
+</pre></blockquote><p><a name="1005435"> </a>
+In the second line, the new type map arrayMap is given an entry with the fully-qualified name of an SQL structured type (<code>SchemaName.DIMENSIONS)</code> and the Java class object (<code>Class.forName("Dimensions"))</code>. This establishes the mapping between the Java type <code>Dimensions</code> and the SQL type <code>DIMENSIONS</code>. In the third line, arrayMap is specified as the type map to use for mapping the contents of this <code>Array</code> object, whose base type is <code>SchemaName.DIMENSIONS</code>.
+</p><p><a name="1005436"> </a>
+The method </a><code>getArray</code> will </a>materialize the elements of the SQL3 <code>ARRAY</code> value designated by array, with each element being mapped according to the mapping specified in arrayMap. In other words, each element, which is a value of type <code>Schema.DIMENSIONS</code>, will be translated to an instance of the class <code>Dimensions</code> by mapping the attributes of each <code>DIMENSIONS</code> value to the fields of a <code>Dimensions</code> object. If the base type of the array does not match the UDT named in arrayMap, the driver will convert the array's elements according to the standard mapping. If no type map is specified to the method <code>getArray</code>, the driver uses the mapping indicated in the connection's type map. If that type map has no entry for <code>Schema.DIMENSIONS</code>, the driver will instead use the standard mapping.
+</p><a name="1007766"> </a>
+<blockquote></blockquote>
+
+<hr><br>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="intro.html">[Prev]</a> <a href="drivermanager.html">[Next]</a> 
+<hr><br>
+
+
+
+<i><a href="copyright.html">Copyright</a> &#169; 1999, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

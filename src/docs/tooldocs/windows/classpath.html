@@ -1,0 +1,365 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<HEAD>
+	<TITLE>Setting the class path</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>Setting the class path</H1>
+
+<H2>Synopsis</H2>
+<BLOCKQUOTE>
+	The class path is the path that the Java runtime environment searches 
+        for classes and other resource files.  The class search path (more commonly 
+        known by the shorter name, "class path") can be set using either the
+	<code>-classpath</code> option when calling an SDK tool (the
+	preferred method) or by setting the <CODE>CLASSPATH</CODE> environment
+	variable.  The <code>-classpath</code> option is preferred because you 
+        can set it individually for each application without affecting other
+        applications and without other applications modifying its value. 
+
+<P> <!-- DON'T USE CODE TAG HERE, BECAUSE ITALIC DOES NOT DISPLAY INSIDE CODE -->
+    <CODE>C:&gt; </CODE><i>sdkTool</i><CODE> <B>-classpath </B></CODE><I>classpath1</I><CODE><B>;</B></CODE><I>classpath2</I>... 
+<P>
+-or-
+<P>
+    <CODE>C:&gt; <B>set CLASSPATH=</B></CODE><I>classpath1</I><CODE><B>;</B></CODE><I>classpath2</I>...
+<P>
+  where:
+<DL>
+  <DT><I>sdkTool</I>
+  <DD>A command-line tool, such as <code>java</code>, <code>javac</code>, or
+     <code>javadoc</code>.  For a listing, see
+     <a href="../tools.html">SDK Tools</a>.
+<P>
+  <DT><I>classpath1</I><CODE><B>;</B></CODE><I>classpath2</I> 
+  <DD>Class paths to the .jar, .zip or .class files.
+      Each <i>classpath</i> should end with a filename or directory depending on 
+      what you are setting the class path to: 
+  <UL TYPE=DISC>
+	  <LI>For a .jar or .zip file that contains .class files, 
+	      the class path ends with the name of the .zip or .jar file.
+	  <LI>For .class files in an unnamed package, the class path ends 
+	      with the directory that contains the .class files.  
+	  <LI>For .class files in a named package, the class path ends with
+	      the directory that contains the "root" package (the
+			first package in the full package name).
+	</UL>
+  <P>
+	Multiple path entries are separated by semi-colons. 
+	With the <code>set</code> command, it's important to omit
+	spaces from around the equals sign (=).  
+	
+  <P> The default class path is the current directory. Setting the <CODE>CLASSPATH</CODE> 
+    variable or using the <CODE>-classpath</CODE> command-line option overrides 
+    that default, so if you want to include the current directory in the search 
+    path, you must include &quot;<B>.</B>&quot; in the new settings. 
+
+  <P>Classpath entries that are neither directories nor archives (.zip or 
+    .jar files) are ignored.
+</DL>
+
+</BLOCKQUOTE>
+
+
+<h2>Description</h2>
+<BLOCKQUOTE>
+	<P>
+        The class path tells SDK tools and applications where to find 
+        third-party and user-defined classes  -- that is, classes that 
+        are not Java
+        <A HREF="../../guide/extensions/index.html">extensions</A>
+	or part of the Java platform.  The class path needs to find any 
+        classes you've compiled with the javac compiler -- its default
+        is the current directory to conveniently enable those classes to 
+        be found.
+        <P>
+
+	Java 2 SDK, the JVM and other SDK tools find classes by searching
+	the Java platform (bootstrap) classes, any extension classes, 
+	and the class path, in that order. (For details on the search 
+	strategy, see
+	<A HREF="../findingclasses.html">How Classes Are Found</A>.)
+	Class libraries for most applications will want to take
+	advantage of the <A HREF="../../guide/extensions/index.html">extensions
+	mechanism</A>. You only need to set the class path when you
+	want to load a class that's (a) not in the current
+	directory or in any of its subdirectories, and (b) not in a
+	location specified by the extensions mechanism. 
+	</P>
+
+	<P>
+	If you are upgrading from an older version of the SDK, your
+	startup settings may include <CODE>CLASSPATH</CODE> settings that are no
+	longer needed. You should remove any settings that are not
+	application-specific, such as <code>classes.zip</code>. 
+	Some third-party applications that use
+	the Java Virtual Machine may modify your <CODE>CLASSPATH</CODE> environment
+	variable to include the libaries they use.  Such settings can
+	remain.
+	</P>
+
+	<P>
+	You can change the class path by using the Java tools'
+	<A HREF="#tooloption">-classpath option</A> when you invoke 
+	the JVM or other SDK tools or by using the 
+	<A HREF="#env var"><CODE>CLASSPATH</CODE> environment variable</A>.
+	Using the <CODE>-classpath</CODE> option is preferred
+	over setting <CODE>CLASSPATH</CODE> environment variable because 
+	you can set it individually for each application without 
+	affecting other applications and without other applications
+	modifying its value. 
+	</P>
+
+	<P>
+	Classes can be stored either in directories (folders) or in
+	archive files.  The Java platform classes are stored in
+	<CODE>rt.jar</CODE>. For more details on archives
+	and information on how the class path works, see 
+	<A HREF="#Understanding">Understanding the class path and package
+	names</A> near the end of this document.
+	</P>
+
+	<DL>
+	<DD><B>Important Note: </B>Some older versions of the JDK sofware included
+	a <CODE>&lt;</CODE><I>jdk-dir</I><CODE>&gt;/classes</CODE> entry 
+        in the default
+	class path. That directory exists for use by the JDK software, and
+	should <I>not</I> be used for application classes. Application
+	classes should be placed in a directory outside of the
+	JDK directory hierarcy. That way, installing a new JDK does not force you to
+	reinstall application classes. For compatibility with older
+	versions, applications that use the 
+        <CODE>&lt;</CODE><I>jdk-dir</I><CODE>&gt;/classes</CODE> 
+        directory as a class
+	library will run in the current version, but there is no
+	guarantee that they will run in future versions.
+	</DL>
+
+
+</BLOCKQUOTE>
+
+<H2><A NAME="tooloption"></A><B>Using the SDK tools' -classpath option</B></H2>
+
+
+<BLOCKQUOTE>
+	<P>
+	The SDK tools <A HREF="java.html">java</A>, <A HREF="jdb.html">jdb</A>,
+	<A HREF="javac.html">javac</A>, and <A
+	HREF="javah.html">javah</A> have a <CODE><B>-classpath</B></CODE> option
+	which replaces the path or paths specified by the <CODE>CLASSPATH</CODE>
+	environment variable while the tool runs. This is the
+	recommended option for changing class path settings, because
+	each application can have the class path it needs without
+	interfering with any other application.
+	</P>
+
+	<P>
+	The runtime tool <A HREF="java.html">java</A>
+        has a <CODE><B>-cp</B></CODE> option, as well. This option is an abbreviation 
+	for <CODE><B>-classpath</B></CODE>.
+	</P>
+
+	
+  <P> For very special cases, both <A HREF="java.html">java</A> and <A HREF="javac.html">javac</A> 
+    have options that let you change the path they use to find their own class 
+    libraries. The vast majority of users will never to need to use those options, 
+    however. </P>
+
+</BLOCKQUOTE>
+
+<H2><A NAME="env var"></A>Using the CLASSPATH environment variable</H2>
+
+
+<BLOCKQUOTE>
+	<P>
+	In general, you will want to use the <CODE>-classpath</CODE> 
+	command-line option, as explained in the previous
+	section.  This section shows you how to set the <CODE>CLASSPATH</CODE>
+	environment variable if you want to do that, or clear settings
+	left over from a previous installation.
+	</P>
+
+	<H3><B>Setting CLASSPATH</B></H3>
+	<P>
+	The <CODE>CLASSPATH</CODE> environment variable is modified with
+	the <B>set</B> command. The format is:
+	<P>
+        <BLOCKQUOTE>
+	<CODE><B>set CLASSPATH=</B></CODE><I>path1</I><CODE><B>;</B></CODE><I>path2</I> ...
+        </BLOCKQUOTE>
+	<P>
+	The paths should begin with the letter specifying the drive,
+	for example, <CODE>C:\</CODE>. That way, the
+	classes will still be found if you happen to switch to a
+	different drive. (If the path entries start with backslash (<CODE>\</CODE>)
+	and you are on drive <CODE>D:</CODE>, for example, then the classes will
+	be expected on <CODE>D:</CODE>, rather than<CODE>C:</CODE>.)
+ 
+	<H3><B>Clearing CLASSPATH</B></H3>
+	<P>
+	If your <CODE>CLASSPATH</CODE> environment variable has been set to a value
+	that is not correct, or if your startup file or script is
+	setting an incorrect path, you can unset <CODE>CLASSPATH</CODE> by using:
+	<P>
+        <BLOCKQUOTE>
+	<CODE>C:&gt; <B>set CLASSPATH=</B></CODE>
+        </BLOCKQUOTE>
+	<P>
+	This command unsets <CODE>CLASSPATH</CODE> for the current command prompt window
+	only. You should also delete or modify your startup settings
+	to ensure that you have the right <CODE>CLASSPATH</CODE> settings in future
+	sessions.
+
+   <H3><B>Changing Startup Settings</B></H3>
+ 	If the <CODE>CLASSPATH</CODE> variable is set at system startup, the place
+ 	to look for it depends on your operating system:
+	<P>
+	
+	<TABLE BORDER="0" WIDTH="90%" 
+summary="How to Check the System Startup CLASSPATH Variable Setting">
+<TR>
+<th align="left"> Operating System</th>
+<th align="left"> Method</th>
+</TR>
+	<TR>
+		<TD WIDTH="22%">Windows 95 and 98 </TD>
+		<TD WIDTH="78%" VALIGN="TOP">Examine autoexec.bat for the <B>set</B> command.</TD>
+	</TR>
+	<TR>
+		<TD WIDTH="22%" HEIGHT="44" VALIGN="TOP">Other (Windows NT, 
+Windows 2000, ...)</TD>
+		<TD WIDTH="78%" HEIGHT="44" VALIGN="TOP">The 
+<tt>CLASSPATH</tt> environment variable can be set using the 
+System utility in the Control Panel.</TD>
+	</TR>
+	</TABLE>
+
+
+</BLOCKQUOTE>
+
+<A NAME="Understanding"></A>
+<H2>Understanding the class path and package names</H2>
+
+
+<BLOCKQUOTE>
+	<P>
+	Java classes are organized into packages which are mapped to
+	directories in the file system. But, unlike the file system,
+	whenever you specify a package name, you specify the
+	<I>whole</I> package name -- never part of it.  For example,
+	the package name for <CODE>java.awt.Button</CODE> is <I>always</I>
+	specified as <CODE>java.awt</CODE>.
+	</P>
+
+	<P>
+	For example, suppose you want the Java runtime to find a class
+	named <CODE>Cool.class</CODE> in the package <CODE>utility.myapp</CODE>. 
+        If the path to that directory
+	is<CODE>C:\java\MyClasses\utility\myapp</CODE>, you
+	would set the class path so that it contains <CODE>C:\java\MyClasses</CODE>.
+	</P>
+
+	<P>
+	To run that app, you could use the following JVM command:
+	<P>
+	<CODE>C:&gt; <B>java -classpath C:\java\MyClasses utility.myapp.Cool</B></CODE>
+	<P>
+	When the app runs, the JVM uses the class path settings to
+	find any other classes defined in the <CODE>utility.myapp</CODE> 
+	package that are used by the <CODE>Cool</CODE> class.
+	</P>
+
+	<P>
+	Note that the entire package name is specified in the command. 
+	It is not possible, for example, to set the class path so it
+	contains <CODE>C:\java\MyClasses\utility</CODE>
+	and use the command <CODE>java myapp.Cool</CODE>.  The class
+	would not be found.
+	</P>
+
+	<P>
+	(You may be wondering what defines the package name for a
+	class. The answer is that the package name is part of the
+	class and cannot be modified, except by recompiling the
+	class.)
+	</P>
+
+	<BLOCKQUOTE>
+	<P>
+		<B>Note: </B>An interesting consequence of the package
+		specification mechanism is that files which are part of the
+		same package may actually exist in different directories. The
+		package name will be the same for each class, but the path to
+		each file may start from a different directory in the class
+		path.
+	</P>
+
+	</BLOCKQUOTE>
+	<H3>Folders and archive files</H3>
+	<P>
+	When classes are stored in a directory (folder), like
+	<CODE>c:\java\MyClasses\utility\myapp</CODE>, then the
+	class path entry points to the directory that contains the
+	first element of the package name. (in this case,
+	<CODE>C:\java\MyClasses</CODE>, since the package name
+	is <CODE>utility.myapp</CODE>.)
+	</P>
+
+	<P>
+	But when classes are stored in an archive file (a .zip or .jar
+	file) the class path entry is the path to and including the .zip 
+	or .jar file. For example, to use a class library that is in a .jar
+	file, the command would look something like this:
+	</P>
+	<CODE>C:&gt; <B>java -classpath C:\java\MyClasses\myclasses.jar utility.myapp.Cool</B></CODE>
+	<H3>Multiple specifications</H3>
+	<P>
+	To find class files in the directory
+	<CODE>C:\java\MyClasses</CODE> as well as classes
+	in <CODE>C:\java\OtherClasses</CODE>, you would set the class path to:
+	</P>
+	<CODE>C:&gt; <B>java -classpath C:\java\MyClasses;C:\java\OtherClasses</B> ...</CODE>
+	<P>
+	Note that the two paths are separated by a semicolon.
+	</P>
+	<H3>Specification order</H3>
+	<P>
+	The order in which you specify multiple class path entries is
+	important. The Java interpreter will look for classes in the
+	directories in the order they appear in the class path variable. 
+	In the example above, the Java interpreter will first look for a 
+	needed class in the directory
+	<CODE>C:\java\MyClasses</CODE>. Only if it doesn't find a
+	class with the proper name in that directory will the
+	interpreter look in the <CODE>C:\java\OtherClasses</CODE>
+	directory.
+	</BLOCKQUOTE>
+
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+
+</BODY>
+
+</HTML>
+

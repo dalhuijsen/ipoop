@@ -1,0 +1,453 @@
+<html><head>
+
+<title>java - the Java application launcher</title>
+
+</head>
+<body bgcolor="white">
+
+<h1>java - the Java application launcher</h1>
+
+<ul>
+  <li><a href="#synopsis">Synopsis</a>
+  <li><a href="#description">Description</a>
+  <li><a href="#options">Options</a>
+  <li><a href="#seealso">See Also</a>
+</ul>
+
+<a name="synopsis">
+<h2>SYNOPSIS</h2></a>
+<pre>
+    <b>java</b> [ options ] class [ argument ... ]
+    <b>java</b> [ options ] <b>-jar</b> file.jar [ argument ... ]
+</pre>
+
+<blockquote>
+<dl>
+     <dt><a href="#options"><code>options</code></a>
+         <dd>Command-line options.
+
+     <dt><code>class</code>
+         <dd>Name of the class to be invoked.
+
+     <dt><code>file.jar</code>
+         <dd>Name of the jar file to be invoked.  
+             Used only with <a href="#-jar"><code>-jar</code></a>.
+
+     <dt><code>argument</code>
+         <dd>Argument passed to the <b>main</b> function.
+
+</dl>
+</blockquote>
+
+<a name="description">
+<h2>DESCRIPTION</h2></a>
+<blockquote>
+The <b>java</b> tool launches a Java application. It does this by
+starting a Java runtime environment, loading a
+specified class, and invoking that class's <b>main</b> method. The
+method declaration must look like the following:
+<pre>
+    public static void main(String args[])
+</pre>
+The method must be declared public and static, it must not
+return any value, and it must accept a String array as a
+parameter. By default, the first non-option argument is the name 
+of the class to be invoked. A fully-qualified class name should be used. 
+If the <b>-jar</b> option is specified, the first non-option argument 
+is the name of a <b>JAR</b> archive containing class and resource files 
+for the application, with the startup class indicated by the
+<b>Main-Class</b> manifest header.
+<p>
+The Java runtime searches for the startup class, and other classes
+used, in three sets of locations: the bootstrap class path, the
+installed extensions, and the user class path.
+<p>
+Non-option arguments after the class name or JAR file name are passed
+to the <b>main</b> function.
+</blockquote>
+
+<a name="options">
+<h2>OPTIONS</h2></a>
+<blockquote>
+The launcher has a set of <a href="#standard">standard options</a> that 
+are supported on the current runtime environment and will be supported in 
+future releases.
+In addition, the current implementations of the virtual machines support 
+a set of <a href="#nonstandard">non-standard options</a> options that 
+are subject to change in future releases.  
+
+</blockquote>
+
+<a name="standard">
+<h2>Standard Options</h2></a>
+<blockquote>
+<dl>
+    <dt><b>-client</b>
+        <dd>Select the Java HotSpot Client VM.  This is the default.
+    <p>
+    <dt><b>-server</b>
+        <dd>Select the Java HotSpot Server VM.
+    <p>
+    <dt><b>-classpath</b> <i>classpath</i>
+    <dt><b>-cp</b> <i>classpath</i>
+	<dd>Specify a list of directories, JAR archives, and ZIP
+	archives to search for class files. Class path entries are
+	separated by colons (<b>:</b>). Specifying
+	<b>-classpath</b> or <b>-cp</b> overrides any setting of the
+	<b>CLASSPATH</b> environment variable.
+	<p>
+	If <b>-classpath</b> and <b>-cp</b> are not used and
+	<b>CLASSPATH</b> is not set, the user class path consists of
+	the current directory (<b><code>.</code></b>).
+	<p>
+	For more information on class paths, see 
+	<a href=classpath.html>Setting the Class Path</a>.
+    <p>
+    <dt><b>-D</b><i>property</i><b>=</b><i>value</i>
+	<dd>Set a system property value.
+
+<p>
+<dt><b>-d32</b>
+<dt><b>-d64</b>
+<dd>Specifies whether the program is to be run in a 32-bit or 64-bit
+	    environment.  On Solaris these correspond to the ILP32 and LP64
+	    data models, respectively.  The <b>-d64</b> option may only be used
+	    on 64-bit Solaris systems.
+<P>
+	    Currently only the Java HotSpot Server VM supports 64-bit
+	    operation, and the "-server" option is implicit with the use
+	    of <b>-d64</b>.  This is subject to change in a future release.
+<p>
+	    If neither <b>-d32</b> nor <b>-d64</b> is specified, the 
+            default is to run in a 32-bit environment.  This is subject to 
+            change in a future release.
+<p>
+<dt><b>-enableassertions</b><i>[:&lt;package name&gt;"..." | :&lt;class name&gt; ]</i>
+<dt><b>-ea</b><i>[:&lt;package name&gt;"..." | :&lt;class name&gt; ]</i>
+<dd>Enable assertions.  Assertions are disabled by default. 
+<p>With no arguments, <b>enableassertions</b> or <b>-ea</b> enables 
+assertions.  With one
+argument ending in <TT>"..."</TT>, the switch enables assertions in the
+specified package and any subpackages.  If the argument is simply
+<tt>"..."</tt>, the switch enables assertions in the unnamed package in the current
+working directory.  With one argument not ending in <TT>"..."</TT>, the switch
+enables assertions in the specified class.
+<p>
+If a single command line contains multiple instances of these 
+switches, they are processed in order before loading any classes. 
+So, for example, to run a program with assertions enabled only in 
+package <TT>com.wombat.fruitbat</TT> (and any subpackages), the following
+command could be used:
+<PRE>java -ea:com.wombat.fruitbat... &lt;Main Class&gt;
+</PRE>
+
+
+<p>The <b>-enableassertions</b> and <b>-ea</b> switches apply to <i>all</i> class loaders and to system classes
+(which do not have a class loader).  There is one exception to this rule:
+in their no-argument form, the switches do <i>not</i> apply to system.
+This makes it easy to turn on asserts in all classes except for system
+classes.  A separate switch is provided to enable asserts in all system
+classes; see <b>-enablesystemassertions</b> below.
+
+<p>
+<dt><b>-disableassertions</b><i>[:&lt;package name&gt;"..." | :&lt;class name&gt; ]</i>
+<dt><b>-da</b><i>[:&lt;package name&gt;"..." | :&lt;class name&gt; ]</i>
+<dd>Disable assertions.  This is the default.
+<p>With no arguments, <b>disableassertions</b> or <b>-da</b> disables 
+assertions.  With one
+argument ending in <TT>"..."</TT>, the switch disables assertions in the
+specified package and any subpackages.  If the argument is simply
+<tt>"..."</tt>, the switch disables assertions in the unnamed package in the current
+working directory.  With one argument not ending in <TT>"..."</TT>, the switch
+disables assertions in the specified class.
+<p>To run a program with assertions enabled in package
+<TT>com.wombat.fruitbat</TT> but disabled in class
+<TT>com.wombat.fruitbat.Brickbat</TT>, the following command could
+be used: <PRE>java -ea:com.wombat.fruitbat... -da:com.wombat.fruitbat.Brickbat &lt;Main Class&gt;
+</PRE>
+<p>The <b>-disableassertions</b> and <b>-da</b> switches apply to <i>all</i> class loaders and to system classes
+(which do not have a class loader).  There is one exception to this rule:
+in their no-argument form, the switches do <i>not</i> apply to system.
+This makes it easy to turn on asserts in all classes except for system
+classes.  A separate switch is provided to enable asserts in all system
+classes; see <b>-disablesystemassertions</b> below.
+
+<p>
+<dt><b>-enablesystemassertions</b>
+<dt><b>-esa</b>
+<dd>
+Enable asserts in all system classes (sets the <i>default assertion 
+status</i> for system classes to <tt>true</tt>).
+
+<p>
+<dt><b>-disablesystemassertions</b>
+<dt><b>-dsa</b>
+<dd>
+Disables asserts in all system classes. 
+
+    <p>
+    <a name="-jar"></a>
+    <dt><b>-jar</b>
+	<dd>Execute a program encapsulated in a JAR file. The first
+	argument is the name of a JAR file instead of a startup
+	class name. In order for this option to work, the manifest of 
+        the JAR file must contain a line of the form 
+        <b>Main-Class: <i>classname</i></b>. 
+        Here, <i>classname</i> identifies the class having the 
+        <tt>public&nbsp;static&nbsp;void&nbsp;main(String[]&nbsp;args)</tt> 
+        method that serves as your application's starting point. See 
+        the <a href="jar.html">Jar tool reference page</a> and 
+        the Jar trail of the 
+        <a href="http://java.sun.com/docs/books/tutorial/jar">Java 
+        Tutorial</a> for information about working with Jar files and 
+        Jar-file manifests.
+        <p> 
+        When you use this option, the 
+        JAR file is the source of all user classes, and other user class 
+        path settings are ignored. 
+        <p>
+        <strong>On Solaris 8</strong>, JAR files that can be run with 
+        the "java -jar" option can have their execute permissions 
+        set so they can be run without using "java -jar".
+    <p>
+    <dt><b>-verbose</b>
+    <dt><b>-verbose:class</b>
+	<dd>Display information about each class loaded.
+    <p>
+    <dt><b>-verbose:gc</b>
+	<dd>Report on each garbage collection event.
+    <p>
+    <dt><b>-verbose:jni</b>
+	<dd>Report information about use of native methods and other
+	Java Native Interface activity.
+    <p>
+    <dt><b>-version</b>
+	<dd>Display version information and exit.
+    <p>
+    <dt><b>-showversion</b>
+	<dd>Display version information and continue.
+    <p>
+    <dt><b>-?</b>
+    <dt><b>-help</b>
+	<dd>Display usage information and exit.
+    <p>
+    <dt><b>-X</b>
+	<dd>Display information about non-standard options and exit.
+</dl>
+</blockquote>
+
+<a name="nonstandard">
+<h3>Non-Standard Options</h3></a>
+<blockquote>
+<dl>
+   <p><dt><b>-Xint</b>
+        <dd>Operate in interpreted-only mode. Compilation to native code 
+        is disabled, and all bytecodes are executed by the interpreter. 
+        The performance benefits offered by the Java HotSpot VMs' adaptive 
+        compiler will not be present in this mode.
+<p>
+    <dt><b>-Xbatch</b>
+        <dd>Disable background compilation. Normally the VM will compile 
+         the method as a background task, running the method in interpreter 
+         mode until the background compilation is finished. The 
+         <tt>-Xbatch</tt> flag disables   
+         background compilation so that compilation of all methods 
+         proceeds as a foreground task until completed.  
+    <p>
+    <dt><b>-Xdebug</b>
+        <dd>Start with the debugger enabled.   Refer to 
+        <a href="jdb.html#description">jdb description</a> for more 
+        details and an example.
+
+    <p><dt><b>-Xbootclasspath:</b><i>bootclasspath</i>
+	<dd>Specify a colon-separated list of directories, JAR
+	archives, and ZIP archives to search for boot class files.
+	These are used in place of the boot class files included in the
+	Java 2 SDK. <em>Note: Applications that use this option for the 
+        purpose of overriding a class in rt.jar should not be deployed 
+        as doing so would contravene the Java 2 Runtime Environment 
+        binary code license.</em>
+    <p><dt><b>-Xbootclasspath/a:</b><i>path</i>
+        <dd>Specify a colon-separated path of directires, JAR 
+        archives, and ZIP archives to append to the default bootstrap 
+        class path. 
+    <p><dt><b>-Xbootclasspath/p:</b><i>path</i>
+        <dd>Specify a colon-separated path of directires, JAR 
+        archives, and ZIP archives to prepend in front of the default 
+        bootstrap class path. <em>Note: Applications that use this option 
+        for the purpose of overriding a class in rt.jar should not be 
+        deployed as doing so would contravene the Java 2 Runtime Environment 
+        binary code license.</em>
+<p>
+    <dt><b>-Xcheck:jni</b>
+        <dd>Perform additional checks for Java Native Interface (JNI) functions.  
+   Specifically, the Java Virtual Machine validates the parameters passed 
+   to the JNI function as well as the runtime environment data before 
+   processing the JNI request.  Any invalid data encountered indicates 
+   a problem in the native code, and the Java Virtual Machine will 
+   terminate with a fatal error in such cases.  Expect a 
+   performance degradation when this option is used.
+
+<p>
+    <dt><b>-Xfuture</b>
+        <dd>Perform strict class-file format checks. For purposes of backwards 
+        compatibility, the default format checks performed by the 
+        Java 2 SDK's virtual machine are no stricter than 
+        the checks performed by 1.1.x versions of the JDK software. The 
+        <b>-Xfuture</b> flag turns on stricter class-file format checks 
+        that enforce closer conformance to the class-file format 
+        specification. Developers are encouraged to use this flag 
+        when developing new code because the stricter checks will 
+        become the default in future releases of the Java application 
+        launcher.
+    <p>
+    <dt><b>-Xnoclassgc</b>
+	<dd>Disable class garbage collection.
+    <p>
+    <dt><b>-Xincgc</b>
+        <dd>
+        Enable the incremental garbage collector. The incremental 
+        garbage collector, which is off by default, will eliminate 
+        occasional garbage-collection pauses during program execution. 
+        However, it can lead to a roughly 10% decrease in overall 
+        GC performance.
+     <p> 
+<dt><b>-Xloggc:</b><i>file</i></dt>
+<dd>
+        Report on each garbage collection event, as with -verbose:gc,
+        but log this data to <i>file</i>.  In addition to the information
+        <tt>-verbose:gc</tt> gives, each reported event will be preceeded by
+        the time (in seconds) since the first garbage-collection event. 
+        <p>Always use a local file system for storage of this file to avoid
+        stalling the JVM due to network latency.  The file may be
+        truncated in the case of a full file system and logging will 
+        continue on the truncated file.  This option overrides
+        <tt>-verbose:gc</tt> if both are given on the command line.
+</dd>
+<p>
+<a name="Xms">
+    <dt><b>-Xms</b><i>n</i>
+	<dd>Specify the initial size, in bytes, of the memory allocation pool. 
+        This value must be a multiple of 1024 greater than 1MB. Append the 
+        letter <tt>k</tt> or <tt>K</tt> to indicate kilobytes, or <tt>m</tt> 
+        or <tt>M</tt> to indicate megabytes. The default value is 2MB.  
+       Examples: 
+       <blockquote><pre>
+       -Xms6291456
+       -Xms6144k
+       -Xms6m
+       </pre></blockquote>
+    <p>
+    <dt><b>-Xmx</b><i>n</i>
+       <dd>Specify the maximum size, in bytes, of the memory allocation pool.
+       This value must a multiple of 1024 greater than 2MB. Append the letter 
+       <tt>k</tt> or <tt>K</tt> to indicate kilobytes, or <tt>m</tt> or 
+       <tt>M</tt> to indicate megabytes. The default value is 64MB.  
+       The upper limit for this value  will  be  approximately  4000m  
+       on Solaris 7 and Solaris 8 SPARC  platforms and 2000m on Solaris 2.6 
+       and x86 platforms,  minus  overhead amounts. 
+       Examples: 
+       <blockquote><pre>
+       -Xmx83886080
+       -Xmx81920k
+       -Xmx80m
+       </pre></blockquote>
+    <p>
+    <dt><b>-Xss</b><i>n</i>
+       <dd>Set thread stack size.
+    <p>
+    <dt><b>-Xprof</b>
+       <dd> 
+       Profiles the running program, and sends profiling data to 
+       standard output. This option is provided as a utility that 
+       is useful in program development and is not intended to be 
+       be used in production systems.
+    <p>
+    <dt><b>-Xrunhprof</b>[:<i>help</i>][:<i>&lt;suboption&gt;=&lt;value&gt;,...</i>]<dd>Enables cpu, heap, or monitor profiling. This option is typically 
+    followed by a list of comma-separated "&lt;suboption&gt;=&lt;value&gt" pairs
+.
+    Run the command <b>java&nbsp;-Xrunhprof:help</b> to obtain a 
+    list of suboptions and their default values.
+
+
+
+    <p>
+    <a name="Xrs">
+    <dt><b>-Xrs</b></a>
+       <dd>Reduces use of operating-system signals by the Java virtual 
+       machine (JVM). 
+       <p>
+       In a previous release, the Shutdown Hooks facility was added to 
+       allow orderly
+       shutdown of a Java application. The intent was to allow user cleanup
+       code (such as closing database connections) to run at shutdown, even
+       if the JVM terminates abruptly.
+       <p>
+       Sun's JVM catches signals to implement shutdown
+       hooks for abnormal JVM termination. The JVM uses SIGHUP, SIGINT, and 
+       SIGTERM to initiate the running of shutdown hooks.
+       <p>
+       The JVM uses a similar mechanism to implement the pre-1.2 feature of
+       dumping thread stacks for debugging purposes. Sun's JVM uses SIGQUIT 
+       to perform thread dumps.
+       <p>
+       Applications embedding the JVM frequently need to
+       trap signals like SIGINT or SIGTERM, which can lead to interference 
+       with the JVM's own signal handlers. The 
+       <b>-Xrs</b> command-line option is available to address this issue. 
+       When <b>-Xrs</b> is used on Sun's JVM, 
+       the signal masks for SIGINT, SIGTERM, SIGHUP, and SIGQUIT are not 
+       changed by the JVM, and signal handlers for these signals are not 
+       installed.
+       <p>
+       There are two consequences of specifying <b>-Xrs</b>:
+       <ul>
+       <li>SIGQUIT thread dumps are not available.
+       <li>User code is responsible for causing shutdown hooks to run, for
+       example by calling System.exit() when the JVM is to be terminated.
+       </ul>
+
+<p>
+<dt><b>-XX:+UseAltSigs</b>
+       <dd>The VM uses <tt>SIGUSR1</tt> and <tt>SIGUSR2</tt> by default, 
+       which can sometimes conflict with applications that signal-chain
+       <tt>SIGUSR1</tt> and <tt>SIGUSR2</tt>. The <tt>-XX:+UseAltSigs</tt> 
+       option will cause the VM to use signals other than 
+       <tt>SIGUSR1</tt> and <tt>SIGUSR2</tt> as the default.
+</dl>
+</blockquote>
+
+<a name="seealso">
+<h2>SEE ALSO</h2></a>
+<blockquote>
+<ul>
+    <li><a href=javac.html>javac - the Java programming language compiler</a>
+    <li><a href=jdb.html>jdb - Java Application Debugger</a>
+    <li><a href=javah.html>javah - C Header and Stub File Generator</a>
+    <li><a href=jar.html>jar - JAR Archive Tool</a>
+    <li><a href=../../guide/extensions/index.html>The
+    Java Extensions Framework</a>
+    <li><a href=../../guide/security/index.html>Security Features</a>.
+</ul>
+</BLOCKQUOTE>
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+
+</body></html>		

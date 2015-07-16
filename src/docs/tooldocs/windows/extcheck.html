@@ -1,0 +1,92 @@
+<html>
+<head>
+<title>extcheck - Jar conflict detection utility</title>
+</head>
+<body bgcolor="#ffffff">
+
+<h1>extcheck - A utility to detect jar conflicts </h1>
+<blockquote>
+<b>extcheck</b> detects version conflicts between a target jar file and 
+currently installed extension jar files.
+</blockquote>
+
+<h2>SYNOPSIS</h2>
+<blockquote>
+<pre>
+extcheck [ -verbose ] targetfile.jar
+</pre>
+</blockquote>
+
+<h2>DESCRIPTION</h2>
+<blockquote>
+
+The <b>extcheck</b> utility checks a specified Jar file for 
+title and version conflicts with any extensions installed 
+in the Java<sup><font size="-2">TM</font></sup> 2 SDK. Before 
+installing an extension, you can use this utility 
+to see if the same or a more recent version of the extension is 
+already installed.
+<p>
+The <b>extcheck</b> utility compares the <code>Specification-title</code> 
+and <code>Specification-version</code> headers in the manifest of 
+<code>targetfile.jar</code> file against the corresponding headers in all 
+Jar files currently installed in the extension directory. (The extension 
+directory is <tt>jre\lib\ext</tt> by default.) The <b>extcheck</b> 
+utility compares version numbers in the same way as the method 
+<tt>java.lang.Package.isCompatibleWith</tt>.
+<p>
+If no conflict is detected, the return code is <tt>0</tt>.
+<p>
+If the manifest of any of the jar file in the extensions directory has the same
+<code>Specification-title</code> and the same or a newer
+<code>Specification-version</code> number, a non-zero error code is
+returned.  A non-zero error code is also returned if
+<code>targetfile.jar</code> does not have the
+<code>Specification-title</code> or <code>Specification-version</code>
+attributes in its manifest.
+</blockquote>
+
+<a name=options><h2>OPTIONS</h2></a>
+<blockquote>
+<dl>
+   <dt><b>-verbose</b> 
+      <dd>Lists Jar files in the extension directory as they are checked. 
+       Additionally, manifest attributes of the target jar file and any 
+       conflicting jar files are also reported. 
+<p>
+<dt><b>-J</b><i>option</i>
+    <dd>Pass <i>option</i> to the Java virtual machine, where 
+    <i>option</i> is one of the options described on the 
+    reference page for the <a href="java.html">java application 
+    launcher</a>.  For example, <b>-J-Xms48m</b> sets the startup
+    memory to 48 megabytes.   
+</dl>
+</blockquote>
+
+<h2>SEE ALSO</h2>
+<blockquote>
+<a href="jar.html">jar</a>
+</blockquote>
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+
+</body>
+</html>

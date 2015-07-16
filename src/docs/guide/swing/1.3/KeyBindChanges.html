@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Keyboard Binding</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Keyboard Binding</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+
+
+<h2>New Keyboard Binding Infrastructure</h2>
+
+<p>
+The new keyboard binding infrastructure 
+unifies and replaces the two previously existing schemes
+for binding user input (for example, Control-S)
+to program actions (for example, saving a file).
+The Swing Connection article
+<a href="http://java.sun.com/products/jfc/tsc/special_report/kestrel/keybindings.html">Keyboard Bindings in Swing</a> has details
+about the old and new keyboard binding schemes,
+including example code.
+
+<p>
+The API changes for the new infrastructure center around
+two new classes -- ActionMap and InputMap.
+Other changes include
+new methods in JComponent, LookAndFeel, and SwingUtilities,
+as well as a few new special-purpose classes
+that descend from ActionMap and InputMap.
+
+
+<p>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/ActionMap.html">javax.swing.ActionMap</a>
+<li><a href="../../../api/javax/swing/InputMap.html">javax.swing.InputMap</a>
+<li><a href="../../../api/javax/swing/ComponentInputMap.html">javax.swing.ComponentInputMap</a>
+<li><a href="../../../api/javax/swing/plaf/ActionMapUIResource.html">javax.swing.plaf.ActionMapUIResource</a>
+<li><a href="../../../api/javax/swing/plaf/InputMapUIResource.html">javax.swing.plaf.InputMapUIResource</a>
+<li><a href="../../../api/javax/swing/plaf/ComponentInputMapUIResource.html">javax.swing.plaf.ComponentInputMapUIResource</a>
+</tt>
+</ul>
+
+<p>
+New methods in JComponent:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JComponent.html#getActionMap()">public ActionMap getActionMap()</a>
+<li><a href="../../../api/javax/swing/JComponent.html#getInputMap()">public InputMap getInputMap()</a>
+<li><a href="../../../api/javax/swing/JComponent.html#getInputMap(int)">public InputMap getInputMap(int condition)</a>
+<li><a href="../../../api/javax/swing/JComponent.html#setActionMap(javax.swing.ActionMap)">public void setActionMap(ActionMap map)</a>
+<li><a href="../../../api/javax/swing/JComponent.html#setInputMap(int, javax.swing.InputMap)">public void setInputMap(int condition, InputMap map)</a>
+</tt>
+</ul>
+
+<p>
+New methods in LookAndFeel:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/LookAndFeel.html#loadKeyBindings(javax.swing.InputMap, java.lang.Object[])">public static void loadKeyBindings(InputMap retMap, Object[] keys)</a>
+<li><a href="../../../api/javax/swing/LookAndFeel.html#makeComponentInputMap(javax.swing.JComponent, java.lang.Object[])">public static ComponentInputMap makeComponentInputMap(JComponent c, Object[] keys)</a>
+<li><a href="../../../api/javax/swing/LookAndFeel.html#makeInputMap(java.lang.Object[])">public static InputMap makeInputMap(Object[] keys)</a>
+</tt>
+</ul>
+
+<p>
+New methods in SwingUtilities:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/SwingUtilities.html#getUIInputMap(javax.swing.JComponent, int)">public static InputMap getUIInputMap(JComponent component, int condition)</a>
+<li><a href="../../../api/javax/swing/SwingUtilities.html#replaceUIInputMap(javax.swing.JComponent, int, javax.swing.InputMap)">public static void replaceUIInputMap(JComponent component, int condition, InputMap map)</a>
+<li><a href="../../../api/javax/swing/SwingUtilities.html#getUIActionMap(javax.swing.JComponent)">public static ActionMap getUIActionMap(JComponent component)</a>
+<li><a href="../../../api/javax/swing/SwingUtilities.html#replaceUIActionMap(javax.swing.JComponent, javax.swing.ActionMap)">public static void replaceUIActionMap(JComponent component, ActionMap map)</a>
+</tt>
+</ul>
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 2000
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

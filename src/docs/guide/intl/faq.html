@@ -1,0 +1,656 @@
+<!--This file created by Claris Home Page version 2.0-->
+<HTML>
+<HEAD>
+   <TITLE>Internationalization Frequently Asked Questions </TITLE>
+   <META NAME=GENERATOR CONTENT="Claris Home Page 2.0">
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" VLINK="#000077">
+
+<P><TABLE BORDER=0 WIDTH="100%" summary="layout">
+   <TR>
+      <TD WIDTH=60>
+         <P><IMG SRC="../../images/javalogo52x88.gif" ALT="Java"
+         WIDTH=52 HEIGHT=88 BORDER=0 ALIGN=bottom>
+      </TD><TD>
+         <H1><CENTER>Internationalization<BR>
+         
+         Frequently Asked Questions</CENTER></H1>
+      </TD><TD WIDTH=60>
+         <P>
+      </TD></TR>
+</TABLE><!-- Body text begins here --></P>
+
+<P>This page answers common questions about internationalization of
+the Java 2 platform, Standard Edition, version 1.4.2, and of Sun's
+Java 2 Runtime Environments, Standard Edition, version 1.4.2. For
+more information, see the
+<A HREF="index.html">Internationalization</A> home page.</P>
+
+<UL>
+   <LI><A HREF="#General Questions">General Questions</A>
+   
+   <LI><A HREF="#Locales">Locales</A>
+   
+   <LI><A HREF="#Resource Bundles">Resource Bundles</A>
+   
+   <LI><A HREF="#Text Processing">Text Processing</A>
+   
+   <LI><A HREF="#Character Encodings">Character Encodings</A>
+   
+   <LI><A HREF="#Text Input">Text Input</A>
+   
+   <LI><A HREF="#Text Rendering">Text Rendering</A>
+   
+   <LI><A HREF="#Component Orientation">Component Orientation</A>
+   
+   <LI><A HREF="#Miscellaneous">Miscellaneous</A>
+</UL>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="General Questions"></A>General Questions</H2>
+
+<H4>What is internationalization?</H4>
+
+<P>Internationalization allows software to be adapted to any language
+and cultural convention. During the internationalization process, the
+programmer isolates the parts of a program that are dependent on
+language and culture. For example, the programmer will isolate error
+messages because they must be translated during localization.</P>
+
+<H4>What is localization?</H4>
+
+<P>Localization is the process of adapting a program for use in a
+specific locale. A locale is a geographic or political region that
+shares the same language and customs. Localization includes the
+translation of text such as GUI labels, error messages, and online
+help. It also includes the culture-specific formatting of data items
+such as monetary values, times, dates, and numbers.</P>
+
+<H4>How do I go about internationalizing an existing program?</H4>
+
+<P>See the steps outlined in the
+<A HREF="http://java.sun.com/docs/books/tutorial/i18n/intro/checklist.html">
+Checklist</A> section of the
+<A HREF="http://java.sun.com/docs/books/tutorial/">The Java
+Tutorial</A>.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Locales"></A>Locales</H2>
+
+<H4>What is a locale?</H4>
+
+<P>A locale is a geographic or political region that shares the same
+language and customs. In the Java programming language, a locale is
+represented by a <CODE>Locale</CODE> object. Locale-sensitive
+operations, such as collation and date formatting, vary according to
+locale.</P>
+
+<H4>Where can I find some coding examples that use
+<CODE>Locale</CODE> objects?</H4>
+
+<P>See the
+<A HREF="http://java.sun.com/docs/books/tutorial/i18n/locale/index.html">Setting
+the Locale</A> section of the
+<A HREF="http://java.sun.com/docs/books/tutorial/">The Java
+Tutorial</A>.</P>
+
+<H4>Which locales are supported?</H4>
+
+<P>The supported locales vary between different implementations of
+the Java 2 platform and between areas of functionality. Information
+about the supported locales in Sun's Java 2 Runtime Environments is
+provided by the <A HREF="locale.doc.html">Supported Locales</A>
+document.</P>
+
+<H4>Can a Java application use multiple locales?</H4>
+
+<P>Yes. This capability allows you to create multilingual
+applications.</P>
+
+<H4>Can I set the default locale from outside an application?</H4>
+
+<P>This depends on the implementation of the Java 2 platform you're
+using. The initial default locale is normally determined from the
+host operating system's locale. Version 1.4.2 of Sun's Java 2 Runtime
+Environments lets you override this by setting the user.language,
+user.country, and user.variant system properties from the command
+line. For example, to select <CODE>Locale("th", "TH", "TH")</CODE> as
+the initial default locale, you would use:</P>
+
+<BLOCKQUOTE><PRE>java -Duser.language=th -Duser.country=TH -Duser.variant=TH MainClass</PRE>
+</BLOCKQUOTE>
+
+<P>Since not all runtime environments provide this feature, it should
+only be used for testing.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Resource Bundles"></A>Resource Bundles</H2>
+
+<H4>What is a resource bundle?</H4>
+
+<P>A <CODE>ResourceBundle</CODE> object allows you to isolate
+localizable elements from the rest of the application. With all
+resources separated into a bundle, the application simply loads the
+appropriate bundle for the active locale. If the user switches
+locales, the application just loads a different bundle.</P>
+
+<H4>Where can I find some coding examples that use
+<CODE>ResourceBundle</CODE> objects?</H4>
+
+<P>See the
+<A HREF="http://java.sun.com/docs/books/tutorial/i18n/resbundle/index.html">Isolating
+Locale-Specific Data</A> section of the
+<A HREF="http://java.sun.com/docs/books/tutorial/">The Java
+Tutorial</A>.</P>
+
+<H4>How do I specify non-ASCII strings in a properties file?</H4>
+
+<P>You can specify any Unicode character with the \u<EM>XXXX</EM>
+notation. (The <EM>XXXX</EM> denotes the 4 hexadecimal digits that
+comprise the Unicode value of a character.) For example, a properties
+file might have the following entries:</P>
+
+<BLOCKQUOTE><PRE>s1=hello there
+s2=\uff2d\uff33\u30b4</PRE></BLOCKQUOTE>
+
+<P>If you have edited and saved the file in a non-ASCII encoding, you
+can convert it to ASCII with the
+<A HREF="../../tooldocs/windows/native2ascii.html"> native2ascii</A>
+tool. For example, you might want to do this when editing a
+properties file in Shift-JIS, a popular Japanese encoding.</P>
+
+<H4>How do I compile a non-ASCII <CODE>ListResourceBundle</CODE>?
+</H4>
+
+<P>If your source file is in a non-ASCII encoding, you can direct the
+compiler to convert it into Unicode. For example, you would compile a
+Japanese resource bundle written in the Shift-JIS encoding as
+follows:</P>
+
+<BLOCKQUOTE><PRE>javac -encoding SJIS LabelsResource_ja.java</PRE>
+</BLOCKQUOTE>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Text Processing"></A>Text Processing</H2>
+
+<H4>How do I format a date?</H4>
+
+<P>You can use the <CODE>SimpleDateFormat</CODE> to format and parse
+dates in a locale-sensitive manner. See the section on formatting
+<A HREF="http://java.sun.com/docs/books/tutorial/i18n/format/dateintro.html">Dates
+and Times</A> in the
+<A HREF="http://java.sun.com/docs/books/tutorial/">The Java
+Tutorial</A>.</P>
+
+<H4>Are formatters thread-safe?</H4>
+
+<P>Instances of <CODE>java.text.Format</CODE> and its subclasses are
+generally not synchronized. It is recommended to create separate
+format instances for each thread. If multiple threads access a format
+concurrently, it must be synchronized externally.</P>
+
+<H4>How does setting the default locale affect the results of
+sorting?</H4>
+
+<P>The <CODE>Collator</CODE> class, and its subclasses, are used for
+building sorting routines. These classes are locale-sensitive, and
+when created with the no-argument constructor will use the collating
+sequence of the default locale.</P>
+
+<H4>The Collator object supports different levels of decomposition
+and strength. How do I choose the right decomposition and strength in
+a locale?</H4>
+
+<P>Since decomposing takes time, turning decomposition off makes
+comparisons go faster. However, for Latin languages the
+<CODE>NO_DECOMPOSITION</CODE> mode is not useful if the text contains
+accents. You should use the default decomposition unless you really
+know what you're doing.</P>
+
+<P>The strength property you choose depends on what your application
+is trying to accomplish. For example, when performing a text search
+you may allow a "weak" match, in which accents and differences in
+case (upper vs. lower) are ignored. This type of search employs the
+<CODE>PRIMARY</CODE> strength. If you are sorting a list of words,
+you might want to use the <CODE>TERTIARY</CODE> strength. In this
+mode the properties that must match are the base character, accent,
+and case.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Character Encodings"></A>Character Encodings</H2>
+
+<H4>What is a character encoding?</H4>
+
+<P>A character encoding is a mapping between characters and code
+values.</P>
+
+<H4>What is Unicode?</H4>
+
+<P>In the Java programming language, <CODE>char</CODE> values
+represent Unicode characters. Unicode is a 16-bit character encoding
+that supports the world's major languages. You can learn more about
+the Unicode standard at the <A HREF="http://www.unicode.org/">Unicode
+Consortium</A> web site.</P>
+
+<H4>How do I convert data between Unicode and other character
+encodings?</H4>
+
+<P>The
+<A HREF="http://java.sun.com/docs/books/tutorial/i18n/text/convertintro.html">
+Converting Non-Unicode Text</A> section of the
+<A HREF="http://java.sun.com/docs/books/tutorial/">The Java
+Tutorial</A> explains how to perform the conversions within an
+application using high-level APIs, or see the
+<A HREF="../../api/java/nio/charset/Charset.html">java.nio.charset.Charset</A>
+class if you need more direct access to character conversion. To
+convert data files, use the
+<A HREF="../../tooldocs/windows/native2ascii.html"> native2ascii</A>
+tool.</P>
+
+<H4>Which character encodings are supported when converting text to
+and from Unicode?</H4>
+
+<P>See the <A HREF="encoding.doc.html">Supported Encodings</A> web
+page.</P>
+
+<H4>How do I create my own character converters?</H4>
+
+<P>The
+<A HREF="../../api/java/nio/charset/spi/CharsetProvider.html">java.nio.charset.spi.CharsetProvider</A>
+class lets developers create their own character converters.</P>
+
+<H4>What is the default encoding?</H4>
+
+<P>The default encoding is selected by the Java runtime based on the
+host operating system and its locale. For example, in the US locale
+on Windows, Cp1252 is used. In the Simplified Chinese locale on
+Solaris, either EUC_CN or GBK can be the default encoding, depending
+on the selection made when logging into Solaris.</P>
+
+<P>The default encoding is significant because the Java programming
+language uses Unicode to represent characters, but the file system of
+the host operating system usually uses some other encoding. The
+default encoding has to match the encoding used by the host operating
+system to ensure correct interaction.</P>
+
+<H4><A NAME="solaris-c"></A>Why can't I use all European characters
+on Solaris?</H4>
+
+<P>There are many character encodings that don't support all European
+characters (such as "&szlig;" or "&eacute;"), but we get this
+question particularly often from users of the Solaris C locale. On
+Solaris and Linux, the Java 2 Runtime Environment version 1.2 and
+higher determines the default encoding by calling the nl_langinfo
+function. On Solaris 7 and higher, this function returns "646" when
+run in the C locale, indicating ISO 646 or ASCII as the default
+encoding. ASCII only includes half the characters of ISO 8859-1, so
+many commonly used European characters are missing.</P>
+
+<P>An easy workaround is to use the Solaris en_US locale, which uses
+ISO 8859-1 as its character encoding. You can set the Solaris locale
+from the login screen or by setting the the LC_ALL environment
+variable. Another solution is to explicitly specify the desired
+character encoding in your calls to String, java.io, and java.nio API
+that performs encoding conversion.</P>
+
+<H4>What is the UTF-8 encoding?</H4>
+
+<P>UTF-8 stands for Unicode (or UCS) Transformation Format, 8-bit
+encoding form. It is a transmission format for Unicode that is
+suitable for use with many network protocols and UNIX file systems.
+</P>
+
+<H4>Are the Cp1252 and ISO8859_1 encodings identical?</H4>
+
+<P>No. Cp1252 contains some additional characters in the range from
+0x80 to 0x9F. See the
+<A HREF="http://www.microsoft.com/globaldev/reference/sbcs/1252.htm">Microsoft
+documentation</A> for more information.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Text Input"></A>Text Input</H2>
+
+<H4>What is the Input Method Framework?</H4>
+
+<P>The input method framework enables all text editing components to
+receive Japanese, Chinese, or Korean text input through input
+methods. An input method lets users enter thousands of different
+characters using keyboards with far fewer keys. Typically a sequence
+of several characters needs to be typed and then converted to create
+one or more characters. For specifications and examples see the web
+page, <A HREF="../imf/index.html">Input Method Framework</A>.</P>
+
+<H4>What does it mean to switch input methods?</H4>
+
+<P>A user may have multiple input methods available. For example, the
+user may have input methods for different languages or input methods
+that accept various types of input. Such a user must be able to
+select the input method used for a particular language or the input
+method that provides the fastest input.</P>
+
+<H4>Can an input method be selected and activated programmatically?
+</H4>
+
+<P>An application can request an input method that supports a
+specific locale using the
+<A HREF="../../api/java/awt/im/InputContext.html#selectInputMethod(java.util.Locale)">InputContext.selectInputMethod</A>
+method, but it cannot select a specific input method - that selection
+is up to the user.</P>
+
+<P>An application can activate an input method using the
+<A HREF="../../api/java/awt/im/InputContext.html#setCompositionEnabled(boolean)">InputContext.setCompositionEnabled</A>
+method.</P>
+
+<H4>Do the AWT and Swing (JFC) text components work with input
+methods?</H4>
+
+<P>See the <A HREF="intl.doc.html#inputmethod">Input Methods</A>
+section of the <A HREF="intl.doc.html">Java 2 SDK
+Internationalization Overview</A>.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Text Rendering"></A>Text Rendering</H2>
+
+<H4><A NAME="fonts"></A>What choices does an application have in
+selecting fonts?</H4>
+
+<P>An application using lightweight components can select fonts in
+four different ways:</P>
+
+<UL>
+   <LI>Using logical font names: The Java 2 platform defines five
+   logical font names that every implementation must support: Serif,
+   SansSerif, Monospaced, Dialog, and DialogInput. These logical font
+   names are mapped to physical fonts in implementation dependent
+   ways. Typically one logical font name maps to several physical
+   fonts in order to cover a large range of characters.
+   
+   <LI>Using physical font names: The Java 2 platform provides APIs
+   that let an application determine which fonts are available to a
+   given runtime and which characters these fonts can handle, and
+   request these fonts using their real name (for example, "Times
+   Roman" or "Helvetica"). The application can either let the user
+   choose fonts or programmatically determine the fonts to be used.
+   
+   <LI>Using the Lucida fonts: Sun's Java 2 Runtime Environments
+   contain this family of physical fonts, which is also licensed for
+   use in other implementations of the Java 2 platform. These fonts
+   are physical fonts, but don't depend on the host operating system.
+   
+   <LI>Using bundled physical fonts: An application can bundle
+   TrueType fonts and instantiate them using the
+   <CODE><A HREF="../../api/java/awt/Font.html#createFont(int, java.io.InputStream)">Font.createFont</A></CODE>
+   method.
+</UL>
+
+<P>An application using peered AWT components can only use logical
+font names.</P>
+
+<H4>What are the advantages and disadvantages of these four
+approaches?</H4>
+
+<P>Here's a brief summary:</P>
+
+<UL>
+   <LI>Using logical font names:
+   
+   <UL>
+      <LI>Advantages: These font names are guaranteed to work
+      anywhere, and they enable text rendering in at least the
+      language that the host operating system is localized for (often
+      a much larger range of languages).
+      
+      <LI>Disadvantages: The physical fonts used for rendering the
+      text vary between different implementations, host operating
+      systems, and locales, so an application can not achieve the
+      same look everywhere. Also, the mapping mechanisms often limit
+      the range of characters that can be rendered. For example, in
+      Sun's Java 2 Runtime Environments Japanese text can only be
+      rendered on Japanese localized host operating systems, not on
+      other localized systems even if Japanese fonts have been
+      installed.
+   </UL>
+   
+   <LI>Using physical font names:
+   
+   <UL>
+      <LI>Advantages: This approach lets an application take full
+      advantage of all available fonts, to accomplish both different
+      text appearances and maximum language coverage.
+      
+      <LI>Disadvantages: This approach is substantially harder to
+      program.
+   </UL>
+   
+   <LI>Using the Lucida fonts:
+   
+   <UL>
+      <LI>Advantages: Applications using these fonts can achieve the
+      same look wherever these fonts are available. Also, these fonts
+      cover a large range of languages (especially European and
+      Middle Eastern), so you can create fully multilingual
+      applications for the supported languages.
+      
+      <LI>Disadvantages: These fonts may not be available in all Java
+      2 runtime environments. Also, they currently do not cover the
+      complete Unicode character set; in particular, Chinese,
+      Japanese, and Korean are not supported.
+   </UL>
+   
+   <LI>Using bundled physical fonts:
+   
+   <UL>
+      <LI>Advantages: Applications using these fonts can achieve the
+      same look everywhere, and have full control over which
+      languages they support.
+      
+      <LI>Disadvantages: The bundled fonts may be quite big, in
+      particular if they support Chinese, Japanese, and Korean.
+      Licensing issues need to be resolved.
+   </UL>
+</UL>
+
+<H4><A NAME="CJK"></A>Why doesn't my application display any Chinese,
+Japanese, or Korean characters even though I have fonts for these
+languages installed?</H4>
+
+<P>The answer depends on how your application selects fonts - see
+<A HREF="#fonts">above</A>.</P>
+
+<UL>
+   <LI>Using logical font names: To use a physical font, it must be
+   selected by the mapping mechanism. In Sun's Java 2 Runtime
+   Environments, fonts for Chinese, Japanese, or Korean are only
+   selected when running on host operating systems localized for
+   these specific languages. To change the mapping, you need to
+   modify a <EM>font.properties</EM> file - see below.
+   
+   <LI>Using physical font names: Your application may not be
+   selecting the fonts correctly, or the font may be using an
+   encoding that's not supported by the Java 2 Runtime Environment.
+   
+   <LI>Using the Lucida fonts: The Lucida fonts included in Sun's
+   Java 2 Runtime Environments do not support Chinese, Japanese, or
+   Korean.
+   
+   <LI>Using bundled physical fonts: The fonts bundled with your
+   application may not support these languages.
+</UL>
+
+<H4>What is a <EM>font.properties</EM> file?</H4>
+
+<P>The <EM>font.properties</EM> files are used in Sun's Java 2
+Runtime Environments to map logical font names to physical fonts.
+There are several files to support different mappings depending on
+host operating system version and locale. The files are located in
+the lib directory within the J2RE installation.</P>
+
+<P>Note that font.properties files are implementation dependent. Not
+all implementations of the Java 2 platform use them, and the format
+and content vary between different runtime environments as well as
+between releases.</P>
+
+<H4>How do I add a physical font to the mapping of a logical font?
+</H4>
+
+<P>Since the mapping from logical fonts to physical fonts is
+implementation dependent, the answer varies. For Sun's Java 2 Runtime
+Environments, you need to create or modify a <EM>font.properties</EM>
+file - see the web page <A HREF="fontprop.html">The font.properties
+Files</A>. Note however that this is a modification of the J2RE, and
+Sun does not support modified J2REs. For other implementations, see
+their respective documentation.</P>
+
+<H4>Why can I see some characters in Swing components, but not in
+peered AWT components?</H4>
+
+<P>Swing user interface components use a different mechanism to
+render text than peered AWT components. The Swing components use the
+Graphics.drawString method, typically specifying a logical font name.
+The logical font name is then mapped to a set of physical fonts to
+cover a large range of characters. AWT components on the other hand
+are implemented using host operating system components. These host
+operating system components often do not support Unicode, so the text
+gets converted to some other character encoding, depending on the
+host operating system and locale. These encodings often cover a
+smaller range of characters than the physical fonts used to implement
+logical font names. For example, on a Japanese Windows 98 system,
+many European accented characters are mapped to the Arial font for
+Swing components, but get lost when converting the text to the
+Shift-JIS encoding for peered AWT components.</P>
+
+<H4>Why can't my application display all Unicode characters even
+though I have a Unicode font installed?</H4>
+
+<P>As in the <A HREF="#CJK">Chinese/Japanese/Korean case</A> above,
+this may be because text is not rendered using the Unicode font at
+all or only for some characters. If your application selects the
+Unicode font using its physical font name, and it still cannot render
+all characters, it could be that the Unicode font doesn't in fact
+cover the entire Unicode character set - sometimes a font is called a
+Unicode font if it just provides the tables that support the Unicode
+character encoding.</P>
+
+<H4>What font types do Sun's Java 2 Runtime Environments support?
+</H4>
+
+<P>See the <A HREF="font.html">Supported Fonts</A> document.</P>
+
+<H4>Is it possible to display more than one language in Sun's Java 2
+Runtime Environments?</H4>
+
+<P>The short answer is yes. The long answer needs to look at which
+languages you want to display at the same time, and how your
+application selects fonts.</P>
+
+<UL>
+   <LI>It is quite common for a group of languages to share a small
+   common character set - for example, the Western European languages
+   can be written in the ISO 8859-1 character set. If you only need
+   to display languages within such a group, you usually don't need
+   to do anything - it will just work.
+   
+   <LI>If the languages you need to display are all supported by the
+   Lucida font family, and your application only needs to run on Java
+   2 runtime environments that contain this font family, you can
+   simply use fonts from that family.
+   
+   <LI>If you need to support languages using separate character
+   ranges, and your application selects fonts using logical font
+   names, you need to create a font.properties file that supports all
+   the languages. See the web page, <A HREF="fontprop.html">The
+   font.properties Files</A>, for details.
+   
+   <LI>If you need to support languages using separate character
+   ranges, and your application selects fonts using physical names,
+   you need to select the fonts using information about the range of
+   characters that they support.
+</UL>
+
+<H4>Can Sun's Java 2 Runtime Environment render text in Thai, Lao,
+Burmese, or any of the Indic scripts?</H4>
+
+<P>Among the South and South-East Asian scripts, version 1.4.2 of
+Sun's Java 2 Runtime Environments supports Thai and Devanagari. For a
+complete list of all supported writing systems, see the
+<A HREF="locale.doc.html#jfc">Supported Locales</A> document. Support
+for other writing systems may be added in future releases.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Component Orientation"></A>Component Orientation</H2>
+
+<H4>Which user interface components implement component orientation
+in Sun's Java 2 Runtime Environments?</H4>
+
+<P>See the <A HREF="locale.doc.html#orientation">Supported
+Locales</A> document.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="Miscellaneous"></A>Miscellaneous</H2>
+
+<H4>Do Sun's Java 2 Runtime Environments support the Euro currency?
+</H4>
+
+<P>Yes, Sun's Java 2 Runtime Environments let you type the Euro
+character, render it, convert it from and to numerous character
+encodings, and use it when formatting numeric values as currency. For
+text input and rendering, you need the appropriate support in the
+host operating system - see the documentation for
+<A HREF="http://www.microsoft.com/windows/euro.asp">Windows</A> and
+<A HREF="http://www.sun.com/software/white-papers/wp-eurocurrency/">Solaris</A>.
+For formatting with a currency symbol, Sun's Java 2 Runtime
+Environments v. 1.4.2 uses the Euro as the default currency for the
+member countries of the European Monetary Union.</P>
+
+<P><!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE="3" NOSHADE>
+<TABLE BORDER=0 WIDTH="100%" summary="layout">
+   <TR>
+      <TD VALIGN=top>
+         <P><FONT
+         SIZE="-2"><A HREF="../../relnotes/SMICopyright.html">Copyright
+         &copy;</A></FONT><FONT SIZE="-2"> 2003 </FONT><FONT
+         SIZE="-2"><A HREF="http://www.sun.com/">Sun Microsystems,
+         Inc.</A></FONT><FONT SIZE="-2"> All Rights Reserved.</FONT>
+         </P>
+         
+         <P><FONT SIZE="-1">Please send comments to: </FONT><FONT
+         SIZE="-1"><A HREF="mailto:java-intl@java.sun.com">java-intl@java.sun.com</A></FONT><FONT
+         SIZE="-1"> </FONT>
+      </TD><TD VALIGN=top align=RIGHT>
+         <P ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif"
+         ALT="Sun" WIDTH=64 HEIGHT=30 BORDER=0 ALIGN=bottom><BR>
+         
+         <I><FONT SIZE="+1">Java Software</FONT></I><FONT SIZE="+1">
+         </FONT>
+      </TD></TR>
+</TABLE></P>
+</BODY>
+</HTML>

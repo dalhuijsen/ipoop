@@ -1,0 +1,337 @@
+<html>
+<head>
+<title>Troubleshooting</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Troubleshooting</h1>
+<hr>
+<p>This section includes the following topics:</p>
+<ul>
+  <li><a href="#general">General Troubleshooting Issues</a></li>
+  <li><a href="#installation">Troubleshooting Installation Issues</a></li>
+  <li><a href="#security">Troubleshooting Security Issues</a></li>
+</ul>
+<h2><b><font size=+1><a name="general"></a></font></b>General Troubleshooting 
+  Issues</h2>
+<p><b>Q. Why do I get a <code>javax.net.ssl.SSLException</code> (or hang or disconnect) 
+  when accessing an applet from an HTTPS site.</b></p>
+<p> A. In some SSL/TLS servers you will encounter this problem if a client message 
+  is received in a format it doesn't understand or with a protocol version number 
+  that it doesn't support. The problem is on the server side. There may be several 
+  aspects of the SSL/TLS protocol that are not implemented correctly. If the server 
+  only speaks SSLv3, when a client sends a TLSv1 (aka SSLv3.1) hello the server 
+  is supposed to respond with a SSLv3 server hello (aka SSLv3.0). But the server 
+  is not doing so; hence, you get the exception (<code>SSLException</code>).</p>
+<p> In Java Plug-in 1.3.x the browser's implementation of SSL was used. Netscape 
+  4.x and Internet Explorer provide only an SSLv3.0 implementation. The problem 
+  will not be seen because in this version of Plug-in only SSLv3.0 is used.</p>
+<p> In Java Plug-in 1.4.0 the JSSE implementation of TLS/SSL was used. By default, 
+  JSSE enables the TLSv1, SSLv3, and SSLv2Hello protocols. In this version of 
+  Plug-in TLSv1 will be used, and this problem may be seen on servers with incorrect 
+  protocol implementations. </p>
+<p> Below are some ways to work around this problem. Turn off the TLSv1 protocol 
+  and use only SSLv3.</p>
+<p> 1. In the Java Plug-in Control Panel (<b>Advanced</b> tab) specify:</p>
+<blockquote>
+  <p><code>-Dhttps.protocols=&quot;SSLv3,SSLv2Hello&quot;</code></p>
+</blockquote>
+<p> 2. Set the system property: </p>
+<blockquote>
+  <p><code>System.setProperty(&quot;https.protocols&quot;, &quot;SSLv3&quot;);</code> 
+  </p>
+</blockquote>
+<p> 3. If you have access to the socket, you can do this:</p>
+<blockquote>
+  <p><code>socket.setEnabledProtocols(&quot;SSLv3&quot;);</code></p>
+</blockquote>
+<p> In Java Plug-in 1.4.1 the SSLv3 and SSLv2Hello protocols are used by default. 
+  Because most browsers use SSLv3 by default and most web servers support it&#151;and 
+  to avoid seeing the above problem&#151;the change was made to this version of 
+  the Plug-in. Users that need to use TLSv1 should set the <code>https.protocols</code> 
+  settings.</p>
+<p><b>Q: Is there a way, other than restarting the browser, to force the JVM to 
+  check the server for modified JAR files for a page with an applet?</b></p>
+<p><b>A:</b> Modified jar files will be downloaded from the server when a page 
+  with an applet is refreshed or revisited if you first do this: type &quot;x&quot; 
+  in the Java Console to clear the Classloader cache.<br>
+</p>
+<p><b>Q: When trying to play a game on <code>http://games.yahoo.com</code> I get 
+  a <code>ControlAccessException</code>. What is the problem and is there a workaround?</b>
+<p>A: The problem is that the game applet needs permission to connect to one or 
+  more servers, and it is being denied permission for security reasons. The workaround 
+  is this: Add the following to your <code>java.policy</code> file:
+<blockquote> 
+  <p><code>grant codeBase &quot;http://download.yahoo.com/games/clients/&quot; 
+    {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;permission java.net.SocketPermission &quot;*&quot;,&quot;connect&quot;;};</code></p>
+</blockquote>
+<p><code>java.policy</code> is located in <code>&lt;JRE installation directory&gt;/Java/j2re1.4.0/lib/security/</code>.</p>
+<p><b>Q: How do I get Nescape to find my plugin when I've downloaded and installed 
+  the J2SE, which includes Java Plug-in?</b> 
+<p><b>A: </b>Set the <tt>NPX_PLUGIN_PATH</tt> envirronement variable to the location 
+  of the Java Plug-in (the directory in which the <tt>javaplugin.so</tt> file 
+  is located): 
+<blockquote> 
+  <p><tt>NPX_PLUGIN_PATH=$JAVAHOME/jre/plugin/sparc</tt><code>/ns4</code> for 
+    Netscape 4<br>
+    <tt>NPX_PLUGIN_PATH=$JAVAHOME/jre/plugin/sparc</tt><code>/ns6</code> for Netscape 
+    6 </p>
+</blockquote>
+<p><b>Q: I can't get Java Plug-in software to install in an intranet environment 
+  when I place it on our Netscape Enterprise 3.0 SuiteSpot web server. Why not?</b> 
+<p><b>A: </b>We have reports that the Netscape Enterprise 3.0 SuiteSpot Webserver 
+  is unable, at least in some circumstances, to serve up .exe files. One apparent 
+  workaround has been to configure the HTML so that the Java Plug-in product is 
+  installed by a Visigenic Orb Gatekeeper, which also functions as a web server. 
+<p><b>Q: I'm having trouble debugging with Java Plug-in Software. Do you have 
+  any tips?</b> 
+<p><b>A: </b>In some circumstances, Java Plug-in Software will use a different 
+  debug connection address than expected. This occurs when Java Plug-in Software 
+  is loaded into the <code>Explorer.exe</code> process running in one of the following 
+  configurations: 
+<ul>
+  <li>Windows 95/NT running Active Desktop with IE4 or later 
+  <li>Windows 98/ME/2000
+</ul>
+<p> Java Plug-in Software is loaded into the <code>Explorer.exe</code> process 
+  when an HTML page containing the <tt>OBJECT</tt> tag is viewed in the following 
+  ways: 
+<ul>
+  <li>via preview in an Explorer folder, if the desktop settings allow web content 
+    to be viewed in folders (in other words, if the View->As Web Page menu option 
+    is checked) 
+  <li>via Internet Explorer, if the Microsoft Internet settings for "Launch browser 
+    windows in a separate process" or "Browse in a new process" are not set 
+  <li>via a web page shown on the Active Desktop 
+</ul>
+<p> This can cause problems when debugging Java applets, since no two processes 
+  should use the same debug connection address. (See <a href="../debugger.html#how">How 
+  to Debug Applets in Java Plug-in</a> in <a href="../debugger.html">Debugging 
+  Support</a> regarding setting of the connection address.). If the <code>Explorer.exe</code> 
+  process has already claimed the debug connection address, and the <code>Netscape.exe</code> 
+  or <code>Iexplorer.exe</code> tries to use it, debugging problems may result. 
+<p> Java Plug-in Software avoids this complication when loaded into the <code>Explorer.exe</code> 
+  process by prepending the debug connection address specified in the Control 
+  Panel with the string <code>Explorer</code>. 
+<p> For example, if the default connection address set at the time of Java Plug-in 
+  Software installation is <code>2502</code>, when running under <code>Explorer.exe</code> 
+  it is actually set to <code>Explorer:2502</code>. 
+<p> When running JDB from the Java 2 SDK you should specify 
+<blockquote>
+  <p> <code>jdb -attach Explorer:2502</code> </p>
+</blockquote>
+<p> to attach to the JVM loaded into the <code>Explorer.exe</code> process. 
+<p><b>Q: My applet is no longer scriptable in Internet Explorer with Java Plug-in. 
+  Why?</b> 
+<p><b>A: </b>With Java Plug-in Software 1.3 a <tt> scriptable</tt> tag must be 
+  included and given a value of "true" in order for an applet to be scriptable. 
+  See the <a href="../using_tags.html">Using <code>OBJECT</code>, <code>EMBED</code> 
+  and <code>APPLET</code> Tags in Java Plug-in</a> for more information. 
+<p><b>Q: Why am I having problems using some standard extensions/optional packages?</b> 
+<p><b>A: </b>Only extensions installed in the <code>&lt;jre&gt;\lib\ext</code> 
+  directory will be added to the classpath. Extensions installed in directories 
+  pointed to by the <code>java.ext.dirs</code> system property will not be added. 
+<p><b>Q: Java Plug-in used to work with my Navigator 4.0.x browser. But when I 
+  upgraded to Navigator 4.5 and re-installed Java Plug-in, it does not work with 
+  Navigator 4.5. Why?</b> 
+<p><b>A: </b>It has been reported that Navigator 4.5 may not install the user 
+  profile properly during installation. As a result, Java Plug-in Software may 
+  not read the correct user profile setting. To make sure the user profile setting 
+  is correct, check the following: 
+<ul>
+  <li><code>HKEY_LOCAL_MACHINE\Software\Netscape\Netscape Navigator\Users\CurrentUser 
+    </code>
+  <li><code>HKEY_LOCAL_MACHINE\Software\Netscape\Netscape Navigator\Users\&lt;UserName&gt;\DirRoot 
+    </code>
+</ul>
+Make sure that these two registry keys exist and <code>&lt;DirRoot&gt;</code> 
+points to an existing user profile. If any of the registry keys are missing or 
+incomplete, use the User Profile Manager tool to recreate your profile. 
+<p><b>Q: We are trying to use Java 3D with Java Plug-in but it doesn't work at 
+  all. Why?</b> 
+<p><b>A: </b>Java 3D comes with various packages. Installing it incorrectly may 
+  inadvertently disable Java Plug-in or cause it to fail. Follow these general 
+  instructions for using Java 3D and Java Plug-in Software: 
+<ol>
+  <li>Install Java Plug-in first. 
+  <li>Install Java 3D in a new directory. Do not install it over the existing 
+    Java 2 SDK, Standard Edition/JRE. See <a href="http://java.sun.com/products/java-media/3D/java3d-install.html">this 
+    page</a> for installation instructions.
+  <li>Install a version of the SDK/JRE that is appropriate for Java 3D if one 
+    is not already installed on your computer.
+  <li>In the Java Plug-in Control Panel, select the appropriate version of the 
+    SDK/JRE..
+</ol>
+The Java 3D demos should now run within Java Plug-in. 
+<p><b>Q: Some web/proxy servers require users to login for authentication. When 
+  I used the browser to access this server with Java Plug-in, two login dialog 
+  boxes appeared. Why?</b> 
+<p><b>A: </b>Normally Java Plug-in will download the applets using its own connection. 
+  If the web/proxy server requires login, the browser will first encounter the 
+  request and bring up a login dialog box. After the HTML page is downloaded, 
+  Java Plug-in will try to download the class or jar files for the applet. However, 
+  since Java Plug-in has no access to the login information that the browser previously 
+  obtained, it will bring up its own login dialog box. 
+<p><b>Q: When I tried to deploy Java Plug-in in the intranet and put the binaries 
+  on the internal web server, IE doesn't download and install Java Plug-in Software 
+  when it encounters the converted page. What's going on?&nbsp;</b> 
+<p><b>A: </b>You may want to check that the <tt>CODEBASE</tt> in the <tt>OBJECT</tt> 
+  tag actually has the correct URL for Java Plug-in. Also, turning off execute 
+  privileges on the directory in which you put the Java Plug-in Software executable 
+  may help. 
+<p><b>Q: I am experiencing problems getting an applet to render using Java Plug-in 
+  Software. What is the cause of this? </b> 
+<p><b>A: </b>While this may be due to a variety of circumstances unique to your 
+  operating environment, a frequent cause of this problem is a security exception. 
+<ul>
+  <p><b>Problem: </b> Your network does not support DNS (Domain Name Service). 
+    In order to perform certain security checks, the applet <code>SecurityManager</code> 
+    needs to be able to find the IP address from which your applet was downloaded. 
+    If DNS is not available, these security checks may fail. 
+  <p><b>Workaround: </b> When visiting the target web page, specify an IP address 
+    rather than a hostname in the URL. For example, use &quot;http://123.45.35.128/fred.html". 
+</ul>
+<p>&nbsp; 
+<b>Q: I changed my browser setting while Java Plug-in Software was running, but 
+it still uses the old settings after the change. Why?</b> 
+<p><b>A: </b>The browser settings are read in by Java Plug-in when it is started. 
+  These settings are valid throughout the lifetime of the browser session. To 
+  make Java Plug-in read in the new settings, restart your browser. If you are 
+  running Active Desktop with Java Plug-in, you need to restart the computer. 
+<p><b>Q: When I loaded my applet, it said "noninit" or "applet not initialized" 
+  in the browser's status bar. How can I identify the cause of the problem?</b> 
+<p><b>A: </b>Follow these steps: 
+<ol>
+  <li> Look at the error message in the Java Console.</li>
+  <li> If you are accessing the applet through the network, make sure the proxy 
+    info shown in the Java Console is correct.</li>
+  <li> Make sure all the class/JAR files are in the right directory.</li>
+  <li> Make sure the converted HTML page is correct.</li>
+  <li> Try the unconverted page with AppletViewer on the same machine. If it works, 
+    check 3, 4, and 5 again. </li>
+</ol>
+<p><b>Q: When I try to use the <code>AppletClassLoader</code> with Java Plug-in 
+  Software, it crashes with a null pointer exception in IE4 but works fine in 
+  Netscape. Why does this happen? Is there a way to make it work correctly in 
+  IE4?</b> 
+<p><b>A: </b>Java Plug-in Software in IE4 tries to load &lt;<i>YourAppletName</i>&gt;<code>BeanInfo.class</code> 
+  even if your applet is not a bean. There is a bug in Java 2 SDK, Standard Edition 
+  v 1.3 in the <code>AppletClassLoader</code> that occurs when trying to load 
+  nonexistent classes. To prevent this problem, create an empty &lt;<i>YourAppletName</i>&gt;BeanInfo.class. 
+<p><b>Q: Why does Java Plug-in Software sometimes crash Internet Explorer but 
+  not Netscape Navigator?</b> 
+<p><b>A: </b>In certain circumstances, bad HTML will cause the browser to crash. 
+  One example is the absence of an &lt;/XMP> tag. Please make sure your HTML is 
+  correct. 
+<p> Another possibility is that the plug-in was disabled using the Control Panel 
+  before you accessed a Plug-in-enabled page. Please check your settings to make 
+  sure the Plug-in is enabled. 
+<p><b>Q: My applet used to create a top-level frame that would remain visible 
+  through page switches. When I upgraded to Java Plug-in this no longer occurs. 
+  Why?</b> 
+<p><b>A: </b>In Java Plug-in Software, applets are stopped and destroyed during 
+  page switches. All the visible components should be destroyed as well. There 
+  has been an enhancement in Java 2 SDK that makes sure that all of the resources 
+  of the applet are properly released, including the top-level frame.
+  &nbsp; 
+<h2><b><font size=+1><a name="installation"></a></font></b>Troubleshooting Installation 
+  Issues </h2>
+<p><b>Q: I am trying to install the Java Plug-in on a network drive. However, 
+  it doesn't install. Why?&nbsp;</b> 
+<p><b>A: </b>If your network drive is protected or read-only, you will not be 
+  able to install the Java Plug-in. Contact your system administrator for more 
+  details. 
+<p><b>Q: I am trying to install Java Plug-in. However, whenever the install program 
+  tries to install the Java Plug-in for Netscape Navigator, it displays an error. 
+  My Navigator is on a network drive. Is there a way to fix this?&nbsp;</b> 
+<p><b>A: </b>If your Navigator is installed on a network drive, you may not have 
+  permission to install the plugin DLL on the Navigator Plugins directory. Contact 
+  your system administrator for more details. 
+<p><b>Q: I'm having trouble installing the Java Plug-in on my Microsoft Windows 
+  machine. I see the error: "An application error has occurred and an application 
+  error log is being generated. Exception: access violation ..." What might be 
+  the problem?&nbsp;</b> 
+<p><b>A: </b>The Microsoft Window installation (using Installshield's installer) 
+  may not work if you have Quarterdeck's Cleansweep product running in the background. 
+<p><b>Q: When I reboot after I uninstalling Java Plug-in software, I get a dialog 
+  box warning that a </b><code><b>.cpl</b></code><b> file has been removed. What 
+  is this?</b> 
+<p><b>A: </b>If the Java Plug-in Control Panel is open while you are uninstalling 
+  the plug-in, <tt>plugincpl.cpl</tt> will not be removed as it is locked when 
+  the Control Panel folder is open. 
+<p><b>Q: When I uninstall Java Plug-in, the Microsoft Window Plugin for Netscape 
+  seems to stay on the machine. How can I remove that?&nbsp; </b> 
+<p><b>A: </b>Delete the <tt>NPJPI&lt;<i>modified version number</i>&gt;.dll</tt> 
+  from the Netscape <code>Plugins</code> directory. For example, for Java Plug-in 
+  1.4.0, delete <code>NPJPI140.dll</code> from the <code>Plugins</code> directory.
+<h2><b><font size=+1><a name="security"></a></font></b>Troubleshooting Security 
+  Issues </h2>
+<p><b>Q: I have some security-related issues in my applet. How do I debug it?</b> 
+<p><b>A: </b>You can enable the <code>java.security.debug</code> property to enable 
+  trace messages from the security system. Please see <a href="../debugger.html#jsdp">java.security.debug 
+  Property</a> in the chapter called Debugging Support for more information. 
+<p><b>Q: When downloading applets from the Internet, an <code>AccessControlExcpetion</code> 
+  is thrown. However, when the applet is located on the intranet, it works. Why?</b> 
+<p><b>A: </b>To prevent DNS spoofing, a security check in Java Plug-in requires 
+  the host name to be resolved into an IP address before any connection is made 
+  from the applet. However, the side-effect of this security check is to require 
+  the intranet DNS server to be able to resolve any external host name from the 
+  Internet. For some customers, this is not the way their DNS servers are setup 
+  within the enterprise, and it causes Java Plug-in to fail. To resolve this issue, 
+  there are several options: 
+<ol>
+  <li> Modify the HTML page of the applet, so the codebase and document base of 
+    the applet contains IP addresses instead of host names. This will avoid Java 
+    Plug-in performing a DNS lookup for the host name. 
+  <li> Set <tt>trustProxy</tt> to true in Java Plug-in. By setting this property, 
+    Java Plug-in will trust the proxy to perform a proper DNS lookup and return 
+    information to Java Plug-in from trusted hosts. For intranet customers whose 
+    proxy servers are setup internally and can be trusted, this property may be 
+    used. This property may be specified as <code>-DtrustProxy=true</code> in 
+    the Java Plug-in Control Panel. 
+    <p> Note that this property should be set by administrator, as setting this 
+      property improperly with an untrusted proxy server may expose the client 
+      machines to DNS spoofing. This property is similar to the <code>security.lower_java_network_security_by_trusting_proxies</code> 
+      property supported by Netscape Navigator's JVM. 
+  </ol>
+<p><b>Q: I keep getting a <code>ClassFormatError </code>exception when my webpage 
+  is loaded with HTTPS in Netscape Navigator. Why?</b> 
+<p><b>A: </b>This is caused by an applet specifying a nonexistent <code>.jar</code> 
+  or <code>.class</code> file in the <tt>EMBED</tt> tag. Due to limitation of 
+  what information can be returned via HTTPS in Navigator, the web server's "File 
+  Not Found" HTML page is returned instead of the appropriate status. This HTML 
+  page is treated as a <code>.class</code> file and that causes the exception. 
+<p><b>Q: I tried to run an RSA signed applet with Java Plug-in, but it is being 
+  treated as an untrusted applet. What is the problem?</b> 
+<p><b>A: </b>There are several possibilities: 
+<ul>
+  <li>Your applet is not signed properly. Use the Netscape's <code>signtool</code> 
+    or Sun's <code>jarsigner</code> to verify it. 
+  <li>Your RSA certificate and its certificate chain may have expired. 
+</ul>
+Please see our <a href="../rsa_signing.html">How to Sign Applets Using RSA-Signed 
+Certificates</a> for details. 
+<p><b>Q: Why do I get a yellow banner across my applet frame when using Java Plug-in? 
+  </b> 
+<p><b>A: </b>When an applet creates a free-standing Frame, Java Plug-in adds a 
+  yellow warning banner so users will know they are dealing with an untrusted 
+  applet window. 
+<p><b>Q: Can I disable the yellow warning banner on frames?&nbsp; </b> 
+<p><b>A: </b>The yellow warning banner is an important security feature. It cannot 
+  be disabled by untrusted applets. 
+<p>If you use a signed applet, where the signing key is trusted by the end user, 
+  then the warning banner will not be shown. 
+<p><b>Q: How do I prevent the warning banner from covering my GUI state?&nbsp; 
+  </b> 
+<p><b>A: </b>See the same question in the <a href="developer.html#banner">Developer 
+  FAQ</a>.
+<p><b>Q: Why does InetAddress.getLocalHost().getHostName() return "localhost"? 
+  </b> 
+<p><b>A: </b> See the same question in the <a href="developer.html#localhost">Developer 
+  FAQ</a>.
+<p>&nbsp;</p>
+</body>
+</html>

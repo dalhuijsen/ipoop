@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>serialver - The Serial Version Command</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+
+<h1>serialver - The Serial Version Command</h1>
+<blockquote>
+The <b>serialver</b> command returns the <code>serialVersionUID</code>.
+</blockquote>
+
+<h2>SYNOPSIS</h2>
+<blockquote>
+<pre>
+<b>serialver</b> [ options ] [ classnames ]
+</pre>
+<blockquote>
+<dl>
+     <dt><code>options</code>
+         <dd>Command-line options, as specified in this document.
+
+     <dt><code>classnames</code>
+         <dd>One or more class names
+</dl>
+</blockquote></blockquote>
+
+<h2>DESCRIPTION</h2>
+<blockquote>
+<p>
+<b>serialver</b> returns the <code>serialVersionUID</code> for one or
+more classes in a form suitable for copying into an evolving class. When
+invoked with no arguments it prints a usage line.
+<p>
+</blockquote>
+
+<a name=Options>
+<h2>OPTIONS</h2>
+</a>
+<blockquote>
+<dl>
+<dt><b>-classpath </b>&lt;directories and zip/jar files separated by :&gt;
+<dd>
+Set search path for application classes and resources.
+</dl>
+<dl>
+<dt><b>-show</b>
+<dd>
+Displays a simple user interface. Enter
+the full class name and press either the Enter key or the Show button to
+display the serialVersionUID.
+<p>
+    <dt><b>-J</b><i>option</i>
+        <dd>Pass <i>option</i> to the Java virtual machine, where 
+        <i>option</i> is one of the options described on the 
+        reference page for the <a href="java.html">java application 
+        launcher</a>.  For example, <b>-J-Xms48m</b> sets the startup
+        memory to 48 megabytes.
+</dl>
+</blockquote>
+<p>
+
+
+
+<h2>SEE ALSO</h2>
+<blockquote>
+<a href="../../api/java/io/ObjectStreamClass.html"><code>java.io.ObjectStreamClass</code></a>
+</blockquote>
+
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+
+</body>
+</html>

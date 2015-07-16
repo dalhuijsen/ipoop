@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Reference Objects</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Reference Objects</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+
+
+<blockquote>
+
+Reference objects support a limited degree of interaction with the garbage
+collector.  A program may use a reference object to maintain a reference to
+some other object in such a way that the latter object may still be reclaimed
+by the collector.  A program may also arrange to be notified some time after
+the collector has determined that the reachability of a given object has
+changed.  Reference objects are therefore useful for building simple caches as
+well as caches that are flushed when memory runs low, for implementing mappings
+that do not prevent their keys (or values) from being reclaimed, and for
+scheduling pre-mortem cleanup actions in a more flexible way than is possible
+with the Java finalization mechanism.
+
+</blockquote>
+
+
+
+<font size="+2"><b>API Specification</b></font><br>
+
+<font size="-1">(javadoc)</font>
+
+<ul>
+
+   <LI><b><a href="../../api/java/lang/ref/package-summary.html">java.lang.ref</a></b>
+
+   <LI><b><a href="../../api/java/lang/ref/Reference.html">java.lang.ref.Reference</a></b>
+
+   <LI><b><a href="../../api/java/lang/ref/ReferenceQueue.html">java.lang.ref.ReferenceQueue</a></b>
+
+   <LI><b><a href="../../api/java/lang/ref/SoftReference.html">java.lang.ref.SoftReference</a></b>
+
+   <LI><b><a href="../../api/java/lang/ref/WeakReference.html">java.lang.ref.WeakReference</a></b>
+
+   <LI><b><a href="../../api/java/lang/ref/PhantomReference.html">java.lang.ref.PhantomReference</a></b>
+
+</ul>
+
+</ul>
+
+<p>
+
+
+
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+   Please send comments to: <a href="mailto:java-gc-comments@eng.sun.com">java-gc-comments@eng.sun.com</a>.
+   This is not a subscription list.
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

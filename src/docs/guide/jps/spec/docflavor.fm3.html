@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide: 3 - Specifying Document Types
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="docflavor.fm2.html">PREV</a>
+ | <a href="docflavor.fm4.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="997144"><i></i> Service-Formatted Print Data
+</a></h2>
+
+<blockquote>
+<a name="997914"><!-- --></a>
+Rather than the client describing the print data format with a MIME type, the client can supply a Java object from which a print service determines the print data format. For example, the Java object can encapsulate a PostScript<sup><font size="-2">TM</font></sup> document. Instead of the client explicitly describing the document as PostScript<sup><font size="-2">TM</font></sup> with a MIME type, the client can wrap a reference to the document in a Java object, which the print service inspects to determine that the format is PostScript<sup><font size="-2">TM</font></sup>. Because the print data is delivered to the print service through the Java object, the class that the Java object implements is the representation class.<p>
+<a name="997928"><!-- --></a>
+The DocFlavor class has an inner class called DocFlavor.SERVICE_FORMATTED that contains DocFlavor object constants representing service-formatted print data. Each of these constants has a MIME type of &#34;application/x-java-jvm-local-objectref&#34;, which indicates that the client will supply a reference to a Java object implementing the interface named as the representation class. <p>
+<a name="1000522"><!-- --></a>
+The three DocFlavor object constants contained in DocFlavor.SERVICE_FORMATTED each represent a common representation class name used with service-formatted print data:<p>
+<li>
+<a name="1000545"><!-- --></a>
+DocFlavor.SERVICE_FORMATTED.PAGEABLE:The client supplies an object that implements thejava.awt.print.Pageable interface, which represents a set of pages to be printed. The printer calls methods in that interface to obtain the pages to be printed, one by one. For each page, the printer supplies a graphics context and prints whatever the client draws in that graphics context.
+</li>
+<li>
+<a name="1000549"><!-- --></a>
+DocFlavor.SERVICE_FORMATTED.PRINTABLE:The client supplies an object that implements the java.awt.print.Printable interface, which is responsible for drawing the contents of each page. The printer calls methods in that interface to obtain the pages to be printed, one by one. For each page, the printer supplies a graphics context and prints whatever the client draws in that graphics context. 
+</li>
+<li>
+<a name="1000553"><!-- --></a>
+DocFlavor.SERVICE_FORMATTED.RENDERABLE_IMAGE:The client supplies an object that implements interface java.awt.image.renderable.RenderableImage, which represents an image that can be manipulated in a rendering-independent manner and can be rendered to various contexts, such as a printer, without compromising quality. The printer calls methods in the interface to obtain the image to be printed. 
+</li>
+<a name="1000584"><!-- --></a>
+As stated in the <a href="jpsOverview.fm.html#996958"><em>Introduction</em></a>, applications that wrap 2D graphics into a Java object can use the service-formatted print data DocFlavor constants. See <a href="printing2d.fm.html"><em>Printing and Streaming 2D Graphics</em></a> for more information.<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="docflavor.fm2.html">PREV</a>
+ | <a href="docflavor.fm4.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

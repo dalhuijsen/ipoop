@@ -1,0 +1,215 @@
+<html>
+<head>
+<title>The @deprecated Tag</title>
+</head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+<CENTER><P ALIGN=LEFT>
+<IMG SRC="../../../images/javalogo52x88.gif" ALT=" Sun Microsystems, Inc " BORDER=0 WIDTH=52 HEIGHT=88>
+</P></CENTER>
+
+
+<font size=-1><a href="index.html">Deprecation Home Page</a></font>
+<HR SIZE=3 NOSHADE>
+<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<center>
+           <h1>The @deprecated Tag</h1>
+</center>
+<center>
+      <b>"@deprecated": Mechanical Help for Abandoning Old APIs</b>
+</center>
+
+<p>
+John R. Rose<br>
+Oct 4, 1996
+<p>
+<b>Problem:</b> 
+<p>
+Java 1.1 introduces many new APIs, some of which supersede
+older ones.  The new and old APIs co-exist in the same packages.
+The superseded ones add various difficulties to the programmer's job,
+the chief being the need to ignore and avoid them in most cases.
+<p>
+Partial Solution: If we mark superseded classes, methods, and fields
+clearly and unambiguously as "deprecated", the programmers will know
+where to concentrate their attention.  Also, the compiler will be able
+to help with this process, by bringing unintentional uses of deprecated
+APIs to the programmer's attention.
+<p>
+<b>Details:</b>
+<p>
+Within documentation comments, we define the new paragraph tag
+"@deprecated".  (See JLS, $$184.)  It can appear in both class and
+member documentation comments, and will apply specifically the construct
+its comment introduces.
+<p>
+The tagged paragraph can be empty.  If it is not, it should tell the
+programmer how to avoid using the deprecated feature.
+<p>
+There should be "@see" tagged paragraphs which refer to the new versions
+of the same functionality.
+<p>
+As far as the compiler is concerned, the presence of the string
+"@deprecated" at the beginning of a documentation comment line (except
+for whitespace) causes it to place a "Deprecated" attribute in the
+output classfile for the corresponding class, field, or method.
+<p>
+Moreover, in parallel with the access checking logic for classes and
+members, the compiler looks for "Deprecated" attributes of classes and
+members being accessed, and issues warnings when the deprecated classes
+or members are used.
+<p>
+Note that deprecation applies to classes and to individual members, not
+to their names.  It is possible for a single method to have deprecated
+and non-deprecated overloadings.  It is possible for a non-deprecated
+member to hide or override a deprecated one, which removes deprecation.
+It is the responsibility of the programmer to deprecate overrides of
+a deprecated method, if in fact they should be deprecated.
+<p>
+A deprecation warning is suppressed if the compilation unit containing
+the deprecation is being compiled at the same time as the compilation
+unit using the deprecated class or member.  This allows legacy APIs to
+be built without warnings.  There currently is no other way to suppress
+the deprecation warnings.
+<p>
+A hypothetical "-strict" option to the compiler could promote all
+warnings, including deprecation warnings, to hard errors.  This is not
+in 1.1.
+<p>
+Javadoc should somehow highlight deprecation paragraphs, and perhaps
+should place a characteristic glyph next to references to deprecated
+names.
+<p>
+<b>Practice:</b>
+<p>
+Here is an example of the most common form of a deprecated method:
+<p><pre>
+    /**
+     * @deprecated
+     * @see #getPreferredSize
+     */
+    public Dimension preferredSize() {
+	return getPreferredSize();
+    }
+</pre>
+(Notes:  The "@deprecated" tag must be followed by a space or newline.
+The "@see" tag must be at the beginning of the line.  See the JLS,
+chapter 18.)
+<p>
+If the deprecation is a simple renaming, there is no need to say
+something like "this method is replaced by getPreferredSize";
+the "@see"-tagged paragraph points the user to the replacement.
+<p>
+The deprecation may be more complex if the API was reorganized by other
+than a renaming of features.  Here is an example of a method that is
+being retracted:
+<p><pre>
+    /**
+     * Delete multiple items from the list.
+     *
+     * @deprecated  Not for public use in the future.
+     * This method is expected to be retained only as a package
+     * private method.
+     * @see #remove(int)
+     * @see #removeAll()
+     */
+    public synchronized void delItems(int start, int end) {
+    ...
+    }
+</pre>
+Designers of new 1.1 APIs should carefully consider whether they are
+superseding old APIs.  For each such API, if they wish to encourage
+users of the old previous API to migrate to the new API, they should
+add a deprecation paragraph to the documentation comment.  Empty
+deprecation paragraphs are bad form, because they do not help the
+user fix the warnings that arise from the deprecation.
+<p>
+Valid reasons for wishing one's users to migrate to the new API include:
+<ul>
+ <li> the old API is insecure, buggy, or highly inefficient
+ <li> the old API is going away in a future release
+ <li> the old API encourages very bad coding practices
+</ul>
+<p>
+Not all of these reasons are of equal weight, yet deprecation is a
+reasonable (though not mandatory) choice in all these cases.  Therefore,
+the use of deprecated APIs can never be made a hard error by default.
+Also, the deprecation comments need to help the user decide when to
+move to the new API, and so should briefly mention the technical reasons
+for deprecation.
+<p>
+(It is probably <b>not</b> good to specifically mention a timetable for
+phase-out of the deprecated API; this is a business decision that needs
+to be communicated other ways.)
+<p>
+It is not necessary to deprecate individual members of a deprecated
+class, unless of course the programmer wants to explain some specific
+point about one member.
+<p>
+When a feature is deprecated, it is a good idea to notify the
+engineering organization of this fact, so that other engineers can
+respond to the change (pro or con) in a timely manner.
+<p>
+<b>Other Design Options:</b>
+<p>
+This is the first time the compiler is in any way cognizant of document
+comment contents.  (Once, it made sure that they were at the right place
+in the parse tree, but this is no longer true.)  We did not lightly
+choose to make the compiler's behavior dependent on the contents of a
+comment.
+<p>
+One precedent for looking into comments is "lint", which uses comments
+like /*PRINTFLIKE2*/ to annotate C APIs.
+<p>
+Note that Java documentation comments are structured, and the structure
+is specified in the Java Language Specification.  This means that we
+"own" the format of this particular sort of comment, so our design is
+somewhat more reasonable than the less-differentiated conventions used
+by lint.
+<p>
+We considered introducing pragmas, and using them for deprecation (e.g.,
+<*deprecated*>) but this would open the door very wide to many sorts of
+incompatible extensions and, possibly, to serious abuses.
+<p>
+However, @deprecated does work like a pragma:  It belongs in the source,
+expresses information about it, but does not modify its semantics.
+Unlike many pragmas, @deprecated is intended for a human audience.
+<p>
+The compiler emits warnings as a friendly and helpful reminder, but does
+not enforce any rules.  It's up to the programmer to use the contents of
+the deprecation paragraph.  Since the human is the primary user of the
+data, it belongs in comments.
+<p>
+We considered introducing a new keyword, something like "transient".
+This would solve the mechanical problem, but at the cost of modifying
+the language itself.  In particular, we would have to take away an
+identifier from coders that we had not previously reserved (like "var").
+Moreover, since the primary audience of deprecations is humans, a
+keyword-based approach is insufficient, and must be augmented by comment
+conventions, preferably ones which integrate with javadoc.  Thus, the
+keyword approach does not pay.
+<p>
+Still, the compiler has heretofore ignored and should generally ignore
+documentation comments.  This is an admittedly irregular exception to
+that practice.  But the other design options for deprecation involve
+worse sorts of irregularity.
+
+
+</ul>
+
+<p>
+<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<HR SIZE=3 NOSHADE>
+
+<IMG alt="Sun logo" SRC="../../../images/sunlogo64x30.gif" ALIGN=RIGHT WIDTH=64 HEIGHT=30>
+
+<FONT SIZE=-2>
+<A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1996 Sun Microsystems, Inc., 2550 Garcia Ave., Mtn. View, CA 94043-1100 USA. All rights reserved.
+<br><br>
+<FONT SIZE=-1>
+Please send comments to: <a href="mailto:jdk-comments@java.sun.com">jdk-comments@java.sun.com</a> 
+</FONT>
+
+
+</BODY>
+</HTML>

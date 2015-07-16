@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Image I/O API Guide: 3 - Writing Image I/O Applications
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="apps.fm7.html">PREV</a>
+ | <a href="extending.fm1.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Image I/O API Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="997341"><i>3.8	</i> Handling Errors using <code>IIOException</code>
+</a></h2>
+
+<blockquote>
+<a name="997068"><!-- --></a>
+In the examples above, the possibility of fatal errors was not considered. Errors may result from a number of sources, including true I/O errors (e.g., file not found, file unreadable, file on corrupt media), security violations (e.g., no permission to read files from an applet), file format problems (file contents corrupted, file using a variant of the format that is not supported by the plug-in), or even bugs in the API implementation or in the plug-in.<p>
+<a name="997069"><!-- --></a>
+The Image I/O API makes use of its own subclass of the standard <code>IOException</code> class, called <code>IIOException</code>. <code>IIOException</code>s are used to signal all errors encountered during the parsing of a source file (e.g., an incorrect checksum or an invalid value for a particular byte within the file), including true I/O errors that result in an <code>IOException</code> being thrown within the reader.<p>
+<a name="998535"><!-- --></a>
+An <code>IIOException</code> contains a (non-localized) message describing the reason for the exception, as well as a reference to another <code>Exception</code> that was the cause of the <code>IIOException</code>, if one exists.<p>
+<a name="997071"><!-- --></a>
+Thus, application code that attempts to provide graceful handling of errors will look something like:<p>
+</blockquote><blockquote><pre>
+File f = new File(&#34;c:\images\myimage.gif&#34;);
+ImageInputStream iis = null;
+try {
+	iis = ImageIO.createImageInputStream(f);
+} catch (IIOException iioe1) {
+	System.out.println(&#34;Unable to create an input stream!&#34;);
+	return;
+}
+
+reader.setInput(stream);
+try {
+	reader.read(0, param);
+} catch (IIOException iioe2) {
+	System.out.println(&#34;An error occurred during reading: &#34; +
+				 iioe2.getMessage());
+	Throwable t = iioe2.getCause();
+	if ((t != null) &amp;&amp; (t instanceof IOException)) {
+		System.out.println(&#34;Caused by IOException: &#34; +
+		                   t.getMessage());
+	}
+}
+</pre></blockquote><blockquote>
+<a name="997090"><!-- --></a>
+<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="apps.fm7.html">PREV</a>
+ | <a href="extending.fm1.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="copyright.fm.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Suzette Pelouch -->
+<!-- Last updated: Fri Apr 27 11:22:59 2001 -->
+ 
+
+
+</body>
+</html>

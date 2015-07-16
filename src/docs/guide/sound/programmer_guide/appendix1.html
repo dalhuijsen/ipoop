@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>Code Overview: AudioSystem.java</title>
+</head>
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Appendix 1: Code Overview: <code>AudioSystem.java</code> </h1>
+<hr>
+<form name="form1">
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>For the benefit of service providers and API implementers, a brief overview 
+  of the JavaSound source code is provided. </p>
+<p><code>javax.sound.sampled.AudioSystem</code> is the entry point to JavaSound 
+  for obtaining resources; i.e., mixers, lines, etc. And each method of <code>AudioSystem</code> 
+  involves getting the providers of some service&#151;<code>MixerProvider[]</code>, 
+  <code>FormatConversionProvider[]</code>, <code>AudioFileReader[]</code>, or 
+  <code>AudioFileWriter[]</code>. Then the method goes onto to obtain some specific 
+  information or perform some task. There is much similarity in how these methods 
+  work. Let us take a look at how <code>getMixerInfo()</code> works.</p>
+<p>The following is a sequence diagram of <code>getMixerInfo()</code> in <code>AudioSystem.java</code>:</p>
+<p align="center"><img src="images/MixerInfo-2a.gif" alt="The following context described this graphic." width="1186" height="705"></p>
+<p align="left"><code>getMixerInfo()</code> in <code>AudioSystem</code> first 
+  calls <code>getMixerProviders()</code>, a <code>private static</code> method 
+  of <code>AudioSystem</code>. The first thing that <code>getMixerProviders()</code> 
+  does is attempt to load <code>sun.misc.Service</code>. If an exception is thrown, 
+  it means that a pre-1.3 JRE is in use and there is no service provider lookup 
+  mechanism present. If an exception is thrown, then <code>sun.media.sound.DefaultServices</code> 
+  is used to obtain service providers (not depicted in above diagram). If the 
+  1.3 mechanims is present, then <code>getJDK13Serives()</code> is called (shown 
+  above) with <code>&quot;javax.sound.sampled.spi.MixerProvider&quot;</code> as 
+  the argument.</p>
+<p align="left"><code>getJDK13Services()</code> is another <code>private static</code> 
+  method of <code>AudioSystem</code>. It attempts to the load the class for <code>&quot;com.sun.media.sound.JDK13Services&quot;</code>, 
+  and if it succeeds it set <code>Class jdk13Services</code> equal to it. A bit 
+  of trickery is then performed by using <code>Class.getMethod()</code> to get 
+  the <code>getProviders()</code> method of <code>jdk13Services</code>, which 
+  is returned as object <code>Method m</code>. The method is then invoked, which 
+  has the effect of invoking <code>getProviders(&quot;javax.sound.sampled.spi.MixerProvider&quot;)</code> 
+  on <code>JDK13Services</code>. This in turn uses the <code>providers()</code> 
+  method of <code>sun.misc.Service</code> to return a vector of mixer providers, 
+  <code>MixerProvider[]</code>. The <code>getMixerInfo()</code> method of <code>MixerProvider</code> 
+  is then called on each element of the vector to return info (<code>Mixer.info</code>) 
+  for all mixers of all mixer providers.</p>
+<p align="left">Other services are handled in a similar way. For instance, <code>getTargetEncodings()</code> 
+  calls <code>getFormatConversionProviders()</code>, <code>getAudioFileFormat()</code> 
+  calls <code>getAudioFileReaders()</code>, etc., which are similarly structured 
+  to <code>getMixerProviders()</code>.</p>
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<HTML>
+<HEAD>
+     <TITLE>Accessibility - New Features</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="javalogo52x88.gif" ALT="Java logo" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+<TD>
+<center>
+           <h1>Accessibility</h1>
+<h3>New Features in the Java<sup><font size=-2>TM</font></sup> 2 Platform, v1.4</h3>
+</center>
+</TD>
+<TD ALIGN=RIGHT VALIGN=TOP>
+   <font size="-1"><a href="index.html">Java Accessibility</a></font>
+</TD>
+</TR>
+</TABLE>
+
+<!-- Body text begins here -->
+
+<blockquote>
+The features described here were introduced in the Java 2 Platform, v1.4.0. 
+These features are also part of subsequent releases of the Java 2 Platform.
+
+<h3>Contents</h3>
+<blockquote>
+<a href="#xcomp2">AccessibleExtendedComponent.getAccessibleKeyBinding</a><br>
+<a href="#role">AccessibleRole New Constants</a><br>
+<a href="#object">Accessibility Support for HTML Object Tags</a><br>
+<a href="#traversal">Support for Tracking HTMLEditorKit Keyboard Link Traversal</a><br>
+<a href="#prop2">Assistive Technologies Property</a><br>
+<a href="#prop3">Screen Reader Property</a><br>
+<a href="#api">API Enhancements</a><br>
+<a href="#edit">AccessibleEditableText</a><br>
+<a href="#xcomp">AccessibleExtendedComponent</a><br>
+<a href="#xtable">AccessibleExtendedTable</a><br>
+<a href="#keybind">AccessibleKeyBinding</a><br>
+<a href="#tab">Mnemonic Tab Navigation</a><br>
+<a href="#list">List Navigation by First Letter</a><br>
+<a href="#html">Accessibility Support for HTML Components</a><br>
+<a href="#prop">Screen Magnifier Property</a><br>
+</blockquote>
+<hr>
+
+<a name=xcomp2>
+<b>AccessibleExtendedComponent.getAccessibleKeyBinding</b></a><br>
+<blockquote>
+Interface <a href="../../api/javax/accessibility/AccessibleExtendedComponent.html"><b><tt>AccessibleExtendedComponent</tt></b></a> has a new method, <tt>getAccessibleKeyBinding</tt>, to return key bindings associated with an object.
+</blockquote>
+
+<a name=role>
+<b>AccessibleRole New Constants</b></a><br>
+<blockquote>
+Class <a href="../../api/javax/accessibility/AccessibleRole.html"><b><tt>AccessibleRole</tt></b></a> contains the following new constants:
+<ul>
+<li><tt>DATE_EDITOR</tt>
+<li><tt>FONT_CHOOSER</tt>
+<li><tt>GROUP_BOX</tt>
+<li><tt>SPIN_BOX</tt>
+<li><tt>STATUS_BAR</tt>
+</ul>
+</blockquote>
+
+<a name=object>
+<b>Accessibility Support for HTML Object Tags</b></a><br>
+<blockquote>
+This release adds accessibility support for HTML <tt>object</tt> tags. <tt>CTRL-t</tt> and <tt>SHIFT-CTRL-t</tt> navigate to the next and previous component, respectively, associated with an <tt>object</tt> tag in an HTML document. <tt>CTRL-SPACE</tt> activates the default action associated with the component.
+</blockquote>
+
+<a name=traversal>
+<b>Support for Tracking HTMLEditorKit Keyboard Link Traversal</b></a>
+<blockquote>
+Assistive technologies needed a way to track HTMLEditorKit keyboard link traversal. The constant <tt>AccessibleContext.ACCESSIBLE_HYPERTEXT_OFFSET</tt> was added to support this feature.
+</blockquote>
+
+<a name=prop2>
+<b>Assistive Technologies Property</b></a><br>
+<blockquote>
+The <a href="properties.html"><tt>javax.accessibility.assistive_technologies</tt></a> property specifies the assistive technologies to load into the JVM.
+</blockquote>
+
+<a name=prop3>
+<b>Screen Reader Property</b></a><br>
+<blockquote>
+The <a href="properties.html"><tt>javax.accessibility.screen_reader_present</tt></a> property, when set to true, lets the Java platform libraries know that a screen reader is present on the system. Application developers can check this property. If an application is self-voicing and a screen reader is present, developers can turn off the self-voicing.
+</blockquote>
+
+
+<a name=api>
+<b>API Enhancements</b></a><br>
+<blockquote>
+The following new classes and interfaces have been added to the 
+Java<sup><font size=-2>TM</font></sup> Accessibility API:
+<ul><b>
+<li><a href="../../api/javax/accessibility/AccessibleEditableText.html"><tt>javax.accessibility.AccessibleEditableText</tt></a>
+<li><a href="../../api/javax/accessibility/AccessibleExtendedComponent.html"><tt>javax.accessibility.AccessibleExtendedComponent</tt></a>
+<li><a href="../../api/javax/accessibility/AccessibleExtendedTable.html"><tt>javax.accessibility.AccessibleExtendedTable</tt></a>
+<li><a href="../../api/javax/accessibility/AccessibleKeyBinding.html"><tt>javax.accessibility.AccessibleKeyBinding</tt></a>
+</b></ul>
+In addition, <b><a href="../../api/javax/accessibility/AccessibleContext.html"><tt>javax.accessibility.AccessibleContext</tt></a></b> was updated to reflect the new 
+classes and interfaces.
+</blockquote>
+
+<a name=edit>
+<b>AccessibleEditableText</b></a><br>
+<blockquote>
+Interface <a href="../../api/javax/accessibility/AccessibleEditableText.html"><b><tt>AccessibleEditableText</tt></b></a> provides support for text editing by assistive technologies.
+</blockquote>
+
+<a name=xcomp>
+<b>AccessibleExtendedComponent</b></a><br>
+<blockquote>
+Interface <a href="../../api/javax/accessibility/AccessibleExtendedComponent.html"><b><tt>AccessibleExtendedComponent</tt></b></a> provides the standard mechanism
+for an assistive technology to determine the extended graphical representation of an object.
+</blockquote>
+
+<a name=xtable>
+<b>AccessibleExtendedTable</b></a><br>
+<blockquote>
+Interface <a href="../../api/javax/accessibility/AccessibleExtendedTable.html"><b><tt>AccessibleExtendedTable</tt></b></a> provides extended information about a user-interface component that presents data in a two-dimensional table format.
+</blockquote>
+
+<a name=keybind>
+<b>AccessibleKeyBinding</b></a><br>
+<blockquote>
+Interface <a href="../../api/javax/accessibility/AccessibleKeyBinding.html"><b><tt>AccessibleKeyBinding</tt></b></a> provides the standard mechanism for an assistive technology to determine the key bindings which exist for an object. 
+</blockquote>
+
+<a name=tab>
+<b>Mnemonic Tab Navigation</b></a><br>
+<blockquote>
+This new feature provides support for easier tab navigation using mnemonics on a <tt>JTabbedPane</tt>.
+</blockquote>
+
+<a name=list>
+<b>List Navigation by First Letter</b></a><br>
+<blockquote>
+This new feature provides support for list navigation using the first letter of list items.
+</blockquote>
+
+<a name=html>
+<b>Accessibility Support for HTML Components</b></a><br>
+<blockquote>
+This release provides accessibility support for HTML components in Swing.
+</blockquote>
+
+<a name=prop>
+<b>Screen Magnifier Property</b></a><br>
+<blockquote>
+The <a href="properties.html"><tt>javax.accessibility.screen_magnifier_present</tt></a> property, when set to true, lets the Java platform libraries know that a screen magnifier is present on the system. Application developers can check this property, and if a screen magnifier is present, developers should make sure their applications are compatible with screen magnification.
+</blockquote>
+
+</blockquote>
+
+
+
+<!-- ============================================================== -->
+
+
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+   Please send comments to: <a href="mailto:access@sun.com">access@sun.com</a> 
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+</BODY>
+</HTML>
+
+
+

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<HTML>
+  
+  <HEAD>
+    <TITLE>Externalization with an NonExternalizable SuperClass</TITLE>
+  </HEAD>
+  
+  <BODY BGCOLOR="ffffff"><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" 
+    HEIGHT="4">
+    
+    <H2>Exernalization with an NonExternalizable SuperClass</H2>
+    
+    <IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+    
+    <H3>Abstract</H3>
+    
+    <BLOCKQUOTE>
+      
+      <P> When using the <TT>Externalizable</TT> interface, an externalizable
+        object must implement a <TT>writeExternal</TT> method to save the state
+        of the object and a <TT>readExternal</TT> method to restore the state
+        of the object. The externalizable object must also coordinate with its
+        supertype to save and restore its state. </P>
+      
+      <P>This example demonstrates how an object saves and restores the state
+        of its <I>nonexternalizable</I> supertype. When the supertype of an
+        externalizable object is <I>not</I> externalizable, the subclass object
+        must explicitly save and restore the state of the fields of the
+        superclass in its own <TT>writeExternal</TT> and <TT>readExternal</TT>
+        methods.</P> </BLOCKQUOTE><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="190" 
+    HEIGHT="2">
+    
+    <H3>Additional Information: </H3>
+    
+    <DL>
+      <DD><A HREF="./sources.html">Source Files</A> </DD>
+      <DD><A HREF="./torun.html">Running the Example</A> </DD>
+      <DD><A HREF="../index.html">List of Examples</A> </DD>
+    </DL><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+  </BODY>
+</HTML>

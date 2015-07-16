@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Miscellaneous changes to java.net</title>
+  </head>
+
+  <body>
+      <h1>Miscellaneous changes to java.net worth mentioning:</h1>
+      <H2>Noteworthy bug fixes:</H2>
+      <UL>
+	<LI><B>InetAddress</B><BR>
+	  A bug existed in JDK1.0.2 where one could not create an InetAddress
+	  out of a IP address String (e.g., "206.26.48.100") if a corresponding
+	  host name (e.g., "java.sun.com") could not be found.  This resulted in
+	  an UnknownHostException.   The bug is fixed in JDK1.1.  Additionally,
+	  when an InetAddress is created from an IP address, the corresponding hostname 
+	  is not looked up until specifically requested (via InetAddress.getHostName()),
+	  as a performance enhancement.
+	<LI><B>ServerSocket/DatagramSocket close()</B><BR>
+	  A bug existed in JDK1.0.2 where the <code>close()</code> method of ServerSocket
+	  and DatagramSocket were <code>synchronized</code>.  The result was that if one thread
+	  were blocked indefinitely in DatagramSocket.receive() or ServerSocket.accept(),
+	  another thread couldn't break the blocking thread out by calling close().  This
+	  is fixed in JDK1.1 by making the close() methods unsynchronized.
+	<LI><B>URLConnection</B><BR>
+	  There was a bug in JDK1.0.2 where the methods on URLConnection:
+	  <UL>
+	    <LI>setRequestProperty()
+	    <LI>getRequestProperty()
+	    <LI>getHeaderField()
+	    <LI>getHeaderFieldInt()
+	    <LI>getContentLength()
+	    <LI>getDate()
+	  </UL>
+	  etc, did not work.  These are fixed in JDK1.1.
+      </UL>
+      <H2>Binding to local port/address:</H2>
+      <UL>
+	<LI><B>Socket, ServerSocket, DatagramSocket</B><BR>
+	  These classes has overloaded constructors for binding to a specific
+	  local address and port.  This is useful and necessary for applications
+	  like proxy servers that operate on multi-homed machines, and need 
+	  particular control over which network interfaces are used.
+      </UL>
+      <H2>MulticastSocket:</H2>
+      <UL>
+      <LI>The MulticastSocket class was moved from package sun.net into the core
+	  API of java.net.
+      </UL>
+      <H2>HttpURLConnection:</H2>
+      <UL>
+	<LI>JDK1.1 introduces a new class, HttpURLConnection which extends 
+	  URLConnection, and provides additional functionality specific to
+	  HTTP:
+	<LI>Ability to use all of the request methods with HTTP/1.1, like:
+	  <UL>
+	    <LI>GET
+	    <LI>POST
+	    <LI>PUT
+	    <LI>HEAD
+	    <LI>TRACE
+	    <LI>DELETE
+	    <LI>OPTIONS
+	  </UL>
+	<LI>Control over whether to follow HTTP redirects.
+      </UL>
+      <hr>
+      <address><a href="mailto:brown@eng.sun.com">David Brown</a></address>
+<!-- Created: Thu Dec  5 12:16:31 PST 1996 -->
+<!-- hhmts start -->
+Last modified: Thu Dec  5 15:09:54 PST 
+<!-- hhmts end -->
+  </body>
+</html>

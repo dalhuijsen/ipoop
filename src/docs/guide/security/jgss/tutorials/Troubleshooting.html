@@ -1,0 +1,215 @@
+<html>
+
+<head>
+    <title>Troubleshooting</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#000077" alink="#FF0000">
+
+
+<H2>Troubleshooting</H2>
+
+<blockquote>
+
+<p>Below are listed some problems that may occur when attempting
+a login, and suggestions for solving them.
+
+<ul>
+
+<li> <b>java.lang.SecurityException at 
+javax.security.auth.login.Configuration.getConfiguration</b>
+
+<blockquote>
+
+<P> <i>Cause</i>: There was a problem processing the JAAS
+login configuration file, possibly due to a syntax error in the
+file. 
+
+<P> <i>Solution</i>: Check the configuration file carefully for errors.
+See <a href="LoginConfigFile.html">JAAS Login Configuration 
+File</a> for information about the syntax required in the
+login configuration file.
+
+</blockquote>
+<p>
+
+
+<li> <b>javax.security.auth.login.LoginException: KrbException:: 
+Pre-authentication information was invalid (24) - Preauthentication failed</b>
+
+<blockquote>
+
+<P> <i>Cause 1:</i> The password entered is incorrect. <p>
+
+<P> <i>Solution 1</i>: Verify the password. 
+
+<P> <i>Cause 2:</i> If you are using the keytab to get the key
+(e.g., by setting the <code>useKeyTab</code> option to <code>true</code> in 
+the Krb5LoginModule entry in the JAAS login configuration file), 
+then the key might have changed since you updated the keytab. 
+
+<P> <i>Solution 2</i>: Consult your Kerberos documentation to
+generate a new keytab and use that keytab.
+
+<P> <i>Cause 3:</i> Clock skew - If the time on the KDC and on the client differ significanlty (typically 5 minutes), this error can be returned.
+
+<P> <i>Solution 3</i>: Synchronize the clocks (or have a system
+administrator do so).
+
+</blockquote>
+<p>
+
+
+<li> <b>GSSException: No valid credentials provided (Mechanism level: 
+Attempt to obtain new INITIATE credentials failed! (null)) . . . 
+Caused by: javax.security.auth.login.LoginException: Clock skew too great</b>
+
+<blockquote>
+
+<P> <i>Cause</i>: Kerberos requires the time on the KDC and on the
+client to be loosely synchronized. (The
+default is within 5 minutes.) If that's not the case, you will
+get this error. 
+
+<P> <i>Solution</i>: Synchronize the clocks (or have a system
+administrator do so).
+
+</blockquote>
+<p>
+
+
+<li> <b>javax.security.auth.login.LoginException: KrbException: Null realm name (601) - default realm not specified </b>
+
+<blockquote>
+
+<P> <i>Cause</i>: The default realm is not specified in the Kerberos
+configuration file <code>krb5.conf</code> (if used), provided as a part of 
+the user name, or specified via the <code>java.security.krb5.realm</code> 
+system property.
+
+<P> <i>Solution</i>: Verify that your Kerberos configuration file (if used) 
+contains an entry specifying the default realm, or directly specify it by
+setting the value of the <code>java.security.krb5.realm</code> 
+system property and/or including it in your user name when authenticating 
+using Kerberos. 
+
+</blockquote>
+<p>
+
+
+<li> <b>javax.security.auth.login.LoginException: 
+java.net.SocketTimeoutException: Receive timed out</b>
+
+<blockquote>
+
+<P> <i>Solution</i>: Verify that the Kerberos KDC is up and running.
+
+</blockquote>
+<p>
+
+
+<li> <b>GSSException: No valid credentials provided (Mechanism level: 
+Failed to find any Kerberos Ticket)</b>
+
+<blockquote>
+
+<P> <i>Cause</i>: This may occur if no valid Kerberos credentials 
+are obtained. In particular, this occurs if you want the underlying
+mechanism to obtain credentials but you forgot to indicate this by
+setting the <code>useSubjectCredsOnly</code> system property value to
+<code>false</code> (for example via <code>-DuseSubjectCredsOnly=false</code> 
+in your execution command). 
+
+<P> <i>Solution</i>: Be sure to set the <code>useSubjectCredsOnly</code> 
+system property value to <code>false</code> if you want the underlying
+mechanism to obtain credentials, rather than your application or a
+wrapper program (such as the Login utility used by some of the
+tutorials) performing authentication using JAAS.
+
+</blockquote>
+<p>
+
+
+<li> <b>javax.security.auth.login.LoginException:  Could not load 
+configuration file &lt;krb5.conf&gt;  (No such file or directory)</b>
+
+<blockquote>
+
+<P> <i>Cause</i>: The tutorials' sample execution commands specify
+the default Kerberos realm and KDC by setting values for the
+<code>java.security.krb5.realm</code> and <code>java.security.krb5.kdc</code> 
+system properties. If you like, you can instead have a
+<code>krb5.conf</code> Kerberos configuration file used. Such a file
+includes information about what the default realm and KDC are.
+To use a <code>krb5.conf</code> file, you either set the 
+system property <code>java.security.krb5.conf</code> (instead of the
+<code>realm</code> and <code>kdc</code> properties) to specify the location
+of the file or you don't set 
+any of these properties and therefore an attempt is made to locate
+the <code>krb5.conf</code> file in a default location.
+You will get the error "Could not load 
+configuration file &lt;krb5.conf&gt;  (No such file or directory)"
+if the file could not be found.
+
+<P> <i>Solution</i>: Verify that the Kerberos configuration file 
+<code>krb5.conf</code> is available and 
+readable. Check <a href="KerberosReq.html">Kerberos Requirements</a>
+for information about how to specify the location of the 
+<code>krb5.conf</code> file and where such a file is searched for
+by default if you don't explicitly indicate the location.
+
+</blockquote>
+<p>
+
+
+<li> <b>javax.security.auth.login.LoginException: KrbException: KDC has 
+no support for encryption type (14) - KDC has no support for encryption type</b> 
+
+<blockquote>
+
+<P> <i>Cause</i>: Your KDC does not support the encryption type requested.
+(Typically, the encryption type is specified in the <code>krb5.conf</code>
+Kerberos configuration file.)
+
+<P> <i>Solution</i>:  
+Please choose an encryption type that is supported by the KDC you are using. 
+The encryption types supported by the Kerberos implementation from 
+Sun Microsystems are DES_CBC_MD5,DES_CBC_CRC,and DES_CBC_MD4.
+
+</blockquote>
+<p>
+
+
+<li> <b>KDC reply did not match expectations</b>
+
+<blockquote>
+
+<P> <i>Cause</i>: The KDC sent a response that cannot be understood by the 
+client.
+
+<P> <i>Solution</i>: Verify that you have set correctly all the 
+<code>krb5.conf</code> file configuration parameters and consult your 
+KDC vendor's guide.
+
+</blockquote>
+
+</ul>
+
+
+<p>
+<br>
+<p><b>Note:</b> A debugging mode can be enabled by setting the system property
+<code>sun.security.krb5.debug</code> to "true". This will allow you to follow 
+the program's execution of the Kerberos V5 protocol. <b><i>If you are sending
+feedback regarding a problem you are facing, we would appreciate your
+including the complete debugging output.</i></b>
+
+
+
+</blockquote>
+
+
+</body>
+
+</html>
+

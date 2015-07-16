@@ -1,0 +1,272 @@
+<HTML>
+<HEAD>
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.02 [en] (X11; U; SunOS 5.5.1 sun4u) [Netscape]">
+   <TITLE>Java(tm) Platform Debugger Architecture</TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+&nbsp;
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR>
+<TD WIDTH="60"><IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+<TD>
+<CENTER>
+<H1>Java<sup><font size="-2">TM</font></sup> Platform Debugger Architecture</H1></CENTER>
+</TD>
+<td width="60"><A HREF="index.html">Home Page</A>
+</td>
+</TR>
+</TABLE>
+<!-- Body text begins here -->
+<P>
+
+<CENTER>
+<H1>
+Architecture Overview</H1></CENTER>
+The Java<sup><font size="-2">TM</font></sup> 
+Platform Debugger Architecture is structured as follows:
+<PRE>
+             <FONT COLOR="#009900">Components</FONT>                         <FONT COLOR="#009900">Debugger Interfaces</FONT>
+
+                /    |--------------|
+               /     |     <A HREF="#vm">VM</A>       |
+ <A HREF="#debuggee">debuggee</A> ----(      |--------------|  &lt;------- <A HREF="#jvmdi">JVMDI</A> - Java VM Debug Interface
+               \     |   <A HREF="#back-end">back-end</A>   |
+                \    |--------------|
+                /           |
+ <A HREF="#channel">comm channel</A> -(            |  &lt;--------------- <A HREF="#jdwp">JDWP</A> - Java Debug Wire Protocol
+                \           |
+                     |--------------|
+                     | <A HREF="#front-end">front-end</A>    |
+                     |--------------|  &lt;------- <A HREF="#jdi">JDI</A> - Java Debug Interface
+                     |      <A HREF="#ui">UI</A>      |
+                     |--------------|
+
+</PRE>
+
+<H2>What is the Java Platform Debugger Architecture (JPDA)?</H2>
+
+JPDA is a multi-tiered debugging architecture that allows
+tools developers to easily create debugger applications
+which run portably across platforms, 
+<A HREF="#vm">virtual machine (VM)</A> implementations
+and SDK versions.
+<P>
+JPDA consists of three layers:
+<DL>
+  <DT> <A HREF="#jvmdi">JVMDI</A> - Java VM Debug Interface
+  <DD> Defines the debugging services a VM provides.
+
+  <DT> <A HREF="#jdwp">JDWP</A> - Java Debug Wire Protocol
+  <DD>      Defines the communication between <A HREF="#debuggee">debuggee</A>
+            and debugger processes.
+
+  <DT> <A HREF="#jdi">JDI</A> - Java Debug Interface
+  <DD>      Defines a high-level Java language interface
+        which tool developers can easily use to
+        write remote debugger applications.
+</DL>
+
+<H2>Reference implementation</H2>
+
+In addition to the specification of these interfaces,
+Sun Microsystems also
+provides a reference implementation, which consists of:
+<UL>
+<LI>JVMDI implementations on multiple Sun VMs (see VM documentation).
+
+<LI>A <A HREF="#back-end">back-end</A> which uses JVMDI to implement the debuggee
+side of JDWP.
+
+<LI>A <A HREF="#front-end">front-end</A> which uses the debugger side of JDWP to
+implement JDI.
+
+<LI>Two simple example debugger applications which are built on JDI.
+</UL>
+This provides a layered implementation in which any layer 
+may be substituted.
+
+<H2>Using JPDA</H2>
+
+A debugger developer may hook into JPDA at any layer.  Since
+the JDI is the highest level and easiest to use we encourage
+developers to use this interface.   Suppose a company
+develops a debugger using JDI.  They can use it with the
+reference implementation and it will automatically work with
+the VMs and platforms Sun supports.  It
+can also work, for example, with the reference implementation
+front-end and a debuggee running another
+company's VM that implements JDWP (which might use or by-pass JVMDI).  
+<P>
+Some debuggers are built on top of lower
+layers, JDWP (for example if the front-end is not written in the
+Java language) or JVMDI (for specialized debuggers which need low-level
+functionality).
+<P>
+
+
+<HR WIDTH="100%"></H1></CENTER>
+
+<CENTER>
+<H1>
+Components</H1></CENTER>
+<A NAME="debuggee"></A>
+<H2>
+debuggee</H2>
+
+<UL>The debuggee is the process being debugged, it consists of the application
+being debugged (not shown), the <A HREF="#vm">VM</A> running the application
+and the <A HREF="#back-end">back-end</A> of the debugger.</UL>
+<A NAME="vm"></A>
+<H2>
+Java Virtual Machine (VM)</H2>
+
+<UL>This refers to the VM running the application being debugged.
+
+<P>The debugger architecture is being designed for use in wide spectrum
+of VM implementations.
+
+<P>The VM implements the Java Virtual Machine Debug Interface (<A HREF="#jvmdi">JVMDI</A>).</UL>
+<A NAME="back-end"></A>
+<H2>
+back-end</H2>
+
+<UL>The back-end of the debugger is responsible for communicating requests
+from the debugger <A HREF="#front-end">front-end</A> to the debuggee <A HREF="#vm">VM</A>
+and for communicating the response to these requests (including desired
+events) to the front-end.&nbsp; The back-end communicates with the front-end
+over a <A HREF="#channel">communications channel</A> using the Java Debug
+Wire Protocol (<A HREF="#jdwp">JDWP</A>).&nbsp; The back-end communicates
+with the debuggee VM using the Java Virtual Machine Debug Interface (<A HREF="#jvmdi">JVMDI</A>).
+
+<P>It is clear from experience that debugger support code, running on the
+debuggee and written in Java, contends with the debuggee in ways that cause
+hangs and other undesired behavior. Thus, the back-end is native code.
+This, in turn, implies that the <A HREF="#jvmdi">JVMDI</A>
+be a pure native interface.</UL>
+<A NAME="channel"></A>
+<H2>
+communications channel</H2>
+
+<UL>The communications channel is the link between the <A HREF="#front-end">front</A>
+and <A HREF="#back-end">back</A> ends of the debugger.&nbsp; The transport
+mechanism used is unspecified; possible mechanisms include: sockets, serial
+lines, and shared memory.&nbsp;&nbsp; However, the format and semantics
+of the serialized bit-stream flowing over the channel is specified by the
+Java Debug Wire Protocol (<A HREF="#jdwp">JDWP</A>).</UL>
+&nbsp;<A NAME="front-end"></A>
+<H2>
+front-end</H2>
+
+<UL>The debugger front-end implements the high-level Java Debug Interface
+(<A HREF="#jdi">JDI</A>).&nbsp; The front-end uses the information from
+the low-level Java Debug Wire Protocol (<A HREF="#jdwp">JDWP</A>).
+</UL>
+&nbsp;<A NAME="ui"></A>
+<H2>
+User Interface (UI)</H2>
+
+<UL>The user interface to the debugger is not specified; the intent is
+that tool vendors will provide value added implementations. We
+provide an example simple graphical user interface (GUI) which serves
+as test harness and as a starting point for the development of more 
+complex GUIs. A version of JDB is also available as an example. 
+
+<P>The example UIs are clients of the Java Debug 
+Interface (<A HREF="#jdi">JDI</A>).</UL>
+&nbsp;
+<CENTER>
+<H1>
+
+<HR><A NAME="interfaces"></A>Debugger Interfaces</H1></CENTER>
+<A NAME="jvmdi">
+<H2>
+Java Virtual Machine Debugger Interface (JVMDI)</H2></A>
+
+<UL>A native interface implemented by the <A HREF="#vm">VM</A>.
+
+<P>Defines the services a VM must provide for debugging. Includes requests
+for information (for example, current stack frame), actions (for example,
+set a breakpoint), and notification (for example, when a breakpoint has
+been hit). A debugger may make use of VM information other than this (for
+example, Java Native Interface (JNI)), but this is the source of all debugger specific information.
+
+<P>Specifying the VM Interface allows
+any VM implementor to plug easily into the debugging architecture. It also
+allows alternate communication channel implementations. VM implementations
+which do not adhere to this interface can still provide access via the
+Java Debug Wire Protocol (<A HREF="#jdwp">JDWP</A>).
+
+<P>See also:
+<UL><A HREF="jvmdi-spec.html">JVMDI Specification</A></UL>
+&nbsp;</UL>
+<A NAME="jdwp">
+<H2>
+Java Debug Wire Protocol (JDWP)</H2></A>
+
+<UL>Defines the format of information and requests transferred between
+the <A HREF="#debuggee">debuggee</A> process and the debugger <A HREF="#front-end">front-end</A>.&nbsp;
+It does not define the transport mechanism (socket, serial line, shared
+memory, ...).
+
+<P>The specification of the protocol allows the debuggee and debugger front-end
+to run under separate VM implementations and/or on separate platforms.
+It also allows the front-end to be written in a language other than Java,
+or the debuggee to be non-native (e.g. Java).
+
+<P>Information and requests are roughly at the level of the Java Virtual
+Machine Debug Interface (<A HREF="#jvmdi">JVMDI</A>), but will include
+additional information and requests necessitated by bandwidth issues, examples
+include information filtering and batching.
+
+<P>See also:
+<UL><A HREF="jdwp-spec.html">JDWP Specification</A></UL>
+</UL>
+<A NAME="jdi">
+<H2>Java Debug Interface (JDI)</H2></A>
+
+<UL>A 100% Java interface implemented by the <A HREF="#front-end">front-end</A>.
+
+<P>Defines information and requests at a user code level. 
+
+<P>While debugger implementors could&nbsp; directly use the Java Debug
+Wire Protocol (<A HREF="#jdwp">JDWP</A>) or Java Virtual Machine Debug
+Interface (<A HREF="#jvmdi">JVMDI</A>), this interface greatly facilitates
+the integration of debugging capabilities into development environments.
+We recommend the JDI layer for all debugger development.
+
+<P>See also:
+<UL><A HREF="jdi/index.html">JDI Specification</A></UL>
+</UL>
+
+<P>
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2>Copyright &copy; 2001 <A HREF="http://www.sun.com/">Sun
+Microsystems, Inc.</A> All Rights Reserved.</FONT>&nbsp;
+
+<P><FONT SIZE=-1>Please send comments to: <A HREF="mailto:java-debugger@sun.com">java-debugger@sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30></TD>
+</TR>
+</TABLE>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+&nbsp;<P>
+</BODY>
+</HTML>

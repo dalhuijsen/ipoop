@@ -1,0 +1,96 @@
+<html>
+<head>
+<title>rmiregistry - The Java Remote Object Registry</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+
+<h1>rmiregistry - The Java Remote Object Registry</h1>
+<blockquote>
+The <b>rmiregistry</b> command starts a remote object registry on the 
+specified port on the current host.
+</blockquote>
+
+<h2>SYNOPSIS</h2>
+<blockquote>
+<pre>
+rmiregistry [<i>port</i>]
+</pre>
+</blockquote>
+
+<h2>DESCRIPTION</h2>
+<blockquote>
+The <b>rmiregistry</b> command creates and starts a remote object
+registry on the specified <i>port</i> on the current host. If
+<i>port</i> is omitted, the registry is started on port 1099. The
+<b>rmiregistry</b> command produces no output and is typically run in
+the background. For example:
+<p>
+<code>rmiregistry &</code>
+<p>
+A remote object registry is a bootstrap naming service that is used by
+RMI servers on the same host to bind remote objects to names. Clients
+on local and remote hosts can then look up remote objects and make
+remote method invocations.
+<p>
+The registry is typically used to locate the first remote object on which
+an application needs to invoke methods. That object in turn will provide
+application-specific support for finding other objects.
+<p>
+The methods of the <code>java.rmi.registry.LocateRegistry</code> class are
+used to get a registry operating on the local host or local host and port.
+<p>
+The URL-based methods of the <code>java.rmi.Naming</code> class operate
+on a registry and can be used to look up a remote object on any host,
+and on the local host: bind a simple (string) name to a remote object,
+rebind a new name to a remote object (overriding the old binding),
+unbind a remote object, and list the URLs bound in the registry.
+<p>
+</blockquote>
+
+<A NAME="Options"></A>
+<H2>
+OPTIONS</H2>
+
+<BLOCKQUOTE>
+<DL>
+<dt>
+<B>-J</B></DT>
+
+<DD>
+Used in conjunction with any <tt>java</tt> option, it passes the option
+following the <TT>-J</TT> (no spaces between the -J and the option) on
+to the <tt>java</tt> interpreter.</DD>
+</dl>
+</BLOCKQUOTE>
+
+<h2>SEE ALSO</h2>
+<blockquote>
+<A HREF="java.html">java</A>,
+<a href="../../api/java/rmi/registry/LocateRegistry.html">
+<code>java.rmi.registry.LocateRegistry</code></a> and
+<a href="../../api/java/rmi/Naming.html"><code> java.rmi.Naming</code></a>
+</blockquote>
+
+<HR SIZE=3 NOSHADE>
+<a href="#skip" title="Skip navigation bar"></a>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2003
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+<a name="skip"></a>
+
+</body>
+</html>

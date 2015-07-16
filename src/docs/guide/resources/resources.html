@@ -1,0 +1,479 @@
+<html>
+<head>
+<title>Accessing Resources</title>
+</head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+
+
+<center>
+     <H1>Accessing Resources in a Location-Independent Manner</H1>
+</center>
+
+<P> Code written for the Java 1.0 platform
+uses two mechanisms to access resources.  
+<ul>
+    <li>Applets use <EM>Applet.getCodeBase()</EM> to get a
+    URL to the base of the code for the applet.  This base can be
+    extended with a "relative path" to point to the desired resource, which
+    can then be loaded (for example using
+    <EM>Applet.getAudioClip(url)</EM>).
+    <li>Applications use "well known locations" (such as
+    <EM>System.getProperty("user.home")</EM> or
+    <EM>System.getProperty("java.home"))</EM>.  They add
+    "/lib/&lt;resource&gt;" to the location and then open that file.
+</ul>
+
+<P> The Java 1.0 platform lacks  a mechanism to locate resources that are
+independent of the code.  That is, there is no way locate resources for an applet loaded from the net using
+multiple http connects, or for an applet loaded using JAR files, or for a Bean
+loaded or a Bean installed in the CLASSPATH, or for a "library" installed in
+the CLASSPATH, and so on.  The APIs described here provide such a mechanism.
+
+<P> The I18N APIs use this API as a primitive operation to locate
+<EM>ResourceBundle</EM>s.  See the latest I18N documentation for details.
+
+<H2>Resources, names, and contexts</H2>
+
+<P>A resource is identified by a String.  This String, while possibly empty, is a <B>/</B>-separated sequence of substrings, each a valid Java
+programming lanaugage identifier, followed by a name of the form "&lt;shortName&gt;" or
+"&lt;shortName&gt;.&lt;extension&gt;".  Both "shortName" and
+"extension" are composed of valid Java Letters and Numbers (section
+3.8 in JLS).  If the optional sequence exists, it is separated from
+the "shortName" by a <B>/</B>.
+
+<P>The name of a resource is independent of the Java implementation;
+in particular, the <B>/</B> is always used as a separator.
+However, the Java implementation controls the details of how the
+contents of the resource are mapped into a file, database, or other
+object containing the actual resource.
+
+<P>The interpretation of a resource name is relative to a ClassLoader
+instance.  Methods implemented by the ClassLoader do this interpretation.
+
+<H2>System Resources</H2>
+
+<P>A system resource is similar to a system class (section 20.14.5 of
+the JLS).  A system resource is a resource that is either built-in to the system, or it is kept by the host implementation in, for example, a local
+file system.  System resources are accessed through special
+methods (<EM>getSystemResource</EM> and
+<EM>getSystemResourceAsStream</EM>) that consult the base
+host implementation.
+
+<P>For example, in a particular implementation, locating a system
+resource may involve searching the entries in the CLASSPATH. 
+Each directory, zip file, or jar file entry in the CLASSPATH is searched for the resource file, and, if found, either an InputStream, or its name,
+is returned.
+If not found, null is returned.  Note that a resource may be found in
+a different entry in the CLASSPATH than where the class file was loaded.
+
+<H2>Non-System Resources</H2>
+
+The implementation of <EM>getResource</EM> on a given <EM>ClassLoader</EM>
+will depend on the details of the ClassLoader.  For example AppletClassLoader
+will:
+
+<UL>
+<LI>First try to locate the resource as a system resource; then, if not found,
+
+<LI>Search through the resources in ARCHIVES (JAR files) already
+loaded in this CODEBASE; then, if not found,
+
+<LI>Use CODEBASE and attempt to locate the resource (which may involve
+contacting a remote site).
+</UL>
+
+<P> All ClassLoaders will search for a resource first as a system 
+resource, in a manner analogous to searcing for class files.  This 
+search rule permits overwriting locally any resource.  Clients should 
+choose a resource name that will be unique (using the company or package 
+name as a prefix, for instance).
+
+<H2>Resource Names</H2>
+
+<P> A common convention for the name of a resource used by a class is
+to use the fully qualified name of the package of the class, convert
+all "." to "/", and add a resource name of the form "&lt;Name&gt;.&lt;ext&gt;".
+To support this, and to simplify handling the details of system
+classes (for which <EM>getClassLoader</EM> returns <B>null</B>),
+the class Class provides two convenience methods that call the
+appropriate methods in <EM>ClassLoader</EM>.
+
+<P> The resource name given to a Class method may have an initial
+starting "/" that identifies it as an "absolute" name.
+Resource names that do not start with a "/" are "relative".
+
+<P>Absolute names are stripped of their starting "/" and are passed,
+without any further modification, to the appropriate ClassLoader
+method to locate the resource.
+Relative names are modified according to the convention described
+previously and then are passed to a ClassLoader method.
+
+<H2>Manipulating Resources</H2>
+
+<P> The method <EM>getResource()</EM> returns a URL for the resource.
+The URL (and its representation) is implementation and JVM<b>*</b>-instance 
+specific (the URL obtained in one runtime instance may not work in 
+another) and may vary depending on the implementation details 
+Its protocol is (usually) specific to the ClassLoader loading the resource.
+If the resource does not exist, a null will be returned; if the resource 
+is not visible due to security considerations, a null will also be 
+returned.
+
+<P> If the client code wants to read the contents of the resource
+as an InputStream, it can apply the <EM>openStream()</EM> method on
+the url.  This is common enough to justify adding
+<EM>getResourceAsStream()</EM> to Class and ClassLoader. 
+<em>getResourceAsStream()</em> is semantically identical to 
+<em>getResource().openStream()</em>, except that IO exceptions are 
+caught and returned as a null <em>InputStream</em>.
+
+<P> The client code code can also request the contents of the
+resource as an object by applying the <EM>getContent()</EM> method
+on the url.  This is useful when the resource contains the data
+for an image, for instance. Note that in this case, the result is 
+an <em>awt.image.ImageProducer</em> object, not an <em>Image</em> object.
+
+<H2>API Additions to Class</H2>
+
+<P>Specifically, the class <EM>Class</EM> methods are of the following
+form:
+
+<PRE>
+<CODE>
+class Class {
+
+    /**
+     * Find a resource with a given name.  Will return null if no
+     * resource with this name is found.  The rules for searching a
+     * resources associated with a given class are implemented by the
+     * ClassLoader of the class.
+     *
+     * The Class methods delegate to ClassLoader methods, after applying
+     * a naming convention: if the resource name starts with "/", it is used
+     * as is.  Otherwise, the name of the package is prepended, after
+     * converting "." to "/".
+     *
+     * @see java.lang.ClassLoader
+     */
+    public InputStream getResourceAsStream(String name) {
+	name = resolveName(name);
+	ClassLoader cl = getClassLoader();
+	if (cl==null) {
+	    // A system class.
+	    return ClassLoader.getSystemResourceAsStream(name);
+	}
+	return cl.getResourceAsStream(name);
+    }
+
+    public java.net.URL getResource(String name) {
+	name = resolveName(name);
+	ClassLoader cl = getClassLoader();
+	if (cl==null) {
+	    // A system class.
+	    return ClassLoader.getSystemResource(name);
+	}
+	return cl.getResource(name);
+    }
+
+    /**
+     * Add a package name prefix if the name is not absolute
+     * Remove leading "/" if name is absolute
+     */
+    private String resolveName(String name) {
+	if (name == null) {
+	    return name;
+	}
+	if (!name.startsWith("/")) {
+	    Class c = this;
+	    while (c.isArray()) {
+		c = c.getComponentType();
+	    }
+	    String baseName = c.getName();
+	    int index = baseName.lastIndexOf('.');
+	    if (index != -1) {
+		name = baseName.substring(0, index).replace('.', '/')
+		    +"/"+name;
+	    }
+	} else {
+	    name = name.substring(1);
+	}
+	return name;
+    }
+
+
+</CODE>
+</PRE>
+
+<P> Note that it is possible, albeit somewhat uncommon, to have two
+classes in two diffent packages sharing the same resource.
+
+<H2>API Additions to ClassLoader</H2>
+
+<P> We provide two sets of methods to access a resource. One set returns
+an InputStream on the resource.  The other set returns a URL. 
+The methods that return an 
+InputStream are somewhat easier to use and will
+satisfy many needs, while the methods that return URLs provide
+access to more complex information, such as an Image and an AudioClip.
+
+<P>Resources are managed through ClassLoaders in a manner analogous
+to classes.  A ClassLoader controls how to map the name of
+a resource to its content.  ClassLoader also provides methods for
+accessing <EM>system resources</EM>, analogous to the <EM>system
+classes</EM>.
+Class Class provides some convenience methods that delegate functionality
+to the appropriate ClassLoader methods.
+
+<P>Many Java programs will access these methods indirectly through the
+I18N APIs.  Others will access it through methods in class Class.
+A few will directly invoke the ClassLoader methods.
+
+<P>The methods in ClassLoader use the given String as the name of the
+resource without applying any absolute/relative transformation
+(cf. the methods in Class).
+The name should not have a leading "/".
+
+<PRE>
+<CODE>
+class ClassLoader {
+
+    /**
+     * A resource is some data (images, audio, text, etc) that wants to be
+     * accessed by some class code in a way that is independent of the
+     * location of the code.  Resources are found with cooperation of the
+     * class loaders, since they are the only ones who know where the class
+     * actually came from. <p>
+     *
+     * System resources are those that are handled by the host implemenation
+     * directly.  For example, they may be located in the CLASSPATH.<p>
+     *
+     * The name of a resource is a "/"-separated sequence of identifiers.
+     * The class Class provides convenience methods for accessing resources;
+     * the methods implement a convention where the package name is prefixed
+     * to the short name of the resource.<p>
+     * 
+     * Resources can be accessed as an InputStream, or as a URL.
+     *
+     * @see	Class
+     */
+
+    /**
+     * Get an InputStream on a given resource..  Will return null if no
+     * resource with this name is found. <p>
+     *
+     * The resource name may be any system resource (e.g. follows CLASSPATH order)
+     * @param	name	the name of the resource, to be used as is.
+     * @return		an InputStream on the resource, or null if not found.
+     */
+
+    public static final InputStream getSystemResourceAsStream(String name) {
+	... this is equivalent to getSystemResource() call plus a openStream()
+    }
+
+    /**
+     * Find a resource with a given name.  The return is a URL to the resource
+     * Doing a getContent() on the URL may return an ImageProducer, an AudioClip, or
+     * an InputStream.<p>
+     *
+     * The resource name may be any system resource (e.g. follows CLASSPATH order)
+     * @param	name	the name of the resource, to be used as is.
+     * @return		the URL on the resource, or null if not found.
+     */
+    public static final java.net.URL getSystemResource(String name) {
+	...
+    }
+
+    /**
+     */
+
+    /**
+     * Get an InputStream on a given resource.  Will return null if no
+     * resource with this name is found. <p>
+     *
+     * The class loader can choose what to do to locate the resource.
+     * @param	name	the name of the resource, to be used as is.
+     * @return		an InputStream on the resource, or null if not found.
+     */
+    public InputStream getResourceAsStream(String name) {
+	return null;
+    }
+
+    /**
+     * Find a resource with a given name.  The return is a URL to the resource.
+     * Doing a getContent() on the URL may return an ImageProducer, an AudioClip,
+     * or an InputStream.<p>
+     *
+     * The class loader can choose what to do to locate the resource.
+     * @param	name	the name of the resource, to be used as is.
+     * @return		an InputStream on the resource, or null if not found.
+     */
+    public java.net.URL getResource(String name) {
+	return null;
+    }
+
+    }
+</CODE>
+</PRE>
+
+<H2>Client code</H2>
+
+<P>Below are two examples of client code.  The first example uses "absolute
+resource" names and traditional mechanisms to get a class Class
+object:
+
+<PRE>
+<CODE>
+package pkg;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+class Test {
+
+    private static final String absName = "/pkg/mumble.baf";
+
+    public static void test1() {
+	Class c=null;
+	try {
+	    c = Class.forName("pkg.Test");
+	} catch (Exception ex) {
+	    // This should not happen.
+	}
+	InputStream s = c.getResourceAsStream(absName);
+	// do something with it.
+    }
+
+    public void test2() {
+	InputStream s = this.getClass().getResourceAsStream(absName);
+	// do something with it.
+    }
+
+</CODE>
+</PRE>
+
+<P>The second example uses "relative resource" names and the new
+mechanism, available from the compiler through the -experimental flag,
+to get a class Class object:
+
+<PRE>
+<CODE>
+package pkg;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+class Test {
+
+    private static final String relName = "mumble.baf";
+
+    public static void test1() {
+	InputStream s = Test.class.getResourceAsStream(relName);
+	// do something with it.
+    }
+
+    public void test2() {
+	InputStream s = Test.class.getResourceAsStream(relName);
+	// do something with it.
+    }
+
+</CODE>
+</PRE>
+
+<h2>Security Details</h2>
+
+Since <em>getResource()</em> provides access to information, it must have well
+defined and well founded security rules that at the same time support
+the intended use of this mechanism.  Below we describe the exact
+details, as specified and implemented in releases starting at version 
+1.1.5 of the Java Development Kit.  The semantics are described only for 
+<em>ClassLoader.getResource</em> 
+and <em>ClassLoader.getSystemResource()</em> and extend to the 
+<em>AsStream</em> methods as defined in the previous section.
+<p>
+If security considerations do not allow a resource to be visible in
+some security context, the <em>getResource()</em> method will fail (will 
+return null) as if the resource was not present at all, this addresses
+existence attacks.
+<p>
+All classloaders will not provide access to the contents of a
+.class file.  This is for both security and performance issues.
+Whether it is possible to obtain a URL into a .class file depends
+on the specifics, as shown below.
+<p>
+There are no specified security issues or restrictions regarding
+resources that are found by a non-system class loader.
+<em>AppletClassLoader</em> provides access to information that is loaded from
+some source location, either individually, or in a group through a JAR
+file; thus <em>AppletClassLoader</em> should apply the same 
+<em>checkConnect()</em> rules when dealing with URLs through 
+<em>getResource()</em>.
+<p>
+The system Class Loader provides access to information in the
+CLASSPATH.  A CLASSPATH may have directories and/or JAR files.  Since
+a JAR file is created intentionally, we ascribe a different
+significance to it than in a directory where things may end up in a
+more casual manner.  In particular, we are more strict on getting
+information out of a directory than out from a JAR file.
+<p>
+If the resource is in a Directory:
+  <ul>
+   <li><em>getResource()</em> invocations will use 
+    <em>File.exists()</em> to determine whether
+    to make the corresponding file visible to the user.  Recall that 
+    <em>File.exists()</em> uses the 
+    <em>checkRead()</em> method in the security manager.
+
+   <li>the same applies to <em>getResourceAsStream()</em>.
+  </ul>
+<p>
+If the resource is in a JAR file:
+  <ul>
+   <li><em>getResource()</em> invocations will succeed for all files, 
+    regardless of whether the invocation is done from within a System or 
+    a non-System class.
+
+   <li><em>getResourceAsStream()</em> invocations will succeed for non 
+     .class resources, and so will for <em>getContent()</em> on corresponding 
+     URLs.
+  </ul>
+
+
+<H2>Related Topics &amp; Known Bugs</H2>
+
+<P> The <EM>getResource</EM> interface does not provide
+specific support for locating localized resources.
+Localized resources are supported by the
+<A HREF="../intl/index.html">internationalization facilities</A>.
+
+<P>
+<FONT SIZE="-1"><B>*As used on this web site, the terms "Java Virtual Machine" 
+or "JVM" mean a virtual machine for the Java platform.</B></FONT>
+<P>
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<hr size=3 noshade>
+<table summary="layout" border="0" width=100%>
+<tr valign=top>
+<td> <small><small>
+   <a href="../../relnotes/SMICopyright.html">Copyright &#169;</a>
+   1996-98
+   <a href="http://www.sun.com/">Sun Microsystems, Inc.</a>
+    All Rights Reserved.</small>
+   Please send comments to: <a href=mailto:jdk-comments@java.sun.com>jdk-comments@java.sun.com</a> 
+</small></td>
+<td align=right>
+   <img src="../../images/sunlogo64x30.gif" alt=" Sun Microsystems, Inc " width=64 height=30>
+   <br>
+   <big><i>Java Software</i></big>
+</td>
+</tr>
+</table>
+</FONT>
+
+</BODY>
+</HTML>
+

@@ -1,0 +1,67 @@
+           Certification Form for Domestic CSPs
+
+Sun's JCE implements encryption using Cryptographic Service 
+Providers (CSPs). Only CSPs signed by a trusted entity can be 
+plugged into the JCE framework. You have indicated that you 
+will be providing a CSP for JCE. Please read, sign, and return 
+this form to:
+
+    Corporate Export
+    Attn: Encryption export
+    4120 Network Circle MS: USCA12-204
+    Santa Clara, CA  95054
+
+Before you return this form, you must send, via email, a
+Certificate Signing Request (CSR) and contact information
+to javasoft-cert-request@sun.com, as noted in
+http://java.sun.com/j2se/1.4/docs/guide/security/jce/HowToImplAJCEProvider.html
+
+In response, you will receive a request number, also via email.
+You may then mail this form. Include the request number here:
+
+    Request Number: ______________________________
+
+Including the request number ensures this form can be matched 
+to your email message.
+
+
+                        Overview
+
+Export controls on commercial encryption products are 
+administered by the Bureau of Industry and Security (BIS) in the 
+U.S. Department of Commerce. Rules governing exports of 
+encryption are found in the Export Administration Regulations 
+(EAR), 15 CFR Parts 730-774  which implements the Export 
+Administration Act ("EAA" 50 U.S.C. App. 2401 et seq.).
+
+BIS requires that each entity exporting products be familiar 
+with and comply with their affirmative obligations set forth in 
+the Export Administration Regulations.  Please note that the 
+regulations are subject to change.  We recommend that you obtain 
+your own legal advice when attempting to export.  In addition 
+some countries may restrict certain levels of encryption 
+imported into their country. We recommend consulting legal 
+counsel in the appropriate country or the applicable 
+governmental agencies in the particular country.  
+
+If you want to export your CSP, it must be reviewed and approved 
+for export by the Bureau of Industry and Security.
+
+                      Certification
+
+I certify that I have read the above "Overview" and will comply 
+with the Export Administration Regulations.  I understand that 
+encryption products may not be exported from the United States 
+without prior approval by the US Government and that such 
+approval is my responsibility.  
+
+Company: _______________________________________________
+
+Address: _______________________________________________
+
+Signature: ____________________________  	Date:  _______
+
+Printed Name: ____________________________________
+
+Title:  ____________________________________________
+

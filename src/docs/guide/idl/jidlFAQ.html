@@ -1,0 +1,661 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html">
+	<TITLE>Java(TM) IDL FAQ</TITLE>
+</HEAD>
+<BODY TEXT="#000000" LINK="#0000ff" VLINK="#000077" BGCOLOR="#ffffff">
+<TABLE BORDER=0 CELLPADDING=2 CELLSPACING=2 summary="layout">
+	<TR>
+		<TD WIDTH=10>
+			<P><IMG SRC="../../images/javalogo52x88.gif" 
+NAME="Graphic1" ALT="Java" ALIGN=BOTTOM WIDTH=52 HEIGHT=88 BORDER=0>
+						</P>
+		</TD>
+	</TR>
+</TABLE>
+<H1 ALIGN=CENTER>Java<FONT SIZE=1><SUP>TM</SUP></FONT> IDL FAQ</H1>
+<P><!-- +++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++ -->This
+is a document that attempts to answer many of the questions you may
+have about using Java<FONT 
+SIZE=1><SUP>TM</SUP></FONT> IDL technology. We will continue to update this document with
+your questions as we receive them. If you do not find your question
+answered here,  please check the user-supported forum for Java IDL 
+technology, which is available at 
+<a href="http://forum.java.sun.com">http://forum.java.sun.com</a>.  
+For comments on the tutorials or other documents on this Web site, please send us email at 
+<a href="mailto:corba-tutorial@sun.com">corba-tutorial@sun.com</a>.
+
+</P>
+
+
+<P><A HREF="#errors">Errors</A></P>
+<UL>
+	<LI><A HREF="#servermain">Why do I get this message when I try to run 
+HelloServer: 
+	Exception in thread "main" java.lang.NoClassDefFoundError:
+	 HelloServer/java</a>
+	 <LI><A HREF="#newidlj">My existing programs aren't running using J2SE
+	 1.4.  Are 
+	 there any compatibility issues that could affect this?</a>
+	 <LI><A HREF="#linuxior">Why can't I connect using IOR's from a Linux 
+	 server when the IOR contains 127.0.0.0 as the host address?</A>
+	 <LI><A HREF="#minorcodes">What does this minor code mean?</A></P>
+	 
+</UL>
+<P><A HREF="#features">Features</A></P>
+<UL>
+	<LI><A HREF="#threading">What is the thread model supported by
+	 the JDK 1.4 CORBA implementation?</A>
+	<LI><A HREF="#notificationevent">Does Java IDL contain
+	notification/event services? an Interface Repository?</A>
+	<LI><A HREF="#two machines">How can I run the Hello World example
+	on two machines?</A>
+	<LI><A HREF="#corbacompliant">Is Java IDL compliant with OMG CORBA specifications?</A>
+</UL>
+
+<P><a href="#compatibility">Compatibility/Interoperability</a>
+<UL>
+	<LI><A href="#differentORB">How can I specify a different ORB?</A>
+	<LI><a href="#testcompat">How can I test whether my JDK ORB Client can 
+communicate with another vendor's ORB implementation?</a>
+	<LI><a href="#interopdoc">Do you have any examples that use a
+	CORBA client and a Java server application?</a>
+	<LI><a href="#nameserver">How do I connect to a 3rd-party Naming 
+	Service from Sun's ORB?</a>
+	<LI><A HREF="#ORBinterop">Can I use the Java IDL ORB with a C++ CORBA 
+server? (interoperability)</A>
+</UL>
+<P><A HREF="#general">General</A></P>
+<UL>
+	<LI><A HREF="#where can I download">Where can I download the
+	idltojava compiler?</A>
+	<LI><A HREF="#what are my options">What are my options for
+	developing CORBA applications using Java technology?</A>
+	<LI><A HREF="#java idl vs rmi-iiop">What is the difference
+	between Java IDL and Java RMI-IIOP?</A>
+	<LI><A HREF="#limitations">What are the limitations of Java
+	IDL and Java RMI-IIOP in this release?</A>
+	<LI><A HREF="#standardtags">What are the standard tags for ...?</A>
+
+	
+	
+</UL>
+
+
+
+<A NAME="errors">
+<HR><BR>
+<H1 ALIGN=CENTER></A>Errors</H1>
+
+<A NAME="servermain">
+<H3>Why do I get this message when I try to run HelloServer: "Exception in thread 
+"main" java.lang.NoClassDefFoundError:
+	 HelloServer/java"</H3></a>
+	 
+<BLOCKQUOTE>
+The most common reason for this error when running HelloServer (and also 
+HelloClient)
+from the Java IDL tutorial is that <tt>HelloServer</tt> is not in the classpath.  For more
+information on setting the classpath variable, see <a href="../../tooldocs/solaris/classpath.html">
+<em>Setting the classpath</em></a>.
+
+<P>The second most common reason occurs when a space is added between quotation marks in the 
+following line of code:
+<P>
+<PRE>
+NameComponent nc = new NameComponent("Hello", "");
+</PRE>
+
+<P>There should be no spaces between the quotation marks.  Without spaces, this 
+value
+is passed as a null.  With a space between the quotations, a space character is 
+passed.
+</BLOCKQUOTE>
+
+<A NAME="newidlj"></a>
+<H3>My existing programs aren't running using J2SE 1.4.  Are 
+	 there any compatibility issues that could affect this?</H3>
+
+<BLOCKQUOTE>
+<P>The <tt>idlj</tt> compiler now generates server-side mappings based on the POA
+Inheritance Model.  For compatibility with existing applications, a new flag has 
+been added to the <tt>idlj</tt> compiler to allow it to generate server-side 
+mappings
+based on the ImplBase Inheritance Model, <tt>-oldImplBase</tt>.  Existing 
+applications
+that need to talk to servers created in J2SE 1.3 or prior may need to update their 
+<em>MAKEFILE</em>
+so that this flag is used, however, new applications that have no such requirements 
+should
+not generate these deprecated mappings.
+<P>Other information on compatibility between J2SE 1.3 and J2SE 1.4 can be
+found in the compatibility document at <A 
+HREF="http://java.sun.com/j2se/1.4/compatibility-CORBA.html">http://java.sun.com/j2se/1
+.4/compatibility-CORBA.html</A>.
+</BLOCKQUOTE>
+
+<A NAME="linuxior"></a>
+<H3>Why can't I connect using IOR's from a Linux 
+	 server when the IOR contains 127.0.0.0 as the host address?</H3>	
+<BLOCKQUOTE>
+On Red Hat Linux installations <tt>InetAddress.getLocalHost()</tt> may return an
+<tt>InetAddress</tt> corresponding to the loopback address (127.0.0.1). This
+arises because the default installation creates an association in
+<tt>/etc/hosts</tt> between the hostname of the machine and the loopback address.
+To ensure that <tt>InetAddress.getLocalHost()</tt> returns the actual host
+address, update the <tt>/etc/hosts</tt> file or the name service
+configuration file (<tt>/etc/nsswitch.conf</tt>)  to query dns or
+nis before searching hosts.
+</BLOCKQUOTE>
+
+<H3><A NAME="minorcodes">What does this minor code mean?</A></H3>
+<BLOCKQUOTE>
+The most recent versions of the standard (OMG) minor code exceptions
+can be found at <a href="http://www.omg.org/docs/omg/03-01-04.txt">
+http://www.omg.org/docs/omg/03-01-04.txt</a>.
+
+
+<P>Some of the most common Sun minor code exceptions are the following:
+	<p><UL>
+	<LI><strong>COMM_FAILURE/201</strong>.  <em>vmcid: SUN  minor code: 201</em> 
+	literally means "CONNECT_FAILURE".
+	This may be caused by a <code>java.net.SocketException</code>, usually one of 
+	<code>BindException</code>, <code>ConnectException</code>, or
+	<code>NoRouteToHostException</code>.
+	
+	<P>Some things to verify are:
+	<P>
+		<UL>
+		<LI>Is a naming service running?  If not, start the ORBD naming service as described
+		in the document 
+		<a href="orbd.html#starting">
+		Starting and Stopping ORBD</a>.
+		<LI>Are the <code>-ORBInitialHost</code> and <code>-ORBInitialPort</code> values being  
+		set correctly for the naming service?  If you are uncertain about what 
+		the settings should be, read the
+		document 
+		<a href="orbd.html#starting">
+		Starting and Stopping ORBD</a>.
+		<LI>Are the client and server applications aware of the port number
+		 (and machine name, if applicable) where the Naming Service is running?  Read
+		  <a href="orbd.html#starting">
+		Starting and Stopping ORBD</a> for more
+		information on how to do this.
+		</UL>
+		<P>
+		
+
+	<LI><strong>COMM_FAILURE/208</strong>. <em>vmcid: SUN  minor code: 208</em> literally
+	means "CONNECTION ABORT", which generally means the connection has been dropped.  <P>
+	
+	<LI><strong>COMM_FAILURE/209</strong>. <em>vmcid: SUN  minor code: 209</em> literally
+	means "CREATE_LISTENER_FAILED": <code>Unable to create the listener thread on the 
+	specific port. Either the post is taken or there was an error creating the daemon
+	 thread</code>. This generally indicates
+	that the port on which you are trying to run the naming service is in use by another process.
+	If you are running on Solaris, you could discover whether or not something is running 
+	on this port using the following terminal prompt command:<P>
+	<PRE>netstat | grep <em>port_number</em></PRE>
+
+	 <P>
+	 <LI><strong>OBJECT_NOT_EXIST/204</strong>. <em>vmcid: SUN  minor code: 204</em>
+	 literally  means "SERVANT_NOT_FOUND".
+	 It is only thrown in one place: <code>corba.INSSubcontract.getINSReference</code>.
+	 <P>
+	 <LI><strong>MARSHAL/217</strong>.  <em>vmcid: SUN  minor code: 217</em> means that
+	 your client tried to send either a <code>wchar</code> or <code>wstring</code>
+	 in GIOP 1.0, which is not legal in the spec. 
+	 <P>
+	 <LI><strong>MARSHAL/202</strong>. <em>vmcid: SUN  minor code: 202</em> means that the
+	 code is attempting to marshal an object that derives from 
+	 <code>org.omg.CORBA.Object</code>, but that particular instance has never
+	 been connected to an ORB.  When using the POA, you need to register the 
+	 object with the POA first.  If you need more information on how to register
+	 an object with the POA, refer to the  
+	 <a href="POA.html">
+	 POA</a> document or the 
+	  <a href="GShome.html">
+	 tutorial</a>.
+	 <P>
+	 <LI><strong>BAD_PARAM/201</strong>.  <em>vmcid: SUN  minor code: 201</em> 
+	literally means "NULL_PARAM". This exception often occurs because a Java 
+	<code>null</code> was given to a <code>write</code> method such as <code>write_string</code>, 
+	<code>write_octet_array</code>, etc.   You cannot return a
+	 Java <code>null</code>  as the result of a Java method.
+	 
+	 <P>
+	 <LI><strong>org.omg.CORBA.INTERNAL</strong>.  <em>vmcid: SUN  minor code: 208</em> 
+	 means <code>Unable to determine local hostname using 
+	 InetAddress.getLocalHost().getHostName()</code>.
+	 
+	 <P>The ORB 
+	 uses <code>InetAddress.getLocalHost().getHostName()</code> to create a 
+	 reference to the name service for looking for and/or binding references.  
+	 It also uses <code>InetAddress.getLocalHost().getHostName()</code> on the 
+	 server side to create remote object references (i.e., IORs) that contain
+	 the name/port of the server (rather than a dotted-decimal/port pair).
+	 
+	 <P>To avoid the call to <code>getHostName</code>, you can set the following
+	 properties (refer to <a href="orbd.html#starting">
+		Starting and Stopping ORBD</a> if you are not sure how to do this):
+	 
+	 <P><UL>
+	 <LI>Set <code>com.sun.CORBA.ORBServerHost</code> to the DNS name or dotted-decimal
+	 address of the server if the ORB is acting as a server.
+	 <LI>Set <code>com.sun.CORBA.ORBInitialHost</code> to the DNS name or dotted-decimal
+	 address of the name server.
+	 </UL>
+	 <P>
+	 <STRONG>NOTE: These properties are proprietary and are subject to deletion or 
+	 change.</STRONG>
+
+
+
+	</UL>
+
+<P>If none of these suggestions work for you, or if you encounter a different Sun minor
+code exception, email us for more information at 
+ <a href="mailto:corba-tutorial@sun.com">corba-tutorial@sun.com</a>. When requesting the 
+ meaning of a minor code please include the following information:
+<P>
+<UL>
+<LI>The platform on which the client and server 
+ are running  (e.g., Solaris, Linux, Win32)
+<LI>The version of the
+JDK you are using (e.g., 1.4.0_01)
+<LI>A  complete stack trace
+<LI>If you are using a naming service or an ORB from another vendor, please
+provide that information
+</UL> 
+
+</BLOCKQUOTE>
+
+
+
+
+ <A NAME="features">
+<HR><BR>
+
+<H1 ALIGN=CENTER>Features</H1></A>
+
+<H3><A NAME="threading"></A>What is the thread model supported by the JDK 1.4
+CORBA implementation?</H3>
+<BLOCKQUOTE>
+The Java CORBA ORB shipped in J2SE is multi-threaded.  On the 
+server side, we have a thread pool such that each incoming request
+is handled by a separate thread.  If all the pool's threads are in use
+when a new request comes in, a new thread is created and added to the pool.
+The thread is returned to the pool after the request is finished.
+</BLOCKQUOTE>
+<BLOCKQUOTE>
+The Java CORBA ORB is threaded to allow scalability and concurrent request
+processing.  The SINGLE_THREAD option for the POA threading policy is not 
+supported.
+ 
+</BLOCKQUOTE>
+<BLOCKQUOTE>
+The threading model for the Java CORBA ORB
+ is implicit: the user does not
+set the thread policy for the ORB. There are no external,
+user-level APIs exposed for controlling the threading model or the number
+of threads.  
+</BLOCKQUOTE>
+
+
+<H3><A NAME="notificationevent"></A>Does Java IDL contain
+notification/event services? an Interface Repository?</H3>
+<BLOCKQUOTE>No, it does not. If you need one of these services, you can
+implement one, you can purchase one off the shelf, or you can search for one freely
+available to start things off with. You can plug-in 3rd party services such
+as these to the J2SE v.1.4 ORB using INS technology.
+</BLOCKQUOTE>
+
+
+<H3><A NAME="two machines"></A>How can I run the Hello World example
+on two machines?</H3>
+<BLOCKQUOTE>You need to use the <tt>-ORBInitialHost &lt;Host Name where
+Name Service is Launched&gt;</tt> option when starting the client and/or
+server (whichever is not running on the same machine as the name
+server). This way the client and server know where to find the Name
+Service. An example can be found on the Web at
+<A 
+HREF="tutorial/jidl2machines.html">
+http://java.sun.com/j2se/1.4/docs/guide/idl/tutorial/jidl2machines.html</A>.
+</BLOCKQUOTE>
+<H3><A NAME="corbacompliant"></A>Is Java IDL technology compliant with CORBA specifications?</H3>
+<BLOCKQUOTE>For compliance information for CORBA technology shipped with 
+J2SE v.1.4, read the CORBA compliance statement at <A 
+HREF="../../api/org/omg/CORBA/doc-files/compliance.html">http://java.sun.com/j2se/1
+.4/docs/api/org/omg/CORBA/doc-files/compliance.html</A>.
+
+</BLOCKQUOTE>
+
+
+
+<a name="compatibility">
+<!--   **************** COMPATIBILITY/INTEROPERABILITY ********* -->
+<HR><BR>
+<H1 ALIGN=CENTER></a>Compatibility/Interoperability</H1>
+
+<H3><A NAME="differentORB"></A>How can I specify a different ORB?</H3>
+<BLOCKQUOTE>
+
+To use an  ORB other than the Java CORBA ORB in your application, you can 
+set the <tt>org.omg.CORBA.ORBClass</tt> property to the ORB of your choice.
+For example,  use code as shown in the example to explicitly set the ORB 
+to the ORB-implementation you would prefer to use:
+
+<P>
+<PRE>
+public class MyApp {
+
+    public static void main( String args[] ) {
+        Properties properties = System.getProperties();
+        <strong>properties.put( "org.omg.CORBA.ORBClass",
+            "<com.other_company.package.ORB>" );</strong>
+        
+        try {
+             ORB orb = ORB.init( args, properties);
+             
+             ...
+</PRE>
+
+<P>Check
+the vendor's documentation for information on setting properties specific to their 
+ORB implementation.
+
+</BLOCKQUOTE>
+
+
+<H3><a name="testcompat"></a>How can I test whether my JDK ORB Client can 
+communicate with another company's ORB implementation?</H3>
+<BLOCKQUOTE>
+<P>Our J2SE v.1.4 ORB has been tested as part of the J2EE certification process, 
+however, it has not been tested with all vendor's standalone CORBA ORBs.
+
+<P>If INS is supported in the other vendor's service, then, try this.  
+Convert the Interoperable Object References (see <a 
+href="INStutorial.html">IOR discussion in INS tutorial</a>) on the other vendor's ORB server to a string using the <tt>ORB.object_to_string()</tt> method using INS.  Write that string to a file.
+
+</BLOCKQUOTE>
+
+
+<a name="interopdoc"></a>
+<H3>Do you have any examples that use a
+	CORBA client and an EJB server application?</H3>
+<BLOCKQUOTE>
+<P>A developer guide that includes an example application with a 
+C++ client and an Enterprise JavaBeans component can be found on the Web site at: 
+<a href="../rmi-iiop/interop.pdf">
+http://java.sun.com/j2se/1.4/docs/guide/rmi-iiop/interop.pdf</a>.
+</BLOCKQUOTE>	
+	
+
+
+<A name="nameserver"></a>
+<H3>How do I connect to a 3rd-party Naming Service from Sun's ORB?</H3>
+
+<BLOCKQUOTE>
+The recommended way is to use the <a href="INStutorial.html">Interoperable 
+Naming Service (INS)</a>, if this option is supported by the 3rd-party 
+Naming Service.
+<P>
+   To use the Sun ORB with another vendor's Naming Service,
+   <OL>
+   <LI>Start the 3rd-party name server on Host <H> and Port. <P>
+   <LI>Pass the following argument to <tt>ORB.init()</tt>:
+   <PRE>
+        -ORBInitRef NameService=corbaloc:iiop:1.2@:/NameService
+   </PRE>
+      
+   </OL>
+ <P>When you do <tt>orb.resolve_initial_references( "NameService" )</tt>, 
+   you should be able to connect to 3rd-party Name Service.  If you are 
+   still not able to connect, try these troubleshooting hints:
+      <UL>
+      <LI>Verify that the 3rd-party Name Service supports INS.
+      <LI>Verify that the host and port information is accurate.
+      <LI>Verify that the 3rd-party Name Service has been started successfully.
+      <LI>Verify that the 3rd-party Name Service supports GIOP 1.2.  If not,
+      refer to the Name Server's documentation for the correct the GIOP
+       version, and modify the <tt>corbaloc:</tt> URL accordingly.
+      <LI>Determine if the 3rd-party Name Service has a different object
+       key it uses to contact <tt>NameService</tt>.  If so, refer to 
+       the Name Server's documentation.
+         </UL>
+    
+</BLOCKQUOTE>
+
+<H3><A NAME="ORBinterop"></A>Can I use the Java IDL ORB with a C++ CORBA server? 
+(interoperability)</H3>
+<BLOCKQUOTE>
+The Java IDL ORB is an ORB completely written using Java technology.  The <tt>idlj</tt> compiler
+generates code that follows the conventions defined in the <EM>IDL to Java 
+Language Mapping 
+Specification</EM>. The Java ORB does not provide a compiler that generates code in 
+any 
+languages other than the Java platform.  If you want to test  
+interoperability between the Java ORB and an ORB written in another language (such 
+as  
+C++), you will need to find an ORB written in that language and a compiler that 
+conforms
+ to the  specific language mapping.  
+Language mapping specifications are available from the Object Management Group Web 
+site at
+<a 
+href="http://www.omg.org/technology/documents/formal/corba_language_mapping_specs.htm">
+http://www.omg.org/technology/documents/formal/corba_language_mapping_specs.htm</a>.
+ A user who wants to use the Java platform on one side and C++ on the 
+other will only
+share the IDL.  You will have to use your C++ ORB's tools to generate
+the stubs and skeletons for use with the C++ ORB, but you don't have to
+change the IDL at all. 
+  To find a vendor that provides a CORBA ORB and a language mapping compiler in the 
+language you are working with, search the Web for "C++ CORBA ORB", or equivalent. 
+
+<P>A developer guide that includes an example application with a 
+C++ client and an Enterprise JavaBeans component can be found on the Web site at: 
+<a href="../rmi-iiop/interop.html">
+http://java.sun.com/j2se/1.4/docs/guide/rmi-iiop/interop.html</a>.
+
+<P><strong>Although it is true that ORBs written in 
+different languages should be able to talk to each other, we haven't tested the 
+interoperability of the Java ORB with other vendor's ORBs.</strong>
+</BLOCKQUOTE>
+<A NAME="general">
+<HR><BR>
+<H1 ALIGN=CENTER></A>General</H1>
+
+<H3><A NAME="where can I download"></A>Where can I download the
+idltojava compiler?</H3>
+<BLOCKQUOTE>We highly recommend that you use the latest version of the IDL-to-Java
+compiler, <tt>idlj</tt> for all new code.  If you still need to use <tt>idltojava</tt>
+for legacy applications, you can download the <TT>idltojava</TT> compiler for JDK
+1.2 from
+<A 
+HREF="http://developer.java.sun.com/developer/earlyAccess/jdk12/idltojava.html">
+http://developer.java.sun.com/developer/earlyAccess/jdk12/idltojava.html</A>.
+
+<P>To get the latest version of the IDL-to-Java compiler, download the latest version
+of  <A 
+HREF="http://java.sun.com/j2se/index.html">
+Java<FONT 
+SIZE=1><SUP>TM</SUP></FONT> 2 Platform, Standard Edition (J2SE<FONT 
+SIZE=1><SUP>TM</SUP></FONT>)</A>.  When J2SE is installed, <TT>idlj</TT>
+will be located in the <TT>bin</TT> directory. 
+
+<P>Other troubleshooting information related to <tt>idltojava</tt> is located
+in the <a href="../../../../1.3/docs/guide/idl/jidlFAQ.html">Java IDL FAQ</a> for J2SE v.1.3.
+</BLOCKQUOTE>
+
+
+</UL>
+<H3><A NAME="what are my options"></A>What are my options for
+developing CORBA applications using Java technology?</H3>
+<BLOCKQUOTE>CORBA technology as part of the Java 2 platform consists
+of an <A HREF="../corba/index.html#orb">Object Request Broker (ORB)</A>
+written in the Java language (with a small bit of native code), the <A 
+HREF="../corba/index.html#rmi">RMI
+programming model</A>, and the <A HREF="../corba/index.html#idl">IDL
+programming model</A>. 
+</BLOCKQUOTE>
+<BLOCKQUOTE>The &quot;magic&quot; that gives us the cross-language,
+cross-vendor interoperability is the Internet InterORB Protocol, or
+IIOP. IIOP can be a transport protocol for distributed applications
+written in either IDL or Java RMI. IIOP allows distributed objects to
+conform to OMG's CORBA specification. 
+</BLOCKQUOTE>
+<BLOCKQUOTE>When using the IDL programming model, the interface is
+everything! It defines the points of entry that can be called from a
+remote process, such as the types of arguments the called procedure
+will accept, or the value/output parameter of information returned.
+Using IDL, the programmer can make the entry points and datatypes
+that pass between communicating processes act like a standard
+language. 
+</BLOCKQUOTE>
+<BLOCKQUOTE>CORBA is a language-neutral system in which the argument
+values or return values are limited to what can be represented in the
+involved implementation languages. In CORBA, object orientation is
+limited only to objects that can be passed by reference (the object
+code itself cannot be passed from machine-to-machine) or are
+predefined in the overall framework. Passed and returned types must
+be those declared in the interface. 
+</BLOCKQUOTE>
+<BLOCKQUOTE>With RMI, the IDL and the implementation language are the
+same thing, so you don't have to worry about mapping from one to the
+other. Language-level objects (the code itself) can be passed from
+one process to the next. Values can be returned by their actual type,
+not the declared type. Or, you can compile the interfaces to generate
+IIOP-compliant stubs and skeletons to talk to objects written on
+other machines in other CORBA-compliant languages. 
+</BLOCKQUOTE>
+<H3><A NAME="java idl vs rmi-iiop"></A>What is the difference between
+Java IDL and Java RMI-IIOP?</H3>
+<BLOCKQUOTE>This is a fundamental question and it's important to
+understand the distinction between these two ways of integrating the
+Java programming language with CORBA. 
+</BLOCKQUOTE>
+<BLOCKQUOTE>Java IDL is for CORBA programmers who want to program in
+the Java programming language based on interfaces defined in CORBA
+Interface Definition Language (IDL). This is &quot;business as usual&quot;
+CORBA programming, supporting the Java language in exactly the same way as other
+languages like C++ or COBOL. 
+</BLOCKQUOTE>
+<BLOCKQUOTE>Java RMI-IIOP (Remote Method Invocation over Internet
+Inter-ORB Protocol) is for developers who want to use the Java 
+programming language  to program to
+the Java RMI interfaces, but use IIOP as the underlying transport.
+Java RMI-IIOP provides interoperability with other CORBA objects
+implemented in various languages - but only if all the remote
+interfaces are originally defined as Java RMI interfaces. It is of
+particular interest to programmers using Enterprise JavaBeans (EJB),
+since the remote object model for EJB's is RMI-based. 
+</BLOCKQUOTE>
+<BLOCKQUOTE>There are several scenarios that will define how you will
+want to create distributed CORBA applications. Here are some of them:
+</BLOCKQUOTE>
+<UL>
+	<LI><BLOCKQUOTE>Java IDL - If you have been developing CORBA
+	applications using IDL for some time, you will probably want to stay
+	in this environment. Create the interfaces using IDL, and define the
+	client and server applications using the Java programming language
+	to take advantage of its &quot;Write Once, Run Anywhere<FONT 
+SIZE=1><SUP>TM</SUP></FONT>&quot;
+	portability, its highly productive implementation environment, and
+	its very robust platform. 
+	</BLOCKQUOTE>
+	<LI><BLOCKQUOTE>RMI-JRMP - If all of your applications are written in
+	the Java programming language, you will probably want to use Java
+	RMI technology to enable communication between Java objects on different
+	virtual machines and different physical machines. Using Java RMI
+	without its IIOP option leverages its strengths of code portability,
+	security, and garbage collection. 
+	</BLOCKQUOTE>
+	<LI><BLOCKQUOTE>Java RMI-IIOP - If you are writing most of your new
+	applications using the Java programming language, but need to
+	maintain legacy applications written in other programming languages
+	as well, you will probably want to use Java RMI with its IIOP
+	compiler option. 
+	</BLOCKQUOTE>
+</UL>
+
+
+<H3><A NAME="limitations">What are the limitations when using Java IDL and/or Java RMI-IIOP?</A></H3>
+
+<BLOCKQUOTE>For more information on product limitations, read <a href="limitations.html">
+<em>Limitations</em></a>.
+</BLOCKQUOTE>
+
+
+<H3><A NAME="standardtags">What are the standard tags for ...?</A></H3>
+<BLOCKQUOTE>
+
+The most recent versions of standard tag
+allocation files can be found at 
+<a href="http://www.omg.org/cgi-bin/doc?standard-tags">
+http://www.omg.org/cgi-bin/doc?standard-tags</a>.
+
+</BLOCKQUOTE>
+<BR><BR>
+	
+	
+	
+	
+	
+
+<!-- ----------------- END FAQ ------------------ -->
+
+
+<!-- end main page content -->
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2000-2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+</BODY>
+</HTML>

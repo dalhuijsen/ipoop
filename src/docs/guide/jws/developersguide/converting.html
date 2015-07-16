@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>Converting JNLP Files to Work With This Release</title>
+
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Converting JNLP Files to Work With This Release</h1>
+<hr>
+<form name="form1">
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  The JNLP file format has not changed between the 1.0 and this release. </p>
+<p>If your JNLP file is compatible with a version of Java Web Start that is lower 
+  than 1.0, please note that the JNLP file format has changed significantly.&nbsp; 
+  Below is a list of the most common modifications that needs to be applied to 
+  a 0.4 JNLP file to make it compatible with Java Web Start 1.0 or higher: </p>
+<ul>
+  <li> Set <tt>spec</tt> attribute to 1.0.</li>
+  <li> Rename the <tt>unrestricted</tt> element to <tt>all-permissions</tt>.</li>
+  <li> Rename the <tt>jre</tt> element to <tt>j2se</tt> and move this element 
+    inside the <tt>resources</tt> element (i.e., make <tt>j2se</tt> a subelement 
+    of <tt>resources</tt>).</li>
+</ul>
+<p> Converting JNLP files used with the 1.0-beta or 1.0-rc release only requires 
+  updating the <tt>spec</tt> attribute to "1.0". </p>
+</body>
+</html>

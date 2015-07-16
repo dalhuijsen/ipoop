@@ -1,0 +1,519 @@
+<html>
+<head>
+<title>Deploying Java Extensions</title>
+<LINK REL=STYLESHEET TYPE="text/css" HREF="styles/style1.css">
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Deploying Java Extensions</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><b><font size="+2">Note: </font></b><i>Java extensions</i> are also referred 
+  to as <i>optional packages</i>, <i>standard extensions</i>, or simply <i>extensions</i>.</p>
+<p>This section covers the following topics:</p>
+<ul>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#specifying">Manifest of the applet JAR file</a></li>
+  <li><a href="#manifest">Manifest of each extension JAR file</a></li>
+  <li><a href="#installation">Manifest of the <code>Implementation-URL</code> 
+    JAR file</a> 
+    <ul>
+      <li><a href="#raw">Raw installation</a></li>
+      <li><a href="#java">Java installer</a></li>
+      <li><a href="#native">Native installer</a></li>
+    </ul>
+  </li>
+  <li><a href="#security">Security</a></li>
+  <li><a href="#instructions">Detailed Instructions</a></li>
+  <li><a href="#limitations">Known Limitations and Other Notes</a></li>
+</ul>
+<p>Java applets may use Java extensions to provide extra functionality to users. 
+  Java Plug-in enables applets to trigger installation of various <a href="http://java.sun.com/products/OV_stdExt.html">Java 
+  extensions</a> (e.g., JavaHelp, Java 3D, Java Media Framework ...) in the Java 
+  2 Runtime Environment. This document describes the basic steps for deploying 
+  <i>installed Java extensions</i> (versus <i>bundled Java extensions</i>) with 
+  Java Plug-in. For details about how Java Extensions work, see the <a href="../../extensions/">The 
+  Java Extensions Mechanism</a>.</p>
+<p> 
+<h2><a name="overview"></a>Overview</h2>
+<p>An applet that uses extensions is packaged as a signed JAR file including manifest. 
+  When an applet is downloaded and run with Java Plug-in, Java Plug-in checks 
+  the manifest of the applet JAR file. The manifest will contain a list of all 
+  extensions that the applet requires. An extension consists of one or more JAR 
+  files to be installed into the <code>&lt;jre&gt;/lib/ext</code> directory. </p>
+<p>In general, for each extension the applet manifest will list name, vendor, 
+  and version information of the extension JARs; it will also list URLs from which 
+  the JARs, or an installer for them, may be obtained if the JARs are not already 
+  installed <code>&lt;jre&gt;/lib/ext</code> or are out of date. A URL may directly 
+  specify one of the extension JARs, or it may specify an installer, native or 
+  Java, that will install the extension JARs. The rules for deciding that an update 
+  is required are described in <a href="../../extensions/versioning.html#rules">Optional 
+  Package Versioning</a>. </p>
+<p>To use Java Plug-in for deploying Java Extensions, information about the extensions 
+  must be specified in three different manifest files:</p>
+<ol>
+  <li> 
+    <p><a href="#specifying">Manifest of the applet JAR file</a></p>
+  </li>
+  <li> 
+    <p><a href="#manifest">Manifest of each extension JAR</a></p>
+  </li>
+  <li> 
+    <p><a href="#installation">Manifest of the <code>Implementation-URL</code> 
+      JAR file</a></p>
+  </li>
+</ol>
+<p>Each of these types of manifest files is described in detail below.</p>
+<p> 
+<h2><a name="specifying"></a>Manifest of the applet JAR file</h2>
+<p>To deploy Java extensions with an applet, the applet must be packaged as a 
+  JAR file. Moreover, the manifest file of the applet JAR must define the list 
+  of extensions it requires and specify the URLs from which the extensions can 
+  be downloaded, along with other information about the extensions, according 
+  to the <a href="../../extensions/versioning.html">Optional Package Versioning</a>. 
+  For example, below is the manifest file for two extensions: 
+<blockquote>
+  <pre>
+Extension-List: RectangleArea RectanglePerimeter
+RectangleArea-Extension-Name: com.mycompany.RectangleArea
+RectangleArea-Specification-Version: 1.2
+RectangleArea-Implementation-Version: 1.2
+RectangleArea-Implementation-Vendor-Id: com.mycompany
+RectangleArea-Implementation-URL: http://mycompany.com/RectangleArea.jar
+RectanglePerimeter-Extension-Name: com.mycompany.RectanglePerimeter
+RectanglePerimeter-Specification-Version: 1.2
+RectanglePerimeter-Implementation-Version: 1.2
+RectanglePerimeter-Implementation-Vendor-Id: com.mycompany
+RectanglePerimeter-Implementation-URL: http://mycompany.com/RectanglePerimeter.jar
+</pre>
+</blockquote>
+<p>In this example, two extensions are deployed with the applet&#151;<tt>RectangleArea</tt> 
+  and <tt>RectanglePerimeter</tt>. Each has a single JAR file. If they have not 
+  been installed or if updated versions are needed, the proper versions will be 
+  downloaded from the <code>Implementation-URL</code> specifications. Notice that 
+  an <code>Implementation-URL</code> must point to a JAR file that:</p>
+<ul>
+  <li><font color="#000000">is the desired extension JAR itself (for raw installation) 
+    or</font></li>
+  <li>contains a Java installer that will install the extension or</li>
+  <li>contains a native installer that will install the extension.</li>
+</ul>
+<p><font color="#000000">This will be explained in detail in the section below 
+  called <a href="#manifest">The manifest of the <code>Implementation-URL</code> 
+  JAR file</a>.</font></p>
+<h3><font color="#000000"><code>Extension-List</code> names and attribute prefixes</font></h3>
+<p><font color="#000000">There are two basic scenarios here: An extension may 
+  have a single JAR file, or it may have multiple JAR files. <code>Extension-List</code> 
+  names and attribute prefixes are discussed below for these two scenarios:</font></p>
+<blockquote> 
+  <h4>Extension with single JAR file</h4>
+  <p>For an extension with a single JAR file (as in the example above), the name 
+    in the <code>Extension-List</code>, and the prefix of the related manifest 
+    attributes, should be the name of the extension JAR file.</p>
+  <h4>Extension with multiple JAR files</h4>
+  <p>Some extensions consist of multiple JAR files. For example, the Java 3D extension 
+    consists of the following JAR files: <code>j3daudio.jar</code>, <code>j3dcore.jar</code>, 
+    <code>j3dutils.jar</code>, and <code>vecmath.jar</code>. There are two scenarios 
+    that need to be considered: (1) The JARs are installed by a native or Java 
+    installer or (2) no installer is used (i.e., raw installation of the extension 
+    JARs).</p>
+  <blockquote>
+    <p>If a <b>native or Java installer</b> is used to install an extension, then 
+      only one of the JAR file names should be used in the <code>Extension-List</code>, 
+      and only one set of attributes, using that name as the prefix, should appear. 
+      Usually an extension has a main JAR file; if so, you should use its name 
+      in the <code>Extension-List</code> and as the prefix for the related manifest 
+      attributes. If there is no main JAR file, you can use the name of any JAR 
+      file in the optional package.</p>
+    <p><font color="#000000">Here is an example of the applet manifest for the 
+      Java 3D extension. <code>j3dcore.jar</code> is the main JAR file.</font></p>
+    <blockquote> 
+      <p><font color="#000000"><code>Extension-List: j3dcore<br>
+        j3dcore-Extension-Name: javax.media.j3d</code></font><font color="#000000"><code><br>
+        </code></font><font color="#000000"><code>j3dcore-Specification-Version: 
+        1.2<br>
+        j3dcore-Specification-Vendor: Sun Microsystems, Inc<br>
+        j3dcore-Implementation-Version: 1.2.1_03<br>
+        j3dcore-Implementation-Vendor-Id: com.sun<br>
+        j3dcore-Implementation-URL: http://&lt;myserver&gt;/native/java3d-win.jar</code></font></p>
+      </blockquote>
+    <p>For a <b>raw installation</b> with multiple JAR files, the story is different: 
+      You must treat each JAR file as though it were a separate extension and 
+      list each according to its name in the <code>Extension-List</code>. Each 
+      one listed then must have its own set of manifest attributes, where the 
+      prefix for an attribute set is the name of the related JAR file.</p>
+  </blockquote>
+</blockquote>
+<table summary="layout" width="90%" bgcolor="#FFFFCC" align="center" cellpadding="5" cellspacing="0" border="1">
+  <tr> 
+    <td> 
+      <h2><u>Note on JAR Extension Identification:</u></h2>
+      <p>Note that Java Plug-in checks four manifest attributes of an installed 
+        extension <code>JAR</code> file:</p>
+      <ul>
+        <li><code>Extension-Name</code></li>
+        <li><code>Specification-Version</code></li>
+        <li><code>Implementation-Version</code></li>
+        <li><code>Implementation-Vendor-Id</code></li>
+      </ul>
+      <p><code>Extension-Name</code> and <code>Implementation-Vendor-Id</code> 
+        must match exactly the values specified in the applet manifest file. </p>
+      <ul>
+        <li>See <a href="../../extensions/versioning.html">Optional Package Versioning</a> 
+          for how Java Plug-in evaluates the version attributes of an installed 
+          extension to decide if a newer extension needs to be downloaded.</li>
+        <li>See <a href="version_format.html">Appendix 6: Sun-Supported <code>Specification-Version</code> 
+          and <code>Implemenation-Version</code> Formats</a> for rules about the 
+          format of <code>Specification-Version</code> and <code>Implemenation-Version</code>.</li>
+      </ul>
+      </td>
+  </tr>
+</table>
+<h2><a name="manifest"></a>Manifest of each extension JAR file</h2>
+<p>Here we are talking about the JAR files that Plug-in can obtain from the URLs 
+  specified by <code>Implemenation-URL</code>. The URL-obtainable extension JARs 
+  may be directly obtained (raw installation) or they may be obtained via a Java 
+  or native installer. In either case they are installed into <code>&lt;jre&gt;/lib/ext</code>. 
+</p>
+<p>The extensions that the applet requires are listed in the applet manifest. 
+  This allows Plug-in to examine the JAR files present in the <code>&lt;jre&gt;/lib/ext</code> 
+  directory when an applet is launched and to decide if it needs to install missing 
+  or out-of-date extensions. </p>
+<p>In general, the manifest of an extension JAR obtained via an <code>Implementation-URL</code> 
+  needs to include various name, version, and vendor information. Thus, when such 
+  an extension JAR is installed, it will be possible in the future for Java Plug-in 
+  to compare this information to the information about an extension that an applet 
+  requests; and Plug-in will be able to determine if an extension needs to be 
+  installed/upgraded. Prior to any applet ever requesting an extension, it is 
+  more than likely that no extension is installed in <code>&lt;jre&gt;/lib/ext</code>, 
+  or that no or incomplete manifest information is present in the installed extension 
+  JAR.</p>
+<p>For an extension with a single JAR file, the JAR file must be signed and include 
+  a manifest file with the following attributes:</p>
+<ul>
+  <li><code>Extension-Name</code></li>
+  <li><code>Specification-Vendor</code></li>
+  <li><code>Specification-Version</code></li>
+  <li><code>Implementation-Vendor-Id</code></li>
+  <li><code>Implementation-Vendor</code></li>
+  <li><code>Implemenation-Version</code></li>
+</ul>
+<h3>Example</h3>
+<blockquote> 
+  <p><code>Extension-Name: javax.help<br>
+    Specification-Vendor: Sun Microsystems, Inc <br>
+    Specification-Version: 1.0 <br>
+    Implementation-Vendor-Id: com.sun <br>
+    Implementation-Vendor: Sun Microsystems, Inc <br>
+    Implementation-Version: 1.1.3</code></p>
+</blockquote>
+<p><a name="exception"></a>If an extension consists of more than one JAR file 
+  and the extension is installed with a native/Java installer, then only the JAR 
+  file whose name is listed in the <code>Extension-List</code> of the applet manifest 
+  needs to have extension information <font color="#000000">(i.e., <code>Extension-Name</code>, 
+  <code>Specification-Version</code>, etc.)</font>. If no installer is used, then 
+  all JAR files must include extension information.<br>
+</p>
+<p>See <a href="../../extensions/versioning.html">Optional Package Versioning</a> 
+  for more information about these attributes.</p>
+<p></p>
+<h2><a name="installation"></a>Manifest of the <code>Implementation-URL</code> 
+  JAR file</h2>
+<p>This is the JAR file which the applet refers to with the <code>Implementation-URL</code> 
+  attribute in its manifest. It is the URL from which the extension can be obtained 
+  if no extension is installed in <code>&lt;jre&gt;/lib/ext</code>, or an extension 
+  is installed but it is out of date. 
+<p>If the <code>Implementation-URL</code> JAR is a native or Java installer, this 
+  is indicated in the manifest via two special attributes: <code>Main-Class</code> 
+  indicates a Java installer; <code>Extension-Installation</code> indicates native 
+  installer. Note that if no installer is indicated, then the <code>Implementation-URL</code> 
+  JAR file is simply the extension JAR file itself.</p>
+<p>As implied from the above, there are three ways that extensions can be installed 
+  by Java Plug-in: 
+<ul>
+  <li><a href="#raw">By raw installation</a></li>
+  <li><a href="#java">With a Java installer</a></li>
+  <li><a href="#native">With a native installer</a></li>
+</ul>
+<p>Each method is discussed below:
+<h3><a name="raw"></a>Raw installation</h3>
+<p>With raw installation of an extension, each extension JAR is installed by Java 
+  Plug-in into the <code>&lt;jre&gt;/lib/ext</code> directory without an installer 
+  (Java or native); i.e., Java Plug-in is the &quot;installer&quot; for each JAR. 
+  If an extension has a single JAR file, then the URL of that JAR is shown as 
+  the <code>Implementation-URL</code> in the applet JAR manifest; and Java Plug-in 
+  knows it is a raw extension because the manifest of the extension JAR file includes 
+  neither <code>Main-Class</code> nor <code>Extension-Installation</code> attribute.</p>
+<p>Suppose we have an extension called <code>javax.mediax</code> with a single 
+  JAR, <code>mediax.jar</code>. Then the applet and extension JAR might be as 
+  shown below:</p>
+<blockquote> 
+  <h4>Example: Applet JAR manifest</h4>
+  <pre>Extension-List: <span class="bg">mediax</span><br>mediaz-Extension-Name: javax.mediax<br>mediax-Specification-Version: 1.1 <br>mediax-Implementation-Version: 1.1.2<br>mediax-Implementation-Vendor-Id: com.sun <br><span class="bg">mediax-Implementation-URL: http://java.sun.com/products/plugin/extensions/examples/media/mediax.jar</span>
+</pre>
+  <h4>Example: Extension JAR manifest</h4>
+  <pre>Extension-Name: javax.<span class="bg">mediax</span><br>Specification-Vendor: Sun Microsystems, Inc
+Specification-Version: 1.1<br>Implementation-Vendor-Id: com.sun<br>Implementation-Vendor: Sun Microsystems, Inc<br>Implementation-Version: 1.1.2</pre>
+</blockquote>
+<p>Now suppose we have another version, <code>javax.mediax-2</code>, that has 
+  two JARs: <code>mediax_core.jar</code> and <code>mediax_codex.jar</code>. Then 
+  we must treat the two JAR files as though they were separate extensions and 
+  list each in the applet JAR manifest.</p>
+<blockquote>
+<h4>Example: Applet JAR manifest</h4>
+  <pre>Extension-List: <span class="bg">mediax_core</span> <span class="bg">mediax_codec</span><br>mediax_core-Extension-Name: javax.mediax_core<br>mediax_core-Specification-Version: 1.1 <br>mediax_core-Implementation-Version: 1.1.2<br>mediax_core-Implementation-Vendor-Id: com.sun <br><span class="bg">mediax_core-Implementation-URL: http://java.sun.com/products/plugin/extensions/examples/media/mediax_core.jar</span>
+mediax_codec-Extension-Name: javax.mediax_codec<br>mediax_codec-Specification-Version: 1.1 <br>mediax_codec-Implementation-Version: 1.1.2<br>mediax_codec-Implementation-Vendor-Id: com.sun <br><span class="bg">mediax_codec-Implementation-URL: http://java.sun.com/products/plugin/extensions/examples/media/mediax_codec.jar</span></pre>
+  <p><b>Example: Extension JAR manifests</b></p>
+  <pre>Extension-Name: javax.<span class="bg">mediax_core</span><br>Specification-Vendor: Sun Microsystems, Inc
+Specification-Version: 1.1<br>Implementation-Vendor-Id: com.sun<br>Implementation-Vendor: Sun Microsystems, Inc<br>Implementation-Version: 1.1.2</pre>
+  <pre>Extension-Name: javax.<span class="bg">mediax_codec</span><br>Specification-Vendor: Sun Microsystems, Inc
+Specification-Version: 1.1<br>Implementation-Vendor-Id: com.sun<br>Implementation-Vendor: Sun Microsystems, Inc<br>Implementation-Version: 1.1.2</pre>
+</blockquote>
+<h3><a name="java"></a>Java Installer</h3>
+<p>An extension can be installed through a Java installer. The Java installer 
+  must be bundled as a JAR file, and the resulting JAR file must be specified 
+  as <code>Implementation-URL</code><i> </i>in the applet JAR manifest file. During 
+  installation the JAR file will be downloaded and verified, and the <code>Main-Class</code> 
+  of the Java installer inside the JAR file will be executed to start the installer. 
+  It is the job of the Java installer to copy the extension JAR files, normally 
+  bundled with the installer, into the right location of the Java 2 Runtime (i.e., 
+  <code>&lt;jre&gt;/lib/ext</code>). </p>
+<p>Though we are now dealing with an application JAR file, the attributes in its 
+  manifest should be the same as those shown for the extension JAR whose name 
+  is listed in the <code>Extension-List</code> of the applet manifest&#151;with 
+  the addition of the <code>Main-Class</code> attribute.<br>
+</p>
+<blockquote>
+  <h4>Example: Java Installer JAR manifest<br>
+  </h4>
+  <pre>
+Extension-Name: javax.help 
+Specification-Vendor: Sun Microsystems, Inc 
+Specification-Version: 1.1 
+Implementation-Vendor-Id: com.sun 
+Implementation-Vendor: Sun Microsystems, Inc 
+Implementation-Version: 1.1.3
+<span class="bg">Main-Class: com.sun.javahelp.installer</span>
+</pre>
+</blockquote>
+In this case, because <code>Main-Class</code> is present in the manifest, the 
+JAR will be treated as a Java Installer, and <code>Main-class</code> will be invoked. 
+It is the job of the Java installer to copy the extensions JAR files into the 
+<code>&lt;jre&gt;/lib/ext</code> directory. Note that each extension JAR file 
+must contain proper versioning information. 
+<h3><a name="native"></a>Native Installer</h3>
+<p>An extension can also be installed through a native installer. The native installer 
+  must be bundled as a JAR file, and the resulting JAR file must be specified 
+  as the <code>Implementation-URL</code><i> </i>in the applet JAR manifest file. 
+  During installation the JAR file will be downloaded and verified, and the native 
+  installer will be started. It is the job of the native installer to copy the 
+  extension JAR files, normally bundled with the installer, into the right location 
+  of the Java 2 Runtime (i.e., <code>&lt;jre&gt;/lib/ext</code>).
+<p>Though we are now dealing with an application JAR file, the attributes in its 
+  manifest should be the same as those shown for the extension JAR whose name 
+  is listed in the <code>Extension-List</code> of the applet manifest&#151;with 
+  the addition of the <code>Extension-Installation</code> attribute. 
+<blockquote>
+  <h4>Example: Native Installer Jar Manifest</h4>
+  <pre>Extension-Name: javax.media.jmf
+Specification-Vendor: Sun Microsystems, Inc 
+Specification-Version: 2.1 
+Implementation-Vendor-Id: com.sun 
+Implementation-Vendor: Sun Microsystems, Inc 
+Implementation-Version: 2.1.1<br><span class="bg">Extension-Installation: jmf-2_1_1-win.exe</span></pre>
+</blockquote>
+<p>In this case, because <code>Extension-Installation</code> is present in the 
+  manifest, the JAR will be treated as a native installer; and the installer itself 
+  will be launched. It is the job of the native installer to copy the Java extensions 
+  into the <i> </i><code>&lt;jre&gt;/lib/ext</code><i> </i>directory. Note that each Java 
+  extension JAR file must contain proper versioning information.<br>
+</p>
+<h2><a name="security"></a>Security</h2>
+<p> When an installed extension needs to be update, the extension will be downloaded 
+  and verified to ensure that it is correctly signed. If it is valid, the Plug-in 
+  will pop-up a security dialog providing three options: </p>
+<ol>
+  <li><em>Grant always</em>: If selected, the <code>Implementation-URL</code> 
+    JAR will be granted the <code>AllPermission</code> permission. Any sapplet 
+    or extension signed with the same certificate will be trusted automatically 
+    in the future, and no security dialog will pop up when this certificate is 
+    encountered again. This decision can be changed from the Java Plug-in Control 
+    Panel.<br>
+  <li><em>Grant this session</em>: If selected, the <code>Implementation-URL</code> 
+    JAR will be granted the <code>AllPermission</code> permission. Any applet 
+    or extension signed with the same certificate will be trusted automatically 
+    within the same browser session.<br>
+  <li><em>Deny</em>: If selected, the installation is cancelled.<br>
+</ol>
+<p> Once the user selects the options from the security dialog, the extensions 
+  installation will be executed in the corresponding security context. The applet 
+  will not be started until the extensions are properly installed.</p>
+<p>Because Java extensions are downloaded and installed into the Java 2 Runtime 
+  <code> &lt;jre&gt;/lib/ext</code> directory, each must be signed. Once the extensions 
+  are installed, they will have the permissions granted to Java extensions through 
+  the policy file.</p>
+<h2><a name="instructions"></a>Detailed Instructions</h2>
+<p>Follow these steps to set up extensions for use with Java Plug-in: 
+<h3>I. Create/obtain the extensions that your applet needs. </h3>
+<p>Each extension will consist of one or more JAR files, each of which must include 
+  a manifest file with version information as described above in <a href="#manifest">Manifest 
+  of each extension JAR file,</a> and each must be signed. (<a href="#exception">See 
+  exception to this with mulitple JARs installed with native/Java installer</a>.)
+<p><b>To create a JAR file</b> from any set of files, use this command: 
+<blockquote> 
+  <p><code>% jar cmf my_manifest my_jar input_files</code></p>
+</blockquote>
+<p>For more information about the <code>jar</code> tool, see the <a href="../../../tooldocs/tools.html">Tools 
+  and Utilities</a> documentation for your platform.</p>
+<p><b>To sign the JAR file</b> is going to take some trouble. In outline form, 
+  this is what you can do:</p>
+<ol>
+  <li>Use the <code>keytool -genkey</code> option to generate a key pair.</li>
+  <li>Use the <code>keytool -certreq</code> to generate a certificate request 
+    for a Certificate Authority (CA), such as <a href="http://www.verisign.com">VeriSign</a> 
+    and <a href="http://www.thawte.com">Thawte</a>. Email the request to the CA. 
+    After the CA has confirmed your identity, it will respond with a certificate 
+    chain via email. Copy the certificate chain to a file.</li>
+  <li>You can then use the <code>keytool -import</code> option to import the chain 
+    to the keystore.</li>
+  <li>You can now use the <code>jarsigner</code> tool to sign the JAR and the 
+    <code>-verify</code> option to check that it is signed.</li>
+</ol>
+<p>For more information about <code>keytool</code> and <code>jarsigner</code>, 
+  see the <a href="../../../tooldocs/tools.html">Tools and Utilities</a> documentation 
+  for your platform.</p>
+<p>More information on this topic, along with examples, is given in the chapter 
+  called <a href="rsa_signing.html">How to Sign Applets Using RSA-Signed Certificates</a>. 
+  Although that chapter discusses how to sign an applet JAR file, the process 
+  is identical to signing an extension JAR file.</p>
+<h3>II. Create/obtain the <code>Implementation-URL</code> JAR files</h3>
+<h4>If no installer is to be used:</h4>
+<p>The extension JAR files described in step I are the <code>Implementation-URL</code> 
+  JARs. 
+<h4>If an installer is to be used:</h4>
+<ol>
+  <li>Create/obtain the installer. </li>
+  <li>Create the manifest for the JAR of the installer and any bundled extensions 
+    that need to go into it. 
+    <ul>
+      <li>For a Java installer include the <code>Main-Class</code> attribute in 
+        the manifest;</li>
+      <li>for a native installer include the <code>Extension-Installation</code> 
+        attribute.</li>
+    </ul>
+  </li>
+  <li>JAR the installer, the manifest, and any bundled extensions that need to 
+    be included and sign the JAR. (The steps for JARing and signing are the same 
+    as described in step I above.)</li>
+</ol>
+<h4>Example</h4>
+<p>Suppose we have an applet that requires Sun's Java Advanced Imaging as an installed 
+  extension. You can download this here:</p>
+<blockquote>
+  <p><code>http://java.sun.com/products/java-media/jai/downloads/download.html</code></p>
+</blockquote>
+<p>Suppose you select the &quot;Windows JRE Install&quot; version. The following 
+  file will be downloaded:</p>
+<blockquote>
+  <p><code>jai-1_1_1_01-lib-windows-i586-jre.exe</code></p>
+</blockquote>
+<p>This installer bundles the following JAR files, which it will install into 
+  the <code>&lt;jre&gt;/lib/ext</code> directory:</p>
+<ul>
+  <li><code>jai_codec.jar</code></li>
+  <li><code>jai_core.jar</code></li>
+  <li><code>mlibwrapper_jai.core</code></li>
+</ul>
+<p>You need to create the manifest for a JAR file that contains the <code>.exe</code> 
+  installer above, and you need to sign the JAR file.</p>
+<p>The manifest would look like this:</p>
+<blockquote>
+  <pre>Extension-Name: javax.media.jai 
+Specification-Vendor: Sun Microsystems, Inc 
+Specification-Version: 1.1 
+Implementation-Vendor-Id: com.sun 
+Implementation-Vendor: Sun Microsystems, Inc 
+Implementation-Version: 1.1.1_01
+<span class="bg">Extension-Installation: jai-1_1_1-01-windows-i586-jre.exe</span></pre>
+</blockquote>
+<p>Now JAR up the installer as <code>jai_win.jar</code>, together with the manifest 
+  file. You don't need to include the extension JAR files, as they are bundled 
+  with the <code>.exe</code> installer in this case. Be sure to include the <code>.jar</code> 
+  extension in the JAR file name. </p>
+<p>Now sign <code>jai_win.jar</code>.</p>
+<h3>III. Create the applet JAR</h3>
+<p>1. Create a manifest file for the applet. Below is a manifest file for the 
+  jai example using a native installer:
+<blockquote> 
+  <p> <code>Extension-List: jai_core<br>
+    jai_core-Extension-Name: javax.media.jai<br>
+    jai_core-Specification-Version: 1.1<br>
+    jai_core-Implementation-Version: 1.1.1_01<br>
+    jai_core-Implementation-Vendor-Id: com.sun<br>
+    jai_core-Implementation-URL: http://myserver.com/jai_win.jar </code></p>
+</blockquote>
+<p>Some optional packages come packaged in different JAR files for different operating 
+  systems. If you want your applet to work on different OSs, you can use the <code>$(os-name)$</code> 
+  construction in the <code>Implementation-URL</code> manifest attribute. The 
+  <code>$(os-name)$</code> will translate to the target OS that the applet is 
+  being run on&#151;i.e., SunOS, Linux, Windows-98, Windows-NT, Windows-2000, 
+  Windows-Me.</p>
+<blockquote> 
+  <p><code>optpkg-Implementation-URL: http://.../optpkg-$(os-name)$.jar</code></p>
+</blockquote>
+<p>2. JAR up the <code>*.class</code> files, and any other supporting files the 
+  applet needs, together with the applet's manifest file, and sign the JAR. (The 
+  procedure for JARing your files and signing the JAR is the same as discussed 
+  previously.) Be sure to include the <code>.jar</code> extension in the JAR file 
+  name.</p>
+<h3>IV. Generate the HTML to launch the applet</h3>
+<p>Create the HTML page for the applet. You can do this manually or you can use 
+  the <code>HtmlConverter</code> that comes with the SDK. It is recommended that 
+  you use the <code>HtmlConverter</code>. But if you want to do it manually, see 
+  <a href="using_tags.html">Using <code>OBJECT</code>, <code>EMBED</code> and 
+  <code>APPLET</code> Tags in Java Plug-in</a> for information on how to do it. 
+  Note that the applet JAR file should go in the <code>archive</code> attribute.
+<p>Suppose your applet is called <code>JaiApplet</code>, the JAR file you created 
+  for it is called <code>JaiApplet.jar</code>, and the main class is <code>JaiApplet.class</code>. 
+<p>Assume the original applet looks like this:
+<blockquote>
+  <pre>&lt;html&gt;<br>&lt;head&gt;<br>&lt;title&gt;JaiApplet&lt;/title&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>&lt;APPLET code=&quot;JaiApplet.class&quot; archive=&quot;JaiApplet.jar&quot; align=&quot;absmiddle&quot; WIDTH=&quot;400&quot;HEIGHT=&quot;300&quot;&gt; &lt;/APPLET&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;</pre>
+</blockquote>
+<p>Then if we use the <code>HtmlConverter</code> to convert it for dynamic versioning, 
+  we will have this: 
+<blockquote>
+  <pre>&lt;html&gt;<br>&lt;head&gt;<br>&lt;title&gt;JaiApplet&lt;/title&gt;<br>&lt;/head&gt;<br>&lt;body&gt;<br>&lt;!--&quot;CONVERTED_APPLET&quot;--&gt;<br>&lt;!-- HTML CONVERTER --&gt;<br>&lt;OBJECT <br>    classid = &quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;<br>    codebase = &quot;http://java.sun.com/products/plugin/autodl/jinstall-1_4-windows-i586.cab#Version=1,4,0,0&quot;<br>    WIDTH = &quot;400&quot; HEIGHT = &quot;300&quot; ALIGN = &quot;absmiddle&quot; &gt;<br>    &lt;PARAM NAME = CODE VALUE = &quot;JaiApplet.class&quot; &gt;<br>    &lt;PARAM NAME = ARCHIVE VALUE = &quot;JaiApplet.jar&quot; &gt;<br>    &lt;PARAM NAME = &quot;type&quot; VALUE = &quot;application/x-java-applet;version=1.4&quot;&gt;<br>    &lt;PARAM NAME = &quot;scriptable&quot; VALUE = &quot;false&quot;&gt;<br>    &lt;COMMENT&gt;<br>	&lt;EMBED <br>            type = &quot;application/x-java-applet;version=1.4&quot; <br>            CODE = &quot;JaiApplet.class&quot;<br>            ARCHIVE = &quot;JaiApplet.jar&quot;<br>            WIDTH = &quot;400&quot;<br>            HEIGHT = &quot;300&quot;<br>            ALIGN = &quot;absmiddle&quot;  <br>	    scriptable = false <br>	    pluginspage = &quot;http://java.sun.com/products/plugin/index.html#download&quot;&gt;<br>	    &lt;NOEMBED&gt;           <br>            &lt;/NOEMBED&gt;<br>	&lt;/EMBED&gt;<br>    &lt;/COMMENT&gt;<br>&lt;/OBJECT&gt;<br>&lt;!--<br>&lt;APPLET CODE = &quot;JaiApplet.class&quot; ARCHIVE = &quot;JaiApplet.jar&quot; WIDTH = &quot;400&quot; HEIGHT = &quot;300&quot; ALIGN = &quot;absmiddle&quot;&gt;<br>&lt;/APPLET&gt;<br>--&gt;<br>&lt;!--&quot;END_CONVERTED_APPLET&quot;--&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;</pre>
+</blockquote>
+<p>When you run the applet Java Plug-in will display a Java Security Warning if 
+  the extension is not already installed, informing you the applet requires installation 
+  of extension <code>javax.media.jai</code> from <code>http://myserver.com/jai_win.jar</code>. 
+  If you grant permission to install the extension, the installer will install 
+  the JAR files in the <code>&lt;jre&gt;/lib/ext</code> directory. Once the installation 
+  is complete your applet will run.</p>
+<p>See <a href="extensions_example.html">Appendix 5: Complete Example&#151;Deploying 
+  Java Media Framework as Java Extension</a> for a complete, working example showing 
+  how to deploy the Java Media Framework as a Java Extension. </p>
+<h2><a name="limitations"></a>Known Limitations and Other Notes</h2>
+<ul>
+  <li>If an <code>Implementation-URL</code> JAR file is not signed properly, Java 
+    Plug-in will fail silently.</li>
+  <li>For any extension be sure that a newer version of the extension contains 
+    at least the same set of JAR file names as the older version. Otherwise, installing 
+    a newer extensions may not overwrite all the older extensions JARs, and there 
+    will be a mix of different versions of an extension in <code>&lt;jre&gt;/lib/ext</code>. 
+    The results will be unpredictable.&nbsp;</li>
+  <li>If Java Installer is used, make sure the program does not exit the <code>Main-class</code> 
+    until the installation is done. In some cases, Java Installer may create an 
+    AWT window and switch control to a different thread and return immediately 
+    from the <code>Main-class</code>. Returning control from the <code>Main-class</code> 
+    will force the applets to be loaded and started immediately, even if the Java 
+    Installer is still in the process of installation. This will cause the applet 
+    to fail to load because the extension is not installed yet.</li>
+</ul>
+<p>&nbsp;</p></body>
+</html>

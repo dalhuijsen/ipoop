@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Enhancements in java.lang and java.util.*</title>
+  </head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Enhancements in Packages java.lang.* and java.util.*</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+<blockquote>
+Version 1.3 of the Java 2 SDK includes the following enhancements:
+<blockquote>
+<a href=#math>Classes <tt>java.lang.Math</tt> and <tt>java.lang.StrictMath</tt></a><br>
+<a href=#timer>New Timer API</a><br>
+<a href=#collections>Enhanced Collections Framework</a><br>
+<a href=#hooks>Virtual Machine Shutdown Hooks</a><br>
+<a href=#caching>New URL JAR File Caching</a>
+</blockquote>
+<hr>
+
+<a name=math>
+<b>Classes <tt>java.lang.Math</tt> and <tt>java.lang.StrictMath</tt></b></a> 
+<blockquote>
+The Java 2 Platform now contains two clases which provide API for 
+performing general numeric operations.  
+<ul>
+   <li><tt><a href=../../api/java/lang/StrictMath.html>java.lang.StrictMath</a></tt> - Class <tt>java.lang.StrictMath</tt> has the same API as old class  
+<tt>java.lang.Math</tt>, which was present previous versions of the Java platform. 
+Unlike class <tt>Math</tt>, however, <tt>StrictMath</tt> is defined to 
+return bit-for-bit reproducible results in all implementations.
+   <li><tt><a href=../../api/java/lang/Math.html>java.lang.Math</a></tt> - 
+Class <tt>java.lang.Math</tt> provides the same set of API as does 
+class <tt>StrictMath</tt>. However, unlike some of the numeric functions of 
+class <tt>StrictMath</tt>, all implementations of the equivalent functions 
+of class <tt>Math</tt> are not defined to return the bit-for-bit same results, 
+but can vary within specified constraints. 
+This permits better-performing implementations where strict
+reproducibility is not required.
+</ul>
+</blockquote>
+<p>
+<a name=timer>
+<b>New Timer API</b></a> 
+<blockquote> 
+Two new classes have been added to the Java 2 Platform to provide 
+an API for a timer facility which can be used for purposes such as 
+animations, human interaction timeouts, on-screen clocks and calendars,
+work-scheduling routines, reminder facilities, and more.
+<ul>
+   <li><tt><a href=../../api/java/util/Timer.html>java.util.Timer</a></tt>
+   <li><tt><a href=../../api/java/util/TimerTask.html>java.util.TimerTask</a></tt>
+</ul>
+<tt><a href=Countdown.java>Countdown.java</a></tt> is a simple demo 
+application that uses the new Timer API.
+</blockquote>
+<p>
+<a name=collections>
+<b>Enhanced Collections Framework</b></a> 
+<blockquote>
+The Collections Framework has these new convenience APIs:
+<ul>
+<li><strong>Added <a
+href="../../api/java/util/Collections.html#singletonList(java.lang.Object)">java.util.Collections.singletonList</a> and <a
+href="../../api/java/util/Collections.html#singletonMap(java.lang.Object, java.lang.Object)">java.util.Collections.singletonMap</a>.</strong>
+Previously, there was a convenience implementation for singleton Set, but no
+corresponding implementation for List and Map.  Both of these
+implementations proved desirable in practice.
+<li><strong>Added <a
+href="../../api/java/util/Collections.html#EMPTY_MAP">java.util.Collections.EMPTY_MAP</a>.</strong>
+Previously, there were constant convenience implementations for the empty Set
+and List, but no corresponding implementation for Map.
+</ul>
+The following special-purpose implementation has also been added:
+<ul>
+<li>
+<strong>Added <a href="../../api/java/util/WeakHashMap.html#WeakHashMap(java.util.Map)">Map
+constuctor</a> for WeakHashMap</strong>.  The 
+<a href="../../api/java/util/Map.html">Map</a> interface dictates that most
+Map implementations should have a "copy constructor" that takes a Map
+argument.  WeakHashMap lacked such a constructor in the 1.2 release.
+
+</ul>
+</blockquote>
+<p>
+<a name=hooks>
+<b>Virtual Machine Shutdown Hooks</b></a>
+<blockquote>
+Sophisticated applications often require the ability to perform 
+specific actions when the virtual machine shuts down, whether due to 
+voluntary exit or involuntary termination.  Typical actions include 
+cleanly closing down network connections, saving session state, 
+and deleting temporary files.  Every major operating system provides 
+the means for native applications to do this, though of course the 
+details vary from platform to platform. Three methods have been 
+added to <tt>java.lang.Runtime</tt> to provide a simple and portable 
+interface to these facitilies. The new methods are:
+<ul>
+<li><tt><a href=../../api/java/lang/Runtime.html#addShutdownHook(java.lang.Thread)>addShutdownHook</a></tt>
+<li><tt><a href=../../api/java/lang/Runtime.html#removeShutdownHook(java.lang.Thread)>removeShutdownHook</a></tt>
+<li><tt><a href=../../api/java/lang/Runtime.html#halt(int)>halt</a></tt>
+</ul>
+In addition, the <tt><a href=../../api/java/lang/Runtime.html#exit(int)>Runtime.exit</a></tt> method has been revised.  For more information, see 
+<a href=hook-design.html><b>Design of the Shutdown Hooks API</b></a>.
+</blockquote>
+<p>
+<a name=caching>
+<b>New URL JAR File Caching</b></a>
+<blockquote> 
+The API of classes <tt>java.util.zip</tt> and <tt>java.util.jar</tt> 
+have been enhanced with the addition of the following:
+<ul>
+<li><tt><a href=../../api/java/util/zip/ZipFile.html#OPEN_READ>java.util.zip.OPEN_READ</a></tt>
+<li><tt><a href=../../api/java/util/zip/ZipFile.html#OPEN_DELETE>java.util.zip.OPEN_DELETE</a></tt>
+<li><tt><a href="../../api/java/util/zip/ZipFile.html#ZipFile(java.io.File, int)">java.util.zip.ZipFile(File file, int mode)</a></tt>
+<li><tt><a href="../../api/java/util/jar/JarFile.html#JarFile(java.io.File, boolean, int)">java.util.jar.JarFile(File file, boolean verify, int mode)</a></tt>
+</ul>
+The previous implementation of caching downloaded Jar files 
+created problems for long-running server application and for RMI. 
+Each open JarURLConnection creates a temporary local file that 
+holds Jar-file date, and a JarFile object is created on top of the 
+temporary file.  Because the open file handle/descriptor on 
+each temporary file was never closed, the files could quickly 
+take up disk space for long-running server applications.  The 
+new API provides a solution for this problem by supporting 
+a new "delete-on-close" mode for opening Zip and Jar files.
+</blockquote>
+
+</blockquote>
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <br>
+
+
+
+<FONT SIZE="-1">
+Please send comments to:
+<a href="mailto:jdk-comments@java.sun.com">jdk-comments@java.sun.com</a>
+</FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </body>
+</html>

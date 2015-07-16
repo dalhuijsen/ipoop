@@ -1,0 +1,257 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Mon Jan 27 15:23:01 2003" />
+    <title>Class Descriptors	</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="serialTOC.html" />
+    <link rel="Previous" href="input.html" />
+    <link rel="Next" href="version.html" />
+    <link rel="Index" href="examples.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="input.html">Previous</a> | 
+        <a accesskey="n" href="version.html">Next</a>
+       </td>
+	   <td align="right"><i>Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp60"> </a><h2 class="pNewHTMLPage">
+Class Descriptors	
+</h2>
+<hr class="pHr"/>
+<a name="wp64"> </a><h2 class="pChapNum">
+Chapter &#160; 4
+</h2>
+<a name="wp5103"> </a><h4 class="pHeading3">
+		Topics:
+</h4>
+<ul class="pBullet1"><a name="wp5107"> </a><div class="pBullet1"><li><a  href="class.html#wp5082">The ObjectStreamClass Class</a></li></div>
+<a name="wp5111"> </a><div class="pBullet1Plus"><li>Dynamic Proxy Class Descriptors</li></div>
+<a name="wp5487"> </a><div class="pBullet1Plus"><li>Serialized Form</li></div>
+<a name="wp5486"> </a><div class="pBullet1Plus"><li><a  href="class.html#wp3127">The ObjectStreamField Class</a></li></div>
+<a name="wp5115"> </a><div class="pBullet1Plus"><li>Inspecting Serializable Classes</li></div>
+<a name="wp5119"> </a><div class="pBullet1Last"><li><a  href="class.html#wp4100">Stream Unique Identifiers</a></li></div>
+</ul>
+<a name="wp5082"> </a><h2 class="pHeading1">
+	4.1	The ObjectStreamClass Class
+</h2>
+<a name="wp1052"> </a><p class="pBody">
+The <code class="cCode">ObjectStreamClass</code> provides information about classes that are saved in a Serialization stream. The descriptor provides the fully-qualified name of the class and its serialization version UID. A <code class="cCode">SerialVersionUID</code> identifies the unique original class version for which this class is capable of writing streams and from which it can read. 
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+package java.io;
+public class ObjectStreamClass
+{
+	public static ObjectStreamClass lookup(Class cl);
+	public String getName();    
+	public Class forClass();    
+	public ObjectStreamField[] getFields();    
+	public long getSerialVersionUID();    
+	public String toString();
+}<a name="wp3047"> </a>
+</pre></div>
+<a name="wp1066"> </a><p class="pBody">
+The <code class="cCode">lookup</code> method returns the <code class="cCode">ObjectStreamClass</code> descriptor for the specified class in the virtual machine. If the class has defined <code class="cCode">serialVersionUID</code> it is retrieved from the class. If the <code class="cCode">serialVersionUID</code> is not defined by the class, it is computed from the definition of the class in the virtual machine. <code class="cCode">I</code>f the specified class is not serializable or externalizable, <code class="cCode">null</code> is returned.
+</p>
+<a name="wp3132"> </a><p class="pBody">
+The <code class="cCode">getName</code> method returns the fully-qualified name of the class. The class name is saved in the stream and is used when the class must be loaded.
+</p>
+<a name="wp4501"> </a><p class="pBody">
+The <code class="cCode">forClass</code> method returns the <code class="cCode">Class</code> in the local virtual machine if one was found by <code class="cCode">ObjectInputStream.resolveClass</code> method. Otherwise, it returns <code class="cCode">null</code>.
+</p>
+<a name="wp3133"> </a><p class="pBody">
+The <code class="cCode">getFields</code> method returns an array of <code class="cCode">ObjectStreamField</code> objects that represent the serializable fields of this class.
+</p>
+<a name="wp5019"> </a><p class="pBody">
+The <code class="cCode">getSerialVersionUID</code> method returns the <code class="cCode">serialVersionUID</code> of this class.   Refer to <a  href="class.html#wp4100">Section&#160;4.6 &quot;Stream Unique Identifiers</a>.&#8221; If not specified by the class, the value returned is a hash computed from the class&#8217;s name, interfaces, methods, and fields using the Secure Hash Algorithm (SHA) as defined by the National Institute of Standards.
+</p>
+<a name="wp3157"> </a><p class="pBody">
+The <code class="cCode">toString</code> method returns a printable representation of the class descriptor including the name of the class and the <code class="cCode">serialVersionUID</code>.
+</p>
+<a name="wp5419"> </a><h2 class="pHeading1">
+	4.2	Dynamic Proxy Class Descriptors
+</h2>
+<a name="wp5420"> </a><p class="pBody">
+ObjectStreamClass descriptors are also used to provide information about dynamic proxy classes (e.g., classes obtained via calls to the getProxyClass method of java.lang.reflect.Proxy) saved in a serialization stream. A dynamic proxy class itself has no serializable fields and a serialVersionUID of 0L. In other words, when the Class object for a dynamic proxy class is passed to the static lookup method of ObjectStreamClass, the returned ObjectStreamClass instance will have the following properties:
+</p>
+<ul class="pBullet1"><a name="wp5422"> </a><div class="pBullet1"><li>Invoking its getSerialVersionUID method will return 0L.</li></div>
+<a name="wp5423"> </a><div class="pBullet1Plus"><li>Invoking its getFields method will return an array of length zero.</li></div>
+<a name="wp5424"> </a><div class="pBullet1Last"><li>Invoking its getField method with any String argument will return null.</li></div>
+</ul>
+<a name="wp5421"> </a><h2 class="pHeading1">
+	4.3	Serialized Form
+</h2>
+<a name="wp5425"> </a><p class="pBody">
+The serialized form of an ObjectStreamClass instance depends on whether or not the Class object it represents is serializable, externalizable, or a dynamic proxy class.
+</p>
+<a name="wp5018"> </a><p class="pBody">
+When an <code class="cCode">ObjectStreamClass</code> instance that does not represent a dynamic proxy class is written to the stream, it writes the class name and <code class="cCode">serialVersionUID</code>, flags, and the number of fields. Depending on the class, additional information may be written:
+</p>
+<ul class="pBullet1"><a name="wp5020"> </a><div class="pBullet1"><li>For non-serializable classes, the number of fields is always zero. Neither the serializable nor the externalizable flag bits are set.</li></div>
+<a name="wp5529"> </a><div class="pBullet1Plus"><li>For serializable classes, the serializable flag is set, the number of fields counts the number of serializable fields and is followed by a descriptor for each serializable field. The descriptors are written in canonical order. The descriptors for primitive typed fields are written first sorted by field name followed by descriptors for the object typed fields sorted by field name. The names are sorted using <code class="cCode">String.compareTo</code>.  For details of the format, refer to <a  href="protocol.html#wp10258">Section&#160;6.4 &quot;Grammar for the Stream Format</a>&#8221;.</li></div>
+<a name="wp5530"> </a><div class="pBullet1Last"><li>For externalizable classes, flags includes the externalizable flag, and the number of fields is always zero.</li></div>
+</ul>
+<a name="wp5426"> </a><p class="pBody">
+When an ObjectOutputStream serializes the ObjectStreamClass descriptor for a dynamic proxy class, as determined by passing its Class object to the isProxyClass method of java.lang.reflect.Proxy, it writes the number of interfaces that the dynamic proxy class implements, followed by the interface names. Interfaces are listed in the order that they are returned by invoking the getInterfaces method on the Class object of the dynamic proxy class.
+</p>
+<a name="wp5427"> </a><p class="pBody">
+The serialized representations of ObjectStreamClass descriptors for dynamic proxy classes and non-dynamic proxy classes are differentiated through the use of different typecodes (TC_PROXYCLASSDESC and TC_CLASSDESC, respectively); for a more detailed specification of the grammar, see <a  href="protocol.html#wp10258">Section&#160;6.4 &quot;Grammar for the Stream Format</a>&#8221;.
+</p>
+<a name="wp3127"> </a><h2 class="pHeading1">
+	4.4	The ObjectStreamField Class
+</h2>
+<a name="wp5024"> </a><p class="pBody">
+An <code class="cCode">ObjectStreamField</code> represents a serializable field of a serializable class. The serializable fields of a class can be retrieved from the <code class="cCode">ObjectStreamClass</code>. 
+</p>
+<a name="wp5257"> </a><p class="pBody">
+The special static serializable field, <code class="cCode">serialPersistentFields</code>, is an array of <code class="cCode">ObjectStreamField </code>components that is used to override the default serializable fields. 
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+package java.io;
+public class ObjectStreamField implements Comparable {    
+	public ObjectStreamField(String fieldName, Class fieldType);    
+	public ObjectStreamField(String fieldName, Class fieldType, 
+				boolean unshared);    
+	public String getName();    
+	public Class getType();    
+	public String getTypeString();    
+	public char getTypeCode();    
+	public boolean isPrimitive();    
+	public boolean isUnshared();    
+	public int getOffset();    
+	protected void setOffset(int offset);    
+	public int compareTo(Object obj);    
+	public String toString();
+}<a name="wp5555"> </a>
+</pre></div>
+<a name="wp5045"> </a><p class="pBody">
+<code class="cCode">ObjectStreamField</code> objects are used to specify the serializable fields of a class or to describe the fields present in a stream.  Its constructors accept arguments describing the field to represent: a string specifying the name of the field, a <code class="cCode">Class</code> object specifying the type of the field, and a <code class="cCode">boolean</code> flag (implicitly <code class="cCode">false</code> for the two-argument constructor) indicating whether or not values of the represented field should be read and written as &#8220;unshared&#8221; objects if default serialization/deserialization is in use (see the descriptions of the <code class="cCode">ObjectInputStream.readUnshared</code> and <code class="cCode">ObjectOutputStream.writeUnshared</code> methods in sections <a  href="input.html#wp961">1.1</a> and <a  href="output.html#wp933">1.1</a>, respectively).
+</p>
+<a name="wp5072"> </a><p class="pBody">
+The <code class="cCode">getName</code> method returns the name of the serializable field.
+</p>
+<a name="wp5073"> </a><p class="pBody">
+The <code class="cCode">getType</code> method returns the type of the field.
+</p>
+<a name="wp5572"> </a><p class="pBody">
+The <code class="cCode">getTypeString</code> method returns the type signature of the field.
+</p>
+<a name="wp5573"> </a><p class="pBody">
+The <code class="cCode">getTypeCode</code> method returns a character encoding of the field type (<code class="cCode">&#8216;B&#8217;</code> for <code class="cCode">byte</code>, <code class="cCode">&#8216;C&#8217;</code> for <code class="cCode">char</code>, <code class="cCode">&#8216;D&#8217;</code> for <code class="cCode">double</code>, <code class="cCode">&#8216;F&#8217;</code> for <code class="cCode">float</code>, <code class="cCode">&#8216;I&#8217;</code> for <code class="cCode">int</code>, <code class="cCode">&#8216;J&#8217;</code> for <code class="cCode">long</code>, <code class="cCode">&#8216;L&#8217;</code> for non-array object types, <code class="cCode">&#8216;S&#8217;</code> for <code class="cCode">short</code>, <code class="cCode">&#8216;Z&#8217;</code> for <code class="cCode">boolean</code>, and <code class="cCode">&#8216;[&#8216;</code> for arrays).
+</p>
+<a name="wp5574"> </a><p class="pBody">
+The <code class="cCode">isPrimitive</code> method returns <code class="cCode">true</code> if the field is of primitive type, or <code class="cCode">false</code> otherwise.
+</p>
+<a name="wp5575"> </a><p class="pBody">
+The <code class="cCode">isUnshared</code> method returns <code class="cCode">true</code> if values of the field should be written as &#8220;unshared&#8221; objects, or <code class="cCode">false</code> otherwise.
+</p>
+<a name="wp5576"> </a><p class="pBody">
+The <code class="cCode">getOffset</code> method returns the offset of the field&#8217;s value within instance data of the class defining the field.
+</p>
+<a name="wp5577"> </a><p class="pBody">
+The <code class="cCode">setOffset</code> method allows <code class="cCode">ObjectStreamField</code> subclasses to modify the offset value returned by the <code class="cCode">getOffset</code> method.
+</p>
+<a name="wp5578"> </a><p class="pBody">
+The <code class="cCode">compareTo</code> method compares <code class="cCode">ObjectStreamFields</code> for use in sorting.  Primitive fields are ranked as &#8220;smaller&#8221; than non-primitive fields; fields otherwise equal are ranked alphabetically.
+</p>
+<a name="wp5074"> </a><p class="pBody">
+The <code class="cCode">toString</code> method returns a printable representation with name and type.
+</p>
+<a name="wp5023"> </a><h2 class="pHeading1">
+	4.5	Inspecting Serializable Classes
+</h2>
+<a name="wp4103"> </a><p class="pBody">
+The program <code class="cCode">serialver</code> can be used to find out if a class is serializable and to get its <code class="cCode">serialVersionUID</code>. When invoked with the-show option, it puts up a simple user interface. To find out if a class is serializable and to find out its <code class="cCode">serialVersionUID</code><code class="cCode">,</code> enter its full class name, then press either the Enter or the Show button. The string printed can be copied and pasted into the evolved class.
+</p>
+<a name="wp7500"> </a><p class="pBody">
+<img src="images/classa.gif" alt="User interface described in the previous context" height="95" width="458" border="0" hspace="0" vspace="0"/>
+</p>
+<a name="wp4117"> </a><p class="pBody">
+When invoked on the command line with one or more class names, serialver prints the <code class="cCode">serialVersionUID</code> for each class in a form suitable for copying into an evolving class. When invoked with no arguments, it prints a usage line.
+</p>
+<a name="wp4100"> </a><h2 class="pHeading1">
+	4.6	Stream Unique Identifiers
+</h2>
+<a name="wp3128"> </a><p class="pBody">
+Each versioned class must identify the original class version for which it is capable of writing streams and from which it can read. For example, a versioned class must declare:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+    private static final long serialVersionUID = 3487495895819393L;<a name="wp3129"> </a>
+</pre></div>
+<a name="wp5432"> </a><p class="pBody">
+The stream-unique identifier is a 64-bit hash of the class name, interface class names, methoit is strongly recommended thatds, and fields. The value must be declared in all versions of a class except the first. It may be declared in the original class but is not required. The value is fixed for all compatible classes. If the SUID is not declared for a class, the value defaults to the hash for that class. <code class="cCode">Serializable</code> classes do not need to anticipate versioning; however, <code class="cCode">Externalizable</code> classes do. 
+</p>
+<hr class="pHr"/><div class="note">
+<a name="wp5440"> </a>
+<b>Note &#8211;</b>  It is strongly recommended that serializable classes that are inner classes or which contain inner classes declare the <em class="cEmphasis">serialVersionUID </em>data member. This is because different implementations of compilers could use different names for synthetic members that are generated for the implementation of inner classes, and these names are used in the current computation of SUIDs.
+<hr class="pHr"/></note>
+<a name="wp5441"> </a><p class="pBody">
+The initial version of an <code class="cCode">Externalizable</code> class must output a stream data format that is extensible in the future. The initial version of the method <code class="cCode">readExternal</code> has to be able to read the output format of all future versions of the method <code class="cCode">writeExternal</code>.
+</p>
+<a name="wp3169"> </a><p class="pBody">
+The <code class="cCode">serialVersionUID</code> is computed using the signature of a stream of bytes that reflect the class definition. The National Institute of Standards and Technology (NIST) Secure Hash Algorithm (SHA-1) is used to compute a signature for the stream. The first two 32-bit quantities are used to form a 64-bit hash. A <code class="cCode">java.lang.DataOutputStream</code> is used to convert primitive data types to a sequence of bytes. The values input to the stream are defined by the Java&#8482; Virtual Machine (VM) specification for classes.
+</p>
+<a name="wp5385"> </a><p class="pBody">
+The sequence of items in the stream is as follows:
+</p>
+<ol class="pList1"><a name="wp5315"> </a><div class="pList1"><li>The class name written using UTF encoding.</li></div>
+<a name="wp5316"> </a><div class="pList1Plus"><li>The class modifiers written as a 32-bit integer.</li></div>
+<a name="wp5317"> </a><div class="pList1Plus"><li>The name of each interface sorted by name written using UTF encoding.</li></div>
+<a name="wp5318"> </a><div class="pList1Plus"><li>For each field of the class sorted by field name (except private static and private transient fields):</li></div>
+<ol type="a" class="pList2"><a name="wp5319"> </a><div class="pList2"><li>The name of the field in UTF encoding.</li></div>
+<a name="wp5320"> </a><div class="pList2Plus"><li>The modifiers of the field written as a 32-bit integer.</li></div>
+<a name="wp5321"> </a><div class="pList2Plus"><li>The descriptor of the field in UTF encoding</li></div>
+</ol>
+<a name="wp5322"> </a><div class="pList1Plus"><li>If a class initializer exists, write out the following:</li></div>
+<ol type="a" class="pList2"><a name="wp5323"> </a><div class="pList2"><li>The name of the method, <code class="cCode">&lt;clinit&gt;</code>, in UTF encoding.</li></div>
+<a name="wp5324"> </a><div class="pList2Plus"><li>The modifier of the method, <code class="cCode">java.lang.reflect.Modifier.STATIC</code>,  written as a 32-bit integer.</li></div>
+<a name="wp5325"> </a><div class="pList2Plus"><li>The descriptor of the method, <code class="cCode">()V</code>, in UTF encoding.</li></div>
+</ol>
+<a name="wp5326"> </a><div class="pList1Plus"><li>For each non-private constructor sorted by method name and signature:</li></div>
+<ol type="a" class="pList2"><a name="wp5327"> </a><div class="pList2"><li>The name of the method, <code class="cCode">&lt;init&gt;</code>, in UTF encoding.</li></div>
+<a name="wp5328"> </a><div class="pList2Plus"><li>The modifiers of the method written as a 32-bit integer.</li></div>
+<a name="wp5329"> </a><div class="pList2Plus"><li>The descriptor of the method in UTF encoding.</li></div>
+</ol>
+<a name="wp5330"> </a><div class="pList1Plus"><li>For each non-private method sorted by method name and signature:</li></div>
+<ol type="a" class="pList2"><a name="wp5331"> </a><div class="pList2"><li>The name of the method in UTF encoding.</li></div>
+<a name="wp5332"> </a><div class="pList2Plus"><li>The modifiers of the method written as a 32-bit integer.</li></div>
+<a name="wp5333"> </a><div class="pList2Plus"><li>The descriptor of the method in UTF encoding.</li></div>
+</ol>
+<a name="wp5334"> </a><div class="pList1Plus"><li>The SHA-1 algorithm is executed on the stream of bytes produced by DataOutputStream and produces five 32-bit values sha[0..4].</li></div>
+<a name="wp5335"> </a><div class="pList1Plus"><li>The hash value is assembled from the first and second 32-bit values of the SHA-1 message digest.  If the result of the message digest, the five 32-bit words H0 H1 H2 H3 H4, is in an array of five int values named <code class="cCode">sha</code>, the hash value would be computed as follows:
+<p>
+<pre>
+<br />     	<code class="cCode">     long hash = ((sha[0] &gt;&gt;&gt; 24) &amp; 0xFF) |<br />             ((sha[0] &gt;&gt;&gt; 16) &amp; 0xFF) &lt;&lt; 8 |<br />             ((sha[0] &gt;&gt;&gt; 8) &amp; 0xFF) &lt;&lt; 16 |<br />             ((sha[0] &gt;&gt;&gt; 0) &amp; 0xFF) &lt;&lt; 24 |<br />             ((sha[1] &gt;&gt;&gt; 24) &amp; 0xFF) &lt;&lt; 32 |<br />             ((sha[1] &gt;&gt;&gt; 16) &amp; 0xFF) &lt;&lt; 40 |<br />             ((sha[1] &gt;&gt;&gt; 8) &amp; 0xFF) &lt;&lt; 48 |<br />             ((sha[1] &gt;&gt;&gt; 0) &amp; 0xFF) &lt;&lt; 56;<br /></code></li></div>
+</pre>
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="input.html">Previous</a> | 
+        <a accesskey="n" href="version.html">Next</a>
+       </td>
+        <td align="right">
+          <span class="copyright">Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification  </span>
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

@@ -1,0 +1,180 @@
+<html>
+  <head>
+    <title>SDK Tools Changes</title>
+  </head>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+
+<TD>
+<center>
+           <H1>Java<sup><font size="-2">TM</font></sup> 2 SDK v 1.4
+<br>Tools Changes</H1>
+</center>
+</TD>
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+   <font size="-1"><a href="tools.html">SDK Tools</a></font>
+</TD>
+</TR>
+</TABLE>
+<blockquote>
+This document describes some of the changes made to the tools in version 
+1.4 of the Java 2 SDK, Standard Edition.  For links to reference pages 
+for all the tools and utilities, see <a href=tools.html><b>SDK Tools</b></a>.
+
+<p>
+<h3>Tools changes in Java 2 SDK 1.4.1</h3>
+<ul>
+<P><LI>Three new <A HREF="tools.html#security"><B>security</B></A> 
+tools were added in the 1.4.1 release of 
+the Java 2 platform: <b><code>kinit</code></b>, <b><code>klist</code></b>, 
+and <b><code>ktab</code></b>. These tools help users obtain, 
+list and manage Kerberos tickets.
+
+<p><li>For changes to the <b>javac</b> bytecode compiler in 
+J2SE 1.4.1, see the <a href="http://java.sun.com/j2se/1.4.1/changes.html#compiler">online release notes</a>.
+
+<p><li>The <b>javadoc</b> tool has about 2 dozen bug fixes.
+For more details, see <a href=javadoc/whatsnew-1.4.1.html>What's 
+New in Javadoc 1.4.1</a>.
+<p>
+
+</ul>
+<p>
+
+<h3>Tools changes in Java 2 SDK 1.4.0</h3> 
+These changes have been brought forward to subsequent 
+releases in the Java 2 SDK 1.4 family.
+<ul>
+<p><li> The <b>java</b> application launcher supports 
+command-line options for the new Assertions Facility. 
+New option <tt>-Xconcgc</tt> is available for invoking 
+concurrent garbage collection on multi-processor platforms 
+to reduce garbage-collections pauses on large heaps. 
+On the Solaris<sup><font size="-2">TM</font></sup> Operating Environment 
+(SPARC<sup><font size="-2">TM</font></sup> Platform Edition) new 
+command-line options are available for specifying 64-bit or 
+32-bit operation. On all platforms, new option <tt>-Xloggc:<i>file</i></tt> 
+logs each garbage-collection event in the specified file.
+
+
+<p><li>The <b>javac</b> byte-code compiler has a new 
+<tt>-source</tt> option that enables support for compiling 
+source code containing assertions. Also, default compilation is
+for <CODE>-target 1.2</CODE>. Previously, the default was 1.1. The
+compiler now correctly detects unreachable empty statements, as
+discussed in bug <a href="http://developer.java.sun.com/developer/bugParade/bugs/4083890.html">4083890</a>. Javac also recognizes the new 
+<tt>-Xswitchcheck</tt> option that checks <tt>switch</tt> blocks for 
+fall-through cases and provides a warning message for any that are
+found.
+
+<p><li>The <b>javadoc</b> tool has several new tags, a dozen new
+options, smarter inheriting of doc comments, more control over 
+HTML output, improvements to the Doclet API, better error 
+messages, dozens of bug fixes, and is easier to run.
+For more details, see <a href=javadoc/whatsnew-1.4.html>What's 
+New in Javadoc 1.4.0</a>.
+<p>
+Downloaded separately from the SDK, the 
+<a href="http://java.sun.com/javadoc/mifdoclet/">MIF doclet</a>
+has had a major upgrade -- it generates API documentation 
+in FrameMaker and PDF format.
+
+
+
+
+
+<p><li> The <b>native2ascii</b> tool contains bug fixes to now correctly 
+process source files encoded with Unicode encoding, such as the default 
+encoding on WinNT.   More specifically, the conversion code correctly 
+processes line endings in encodings where a line-end is encoded as 
+2-bytes (Unicode being the most notable example). 
+(Fixes bugs 4191313 and 4218514)
+
+<p><li> The graphical <b>Policy Tool</b> utility has been enhanced
+to enable specifying a Principal field indicating what user is to be
+granted specified access control permissions.
+
+<p><li>The <a href="../guide/rmi-iiop/toJavaPortableUG.html"><b>idlj</b></a> tool has changed the default generated files and provides
+new command-line options.  By default, the <b>idlj</b> tool generates server-side
+bindings following the <em>Portable Servant Inheritance Model</em>.  New command-line
+options enable you to continue to generate backwards-compatible server-side bindings.  
+These changes were made to more closely align with the Object Management Group (OMG) 
+CORBA specifications.
+
+<p><li>The <a href="../guide/idl/orbd.html"><b>orbd</b></a> tool, which stands for <em>Object Request Broker Daemon</em>,
+ is new to this release.  ORBD is used instead of the Transient
+ Naming Service, <tt>tnameserv</tt>.  ORBD includes both a Transient Naming Service 
+ and a Persistent Naming Service.  The <B>orbd</B> tool is used to enable
+ clients to transparently locate and invoke persistent objects on servers in the 
+ CORBA environment. The <b>orbd</b> tool incorporates the functionality of a Server Manager, 
+ an Interoperable Naming Service, and a Bootstrap Name Server.  When used in conjunction
+  with the <tt>servertool</tt>, the Server Manager locates, registers, and activates
+   a server when a client wants to access the server. 
+
+ 
+ <p><li>The <a href="../guide/idl/servertool.html"><b>servertool</b></a> is new to this release.  The <b>servertool</b> provides 
+ an ease-of-use interface for application programmers to register, unregister, 
+ startup, and shutdown a server.  
+ 
+ <p><li>The <a href="../tooldocs/solaris/rmic.html"><b>rmic</b></a> compiler has a new option to enable Portable Object Adapter, or <em>POA</em> support for Remote Method Invocation.  The POA enables portability among vendor ORBs, among other uses.  To learn more about the <a href="../guide/idl/POA.html">POA</a>, follow the link.  To enable POA support with the <tt>rmic</tt> compiler, use the arguments <tt>rmic -iiop -poa</tt>.
+ 
+
+
+<p><li>There are minor bug fixes but no feature changes to other basic tools:
+<b>appletviewer</b>, <b>jar</b>, <b>jdb</b>, <b>javah</b>, <b>javap</b>, 
+<b>extcheck</b>, and <b>unregbean</b>.
+
+</ul>
+</blockquote>
+
+<HR SIZE=3 NOSHADE>
+
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+
+<TD>
+<FONT SIZE="-2">
+   <A HREF="../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT>
+   <br>
+   <br>
+
+   <FONT SIZE="-1">
+   <a href="/docs/forms/sendusmail.html">Feedback</a> 
+   </FONT>
+</TD>
+
+<TD ALIGN=RIGHT>
+   <IMG SRC="../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+
+</TR>
+</TABLE>
+<pre>
+
+
+
+
+
+
+
+
+
+</pre>
+  </body>
+</html>
+ 
+

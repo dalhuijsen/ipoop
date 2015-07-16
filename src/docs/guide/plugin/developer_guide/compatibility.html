@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>Appendix 4: Microsoft VM and Java 2 Applet Compatibility Issues</TITLE>
+<META content=en-us http-equiv=Content-Language>
+<META content="MSHTML 5.00.2314.1000" name=GENERATOR>
+<META content=FrontPage.Editor.Document name=ProgId></HEAD>
+<BODY bgcolor="#FFFFFF">
+<hr>
+<H1 align=left>Appendix 4: Microsoft VM and Java 2 Applet Compatibility Issues</H1>
+<HR>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <script src="menu_script.js" language="JavaScript"></script>
+  </select>
+</form>
+This appendix documents the known applet compatibility issues between the Microsoft 
+VM (Virtual Machine) and Sun's Java 2 VM. <BR>
+<h3><code>ClassFormatError</code></h3>
+<p>This problem is caused by bytecode generated from old JDK 1.0.2 or 1.1 compilers, 
+  which generate bytecode that does not conform to the Java VM Specification. 
+  Since the verifiers in recent J2SE releases are much stricter about bad class 
+  format, <code>ClassFormatError</code> is thrown by the VM when these bad class 
+  files are loaded.</p>
+<p>To allow some applets with bad class file format to run in Java 2, a bytecode 
+  transformer is put into the Java Plug-in to transform some of the bad class 
+  files to good ones. Currently only bad class files with the following <code>ClassFormatError</code> 
+  may be transformed:<BR>
+</p>
+<ul>
+  <li>Local variable name has bad constant pool index </li>
+  <li>Extra bytes at the end of the class file </li>
+  <li>Code segment has wrong length </li>
+  <li>Illegal field/method name </li>
+  <li>Illegal field/method modifiers </li>
+  <li>Invalid start_pc/length in local var table </li>
+</ul>
+<p>Unfortunately, the following <code>ClassFormatError</code> is not fixable by 
+  the bytecode transformer, so any class file that has any of these known problems 
+  will not run under Java 2:<BR>
+</p>
+<ul>
+  <li>Illegal use of nonvirtual function call </li>
+  <li>Arguments can't fit into locals </li>
+  <li>Unsorted lookup switch </li>
+  <li>Truncated class file<BR>
+  </li>
+</ul>
+<h3>Security exception with <code>sun.audio</code></h3>
+<p>The <code>sun.audio</code> package was accessible by applets in JDK 1.1. However, 
+  the applet sandbox was closed up in Java 2, so that applets that try to access 
+  any class libraries in the <code>sun.audio</code> package will result in a <code>SecurityException</code>.&nbsp;</p>
+<p>To provide maximum applet compatibility, the applet sandbox in Java Plug-in 
+  has been opened up to allow applets to access the <code>sun.audio</code> package 
+  again.
+</p>
+<h3><B>Unable to find resources from <code>AppletContext.getAudioClip()</code> 
+  and <code>AppletContext.getImage()</code></B> </h3>
+<p>The resource-lookup sequence in <code>AppletContext.getImage()</code> and <code>AppletContext.getAudioClip()</code> 
+  is different in the Microsoft and Sun implementations.&nbsp;<BR>
+  <BR>
+  In the Microsoft VM, resources are looked up in the following sequence:<BR>
+</p>
+<ol>
+  <li>Archives specified through HTML <code>archive</code> or <code>cabbase</code> 
+    parameters </li>
+  <li><code>codebase</code> URL </li>
+</ol>
+<p> In Sun's implementation, resources are looked up according to <code>codebase</code> 
+  URL.</p>
+<p> As a result, some applets that rely on the resources-lookup sequence in the 
+  Microsoft VM may not load resources properly in Java 2.&nbsp;</p>
+<p>To provide maximum applet compatibility, the resources-lookup sequence in Java 
+  Plug-in has been changed to the following:<BR>
+</p>
+<ol>
+  <li>Archives specified through HTML <code>archive</code> parameters </li>
+  <li><code>codebase</code> URL<BR>
+  </li>
+</ol>
+<h3><B><code>ClassLoader</code> sharing policy</B></h3>
+<p><code>ClassLoader</code> sharing policy is different in the Microsoft and Sun 
+  implementations.&nbsp;</p>
+<p>In the Microsoft VM, the <code>ClassLoader</code> object is shared between 
+  applets if and only if all of the following are true:<BR>
+</p>
+<ul>
+  <li><code>codebase</code> values are the same</li>
+  <li><code>archive</code> values are the same</li>
+  <li><code>cabbase</code> values are the same</li>
+</ul>
+<p>In Sun's implementation, a <code>ClassLoader</code> object is shared between 
+  applets if and only if:<BR>
+</p>
+<ul>
+  <li><code>codebase</code> values are the same </li>
+</ul>
+<p>Some applets relying on the <code>ClassLoader</code> sharing policy in the 
+  Microsoft VM may not run properly in Java 2 because of potential class definition 
+  conflicts.&nbsp;</p>
+<p>To provide maximum applet compatibility, the <code>ClassLoader</code> sharing 
+  policy in Java Plug-in has been changed to the following requirements:<BR>
+</p>
+<ul>
+  <li><code>codebase</code> values are the same and </li>
+  <li><code>cache_archive</code> values are the same and </li>
+  <li><code>java_archive</code> values are the same and </li>
+  <li><code>archive</code> values are the same<BR>
+  </li>
+</ul>
+<h3><B>Security model&#151;Java 2 Versus Microsoft</B> </h3>
+<p>Java 2 has a new security model providing much more capability and flexibility 
+  than JDK 1.1 provides. The Microsoft VM security model is based on JDK 1.1 and 
+  its own propriety technologies.&nbsp;</p>
+<p>This issue is not fixable, so applets that rely on the Microsoft's security 
+  model will not run properly in Java 2.<BR>
+</p>
+<h3><B>Applet packaging</B></h3>
+<p>Applet packaging in Java 2 and JDK 1.1 is through the <code>.jar</code> file. 
+  However, Microsoft's VM supports applet packaging through <code>.jar</code> 
+  file and its own propriety <code>.cab</code><I> </I>(cabinet) file.&nbsp;</p>
+<p>This issue is not fixable, so applets packaged in Microsoft's <code>.cab</code> 
+  file format will not load in Java 2.<BR>
+</p>
+<h3>Java language specification strictness (<code>null</code> versus zero-length 
+  <code>String</code>)</h3>
+<p>In JDK 1.1, the Java language specification was loose in dealing with <code>null</code> 
+  and zero-length strings in the class libraries. Some APIs may treat <code>null</code> 
+  as a zero-length <code>String</code>, while some other APIs may treat <code>null</code> 
+  as it is. In Java 2, the Java language specification has been tightened up to 
+  specify what the exact behavior should be.&nbsp;</p>
+<p>This issue is not fixable, so applets that rely on the APIs to treat <code>null</code> 
+  as a zero-length <code>String</code> may result in an exception in Java 2.<BR>
+</p>
+<h3>Applet signing&#151;RSA versus Authenticode</h3>
+<p>In Java 2, applet signing is supported through RSA and the <code>.jar</code> 
+  file, while Microsoft supports applet signing through its own proprietary Authenticode 
+  and <code>.cab</code> technologies.</p>
+<p>This issue is not fixable, so signed applets that rely on Microsoft's Authenticode 
+  and <code>.cab</code> technologies may not load properly in Java 2.<BR>
+</p>
+<h3>Implementation changes in AWT class libraries</h3>
+<p>In JDK 1.1, AWT class libraries were used by developers as thread-safe libraries; 
+  i.e., applets may perform lots of actions through the AWT in multiple threads 
+  and assume the class libraries will take care of synchronization issues. In 
+  Java 2, the AWT class libraries implementation has been changed to guarantee 
+  thread safety only when it is called by the AWT event-dispatch thread.&nbsp;</p>
+<p>This issue is not fixable, so applets in Java 2 that make calls to AWT class 
+  libraries without awareness of the thread-safety issue may result in deadlock 
+  or race conditions.<BR>
+</p>
+<h3>Java/JavaScript communication</h3>
+<p>In the Microsoft implementation, applet methods and properties exposed in JavaScript 
+  in an HTML page are exactly the same as the methods/fields of the applet object. 
+  In Java Plug-in, applet methods and properties exposed in JavaScript in HTML 
+  are obtained via JavaBeans Introspection, which analyzes methods and properties 
+  through naming convention in the applet object. The side effect is that applet 
+  fields are treated differently.</p>
+<p>This problem will be fixed in future release of Java Plug-in. In the meantime, 
+  JavaScript accessing fields in the applet object may not work properly in Java 
+  2.&nbsp;&nbsp;&nbsp;<BR>
+</p>
+<h3>Microsoft proprietary Java class libraries</h3>
+<p>Microsoft has provided lots of proprietary class libraries in its VM implementation, 
+  including J/Direct, AFC, WFC, etc.</p>
+<p>This issue is not fixable, so applets that rely on any of the Microsoft proprietary 
+  Java class libraries will not work properly in Java 2.<BR>
+</p>
+<h3>Whitespace characters in string returned from <code>Applet.getParameter()</code></h3>
+<p>In the Microsoft implementation, whitespace characters are stripped off before 
+  the string is returned to the applets in <code>Applet.getParameter()</code>. 
+  However, the Sun implementation returns the string as it is specified in the 
+  HTML parameters. As a result, some JDK 1.1 applets refuse to run in Java 2 because 
+  the applet's logic doesn't take the whitespace into account.</p>
+<p>To provide maximum applet compatibility, the implementation of <code>Applet.getParameter()</code> 
+  in Java Plug-in has been changed to strip off whitespace characters in the return 
+  value.<BR>
+</p>
+<h3>Design changes in <code>java.util.Hashtable.hashCode()</code>&nbsp;<B>&nbsp;&nbsp;&nbsp;</B></h3>
+<p>In JDK 1.1, <code>Hashtable.hashCode()</code> was implemented based on object 
+  identity, so that each <code>Hashtable</code> object returns&nbsp;its unique 
+  value when <code>hashCode()</code> is called. In Java 2, implementation of <code>Hashtable.hashCode()</code> 
+  was changed to be value-based as part of the Java Collection Framework. <code>Hashtable</code> 
+  object returns its hashcode value based on the objects it contains.&nbsp;&nbsp;</p>
+<p>This change breaks some JDK 1.1 applets if they add <code>Hashtable</code> 
+  object into itself, as this breaks the fundamental design of the Collection 
+  Framework and causes a <code>StackOverflowError</code>. It breaks the logic 
+  in the code of some applets that rely on <code>Hashtable.hashCode()</code><I> 
+  </I>to return a constant value from the same <code>Hashtable</code> object.</p>
+<p>To provide maximum applet compatibility, the implementation of <code>Hashtable.hashCode()</code> 
+  is changed to check for this special case and avoid stack overflow.<BR>
+</p>
+<h3>Accessing frame from applet</h3>
+<p>To track mouse events or for other reasons, an applet may sometimes try to 
+  access to its frame. In the Microsoft and Sun implementations, the number of 
+  containers between the frame and the applet is different.</p>
+<p>An applets that relies on the location of its frame being at a particular level 
+  of containment in the Microsoft VM (without navigating the entire AWT hierarchical 
+  component tree) is likely to fail in Java 2. The most common symptom is <code>ClassCastException</code> 
+  from the AWT Dispatch Event Thread.</p>
+<p>This issue is not fixable; thus an applets affected by this issue may not run 
+  properly in Java 2.<BR>
+</p>
+<h3><code>MAYSCRIPT</code></h3>
+<p>In Netscape Navigator and Java Plug-in, an applet accessing JavaScript is required 
+  to specify the <code>MAYSCRIPT</code><I> </I>parameter in the applet tag. However, 
+  the Microsoft implementation doesn't honor this parameter and allows applets 
+  to access JavaScript under all conditions. Since most Internet applets target 
+  the Microsoft VM, <code>MAYSCRIPT</code> is not specified in these applets.</p>
+<p>To provide maximum applet compatibility, the <code>MAYSCRIPT</code> check has 
+  been removed from Java Plug-in.<BR>
+</p>
+<h3>HTTP User-Agent</h3>
+<p>In the Microsoft and Sun implementations, different HTTP User-Agent strings 
+  are passed to the server when an HTTP connection is requested. Since most web 
+  sites target the Microsoft VM instead of Sun's, these web sites do not recognize 
+  Sun's HTTP User-Agent, and this may result in failure.</p>
+<p>As a result, HTTP User-Agent used in Java Plug-in has been changed to be similar 
+  to the one in the browser; thus most web servers will recognize requests made 
+  from applets running in Java Plug-in.<BR>
+</p>
+<h3>Events during applet startup and shutdown</h3>
+<p>In the Microsoft and Sun implementations, the events occurring during applet 
+  startup and shutdown may not be exactly the same. For example, the logic in 
+  the applet may rely on the applet being visible when <code>Applet.start()</code>/<code>Applet.stop()</code> 
+  is called, which may be true in Microsoft's implementation but not in Sun's.</p>
+<p>Applets that rely on specific events during applet startup or shutdown in Microsoft's 
+  VM may not function properly in Java 2. The most common symptom is <code>NullPointerException</code> 
+  from the AWT Dispatch Event Thread.</p>
+<p>This issue is not fixable. <BR>
+  <BR>
+</p>
+<h3>Java class libraries compatibility&nbsp;</h3>
+<p>There are lots of changes in the Java class libraries in Java 2. Some APIs 
+  are clarified, some are depreciated, and some other have been altered in implementation. 
+  These following have caused some of the applets run in Microsoft's VM to fail 
+  in Java 2:<BR>
+</p>
+<h4><code>java.awt.Graphics.drawString()</code></h4>
+<blockquote>
+  <p><code>drawString()</code> treats <code>null</code> as an empty string in 
+    the Microsoft VM. In Java 2, <code>drawString()</code> treats <code>null</code> 
+    as it is and throws <code>NullPointerException</code>.</p>
+</blockquote>
+<h4><code>java.awt.Graphics.drawImage()</code></h4>
+<blockquote>
+  <p><code>drawImage()</code> ignores<code> null</code> image in the Microsoft 
+    VM. In Java 2, <code>drawImage()</code> treats <code>null</code> as it is 
+    and throws <code>NullPointerException</code>.</p>
+</blockquote>
+<h4><code>java.awt.Color</code><I> </I>constructors</h4>
+<blockquote>
+  <p>In the Microsoft VM, passing over-bound/under-bound values in the <code>Color</code> 
+    constructor will cause the VM to print out a warning message in the console, 
+    but the values will be reset to max/min automatically. In Java 2, <code>Color</code> 
+    constructor checks for illegal values and throws <code>IllegalArgumentException</code>.</p>
+</blockquote>
+<h4><code>Thread.stop()</code>, <code>Thread.suspend()</code>, <code>Thread.resume()</code></h4>
+<blockquote>
+  <p>In the Microsoft VM, stopping, suspending, or resuming a dead thread will 
+    cause the call to be ignored. In Java 2, calling these methods on a dead thread 
+    will result in <code>AccessControlException</code>.</p>
+  <p>All of these issues are fixable but have not yet been fixed. At this time, 
+    applets affected by these issues will result in exceptions and may not run 
+    properly in Java 2. </p>
+</blockquote>
+</BODY></HTML>

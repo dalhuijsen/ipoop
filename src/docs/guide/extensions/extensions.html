@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Optional Package Overview</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=
+88>
+</TD>
+
+<TD>
+<center>
+           <H1>Optional Packages - An Overview</h1>
+</center>
+</TD>
+
+
+</TR>
+
+</TABLE>
+
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#what">What an optional package is</a>
+<li><a href="#installed">Installed optional packages</a>
+<li><a href="#download">Download optional packages</a>
+</ul>
+
+<a name="what"></a>
+<h2>What an optional package is</h2>
+<em>Note:</em> Optional packages were formerly known as <i>standard 
+extensions</i> or just <i>extensions</i>.
+<p>
+Optional packages are packages of Java classes and associated native 
+code that application developers can use to extend the functionality 
+of the core platform. The extension mechanism allows the Java virtual 
+machine (VM) to use the optional-package classes in much the same way as the 
+VM uses bootstrap classes. (Bootstrap classes are those implementing 
+the core platform, contained in <tt>jre/lib/rt.jar</tt> and 
+several other important jar files. These include classes of the public API such 
+as <tt>java.lang</tt>, <tt>java.io</tt>, etc., and classes supporting 
+the platform's internationalization/localization features.). Like 
+bootstrap classes, classes in optional packages do 
+not have to be placed on the class path. The extension mechanism also 
+provides a way for needed optional packages to be retrieved from specified 
+URLs when they are not already installed in the Java 2 Runtime Environment 
+or Java 2 SDK.
+<p>
+Optional packages are embodied in <a href="../jar/jarGuide.html">
+JAR</a> files, and every JAR file is a potential optional package. A JAR 
+file can be made to play the role of an optional package in two ways:
+
+<ul>
+<li>by being placed in a special location in the Java 2 Runtime Environment 
+or Java 2 SDK directory 
+structure - in 
+which case it is an <a href="#installed"><em>installed</em> optional package</a>.
+<li>by being referenced in a specified way from the manifest of the 
+JAR file of an applet or application - in which case it is a 
+<a href="#download"><em>download</em> optional package</a>.
+</ul>
+When the VM is searching for a class of a particular name, it will first 
+look among the bootstrap classes. If it fails to find the 
+desired class there, it will next look for the class among any installed 
+optional packages. If it doesn't find the class among either the bootstrap classes 
+or the installed optional packages, the VM will search among any download 
+optional packages referenced by the application or applet. The VM only searches 
+the class path if it fails to find a class among the bootstrap classes or 
+optional package classes.
+
+<a name="installed"></a>
+<h2>Installed optional packages</h2>
+Installed optional packages are JAR files in the directory 
+<blockquote><pre>
+lib/ext       [in the Java 2 Runtime Environment]
+jre/lib/ext   [in the Java 2 SDK]
+</pre></blockquote>
+Classes within JAR files in this directory can be used by applets 
+and applications much as if they were part of the set of bootstrap 
+classes, without having to explicitly include them in the class path.
+<p>
+An installed optional package's native code binaries, if any, are placed in 
+<blockquote><pre>
+jre\bin         [Microsoft Windows]
+jre/lib/&lt;arch&gt;  [Solaris operating environment]
+</pre></blockquote>
+where <code>&lt;arch&gt;</code> is the Solaris processor architecture, 
+either <code>sparc</code> or <code>i386</code>. Native libraries may 
+also be placed in <tt>jre/lib/ext/&lt;arch&gt;</tt> for both Microsoft Windows
+and the Solaris operating environment, 
+where <tt>&lt;arch&gt;</tt> will be <tt>i386</tt> on Microsoft Windows 
+systems.  The <tt>jre/lib/ext/&lt;arch&gt;</tt> directory is 
+searched <em>after</em> <tt>jre\bin</tt> or 
+<tt>jre/lib/&lt;arch&gt;</tt>.
+<p>
+When the Java VM 
+encounters a class name, it looks first for the class in the 
+runtime environment. If it fails to find the desired class among 
+the classes that are part of the standard runtime environment, the VM
+will search for the class in any JAR files in the optional packages 
+directory.
+<p>
+Note that there is nothing special about any particular JAR file  
+itself or the classes it contains that makes it an installed optional package. 
+It is an installed optional package by virtue of its location in 
+<code>jre/lib/ext</code>.
+<p>
+The manifest of an installed optional package's JAR file should contain 
+version and vendor information for use by applets that need 
+to use the optional packages classes.  The attributes that specify the 
+version and vendor information are described in 
+<a href=versioning.html><b>Optional Package Versioning</b></a>. Here is 
+an example of what such a manifest might look like:
+<blockquote><pre>
+Manifest-version: 1.0 
+Extension-Name: javax.extension
+Specification-Version: 1.0
+Specification Vendor: Sun Microsystems, Inc.
+Implementation-Vendor: Sun Microsystems, Inc.
+Implementation-Vendor-Id: com.sun
+Sealed: true 
+</pre></blockquote>
+This version and vendor information can be used by the 
+Java Plug-in when running an applet to see if optional packages 
+needed by the applet are installed, are up to date, and 
+are from the vendor requested by the applet. If not, 
+the Java Plug-in can prompt the applet user to download the 
+proper optional package.  See <a href=versioning.html><b>Optional Package 
+Versioning</b></a> for more information.
+<p>
+If a class is not found after searching both the system classes and 
+the classes in the installed optional packages, the extension mechanism will 
+search for the class in a download optional package....
+
+<a name="download"></a>
+<h2>Download optional packages</h2>
+A download optional package is a JAR files that is specified in the 
+<tt>Class-Path</tt> header field in the 
+manifest of another JAR files. Classes in download optional packages may 
+be used by classes in the referencing JAR file. In a typical situation, 
+an applet will be bundled in a JAR file whose manifest  
+references a JAR file (or several JAR files) that will serve as an 
+optional package for the purposes of that applet. Optional packages may reference 
+each other in the same way.
+<p>
+A <tt>Class-Path</tt> header might look like this, for example:
+<blockquote><pre>
+Class-Path: servlet.jar infobus.jar acme/beans.jar
+</pre></blockquote>
+This specifies that the classes in the files <code>servlet.jar</code>, 
+<code>infobus.jar</code>, and <code>acme/beans.jar</code> will serve 
+as optional pakcages for purposes of the classes in the JAR file whose manifest 
+contains this header. The URLs 
+in the Class-Path field are given relative to the URL of the 
+JAR file of the applet or application.
+<p>
+Unlike the case of installed optional packages, the location of the 
+JAR files 
+that serve as download optional packages is irrelevent. A download optional package 
+is an optional package because it is specified as the value of the 
+<tt>Class-Path</tt> header in another JAR file's manifest, <em>not</em> because it 
+has any particular location.
+<p>
+Another difference between installed and download optional packages is that 
+only applets and applications bundled in a JAR file can make use of download 
+optional packages. Applets and applications not bundled in a JAR file don't 
+have a manifest from which to reference download optional packages.
+<p>
+When searching for a class, the VM first searches among the classes 
+in the system classes and in any installed optional packages. If the class is 
+not found in either the system classes or in the installed optional packages, 
+the VM will search for the class in any download optional packages referenced 
+by the manifest of the application or applet. 
+A download optional package will not be downloaded if a desired class is found 
+among the installed optional packages, even if the download optional package is 
+referenced by the manifest file of the applet or application. 
+<p>
+The extension mechanism will not install a download optional package 
+in the Java 2 Runtime Environment or Java 2 SDK directory structure. 
+Download optional packages <em>do not</em> become installed extentions after 
+they have once been downloaded.
+<p>
+Unlike installed optional packages, download optional packages cannot have any native 
+code.
+<p>
+
+
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+
+<TD>
+<FONT SIZE="-2">
+Copyright &#169; 1997, 1998
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT>
+</TD>
+
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30
+>
+   <BR>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+
+</TR>
+</TABLE>
+
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </body>
+</html>

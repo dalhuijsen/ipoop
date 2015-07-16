@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 5 - Server Interfaces
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-server24.html">PREV</a>
+ | <a href="rmi-server26.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<h2><a name="179"><i>	5.4	</i> The <code>Unreferenced</code> Interface
+</a></h2>
+
+<blockquote><pre>package java.rmi.server;
+
+public interface Unreferenced {
+	public void unreferenced();
+}
+
+
+</pre></blockquote><blockquote>
+<a name="1584"><!-- --></a>
+The <code>java.rmi.server.Unreferenced</code> interface allows a server object to receive notification that there are no clients holding remote references to it. The distributed garbage collection mechanism maintains for each remote object, the set of client virtual machines that hold references to that remote object. As long as some client holds a remote reference to the remote object, the RMI runtime keeps a local reference to the remote object. Each time the remote object&#39;s &#34;reference&#34; set becomes empty (meaning that the number of clients that reference the object becomes zero), the <code>Unreferenced.unreferenced</code> method is invoked (if that remote object implements the <code>Unreferenced</code> interface). A remote object is <em>not</em> required to support the <code>Unreferenced</code> interface.<p>
+<a name="1593"><!-- --></a>
+As long as some local reference to the remote object exists, it may be passed in remote calls or returned to clients. The process that receives the reference is added to the reference set for the remote object. When the reference set becomes empty, the remote object&#39;s <code>unreferenced</code> method will be invoked. As such, the <code>unreferenced</code> method can be called more than once (each time the set is newly emptied). Remote objects are only collected when no more references, either local references or those held by clients, still exist.<p>
+</blockquote>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-server24.html">PREV</a>
+ | <a href="rmi-server26.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Security Architecture:  - 
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href=security-specTOC.fm.html>CONTENTS</a> | <a href=security-specTOC.fm.html>PREV</a>
+ | <a href="security-spec.doc1.html">NEXT</a> <!-- | <a href="security-spec.doc.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java Security Architecture</i></td>
+</tr></table>
+<br>
+ 
+<H2>
+
+Table of Contents</a>
+</H2>
+
+<dl>
+<dt></dt>
+<dd><br>
+<a href="security-spec.doc1.html">
+<b><font size="+2">
+1  
+<a href="security-spec.doc1.html#21150">Introduction</a></font></b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b>1.1  
+<a href="security-spec.doc1.html#18313">The Original Sandbox Model</a>
+</b>
+<dd>
+<b>1.2  
+<a href="security-spec.doc1.html#18314">Evolving the Sandbox Model</a>
+</b>
+</dl>
+<dd><br>
+<a href="security-spec.doc2.html">
+<b><font size="+2">
+2  
+<a href="security-spec.doc2.html#19853">New Protection Mechanisms -- Overview of Basic Concepts</a></font></b>
+
+<dd><br>
+<a href="security-spec.doc3.html">
+<b><font size="+2">
+3  
+<a href="security-spec.doc3.html#19802">Permissions and Security Policy</a></font></b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b>3.1  
+<a href="security-spec.doc3.html#17001">The Permission Classes</a>
+</b>
+
+<dl>
+<dt></dt>
+<dd>
+<b>3.1.1  
+<a href="security-spec.doc3.html#19902">java.security.Permission</a>
+</b>
+
+<dd>
+<b>3.1.2  
+<a href="security-spec.doc3.html#19905">java.security.PermissionCollection</a>
+</b>
+
+<dd>
+<b>3.1.3  
+<a href="security-spec.doc3.html#19911">java.security.Permissions</a>
+</b>
+
+<dd>
+<b>3.1.4  
+<a href="security-spec.doc3.html#22515">java.security.UnresolvedPermission</a>
+</b>
+
+<dd>
+<b>3.1.5  
+<a href="security-spec.doc3.html#19913">java.io.FilePermission</a>
+</b>
+
+<dd>
+<b>3.1.6  
+<a href="security-spec.doc3.html#19915">java.net.SocketPermission</a>
+</b>
+
+<dd>
+<b>3.1.7  
+<a href="security-spec.doc3.html#20057">java.security.BasicPermission</a>
+</b>
+
+<dd>
+<b>3.1.8  
+<a href="security-spec.doc3.html#20107">java.util.PropertyPermission</a>
+</b>
+
+<dd>
+<b>3.1.9  
+<a href="security-spec.doc3.html#20113">java.lang.RuntimePermission</a>
+</b>
+
+<dd>
+<b>3.1.10  
+<a href="security-spec.doc3.html#20327">java.awt.AWTPermission</a>
+</b>
+
+<dd>
+<b>3.1.11  
+<a href="security-spec.doc3.html#20353">java.net.NetPermission</a>
+</b>
+
+<dd>
+<b>3.1.12  
+<a href="security-spec.doc3.html#26158">java.lang.reflect.ReflectPermission</a>
+</b>
+
+<dd>
+<b>3.1.13  
+<a href="security-spec.doc3.html#26159">java.io.SerializablePermission</a>
+</b>
+
+<dd>
+<b>3.1.14  
+<a href="security-spec.doc3.html#26196">java.security.SecurityPermission</a>
+</b>
+
+<dd>
+<b>3.1.15  
+<a href="security-spec.doc3.html#26221">java.security.AllPermission</a>
+</b>
+
+<dd>
+<b>3.1.16  
+<a href="security-spec.doc3.html#AuthPermission">javax.security.auth.AuthPermission</a>
+</b>
+
+<dd>
+<b>3.1.17  
+<a href="security-spec.doc3.html#22640">Discussion of Permission Implications</a>
+</b>
+
+<dd>
+<b>3.1.18  
+<a href="security-spec.doc3.html#20211">How To Create New Types of Permissions</a>
+</b>
+
+</dl>
+<dd>
+<b>3.2  
+<a href="security-spec.doc3.html#25999">java.security.CodeSource</a>
+</b>
+<dd>
+<b>3.3  
+<a href="security-spec.doc3.html#20128">java.security.Policy</a>
+</b>
+
+<dl>
+<dt></dt>
+<dd>
+<b>3.3.1  
+<a href="security-spec.doc3.html#20131">Policy File Format</a>
+</b>
+
+<dd>
+<b>3.3.2  
+<a href="security-spec.doc3.html#25970">Property Expansion in Policy Files</a>
+</b>
+
+<dd>
+<b>3.3.3  
+<a href="security-spec.doc3.html#20265">General Expansion in Policy Files</a>
+</b>
+
+<dd>
+<b>3.3.4  
+<a href="security-spec.doc3.html#20264">Assigning Permissions</a>
+</b>
+
+<dd>
+<b>3.3.5  
+<a href="security-spec.doc3.html#23883">Default System and User Policy Files</a>
+</b>
+
+<dd>
+<b>3.3.6  
+<a href="security-spec.doc3.html#27428">Customizing Policy Evaluation</a>
+</b>
+
+</dl>
+<dd>
+<b>3.4  
+<a href="security-spec.doc3.html#28292">java.security.GeneralSecurityException</a>
+</b>
+</dl>
+<dd><br>
+<a href="security-spec.doc4.html">
+<b><font size="+2">
+4  
+<a href="security-spec.doc4.html#20389">Access Control Mechanisms and Algorithms</a></font></b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b>4.1  
+<a href="security-spec.doc4.html#21491">java.security.ProtectionDomain</a>
+</b>
+<dd>
+<b>4.2  
+<a href="security-spec.doc4.html#17119">java.security.AccessController</a>
+</b>
+
+<dl>
+<dt></dt>
+<dd>
+<b>4.2.1  
+<a href="security-spec.doc4.html#24646">Algorithm for Checking Permissions</a>
+</b>
+
+<dd>
+<b>4.2.2  
+<a href="security-spec.doc4.html#20573">Handling Privileges</a>
+</b>
+
+</dl>
+<dd>
+<b>4.3  
+<a href="security-spec.doc4.html#21495">Inheritence of Access Control Context</a>
+</b>
+<dd>
+<b>4.4  
+<a href="security-spec.doc4.html#22405">java.security.AccessControlContext</a>
+</b>
+</dl>
+<dd><br>
+<a href="security-spec.doc5.html">
+<b><font size="+2">
+5  
+<a href="security-spec.doc5.html#20588">Secure Class Loading</a></font></b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b>5.1  
+<a href="security-spec.doc5.html#28488">Class Loader Class Hierarchies</a>
+</b>
+<dd>
+<b>5.2  
+<a href="security-spec.doc5.html#28414">The Primordial Class Loader</a>
+</b>
+<dd>
+<b>5.3  
+<a href="security-spec.doc5.html#28657">Class Loader Delegation</a>
+</b>
+<dd>
+<b>5.4  
+<a href="security-spec.doc5.html#28633">Class Resolution Algorithm</a>
+</b>
+</dl>
+<dd><br>
+<a href="security-spec.doc6.html">
+<b><font size="+2">
+6  
+<a href="security-spec.doc6.html#19349">Security Management</a></font></b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b>6.1  
+<a href="security-spec.doc6.html#28400">Managing Applets and Applications</a>
+</b>
+<dd>
+<b>6.2  
+<a href="security-spec.doc6.html#28195">SecurityManager versus AccessController</a>
+</b>
+<dd>
+<b>6.3  
+<a href="security-spec.doc6.html#18540">Auxiliary Tools</a>
+</b>
+
+<dl>
+<dt></dt>
+<dd>
+<b>6.3.1  
+<a href="security-spec.doc6.html#27533">The Key and Certificate Management Tool</a>
+</b>
+
+<dd>
+<b>6.3.2  
+<a href="security-spec.doc6.html#21952">PolicyTool</a>
+</b>
+
+<dd>
+<b>6.3.3  
+<a href="security-spec.doc6.html#21611">The JAR Signing and Verification Tool</a>
+</b>
+
+</dl>
+</dl>
+<dd><br>
+<a href="security-spec.doc7.html">
+<b><font size="+2">
+7  
+<a href="security-spec.doc7.html#28311">GuardedObject and SignedObject</a></font></b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b>7.1  
+<a href="security-spec.doc7.html#28312">java.security.GuardedObject and java.security.Guard</a>
+</b>
+<dd>
+<b>7.2  
+<a href="security-spec.doc7.html#28356">java.security.SignedObject</a>
+</b>
+</dl>
+<dd><br>
+<a href="security-spec.doc8.html">
+<b><font size="+2">
+8  
+<a href="security-spec.doc8.html#21605">Discussion and Future Directions</a></font></b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b>8.1  
+<a href="security-spec.doc8.html#20670">Resource Consumption Management</a>
+</b>
+<dd>
+<b>8.2  
+<a href="security-spec.doc8.html#28250">Arbitrary Grouping of Permissions</a>
+</b>
+<dd>
+<b>8.3  
+<a href="security-spec.doc8.html#28253">Object-Level Protection</a>
+</b>
+<dd>
+<b>8.4  
+<a href="security-spec.doc8.html#28269">Subdividing Protection Domains</a>
+</b>
+<dd>
+<b>8.5  
+<a href="security-spec.doc8.html#28211">Running Applets with Signed Content</a>
+</b>
+</dl>
+<dd><br>
+<a href="security-spec.doc9.html">
+<b><font size="+2">
+9  
+<a href="security-spec.doc9.html#21417">Summary</a></font></b>
+
+<dd><br>
+<a href="security-spec.doc10.html">
+<b><font size="+2">
+10  
+<a href="security-spec.doc10.html#22214">Acknowledgments</a></font></b>
+
+<dd><br>
+<a href="security-spec.doc11.html">
+<b><font size="+2">
+11  
+<a href="security-spec.doc11.html#18136">References</a></font></b>
+
+<dd><br>
+<a href="security-spec.doc12.html">
+<b><font size="+2">
+12  
+<a href="security-spec.doc12.html#18723">Revision History</a></font></b>
+
+</dl>
+
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href=security-specTOC.fm.html>CONTENTS</a> | <a href=security-specTOC.fm.html>PREV</a>
+ | <a href="security-spec.doc1.html">NEXT</a> <!-- | <a href="security-spec.doc.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 1997-2002 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+<HTML>
+<HEAD>
+  <TITLE></TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="jndi.9.html">PREV</A>
+    | <A HREF="appendix-ldap-example.html">NEXT</A></TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<P CLASS="AppendixStart"><FONT COLOR="#707070">Appendix 1:<BR>
+</FONT><B><FONT SIZE="+3">JNDI Standard Environment Properties</FONT></B></P>
+
+<H6 CLASS="Body"><A NAME="pgfId=999392"></A>&nbsp;</H6>
+
+<P><TABLE summary="layout" BORDER="1" CELLSPACING="2" CELLPADDING="0">
+  <CAPTION ALIGN="TOP"><P CLASS="TableTitle"><A NAME="pgfId=999116"></A><B><FONT SIZE="+1">JNDI
+Environment Properties</FONT></B><A HREF="#pgfId=999608" CLASS="footnote">
+1</A></CAPTION>
+   
+  <TR>
+    <TD COLSPAN="2">
+    <H4 CLASS="CellTitle"></A>Environment Configuration</H4>
+</TD>
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><CODE>java.naming.applet</CODE>
+    <P CLASS="CellName">(<CODE>Context.APPLET</CODE>)
+    <TD>
+    <P CLASS="CellBody">An instance of <CODE>java.applet.Applet</CODE>
+     whose applet parameters are used to obtain some environment properties.
+     <br>
+     See Chapter 6 for details.  No default.  
+     </TD>
+  </TR>
+  
+    <TD COLSPAN="2">
+    <H4 CLASS="CellTitle"><A NAME="pgfId=999403"></A>Program Configuration<A
+    HREF="#pgfId=999680" CLASS="footnote"> 2</A></H4>
+</TD>
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999407"></A><CODE>java.naming.factory.initial</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999578"></A>(<CODE>Context.INITIAL_CONTEXT_FACTORY</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999409"></A>Class name of
+    initial context factory to use.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999456"></A>See <CODE>InitialContext</CODE>
+    .</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999739"></A>No default.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999412"></A><CODE>java.naming.factory.object</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999579"></A>(<CODE>Context.OBJECT_FACTORIES</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999415"></A>Colon-separated
+    list of class names of object factory classes to use.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999454"></A>See <CODE>NamingManager.getObjectInstance()</CODE>
+    and <CODE>DirectoryManager.getObjectInstance()</CODE> .</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999729"></A>Defaults to empty
+    list.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999615"></A><CODE>java.naming.factory.state</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999616"></A>(<CODE>Context.STATE_FACTORIES</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999618"></A>Colon-separated
+    list of class names of state factory classes to use.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999731"></A>See <CODE>NamingManager.getStateToBind()</CODE>
+    and <CODE>DirectoryManager.getStateToBind()</CODE> .</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999734"></A>Defaults to empty
+    list.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999632"></A><CODE>java.naming.factory.control</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999633"></A>(<CODE>LdapContext.CONTROL_FACTORIES</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999635"></A>Colon-separated
+    list of class names of response control factory classes to use.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999637"></A>See <CODE>ControlFactory.getControlInstance()</CODE>
+    .</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999737"></A>Defaults to empty
+    list.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999440"></A><CODE>java.naming.factory.url.pkgs</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999580"></A>(<CODE>Context.URL_PKG_PREFIXES</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999442"></A>Colon-separated
+    list of package prefixes to use when loading in URL context factories.
+    <CODE>com.sun.jndi.url</CODE> is always added to end of list.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999455"></A>See <CODE>NamingManager.getURLContext()</CODE>
+    .</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999738"></A>Defaults to empty
+    list.</TD> 
+  </TR>
+  <TR>
+    <TD COLSPAN="2">
+    <H4 CLASS="CellTitle"><BR>
+    <A NAME="pgfId=999124"></A>Access Configuration<A HREF="#pgfId=999686"
+    CLASS="footnote"> 3</A></H4>
+</TD>
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999128"></A><CODE>java.naming.provider.url</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999581"></A>(<CODE>Context.PROVIDER_URL</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999166"></A>Specifies configuration
+    information for provider to use.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999167"></A>Defaults to provider
+    default, using provider's own configuration or discovery protocols.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999132"></A><CODE>java.naming.dns.url</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999582"></A>(<CODE>Context.DNS_URL</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999186"></A>Specifies the
+    DNS host and domain names.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999740"></A>No default.</TD> 
+  </TR>
+  <TR>
+    <TD COLSPAN="2">
+    <H4 CLASS="CellTitle"><BR>
+    <A NAME="pgfId=999140"></A>Service-Related</H4>
+</TD>
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999144"></A><CODE>java.naming.authoritative</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999583"></A>(<CODE>Context.AUTHORITATIVE</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999200"></A>Specifies the
+    authoritativeness of the service requested. If &quot;<CODE>true</CODE>&quot;,
+    specifies most authoritative source is to be used (e.g., bypass
+    any caches, or bypass replicas in some systems). Otherwise, source
+    need not be (but can be) authoritative.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999225"></A>Defaults to &quot;<CODE>false</CODE>&quot;.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999148"></A><CODE>java.naming.batchsize</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999584"></A>(<CODE>Context.BATCHSIZE</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999212"></A>Specifies the
+    preferred batch size to use when returning data via the service's
+    protocol. This is a hint to the provider to return the results
+    of operations in batches of the specified size, so that the provider
+    can optimize its performance and usage of resources. It does
+    not affect the total number or size of the data returned.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999214"></A>Defaults to provider
+    default.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999460"></A><CODE>java.naming.referral</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999585"></A>(<CODE>Context.REFERRAL</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999462"></A>Specifies that
+    referrals encountered by the service provider are to be followed
+    automatically. If &quot;<CODE>follow</CODE>&quot;, <CODE>follow</CODE>
+    referrals automatically. If &quot;<CODE>ignore</CODE>&quot;,
+    <CODE>ignore</CODE> referrals encountered. If &quot;<CODE>throw</CODE>&quot;,
+    throw <CODE>ReferralException</CODE> when a referral is encountered.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999473"></A>Defaults to provider
+    default.</TD> 
+  </TR>
+  <TR>
+    <TD COLSPAN="2">
+    <H4 CLASS="CellTitle"><BR>
+    <A NAME="pgfId=999152"></A>Security</H4>
+</TD>
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999251"></A><CODE>java.naming.security.protocol</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999586"></A>(<CODE>Context.SECURITY_PROTOCOL</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999261"></A>Security protocol
+    to use for service.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999267"></A>Defaults to provider
+    default.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999247"></A><CODE>java.naming.security.authentication</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999587"></A>(<CODE>Context.SECURITY_AUTHENTICATION</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999277"></A>Takes values &quot;<CODE>none</CODE>&quot;,
+    &quot;<CODE>simple</CODE>&quot;, &quot;<CODE>strong</CODE>&quot;,
+    or a provider-specific string (e.g., &quot;CRAM-MD5 DIGEST-MD5
+    EXTERNAL&quot;).</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999278"></A>Defaults to provider
+    default.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999243"></A><CODE>java.naming.security.principal</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999588"></A>(<CODE>Context.SECURITY_PRINCIPAL</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999292"></A>Identity of principal
+    (e.g., user) for the authentication scheme.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999293"></A>Defaults to provider
+    default.</TD> 
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999239"></A><CODE>java.naming.security.credentials</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999591"></A>(<CODE>Context.SECURITY_CREDENTIALS</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999313"></A>Principal's credentials
+    for the authentication scheme.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999751"></A>The particular
+    type of credentials is determined by the authentication scheme
+    chosen. Examples of different types of credentials are passwords,
+    keys, and certificates.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999318"></A>Defaults to provider
+    default.</TD> 
+  </TR>
+  <TR>
+    <TD COLSPAN="2">
+    <H4 CLASS="CellTitle"><BR>
+    <A NAME="pgfId=999235"></A>Internationalization</H4>
+</TD>
+  </TR>
+  <TR>
+    <TD>
+    <P CLASS="CellName"><A NAME="pgfId=999348"></A><CODE>java.naming.language</CODE></P>
+
+    <P CLASS="CellName"><A NAME="pgfId=999592"></A>(<CODE>Context.LANGUAGE</CODE>)</TD> 
+    <TD>
+    <P CLASS="CellBody"><A NAME="pgfId=999358"></A>Specifies a colon-separated
+    list of preferred language to use with this service (e.g., &quot;en-US&quot;,
+    &quot;fr&quot;, &quot;fr-CH&quot;, &quot;ja-JP-kanji&quot;).</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999363"></A>Languages are
+    specified using tags defined in RFC 1766.</P>
+
+    <P CLASS="CellBody"><A NAME="pgfId=999360"></A>Defaults to provider
+    default.</TD> 
+  </TR>
+</TABLE><DIV></P>
+
+<H5 CLASS="body"><A NAME="pgfId=998453"></A>&nbsp;</H5>
+
+</DIV><HR ALIGN=LEFT><DIV CLASS="footnotes"><DIV CLASS="footnote">
+
+<P CLASS="TableFootnote"><SPAN CLASS="footnoteNumber"> 1.</SPAN>
+<A NAME="pgfId=999608"></A>The <CODE>Context</CODE> and <CODE>LdapContext</CODE>
+interfaces define constants for these property names. The names
+of the constants are shown in parentheses below the property's
+string names.</P>
+
+</DIV><DIV CLASS="footnote">
+
+<P CLASS="TableFootnote"><SPAN CLASS="footnoteNumber"> 2.</SPAN>
+<A NAME="pgfId=999680"></A>These properties may be set in the
+Java runtime's system properties or in an applet's parameter list.</P>
+
+</DIV><DIV CLASS="footnote">
+
+<P CLASS="TableFootnote"><SPAN CLASS="footnoteNumber"> 3.</SPAN>
+<A NAME="pgfId=999686"></A>These properties may be set in the
+Java runtime's system properties or in an applet's parameter list.</P>
+
+</DIV></DIV>
+
+<P><HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A> | <A 
+HREF="jndi.9.html">PREV</A> | <A HREF="appendix-ldap-example.html">NEXT</A><HR ALIGN=LEFT><I><FONT
+ SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

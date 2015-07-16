@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Image I/O API Guide: 4 - Writing Image I/O Plug-ins
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="extending.fm4.html">PREV</a>
+ | <a href="extending.fm6.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Image I/O API Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="996882"><i>4.5	</i> Writing Transcoder Plug-ins
+</a></h2>
+
+<blockquote>
+<a name="999277"><!-- --></a>
+A transcoder plug-in consists of an <code>ImageTranscoderSpi</code>, which performs the same functions as do the Spi classes for other plug-ins, and an object that implements the <code>ImageTranscoder</code> interface:<p>
+</blockquote><blockquote><pre>
+IIOMetadata convertStreamMetadata(IIOMetadata inData,
+                                  ImageWriteParam param);
+
+IIOMetadata convertImageMetadata(IIOMetadata inData,
+                                 ImageTypeSpecifier imageType,
+                                 ImageWriteParam param);
+
+</pre></blockquote><blockquote>
+<a name="999306"><!-- --></a>
+The <code>ImageTranscoder</code> may use the standard interfaces to unpack the incoming metadata, or it may make use of interfaces that are specific to the actual object at hand. For example, it could access the <code>keywords</code> and <code>values</code> instance variables of the <code>MyFormatMetadata</code> class defined above; these were made public, but not documented, precisely in order to allow a transcoder plug-in developer to access them without having to go through a DOM representation.<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="extending.fm4.html">PREV</a>
+ | <a href="extending.fm6.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="copyright.fm.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Suzette Pelouch -->
+<!-- Last updated: Fri Apr 27 11:23:03 2001 -->
+ 
+
+
+</body>
+</html>

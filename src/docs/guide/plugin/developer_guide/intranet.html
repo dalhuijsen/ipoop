@@ -1,0 +1,133 @@
+<html>
+<head>
+<title>Deployment: Intranet</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Intranet With <code>OBJECT/EMBED</code> Tag</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This section includes the following topics:</p>
+<ul>
+  <li><a href="#intro">Introduction</a> </li>
+  <li><a href="#IE">Deploying Java Plug-in with Internet Explorer</a> </li>
+  <li><a href="#Nav">Deploying Java Plug-in with Navigator</a> </li>
+</ul>
+<h2><a name="intro"></a>Introduction</h2>
+<p>The intranet is a more controlled environment than the internet, and you can 
+  decide whether you want to deploy your applets via the <code>APPLET</code>, 
+  <code>OBJECT</code>, or <code>EMBED</code> tags. This chapter deals with deployment 
+  using the <code>OBJECT</code> or <code>EMBED</code> tags.</p>
+<p>Java Plug-in can be deployed in an intranet environment so that users can download 
+  and install it without leaving the firewall. Deployment details for Internet 
+  Explorer and Netscape Navigator are described below.</p>
+<table summary="layout" width="90%" border="1" cellpadding="5" bgcolor="#FFFFCC" align="center" cellspacing="0">
+  <tr>
+    <td>
+      <p><font color="#000000" size="4"><b><u>Note</u></b></font> </p>
+      <p>You need to understand the Java Plug-in tagging structure to understand 
+        the discussion below. The tagging structure is explained in <a href="using_tags.html">Using 
+        OBJECT, EMBED and APPLET Tags in Java Plug-in</a>.)</p>
+    </td>
+  </tr>
+</table>
+<h2><a name="IE"></a>Deploying Java Plug-in with Internet Explorer (IE)</h2>
+<p>To deploy Java Plug-in in intranet environments with IE, you need to download 
+  and store the Java Plug-in binary file on a web server. Then you need to modify 
+  the <tt>codebase</tt> attribute inside the <tt>&lt;OBJECT&gt;</tt> tag in the 
+  HTML file to point to the binary. For example, if you want to use the Java Plug-in 
+  binary file in <code>http://my_company.com/plugin/</code>, then you should specify 
+  the <tt>codebase</tt> attribute as </p>
+<blockquote>
+  <p><code>&quot;http://my_company.com/plugin/jre-1_4-win.exe#Version=1,4,0,0&quot;</code> 
+  </p>
+</blockquote>
+<p>(For Internet deployment the above might use a <code>.cab</code> file rather 
+  than <code>.exe</code>. The <code>.cab</code> file points to an <code>.exe</code> 
+  and provides a download progress bar.) </p>
+<p>Note the version number in the above URL. For Java Plug-in 1.4, the version 
+  number is <code>1,4,0,0</code>. This version number changes for each release, 
+  and you must change the version number inside the <tt>&lt;OBJECT&gt;</tt> tag 
+  if you want to specify the newest release of Java Plug-in. </p>
+<p>The file <code>jre-1_4-win.exe#Version=1,4,0,0</code> is the same binary that 
+  can be download directly from the Java Software web site. It is digitally signed 
+  with a VeriSign digital signature signed by Sun Microsystems, Inc. If you are 
+  using the Java Plug-in HTML Converter, you can simply change the conversion 
+  template file to specify the latest Plug-in version (the <tt>CabFileLocation</tt> 
+  variable) before the conversion. For information about modifying the conversion 
+  template, consult the README file in the Java Plug-in HTML Converter. Note that 
+  <code>CabFileLocation</code> can be the location of the <code>.cab</code> file 
+  or the <code>.exe</code>.</p>
+<p> Once you have implemented these changes, when a machine that does not have 
+  Java Plug-in installed browses an HTML page with IE, IE will look into your 
+  predefined location (<tt>http://my_company.com/plugin</tt> in the example) and 
+  download Java Plug-in. Notice that there is no need to download Java Plug-in 
+  over the firewall if the web server is inside the intranet. 
+<p>
+<table summary="layout" width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr>
+    <td>
+      <h3 align="left"><u>Note: Recommendations</u></h3>
+      <p>The following is recommeded for long-term reliability:</p>
+      <ul>
+        <li>For the <code>codebase</code> attribute in the <code>OBJECT</code> 
+          tag, it is recommended that you use the <code>.exe</code> version, rather 
+          than the <code>.cab</code> version, on <code>java.sun.com</code>. That 
+          <code>.cab</code> version on <code>java.sun.com</code> may point to 
+          an updated version that you do not want to use for your deployment.</li>
+        <li>It is also recommend that you create your own download site for the 
+          versions you need so that you do not rely on <code>java.sun.com</code>. 
+          Downloads on <code>java.sun.com</code> frequently change.</li>
+      </ul>
+</td>
+  </tr>
+</table>
+<h2><a name="Nav"></a>Deploying Java Plug-in with Navigator </h2>
+<p>For Netscape 6 you must use the APPLET tag.</p>
+<p>To deploy Java Plug-in in intranet environments with Navigator 4, you need 
+  to download and store the Java Plug-in binary file on one of your web servers. 
+  Then you need to set up a Java Plug-in Download page and modify the <tt>pluginspage</tt> 
+  attribute in the EMBED tag to refer to this page. For example, if you have set 
+  up the Java Plug-in Download page at &quot;<tt>http://my_company.com/plugin/</tt>&quot; 
+  and the page is called <tt>plugin-install.html</tt>, you can specify the <tt>pluginspage</tt> 
+  as &quot;<tt>http://my_company.com/plugin/plugin-install.html</tt>&quot;. The Download 
+  page should have options to download different versions of Java Plug-in, such 
+  as for Windows and Solaris.</p>
+<p>If you are using the Java Plug-in HTML Converter, you can simply change the 
+  conversion template file to specify your download page (the <tt>NSFileLocation</tt> 
+  variable) before the conversion. For information about modifying the conversion 
+  template, see <a href="html_converter_more.html#details">Details About Templates</a> 
+  in the chapter called <a href="html_converter_more.html">More About HTML Converter</a> 
+  or consult the Help file in the HTML Converter itself (Help&gt;Help). </p>
+<p> Once you have implemented these changes, when a machine that does not have 
+  Java Plug-in installed browses an HTML page with Navigator, users will see a 
+  missing-plugin icon on the HTML page. When the user clicks on this picture, 
+  Navigator directs the user to your predefined Java Plug-in Download Page <code>(http://my_company.com/plugin/plugin-install.html</code> 
+  in this example). Notice that there is no need to download Java Plug-in over 
+  the firewall if the web server is inside the intranet. 
+<h2>Deploying Java Plug-in with Unix/Linux with Navigator</h2>
+<p>There are two ways that Java Plug-in might be installed in the Intranet environment 
+  with Unix or Linux:
+<ul>
+  <li>It might be installed on a per-user-account basis on individual machines, 
+    as it is installed in the Window environment.</li>
+  <li>It might be installed by a system administrator on a shared NSF drive for 
+    shared installation.</li>
+</ul>
+<p>In either case, for Netscape 4 the environmental variable NPX_PLUGIN_PATH must 
+  be set to point to the Java Plug-in. When Java Plug-in is installed on the local 
+  machine, then the user needs to set this variable to point to the Java Plug-in 
+  in the JRE on the local machine. For a shared installation, the system administrator 
+  needs to determine the shared location of the Java Plug-in in the shared JRE 
+  on the NSF drive and set the user profile for every machine to point to this 
+  via NPX_PLUGIN_PATH.</p>
+<p>&nbsp;</p>
+</body>
+</html>

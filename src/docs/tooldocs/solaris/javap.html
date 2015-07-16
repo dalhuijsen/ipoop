@@ -1,0 +1,269 @@
+<html>
+<head>
+<title>javap - The Java Class File Disassembler</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+
+<h1>javap - The Java Class File Disassembler</h1>
+<blockquote>
+Disassembles class files.
+</blockquote>
+
+<h2>SYNOPSIS</h2>
+<blockquote>
+<pre>
+javap [ <a href="javap.html#Options">options</a> ] class. . .
+</pre>
+</blockquote>
+
+<h2>DESCRIPTION</h2>
+<blockquote>
+The <b>javap</b> command disassembles a class file. Its output depends on 
+the options used. If no options are used, <b>javap</b> prints out the package, 
+protected, and public fields and methods of the classes passed to it. 
+<b>javap</b> prints its output to stdout. For example, compile the 
+following class declaration:
+<blockquote>
+
+<pre>
+import java.awt.*;
+import java.applet.*;
+
+public class DocFooter extends Applet {
+        String date;
+        String email;
+
+        public void init() {
+                resize(500,100);
+                date = getParameter("LAST_UPDATED");
+                email = getParameter("EMAIL");
+        }
+
+        public void paint(Graphics g) {
+                g.drawString(date + " by ",100, 15);
+                g.drawString(email,290,15);
+        }
+}
+</pre>
+</blockquote>
+The output from <b>javap DocFooter</b> yields:
+<blockquote>
+<pre>
+Compiled from DocFooter.java
+public class DocFooter extends java.applet.Applet {
+    java.lang.String date;
+    java.lang.String email;
+    public DocFooter();
+    public void init();
+    public void paint(java.awt.Graphics);
+}
+</pre>
+</blockquote>
+
+The output from <b>javap -c DocFooter</b> yields:
+<blockquote>
+<pre>
+Compiled from DocFooter.java
+public class DocFooter extends java.applet.Applet {
+    java.lang.String date;
+    java.lang.String email;
+    public DocFooter();
+    public void init();
+    public void paint(java.awt.Graphics);
+}
+
+Method DocFooter()
+   0 aload_0
+   1 invokespecial #1 <Method java.applet.Applet()>
+   4 return
+
+Method void init()
+   0 aload_0
+   1 sipush 500
+   4 bipush 100
+   6 invokevirtual #2 <Method void resize(int, int)>
+   9 aload_0
+  10 aload_0
+  11 ldc #3 <String "LAST_UPDATED">
+  13 invokevirtual #4 <Method java.lang.String getParameter(java.lang.String)>
+  16 putfield #5 <Field java.lang.String date>
+  19 aload_0
+  20 aload_0
+  21 ldc #6 <String "EMAIL">
+  23 invokevirtual #4 <Method java.lang.String getParameter(java.lang.String)>
+  26 putfield #7 <Field java.lang.String email>
+  29 return
+
+Method void paint(java.awt.Graphics)
+   0 aload_1
+   1 new #8 <Class java.lang.StringBuffer>
+   4 dup
+   5 invokespecial #9 <Method java.lang.StringBuffer()>
+   8 aload_0
+   9 getfield #5 <Field java.lang.String date>
+  12 invokevirtual #10 <Method java.lang.StringBuffer append(java.lang.String)>
+  15 ldc #11 <String " by ">
+  17 invokevirtual #10 <Method java.lang.StringBuffer append(java.lang.String)>
+  20 invokevirtual #12 <Method java.lang.String toString()>
+  23 bipush 100
+  25 bipush 15
+  27 invokevirtual #13 <Method void drawString(java.lang.String, int, int)>
+  30 aload_1
+  31 aload_0
+  32 getfield #7 <Field java.lang.String email>
+  35 sipush 290
+  38 bipush 15
+  40 invokevirtual #13 <Method void drawString(java.lang.String, int, int)>
+  43 return
+</pre>
+</blockquote>
+</blockquote>
+<a name=Options>
+<h2>OPTIONS</h2>
+</a>
+<blockquote>
+<dl>
+
+<dt><b>-help</b>
+<dd>
+Prints out help message for <b>javap</b>.
+<p>
+
+<dt><b>-l</b>
+<dd>
+Prints out line and local variable tables.
+<p>
+
+<dt><b>-b</b>
+<dd>
+Ensures backward compatibility with <b>javap</b> in JDK 1.1.
+<p>
+
+<dt><b>-public</b>
+<dd>
+Shows only public classes and members.
+<p>
+
+<dt><b>-protected</b>
+<dd>
+Shows only protected and public classes and members.
+<p>
+
+<dt><b>-package</b>
+<dd>
+Shows only package, protected, and public classes and members.  This is the 
+default.
+<p>
+
+<dt><b>-private</b>
+<dd>
+Shows all classes and members.
+<p>
+
+<dt><b>-J<i>flag</i></b>
+<dd>
+Pass <i>flag</i> directly to the runtime system. Some examples:
+<blockquote><pre>
+javap -J-version
+javap -J-Djava.security.manager -J-Djava.security.policy=MyPolicy MyClassName
+</pre></blockquote>
+
+<p>
+
+<dt><b>-s</b>
+<dd>
+Prints internal type signatures.
+
+<p>
+
+<dt><b>-c</b>
+<dd>
+Prints out disassembled code, i.e., the instructions that comprise the 
+Java bytecodes, for each of the methods in the class.   These are documented
+in the <a href="http://java.sun.com/docs/books/vmspec/">Java Virtual Machine
+Specification</a>.
+<p>
+<dt><b>-verbose</b>
+<dd>
+Prints stack size, number of <code>locals</code> and <code>args</code> for 
+methods. 
+<p>
+ 
+<dt><b>-classpath <i>path</i></b>
+<dd>
+Specifies the path <b>javap</b> uses to look up classes. Overrides the default 
+or the CLASSPATH environment variable if it is set. Directories are 
+separated by 
+colons. Thus the general format for <i>path</i> is:
+<p>
+
+<pre>
+   .:&lt;your_path&gt;
+</pre>
+
+For example:
+
+<pre>
+.:/home/avh/classes:/usr/local/java/classes
+</pre>
+
+<dt><b>-bootclasspath <i>path</i></b>
+<dd>
+Specifies path from which to load bootstrap classes.  By default, 
+the bootstrap classes are the classes implementing the core Java 2platform located in <tt>jre/lib/rt.jar</tt> and several other jar files.
+<p>
+<dt><b>-extdirs <i>dirs</i></b>
+<dd>
+Overrides location at which installed extensions are searched for. 
+The default location for extensions is <tt>jre/lib/ext</tt>.
+<p>
+
+</dl>
+</blockquote>
+
+<h2>ENVIRONMENT VARIABLES</h2>
+<blockquote>
+<dl>
+<dt>CLASSPATH
+<dd>Used to provide the system a path to user-defined classes. Directories are
+separated by colons, for example,
+For example:
+<blockquote>
+<pre>
+.:/home/avh/classes:/usr/local/java/classes
+</pre>
+</dl>
+</blockquote>
+</dl>
+
+<h2>SEE ALSO</h2>
+<blockquote>
+<a href="javac.html">javac</a>,
+<a href="java.html">java</a>,
+<a href="jdb.html">jdb</a>,
+<a href="javah.html">javah</a>,  
+<a href="javadoc.html">javadoc</a>
+</blockquote>
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+</body>
+</html>
+ 

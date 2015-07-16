@@ -1,0 +1,99 @@
+<HTML>
+<!-- 
+Copyright 2001, Deva Associates LLC. All rights reserved.
+Portions copyright 2001, KScripts Web Consulting and Design. All rights reserved. 
+-->
+<HEAD>
+<TITLE>Deva Search</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="style.css" TITLE="style">
+<script language="Javascript" type="text/javascript">
+<!-- // START OF SEARCH SCRIPT
+
+function getUrlValue(valname)
+  {
+  var locat = window.location.toString();
+  var ind = locat.search(/\?/i);
+  if (ind != -1)
+    {
+    locat = locat.substr(ind + 1);
+
+    var re = new RegExp(valname + "=", "i");  
+    if ((ind = locat.search(re)) != -1)
+      {
+      locat = locat.substr(ind + valname.length + 1);
+      if ((ind = locat.search(/\&/i)) != -1)
+        locat = locat.substr(0, ind);
+        
+      locat = locat.replace(/\+/gi, " ").replace(/\%2B/gi, "+");
+      return locat;
+      }
+    else
+      return "";
+    
+    }
+  else
+    return "";
+  }
+
+var query = getUrlValue("QUERY");
+var resultsStart = getUrlValue("res_start");
+var resultsPrev = getUrlValue("res_prev");
+var resultsNext = getUrlValue("res_next");
+  
+// window.alert("RES:" + resultsStart);
+if (resultsStart != "")
+  {
+  if (parent.frames[0].window_loaded == 1)
+    {
+    if (parent.frames[0].search(query) != 0)
+      {
+      resultsStart = "0";
+      parent.frames[0].currentmatch = 0;  
+      }
+    else
+      resultsStart = "";
+    }
+  }
+else if (resultsPrev != "")
+  {
+  resultsStart = "-1";
+  parent.frames[0].currentmatch = parseInt(resultsPrev);  
+  }
+else if (resultsNext != "")
+  {
+  resultsStart = "1";
+  parent.frames[0].currentmatch = parseInt(resultsNext);  
+  }
+  
+  
+// END OF SEARCH SCRIPT -->
+</script>
+</HEAD>
+<BODY>
+<SCRIPT language=JavaScript1.2>
+<!--
+if (resultsStart == "")
+  {
+  document.write("<CENTER>");
+  document.write("<table border=0 cellpadding=10 align=center>");
+  document.write("<TR><TD class=\"help\" nowrap><P><UL>");
+  document.write("<LI><B>Add + in front of terms that you want included in the search.</B>");
+  document.write("<LI><B>Add - in front of terms that you want excluded from the search.</B>");
+  document.write("<LI><B>Common words (e.g., the, but, it, etc.) have been excluded from the search.</B>");
+  document.write("<LI><B>Search terms may use the following characters: [ A-Z a-z 0-9 _ - . ' , $ % ]. </B>");
+  document.write("<LI><B>Searches are case insensitive.</B>");
+  document.write("</UL></P></TD></TR></table>")
+  }
+else
+  {
+  // write 
+  parent.frames[0].display(parent.frames[0].sortedurls, 
+                           parent.frames[0].currentmatch, 
+                           parent.frames[0].displaymatches);
+  }
+
+//-->
+</SCRIPT>
+
+</BODY>
+</HTML>

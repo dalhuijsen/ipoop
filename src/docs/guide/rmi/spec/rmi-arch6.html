@@ -1,0 +1,174 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 3 - RMI System Overview
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<a href="#skip" title="Skip navigation bar"></a>
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-arch5.html">PREV</a>
+ | <a href="rmi-client2a.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	3.5	</i> RMI Through Firewalls Via Proxies
+</a></h2>
+
+<blockquote>
+<a name="3749"><!-- --></a>
+The RMI transport layer normally attempts to open direct sockets to hosts on the Internet. Many intranets, however, have firewalls that do not allow this. The default RMI transport, therefore, provides two alternate HTTP-based mechanisms which enable a client behind a firewall to invoke a method on a remote object which resides outside the firewall.<p>
+<a name="5659"><!-- --></a>
+As described in this section, the HTTP-based mechanism that the RMI transport layer uses for RMI calls only applies to firewalls with HTTP proxy servers.<p>
+</blockquote>
+<br>
+<h3>
+<a name="3750"><!-- --></a>
+<i>	3.5.1	</i> How an RMI Call is Packaged within the HTTP Protocol
+</h3>
+
+<blockquote>
+<a name="3751"><!-- --></a>
+To get outside a firewall, the transport layer embeds an RMI call within the firewall-trusted HTTP protocol. The RMI call data is sent outside as the body of an HTTP POST request, and the return information is sent back in the body of the HTTP response. The transport layer will formulate the POST request in one of two ways:<p>
+</blockquote><a name="3752"><!-- --></a>
+<UL><OL>
+<LI>If the firewall proxy will forward an HTTP request directed to an arbitrary port on the host machine, then it is forwarded directly to the port on which the RMI server is listening. The default RMI transport layer on the target machine is listening with a server socket that is capable of understanding and decoding RMI calls inside POST requests.
+<BR>
+<LI>If the firewall proxy will only forward HTTP requests directed to certain well-known HTTP ports, then the call is forwarded to the HTTP server listening on port 80 of the host machine, and a CGI script is executed to forward the call to the target RMI server port on the same machine.
+</OL>
+</UL>
+
+<br>
+<h3>
+<a name="3754"><!-- --></a>
+<i>	3.5.2	</i> The Default Socket Factory
+</h3>
+
+<blockquote>
+<a name="3755"><!-- --></a>
+The RMI transport implementation includes an extension of the class <code>java.rmi.server.RMISocketFactory</code>, which is the default resource-provider for client and server sockets used to send and receive RMI calls; this default socket factory can be obtained via the j<code>ava.rmi.server.RMISocketFactory.getDefaultSocketFactory</code> method. This default socket factory creates sockets that transparently provide the firewall tunnelling mechanism as follows:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="3756"><!-- --></a>
+Client sockets first attempt a direct socket connection. Client sockets automatically attempt HTTP connections to hosts that cannot be contacted with a direct socket if that direct socket connection results in either a <code>java.net.NoRouteToHostException</code> or a <code>java.net.UnknownHostException</code> being thrown. If a direct socket connection results in any other exception being thrown, such as a <code>java.net.ConnectException</code>, an HTTP connection will not be attempted.
+</li>
+<li>
+<a name="3757"><!-- --></a>
+Server sockets automatically detect if a newly-accepted connection is an HTTP POST request, and if so, return a socket that will expose only the body of the request to the transport and format its output as an HTTP response.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="3758"><!-- --></a>
+Client-side sockets, with this default behavior, are provided by the factory&#39;s <code>java.rmi.server.RMISocketFactory.createSocket</code> method. Server-side sockets with this default behavior are provided by the factory&#39;s <code>java.rmi.server.RMISocketFactory.createServerSocket</code> method.<p>
+</blockquote>
+<br>
+<h3>
+<a name="3759"><!-- --></a>
+<i>	3.5.3	</i> Configuring the Client
+</h3>
+
+<blockquote>
+<a name="3760"><!-- --></a>
+There is no special configuration necessary to enable the client to send RMI calls through a firewall.<p>
+<a name="3761"><!-- --></a>
+The client can, however, disable the packaging of RMI calls as HTTP requests by setting the <code>java.rmi.server.disableHttp</code> property to equal the boolean value <code>true</code>.<p>
+</blockquote>
+<br>
+<h3>
+<a name="3762"><!-- --></a>
+<i>	3.5.4	</i> Configuring the Server
+</h3>
+
+
+<blockquote>
+<blockquote><hr noshade size="1">
+<b><a name="5438">Note - </a></b>The host name should not be specified as the host&#39;s IP address, because some firewall proxies will not forward to such a host name. 
+<hr noshade size="1">
+</blockquote>
+</blockquote>
+<a name="3763"><!-- --></a>
+<OL><OL>
+<LI>In order for a client outside the server host&#39;s domain to be able to invoke methods on a server&#39;s remote objects, the client must be able to find the server. To do this, the remote references that the server exports must contain the fully-qualified name of the server host.</LI>
+
+<a name="3764"><!-- --></a>
+<p>Depending on the server&#39;s platform and network environment, this information may or may not be available to the Java virtual machine on which the server is running. If it is not available, the host&#39;s fully qualified name must be specified with the property <code>java.rmi.server.hostname</code> when starting the server.
+<p>
+<a name="3765"><!-- --></a>
+For example, use this command to start the RMI server class <code>ServerImpl</code> on the machine chatsubo.javasoft.com:
+<p>
+<blockquote><pre>   java -Djava.rmi.server.hostname=chatsubo.javasoft.com ServerImpl
+
+</pre></blockquote><a name="3768"><!-- --></a>
+
+<LI>If the server will not support RMI clients behind firewalls that can forward to arbitrary ports, use this configuration:</TD>
+<a name="3769"><!-- --></a>
+<OL><p>
+<LI>An HTTP server is listening on port 80.
+<p><a name="3770"><!-- --></a>
+<LI>A CGI script is located at the aliased URL path 
+<p>
+<blockquote><pre><code>/cgi-bin/java-rmi.cgi</code></code>
+</pre></blockquote> 
+
+<a name="5637"><!-- --></a>
+This script:
+</OL></OL>
+<UL><UL><UL>
+<a name="5076"><!-- --></a>
+<p>
+
+<LI>Invokes the local interpreter for the Java programming language to execute a class internal to the transport layer which forwards the request to the appropriate RMI server port.</LI>
+<p>
+<a name="3772"><!-- --></a>
+<LI>Defines properties in the Java virtual machine with the same names and values as the CGI 1.0 defined environment variables.</TD>
+</UL></UL></UL>
+<p><dl>
+<dd><a name="3773"><!-- --></a>
+An example script is supplied in the RMI distribution for the Solaris and Windows 32 operating systems. Note that the script must specify the complete path to the interpreter for the Java programming language on the server machine.
+<p>
+
+</dl>
+</OL>
+<br>
+<h3>
+<a name="3774"><!-- --></a>
+<i>	3.5.5	</i> Performance Issues and Limitations
+</h3>
+
+<blockquote>
+<a name="3775"><!-- --></a>
+Calls transmitted via HTTP requests are at least an order of magnitude slower that those sent through direct sockets, without taking proxy forwarding delays into consideration.<p>
+<a name="3776"><!-- --></a>
+Because HTTP requests can only be initiated in one direction through a firewall, a client cannot export its own remote objects outside the firewall, because a host outside the firewall cannot initiate a method invocation back on the client.<p>
+</blockquote>
+</ul>
+<br>
+<hr>
+<a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-arch5.html">PREV</a>
+ | <a href="rmi-client2a.html">NEXT</a> 
+
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

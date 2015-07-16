@@ -1,0 +1,230 @@
+<html>
+<head>
+<title>Multi-Version Support</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Multi-Version Support</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>This chapter includes the following topics:</p>
+<ul>
+  <li><a href="#clsid">Unique <code>CLSID</code></a></li>
+  <li><a href="#mime">Unique MIME Type and dll</a></li>
+  <li><a href="#registry">Unique Java Plug-in Registry Key</a></li>
+  <li><a href="#property">Unique Java Plug-in Property File</a></li>
+  <li><a href="#trace">Unique Java Plug-in Trace and Log Files</a></li>
+  <li><a href="#control">Unique Java Plug-in Control Panel</a></li>
+  <li><a href="#jre-jdk">Unique Registry Keys for JRE/JDK</a><br>
+  </li>
+</ul>
+<p>So that multiple JRE versions may be deployed in the same environment, every 
+  new or patch release of Java Plug-in uniquely identifies registry keys, <code>CLSID</code>, 
+  MIME type and other resources. </p>
+<div align="center">
+  <table summary="layout" width="90%" border="1" cellpadding="5" bgcolor="#FFFFCC" cellspacing="0">
+    <tr>
+      <td><font size="4"><b>Notes:</b></font> (1) For an explanation of product 
+        version numbers, see the <a href="using_tags.html#note">note</a> in the 
+        section called &quot;Using <code>OBJECT</code>, <code>EMBED</code> and 
+        <code>APPLET</code> Tags in Java Plug-in.&quot; In this section, a mix 
+        of version 1.3 and 1.4 examples is given. (2) While the examples below 
+        are for Windows, multi-version support also applies to Solaris and Linux.</td>
+    </tr>
+  </table>
+  <p>
+</div>
+<h3><a name="clsid"></a>Unique <code>CLSID</code></h3>
+<p>There is a unique CLSID for every new/patch version of Java Plug-in. (<code>CLSID</code> 
+  is used in the <code>OBJECT</code> tag with Internet Explorer running on Windows.) 
+  If you want a particular version of Java Plug-in to be used, then specify this 
+  unique <code>CLSID</code> in the <code>OBJECT</code> tag. The <code>CLSID</code> 
+  is stored in the registry in:&nbsp;</p>
+<blockquote> 
+  <p><code>HKEY_CLASSES_ROOT\CLSID\</code></p>
+</blockquote>
+<p>In general the CLSID looks as follows:</p>
+<p><code>CAFEEFAC-&lt;<i>major version</i>&gt;-&lt;<i>minor version</i>&gt;-&lt;<i>patch 
+  version</i>&gt;-ABCDEFFEDCBA</code></p>
+<p>where <code><i>major version</i></code>, <code><i>minor version</i></code> 
+  and <code><i>patch version</i></code> are all 4-digit hexadecimal numbers for 
+  the Java Plug-in/JRE release.</p>
+<h4>Examples:</h4>
+<p>For example, the CLSID for Java Plug-in 1.4 is: </p>
+<blockquote>
+  <p><code>CAFEEFAC-0014-0000-0000-ABCDEFFEDCBA</code></p>
+</blockquote>
+<p>and you would find this in the registry:</p>
+<blockquote>
+  <p><code>HKEY_CLASSES_ROOT\CLSID\CAFEEFAC-0014-0000-0000-ABCDEFFEDCBA</code></p>
+</blockquote>
+<p>The CLSID for 1.3.0_03 is: </p>
+<blockquote>
+  <p><code>CAFEEFAC-0013-0000-0003-ABCDEFFEDCBA</code></p>
+</blockquote>
+<p>and you would find this in the registry:</p>
+<blockquote>
+  <p><code>HKEY_CLASSES_ROOT\CLSID\CAFEEFAC-0013-0000-0003-ABCDEFFEDCBA</code></p>
+</blockquote>
+<p>Note that CLSID is also stored in:&nbsp;<br>
+</p>
+<blockquote> 
+  <p><code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Code Store Database\Distribution 
+    Units\</code></p>
+</blockquote>
+<h3><a name="mime"></a>Unique MIME Type and dll</h3>
+<p>There is a unique MIME type and <code>NP*.dll</code> for every new/patch version 
+  of Java Plug-in. (MIME type is used in the <code>EMBED</code> tag with Netscape 
+  and as a <code>PARM</code> in the <code>OBJECT</code> tag for Internet Explorer. 
+  <code>NP*.dll</code> is unique to Netscape.) If you want to use a particular 
+  version of Java Plug-in with Netscape, specify the unique MIME type in the <code>EMBED</code> 
+  tag. </p>
+<p>Note that this MIME type will be supported by an <code>NP*.dll</code> with 
+  a unique name for every new/patch version. Thus, installing different version 
+  of Java Plug-in does not overwrite other <code>.dll</code> files in Navigator's 
+  <code>Plugins</code> directory. </p>
+<p>In general MIME type looks like this:</p>
+<blockquote>
+  <p><code>application/x-java-applet;jpi-version=<version>&lt;<i>version</i>&gt;</code></p>
+</blockquote>
+<p>where <code><i>version</i></code> includes the major, minor and patch version 
+  numbers.</p>
+<h4>Examples:</h4>
+<p>The MIME type for the 1.4 release is: </p>
+<blockquote>
+  <p><code>application/x-java-applet;jpi-version=1.4 </code></p>
+</blockquote>
+<p>The MIME type for the 1.3.0_03 release is: </p>
+<blockquote>
+  <p><code>application/x-java-applet;jpi-version=1.3.0_03</code></p>
+</blockquote>
+<p><br>
+  MIME type is supported in the file<br>
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <code>NPJPI<i>&lt;modified version 
+  number&gt;</i>.dll</code><code> </code></p>
+<h4>Example:</h4>
+<p>For Java Plug-in 1.4.0_01, the unique MIME type would be: </p>
+<blockquote>
+  <p><code>application/x-java-applet;jpi-version=1.4.0_01</code></p>
+</blockquote>
+<p>and it would be supported in the file: </p>
+<blockquote> 
+  <p><code>NPJPI140_01.dll</code> </p>
+</blockquote>
+<p>in Navigator's <code>Plugins</code> directory.</p>
+<table summary="layout" width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr>
+    <td>
+      <h2><u>Note</u></h2>
+      <p>Prior to release 1.4.0, the supporting .dll file was of the form <code>NPJava&lt;<i>modified 
+        version number</i>&gt;.dll</code>; e.g., release <code>1.3.0_03</code> 
+        would we supported by <code>NPJava130_03.dll</code>.</p>
+    </td>
+  </tr>
+</table>
+<h3><a name="registry"></a>Unique Java Plug-in Registry Key</h3>
+<p>There is a unique Java Plug-in registry key for every new/patch version of 
+  Java Plug-in. The main Java Plug-in registry key is:</p>
+<blockquote>
+  <p><code>HKEY_LOCAL_MACHINE\Software\JavaSoft\Java Plug-in\<i>&lt;version number&gt;</i></code></p>
+</blockquote>
+<p>where the <i>&lt;version number&gt;</i> will include the major, minor and the 
+  patch version numbers.</p>
+<h4><code>Example:</code></h4>
+<p>For Java Plug-in 1.4 you will find the following in your registry:</p>
+<blockquote> 
+  <p><code>HKEY_LOCAL_MACHINE\Software\JavaSoft\Java Plug-in\1.4.0</code></p>
+</blockquote>
+<h3><a name="property"></a>Unique Java Plug-in Property File</h3>
+<p>As in previous versions, the property file continues to be located in <i>&lt;user.home&gt;\.java. 
+  </i>However, the filename will be unique in every new/patch release and have 
+  the following form:</p>
+<blockquote>
+  <p> <i><code>&lt;user.home&gt;</code></i><code>\.java\properties_<i>&lt;modified 
+    version number&gt;</i></code></p>
+</blockquote>
+<p>where the <i><code>&lt;modified version number&gt;</code></i> will include 
+  the major, minor, and patch version numbers; e.g.,</p>
+<blockquote>
+  <p><code>C:\WINNT\Profiles\stanleyh\.java\properties140_xx</code><i><br>
+    </i></p>
+</blockquote>
+<h3><a name="trace"></a>Unique Java Plug-in Trace and Log Files</h3>
+<p>A trace file has been created automatically in <i><code>&lt;user.home&gt;</code></i> 
+  when Java Console is enabled. Its purpose is to capture in a single file the 
+  same messages that are displayed in Java Console. But in order to avoid conflict, 
+  this file is now uniquely named in every new/patch release. There is also a 
+  uniquely named log file. These files have the form:</p>
+<blockquote> 
+  <p><i><code>&lt;user.home&gt;</code></i><code>\.plugin<i>&lt;modified version 
+    number&gt;</i>.trace<br>
+    &lt;user.home&gt;\.plugin&lt;<i>modified version number</i>&gt;.log</code></p>
+</blockquote>
+<p>where the <i><code>&lt;modified version number&gt;</code></i> includes the 
+  major, minor and the patch version numbers; e.g., <code>.plugin140_xx.trace</code></p>
+<h3><a name="control"></a>Unique Java Plug-in Control Panel</h3>
+<p>There is a unique file name for the Java Plug-in Control Panel dll in every 
+  new/patch release. From the Windows Control Panel, this allows the user to launch 
+  the Control Panel for a particular version of Java Plug-in. The filename for 
+  the dll is of the form:</p>
+<blockquote>
+  <p><code>plugincpl<i>&lt;modified version number&gt;</i>.cpl</code> </p>
+</blockquote>
+<p>where the <i><code>&lt;modified version number&gt;</code></i> will include 
+  the major, minor and the patch version numbers; e.g., <code>plugincpl130_01.cpl</code></p>
+<p>Note below that the user can choose which version of the Java Plug-in Control 
+  Panel to launch.</p>
+<p align="center"><img src="images/windows_control_panel-1.gif" alt="Windows Control Panel window" width="490" height="513"></p>
+
+<h3><a name="jre-jdk"></a>Unique Registry Keys for JRE/JDK</h3>
+<p>There are unique registry keys for every new/patch release of the JRE/JDK. 
+  Prior to release 1.3 of Java Plug-in, installating multiple versions of Java 
+  Plug-in overwrote the JRE/JDK registry keys. These registry keys are located 
+  as follows:</p>
+<blockquote> 
+  <p><code>HKEY_LOCAL_MACHINE\Software\JavaSoft\Java Runtime Environment\<i>&lt;version 
+    number&gt;<br>
+    </i></code><code>HKEY_LOCAL_MACHINE\Software\JavaSoft\Java Development Kit\<i>&lt;version 
+    number&gt;</i></code></p>
+  </blockquote>
+<p>where the <i><code>&lt;version number&gt;</code></i> includes the major, minor 
+  and the patch version numbers; e.g., <code>1.3.0_01</code></p>
+<p>These keys allow Java Plug-in to locate the proper version of JRE/JDK. </p>
+<p>&nbsp;</p>
+
+<!--
+
+<h3>Collision Detection</h3>
+<p>Collision detection is supported in every new/patch version of Java Plug-in. 
+  It is very important to note the following:</p>
+<a name="collision"></a>
+<table summary="layout" width="65%" align="center" cellpadding="5">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <div align="left">Multiple versions of Java Plug-in can be run in different 
+        browser sessions. However, multiple versions cannot be run in the same 
+        browser sessions. Should this be attempted, the user is warned and the 
+        attempt will fail.</div>
+    </td>
+  </tr>
+</table>
+<p>[???This support began in 1.3.0_01, correct? But do we want to say that? First 
+  announced support is in 1.4.0, right? What about Solaris and Linux support? 
+  What do we need to say? Out orginal TOC shows two major topics:</p>
+<ul>
+  <li>Windows</li>
+  <li>Solaris and Linux</li>
+</ul>
+<p>We need to follow up on that in the doc. Currently we mostly cover Windows.]</p>
+
+-->
+
+</body>
+</html>

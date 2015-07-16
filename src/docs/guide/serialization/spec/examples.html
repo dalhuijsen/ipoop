@@ -1,0 +1,124 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Mon Jan 27 15:24:24 2003" />
+    <title>Example of Serializable Fields		</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="serialTOC.html" />
+    <link rel="Previous" href="exceptions.html" />
+    <link rel="Next" href="" />
+    <link rel="Index" href="examples.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table summary="layout" id="layout" width="100%">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="exceptions.html">Previous</a> | Next
+        </td>
+		<td align="right"><i>Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp3601"> </a><h2 class="pNewHTMLPage">
+Example of Serializable Fields		
+</h2>
+<hr class="pHr"/>
+<a name="wp4374"> </a><h2 class="pAppxNum">
+Appendix &#160; C
+</h2>
+<a name="wp4378"> </a><h4 class="pHeading3">
+		Topics:
+</h4>
+<ul>
+<a name="wp4421"> </a><div class="pBullet1Plus"><li><a  href="examples.html#wp4420">Example Alternate Implementation of java.io.File</a></li></div>
+</ul>
+<a name="wp4420"> </a><h2 class="pHeading1">
+	C.1		Example Alternate Implementation of java.io.File
+</h2>
+<a name="wp4325"> </a><p class="pBody">
+This appendix provides a brief example of how an existing class could be specified and implemented to interoperate with the existing implementation but without requiring the same assumptions about the representation of the file name as a <code class="cCode">String</code>.
+</p>
+<a name="wp4326"> </a><p class="pBody">
+The system class <code class="cCode">java.io.File</code> represents a filename and has methods for parsing, manipulating files and directories by name. It has a single private field that contains the current file name. The semantics of the methods that parse paths depend on the current path separator which is held in a static field. This path separator is part of the serialized state of a file so that file name can be adjusted when read.
+</p>
+<a name="wp4327"> </a><p class="pBody">
+The serialized state of a <code class="cCode">File</code> object is defined as the serializable fields and the sequence of data values for the file. In this case, there is one of each.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+Serializable Fields:    
+	String path;     // path name with embedded separators
+Serializable Data:    
+	char            // path name separator for path name
+An alternate implementation might be defined as follows:
+class File implements java.io.Serializable {    
+	...    
+	private String[] pathcomponents;    
+	// Define serializable fields with the ObjectStreamClass    
+
+	/**
+	* @serialField path String 
+	*              Path components separated by separator. 
+	*/
+	private static final ObjectStreamField[] serialPersistentFields 
+	=   }            
+		new ObjectStreamField(&#8220;path&#8221;, String.class)
+	 };
+	...	
+	/**
+	* @serialData  Default fields followed by separator character.
+	*/ 
+	private void writeObject(ObjectOutputStream s)        
+		throws IOException    
+	{        
+		ObjectOutputStream.PutField fields = s.putFields();        
+		StringBuffer str = new StringBuffer();        
+		for(int i = 0; i &lt; pathcomponents; i++) {            
+			str.append(separator);            
+			str.append(pathcomponents[i]);        
+		}        
+		fields.put(&#8220;path&#8221;, str.toString());        
+		s.writeFields();        
+		s.writeChar(separatorChar); // Add the separator character    
+	}    
+	...
+    private void readObject(ObjectInputStream s)        
+		throws IOException    
+	{        
+		ObjectInputStream.GetField fields = s.readFields();        
+		String path = (String)fields.get(&#8220;path&#8221;, null);        
+		...        
+		char sep = s.readChar(); // read the previous separator char
+        // parse path into components using the separator        
+		// and store into pathcomponents array.    
+	}
+}
+</pre></div>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+
+    <table summary="layout" width="100%">
+      <tr>
+        <td align="left">
+          <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	  <a accesskey="p" href="exceptions.html">Previous</a> | Next
+        </td>
+        <td class="go-right">
+          <span class="copyright">Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification  </span>
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

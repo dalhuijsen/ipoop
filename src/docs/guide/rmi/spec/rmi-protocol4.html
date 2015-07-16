@@ -1,0 +1,105 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 10 - RMI Wire Protocol
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-protocol3.html">PREV</a>
+ | <a href="rmi-protocol5.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	10.3	</i> RMI&#39;s Use of Object Serialization
+</a></h2>
+
+<blockquote>
+<a name="3271"><!-- --></a>
+Call and return data in RMI calls are formatted using the Java Object Serialization protocol. Each method invocation&#39;s <em>CallData</em> is written to a Java object output stream that contains the <em>ObjectIdentifier</em> (the target of the call), an <em>Operation</em> (a number representing the method to be invoked), a <em>Hash</em> (a number that verifies that client stub and remote object skeleton use the same stub protocol), followed by a list of zero or more <em>Arguments</em> for the call. <p>
+<a name="4109"><!-- --></a>
+In the JDK1.1 stub protocol the <em>Operation</em> represents the method number as assigned by <em>rmic,</em> and the <em>Hash</em> was the stub/skeleton hash which is the stub&#39;s interface hash. As of the Java 2 stub protocol (Java 2 stubs are generated using the <code>-v1.2</code> option with <code>rmic</code>), <em>Operation</em> has the value -1 and the <em>Hash</em> is a hash representing the method to call. The hash is described in the section &#34;<a href="rmi-stubs24.html">The <CODE>RemoteRef</CODE> Interface</a>&#34;.
+
+<P>
+<DL>
+	<DT><em>CallData:</em>
+		<DD><BR><em>ObjectIdentifier Operation Hash Arguments</em><sub>opt</sub>
+		<DD><BR><em>ObjectIdentifier:</em>
+		<DD><BR><em>ObjectNumber UniqueIdentifier</em>
+		</DD>
+	<DT><BR><em>UniqueIdentifier:</em>
+		<DD><BR><em>Number Time Count</em>
+		</DD>
+	<DT><BR><em>Arguments:</em>
+		<DD><BR><em>Value</em>
+		<DD><BR><em>Arguments Value</em>
+		</DD>
+	<DT><BR><em>Value:</em>
+		<DD><BR><em>Object</em>
+		<DD><BR><em>Primitive</em>
+		</DD>
+	</DT>
+</DL>
+<p>
+
+ 
+<a name="3276"><!-- --></a>
+A <em>ReturnValue</em> of an RMI call consists of a return code to indicate either a normal or exceptional return, a <em>UniqueIdentifier</em> to tag the return value (used to send a <code>DGCAck</code> if necessary) followed by the return result: either the <em>Value</em> returned or the <em>Exception </em>thrown<em>.
+
+<P>
+<DL>
+	<DT><em>ReturnValue:</em>
+		<DD><BR><em>0x01</em><em> UniqueIdentifier Value</em><sub>opt</sub>
+		<DD><BR><em>0x02</em><em> UniqueIdentifier Exception</em></em>
+
+		</DD>
+	</DT>
+</DL>
+<p>
+</blockquote>
+<blockquote>
+<blockquote><hr noshade size="1">
+<b><a name="3422">Note - </a></b><em>ObjectIdentifier</em>, <em>UniqueIdentifier, </em>and<em> EndpointIdentifier </em>are not written out using default serialization, but each uses its own special <em>write</em> method (this is not the <em>writeObject</em> method used by object serialization); the <em>write</em> method for each type of identifier adds its component data consecutively to the output stream. 
+<hr noshade size="1">
+</blockquote>
+</blockquote>
+
+<br>
+<h3>
+<a name="4091"><!-- --></a>
+<i>	10.3.1	</i> Class Annotation and Class Loading
+</h3>
+
+<blockquote>
+<a name="4092"><!-- --></a>
+RMI overrides the <code>annotateClass</code> and <code>resolveClass</code> methods of <code>ObjectOutputStream</code> and <code>ObjectInputStream</code> respectively. Each class is annotated with the codebase URL (the location from which the class can be loaded). In the <code>annotateClass</code> method, the classloader that loaded the class is queried for its codebase URL. If the classloader is non-<code>null</code> and the classloader has a non-<code>null</code> codebase, then the codebase is written to the stream using the <code>ObjectOutputStream.writeObject</code> method; otherwise a <code>null</code> is written to the stream using the <code>writeObject</code> method. Note: as an optimization, classes in the &#34;<code>java</code>&#34; package are not annotated, since they are always available to the receiver.<p>
+<a name="4093"><!-- --></a>
+The class annotation is resolved during deserialization using the <code>ObjectInputStream.resolveClass</code> method. The <code>resolveClass</code> method first reads the annotation via the <code>ObjectInputStream.readObject</code> method. If the annotation, a codebase URL, is non-<code>null</code>, then it obtains the classloader for that URL and attempts to load the class. The class is loaded by using a <code>java.net.URLConnection</code> to fetch the class bytes (the same mechanism used by a web browser&#39;s applet classloader).<p>
+</blockquote>
+
+</ul>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-protocol3.html">PREV</a>
+ | <a href="rmi-protocol5.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Monday, October 7, 2002 -->
+</body>
+</html>

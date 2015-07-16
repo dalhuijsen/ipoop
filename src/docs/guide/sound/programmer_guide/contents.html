@@ -1,0 +1,463 @@
+<html>
+<head>
+<title>Java Plug-in 1.4 Developer Guide Contents</title>
+<LINK REL=STYLESHEET TYPE="text/css" HREF="styles/style1.css">	
+</head>
+<body bgcolor="#FFFFFF">
+<table summary="layout" width="100%" border="0" cellpadding="5">
+  <tr> 
+    <td width="10%">
+      <div align="center"><img src="images/javalogo.gif" alt="Java logo" width="52" height="88"></div>
+    </td>
+    <td>&nbsp;</td>
+    <td width="10%">
+      <div align="center"></div>
+    </td>
+  </tr>
+</table>
+<table summary="layout" width="80%" border="2" align="center" bgcolor="#6495ed" height="100" cellpadding="5" cellspacing="0" bordercolor="#999999">
+  <tr>
+    <td> 
+      <div align="center"><font size="7"><b><font size="6">Java Sound Programmer 
+        Guide</font></b></font></div>
+    </td>
+  </tr>
+</table>
+<br>
+<table summary="layout" width="80%" border="0" cellpadding="5" align="center">
+  <tr> 
+    <td> 
+      <p><span class="bg"><font size="+2"><b>Note:</b></font></span> There are 
+        two ways to navigate this guide:</p>
+      <ul>
+        <li><a href="DevaSearch/search.html">Search</a> the guide</li>
+        <li>Select from the <a href="#contents">contents</a> below:</li>
+      </ul>
+      </td>
+  </tr>
+</table>
+<p>
+<table summary="layout" width="80%" border="2" cellpadding="5" align="center" bordercolor="#000000" cellspacing="0">
+  <tr>
+    <td bordercolor="#FFFFFF"> 
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center" bgcolor="#CCCCCC">
+        <tr> 
+          <td> <font size="5"><b><a name="contents"></a>Introductory Material</b></font></td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center">
+        <tr> 
+          <td> <a href="preface.html">
+            <h2>Preface </h2>
+            </a>
+            <dl>
+              <dd><a href="preface.html#whom"> For Whom This Guide Is Intended 
+                </a> </dd>
+              <dd><a href="preface.html#what"> What this Guide Describes </a> 
+              </dd>
+              <dd><a href="preface.html#more"> For More Information </a></dd>
+            </dl>
+            <a href="chapter1.html">
+            <h2> Chapter: 1 Introduction to the Java Sound API </h2>
+            </a>
+            <dl>
+              <dd><a href="chapter1.html#design"> Design Goals </a> 
+                <dl>
+                  <dd><a href="chapter1.html#111814"> Who is the Java Sound API 
+                    For? </a> </dd>
+                  <dd><a href="chapter1.html#111823"> How Does the Java Sound 
+                    API Relate to Other Interfaces? </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter1.html#111831"> Packages </a> </dd>
+              <dd><a href="chapter1.html#111847"> Sampled Audio </a> 
+                <dl>
+                  <dd><a href="chapter1.html#111849"> What Is Sampled Audio? </a> 
+                  </dd>
+                  <dd><a href="chapter1.html#112759"> Audio Configurations </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter1.html#111877"> MIDI </a> 
+                <dl>
+                  <dd><a href="chapter1.html#111880"> What Is MIDI? </a> </dd>
+                  <dd><a href="chapter1.html#112483"> MIDI Configurations </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter1.html#111901"> Service Provider Interfaces 
+                </a></dd>
+            </dl>
+          </td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center" bgcolor="#CCCCCC">
+        <tr> 
+          <td> <b><font size="5">Part I: Sampled Audio</font></b></td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center">
+        <tr> 
+          <td> 
+            <h2><a href="chapter2.html">Chapter 2: Overview of the Sampled Package 
+              </a></h2>
+            <dl>
+              <dd><a href="chapter2.html#112324"> Design Goals </a> 
+                <dl>
+                  <dd><a href="chapter2.html#112328"> A Focus on Data Transport 
+                    </a> </dd>
+                  <dd><a href="chapter2.html#112334"> Buffered and Unbuffered 
+                    Handling of Audio </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter2.html#112344"> The Essentials: Format, Mixer, 
+                and Line </a> 
+                <dl>
+                  <dd><a href="chapter2.html#112348"> What Is Formatted Audio 
+                    Data? </a> </dd>
+                  <dd><a href="chapter2.html#112387"> What Is a Mixer? </a> </dd>
+                  <dd><a href="chapter2.html#113943"> What Is a Line? </a> </dd>
+                  <dd><a href="chapter2.html#112421"> Lines in an Audio-output 
+                    Configuration </a> </dd>
+                  <dd><a href="chapter2.html#112435"> Lines in an Audio-input 
+                    Configuration </a> </dd>
+                  <dd><a href="chapter2.html#112445"> The Line Interface Hierarchy	
+                    </a></dd>
+                </dl>
+              </dd>
+            </dl>
+            <h2><a href="chapter3.html"> Chapter 3: Accessing Audio System Resources 
+              </a></h2>
+            <dl>
+              <dd><a href="chapter3.html#113101"> The AudioSystem Class </a> </dd>
+              <dd><a href="chapter3.html#113123"> Information Objects </a> </dd>
+              <dd><a href="chapter3.html#113128"> Getting a Mixer </a> </dd>
+              <dd><a href="chapter3.html#113154"> Getting a Line of a Desired 
+                Type </a> 
+                <dl>
+                  <dd><a href="chapter3.html#113159"> Getting a Line Directly 
+                    from the AudioSystem </a> </dd>
+                  <dd><a href="chapter3.html#113208"> Getting a Line from a Mixer 
+                    </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter3.html#113216"> Selecting Input and Output Ports 
+                </a> </dd>
+              <dd><a href="chapter3.html#113223"> Permission to Use Audio Resources	
+                </a></dd>
+            </dl>
+            <h2><a href="chapter4.html"> Chapter 4: Playing Back Audio </a></h2>
+            <dl>
+              <dd><a href="chapter4.html#113609"> Using a Clip </a> 
+                <dl>
+                  <dd><a href="chapter4.html#113613"> Setting Up the Clip for 
+                    Playback </a> </dd>
+                  <dd><a href="chapter4.html#113626"> Starting and Stopping Playback 
+                    </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter4.html#113634"> Using a SourceDataLine </a> 
+                <dl>
+                  <dd><a href="chapter4.html#116365"> Setting Up the SourceDataLine 
+                    for Playback </a> </dd>
+                  <dd><a href="chapter4.html#113663"> Starting and Stopping Playback 
+                    </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter4.html#113711"> Monitoring a Line's Status </a> 
+              </dd>
+              <dd><a href="chapter4.html#113725"> Synchronizing Playback on Multiple 
+                Lines </a> </dd>
+              <dd><a href="chapter4.html#113736"> Processing the Outgoing Audio	
+                </a></dd>
+            </dl>
+            <h2><a href="chapter5.html"> Chapter 5: Capturing Audio </a></h2>
+            <dl>
+              <dd><a href="chapter5.html#113969"> Setting Up a TargetDataLine 
+                </a> </dd>
+              <dd><a href="chapter5.html#115741"> Reading the Data from the TargetDataLine 
+                </a> </dd>
+              <dd><a href="chapter5.html#114432"> Monitoring the Line's Status 
+                </a> </dd>
+              <dd><a href="chapter5.html#114049"> Processing the Incoming Audio	
+                </a></dd>
+            </dl>
+            <h2><a href="chapter6.html"> Chapter 6: Processing Audio with Controls 
+              </a></h2>
+            <dl>
+              <dd><a href="chapter6.html#114180"> Introduction to Controls </a> 
+              </dd>
+              <dd><a href="chapter6.html#117862"> Getting a Line that Has the 
+                Desired Controls </a> </dd>
+              <dd><a href="chapter6.html#114255"> Getting the Controls from the 
+                Line </a> </dd>
+              <dd><a href="chapter6.html#116401"> Using a Control to Change the 
+                Audio Signal </a> 
+                <dl>
+                  <dd><a href="chapter6.html#114284"> Controlling a Line's Mute 
+                    State </a> </dd>
+                  <dd><a href="chapter6.html#114292"> Changing a Line's Volume 
+                    </a> </dd>
+                  <dd><a href="chapter6.html#114300"> Selecting among Various 
+                    Reverberation Presets </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter6.html#114326"> Manipulating the Audio Data 
+                Directly </a></dd>
+            </dl>
+            <h2><a href="chapter7.html"> Chapter 7: Using Files and Format Converters 
+              </a></h2>
+            <dl> 
+              <dd><a href="chapter7.html#114527"> Reading Sound Files </a> </dd>
+              <dd><a href="chapter7.html#114602"> Writing Sound Files </a> </dd>
+              <dd><a href="chapter7.html#114640"> Converting File and Data Formats 
+                </a> 
+                <dl> 
+                  <dd><a href="chapter7.html#114644"> Converting from One File 
+                    Format to Another </a> </dd>
+                  <dd><a href="chapter7.html#114718"> Converting Audio between 
+                    Different Data Formats </a> </dd>
+                  <dd><a href="chapter7.html#114777"> Learning What Conversions 
+                    Are Available </a></dd>
+                </dl>
+              </dd>
+            </dl>
+            </td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center" bgcolor="#CCCCCC">
+        <tr> 
+          <td> <font size="5"><b>Part II: MIDI</b></font></td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center">
+        <tr> 
+          <td> 
+            <h2><a href="chapter8.html">Chapter 8: Overview of the MIDI Package 
+              </a></h2>
+            <dl>
+              <dd><a href="chapter8.html#118774"> A MIDI Refresher: Wires and 
+                Files </a> 
+                <dl>
+                  <dd><a href="chapter8.html#118791"> Streaming Data in the MIDI 
+                    Wire Protocol </a> </dd>
+                  <dd><a href="chapter8.html#119349"> Sequenced Data in Standard 
+                    MIDI Files </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter8.html#118810"> The Java Sound API's Representation 
+                of MIDI Data </a> 
+                <dl>
+                  <dd><a href="chapter8.html#119522"> MIDI Messages </a> </dd>
+                  <dd><a href="chapter8.html#118823"> MIDI Events </a> </dd>
+                  <dd><a href="chapter8.html#118829"> Sequences and Tracks </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter8.html#118842"> The Java Sound API's Representation 
+                of MIDI Devices </a> 
+                <dl>
+                  <dd><a href="chapter8.html#118846"> The MidiDevice Interface 
+                    </a> </dd>
+                  <dd><a href="chapter8.html#118852"> Transmitters and Receivers 
+                    </a> </dd>
+                  <dd><a href="chapter8.html#118858"> Sequencers </a> </dd>
+                  <dd><a href="chapter8.html#118862"> Synthesizers </a></dd>
+                </dl>
+              </dd>
+            </dl>
+            <h2><a href="chapter9.html"> Chapter 9: Accessing MIDI System Resources 
+              </a></h2>
+            <dl>
+              <dd><a href="chapter9.html#119711"> The MidiSystem Class </a> </dd>
+              <dd><a href="chapter9.html#119749"> Obtaining Default Devices </a> 
+              </dd>
+              <dd><a href="chapter9.html#119787"> Learning What Devices Are Installed 
+                </a> </dd>
+              <dd><a href="chapter9.html#119833"> Obtaining a Desired Device </a> 
+              </dd>
+              <dd><a href="chapter9.html#119891"> Opening Devices </a></dd>
+            </dl>
+            <h2><a href="chapter10.html"> Chapter 10: Transmitting and Receiving 
+              MIDI Messages </a></h2>
+            <dl>
+              <dd><a href="chapter10.html#understanding"> Understanding Devices, 
+                Transmitters, and Receivers </a> </dd>
+              <dd><a href="chapter10.html#sending"> Sending a Message to a Receiver 
+                without Using a Transmitter </a> </dd>
+              <dd><a href="chapter10.html#understanding_time"> Understanding Time 
+                Stamps </a> 
+                <dl>
+                  <dd><a href="chapter10.html#120517"> Time Stamps on Messages 
+                    Sent to Devices </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter10.html#122132"> Connecting Transmitters to 
+                Receivers </a> 
+                <dl>
+                  <dd><a href="chapter10.html#120544"> Connecting to a Single 
+                    Device </a> </dd>
+                  <dd><a href="chapter10.html#120569"> Connecting to More than 
+                    One Device </a> </dd>
+                  <dd><a href="chapter10.html#120605"> Closing Connections </a></dd>
+                </dl>
+              </dd>
+            </dl>
+            <h2><a href="chapter11.html"> Chapter 11: Playing, Recording, and 
+              Editing MIDI Sequences </a></h2>
+            <dl>
+              <dd><a href="chapter11.html#120890"> Introduction to Sequencers 
+                </a> 
+                <dl>
+                  <dd><a href="chapter11.html#when"> When to Use a Sequencer </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter11.html#124542"> Understanding Sequence Data 
+                </a> 
+                <dl>
+                  <dd><a href="chapter11.html#124544"> Sequences and Tracks </a> 
+                  </dd>
+                  <dd><a href="chapter11.html#124548"> MidiEvents and Ticks </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter11.html#124591"> Overview of Sequencer Methods 
+                </a> </dd>
+              <dd><a href="chapter11.html#124598"> Obtaining a Sequencer </a> 
+              </dd>
+              <dd><a href="chapter11.html#124620"> Loading a Sequence </a> </dd>
+              <dd><a href="chapter11.html#124643"> Playing a Sequence </a> </dd>
+              <dd><a href="chapter11.html#124654"> Recording and Saving Sequences 
+                </a> </dd>
+              <dd><a href="chapter11.html#124674"> Editing a Sequence </a> </dd>
+              <dd><a href="chapter11.html#124684"> Using Advanced Sequencer Features 
+                </a> 
+                <dl>
+                  <dd><a href="chapter11.html#124686"> Moving to an Arbitrary 
+                    Position in the Sequence </a> </dd>
+                  <dd><a href="chapter11.html#124696"> Changing the Playback Speed 
+                    </a> </dd>
+                  <dd><a href="chapter11.html#124704"> Muting or Soloing Individual 
+                    <br>
+                    Tracks in the Sequence </a> </dd>
+                  <dd><a href="chapter11.html#124721"> Synchronizing with Other 
+                    MIDI Devices </a> </dd>
+                  <dd><a href="chapter11.html#124725"> Specifying Special Event 
+                    Listeners </a></dd>
+                </dl>
+              </dd>
+            </dl>
+            <h2><a href="chapter12.html"> Chapter 12: Synthesizing Sound </a></h2>
+            <dl> 
+              <dd><a href="chapter12.html#121742"> Understanding MIDI Synthesis 
+                </a> 
+                <dl> 
+                  <dd><a href="chapter12.html#121747"> Instruments </a> </dd>
+                  <dd><a href="chapter12.html#121755"> Channels </a> </dd>
+                  <dd><a href="chapter12.html#121767"> Soundbanks and Patches 
+                    </a> </dd>
+                  <dd><a href="chapter12.html#121777"> Voices </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter12.html#121793"> Managing Instruments and Soundbanks 
+                </a> 
+                <dl> 
+                  <dd><a href="chapter12.html#121803"> Learning What Instruments 
+                    Are Loaded </a> </dd>
+                  <dd><a href="chapter12.html#121824"> Loading Different Instruments 
+                    </a> </dd>
+                  <dd><a href="chapter12.html#121858"> Unloading Instruments </a> 
+                  </dd>
+                  <dd><a href="chapter12.html#123435"> Accessing Soundbank Resources	
+                    </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter12.html#123441"> Querying the Synthesizer's 
+                Capabilities and Current State </a> </dd>
+              <dd><a href="chapter12.html#121890"> Using Channels </a> 
+                <dl> 
+                  <dd><a href="chapter12.html#121894"> Controlling the Synthesizer 
+                    without <br>
+                    Using a Sequencer </a> </dd>
+                  <dd><a href="chapter12.html#121937"> Getting a Channel's Current 
+                    State </a> </dd>
+                  <dd><a href="chapter12.html#121953"> Muting and Soloing a Channel 
+                    </a></dd>
+                </dl>
+              </dd>
+              <dd><a href="chapter12.html#121964"> Permission to Play Synthesized 
+                Sound </a></dd>
+            </dl>
+            </td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center" bgcolor="#CCCCCC">
+        <tr> 
+          <td> <font size="5"><b>Part III: Service Provider Interfaces</b></font></td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center">
+        <tr> 
+          <td> 
+            <h2><a href="chapter13.html">Chapter 13: Introduction to the Service 
+              Provider Interfaces </a></h2>
+            <dl>
+              <dd><a href="chapter13.html#what"> What Are Services? </a> </dd>
+              <dd><a href="chapter13.html#how"> How Services Work </a> </dd>
+              <dd><a href="chapter13.html#how_providers"> How Providers Prepare 
+                New Services </a> </dd>
+              <dd><a href="chapter13.html#how_users"> How Users Install New Services 
+                </a></dd>
+            </dl>
+            <h2><a href="chapter14.html"> Chapter 14: Providing Sampled-Audio 
+              Services </a></h2>
+            <dl>
+              <dd><a href="chapter14.html#118164"> Introduction </a> </dd>
+              <dd><a href="chapter14.html#118177"> Providing Audio File-Writing 
+                Services </a> </dd>
+              <dd><a href="chapter14.html#118201"> Providing Audio File-Reading 
+                Services </a> </dd>
+              <dd><a href="chapter14.html#118208"> Providing Format-Conversion 
+                Services </a> </dd>
+              <dd><a href="chapter14.html#120618"> Providing New Types of Mixers	
+                </a></dd>
+            </dl>
+            <h2><a href="chapter15.html"> Chapter 15: Providing MIDI Services 
+              </a></h2>
+            <dl> 
+              <dd><a href="chapter15.html#122553"> Introduction </a> </dd>
+              <dd><a href="chapter15.html#122566"> Providing MIDI File-Writing 
+                Services </a> </dd>
+              <dd><a href="chapter15.html#122592"> Providing MIDI File-Reading 
+                Services </a> </dd>
+              <dd><a href="chapter15.html#122598"> Providing Particular MIDI Devices 
+                </a> </dd>
+              <dd><a href="chapter15.html#122605"> Providing Soundbank File-Reading 
+                Services </a></dd>
+            </dl>
+            </td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center" bgcolor="#CCCCCC">
+        <tr> 
+          <td> <font size="5"><b>Appendices </b></font></td>
+        </tr>
+      </table>
+      <br>
+      <table summary="layout" width="100%" border="0" cellpadding="5" align="center">
+        <tr> 
+          <td> 
+            <h2><a href="appendix1.html">Appendix 1: Code Overview: <code>AudioSystem.java</code></a></h2>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<p align="center"><font size="-1">Last updated January 11, 2002</font></p>
+</body>
+</html>

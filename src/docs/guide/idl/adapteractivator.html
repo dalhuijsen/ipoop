@@ -1,0 +1,453 @@
+
+<HTML>
+<HEAD>
+<!--updated dcarson 7/2002-->
+   <TITLE>Java IDL: Using Adapter Activators</TITLE>
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1 ALIGN=CENTER>Using Adapter Activators</H1>
+<HR>
+
+<P>When creating a new <a href="POA.html">POA</a>,  the application developer may declare 
+specific 
+policy choices for the new 
+POA and provide a different adapter activator and <a 
+href="POA.html#servantmanager">servant manager</a> (these are callback objects used by the 
+POA to 
+activate POAs 
+on demand and activate servants). Creating new POAs also allows the application developer to 
+partition 
+the name space of objects, as Object Ids are interpreted relative to a POA. Finally, by 
+creating new 
+POAs, the developer can independently control request processing for multiple sets of 
+objects.
+
+<P>An <strong>adapter activator</strong> is optional.  You would use an adapter activator if 
+POAs need 
+to be created during request processing.  If all needed POAs are created when the application 
+is 
+initialized, an adapter activator is not required.
+
+
+<P>An adapter activator supplies a POA with the ability to create child POAs on demand, as a 
+side-effect of receiving a request that names the
+child POA (or one of its children), or when the <code>find_POA</code> method is called with 
+an activate 
+parameter value of TRUE.  The ORB will invoke an operation on an adapter activator when a 
+request is 
+received for a child POA that does not currently exist. The adapter activator can then create 
+the 
+required POA on demand.
+
+<P>A request must be capable of conveying the Object Id of the target object as well as the 
+identification of the POA that created the target object reference. When a client issues a 
+request, the 
+ORB first locates an appropriate server (perhaps starting one if needed) and then it locates 
+the 
+appropriate POA within that server. 
+
+<P>If the POA does not exist in the server process, the application has the opportunity to 
+re-create 
+the required POA by using an adapter activator. An adapter activator is a user-implemented 
+object that 
+can be associated with a POA. It is invoked by the ORB when a request is received for a 
+nonexistent 
+child POA. The adapter activator has the opportunity to create the required POA. If it does 
+not, the 
+client receives the <code>ADAPTER_NONEXISTENT</code> exception. 
+
+<P>Once the ORB has located the appropriate POA, it delivers the request to that POA. The 
+further 
+processing of that request depends both upon the policies associated with that POA as well as 
+the 
+object's current state of activation.
+
+<H1>An Example Using Adapter Activators</H1>
+
+<P>The following example code shows an application that uses Adapter Activators to enable the 
+POA to be 
+created during request processing.  This application builds on the <a 
+href="GShome.html">"Hello 
+World"</a> example. 
+The following files are included in this example:
+<P>
+<UL>
+<LI><code><a href="#client">Client.java</a></code>
+<LI><code><a href="#server">Server.java</a></code>
+<LI><code><a href="#helloidl">Hello.idl</a></code>
+<LI><code><a href="#HelloServant">HelloServant.java</a></code>
+<LI><code><a href="#makefile">Makefile</a></code>
+<LI><code><a href="#runbat">run.bat</a></code>
+</UL>
+<P>For instructions on running this example, see <a href="#running">Running
+the Example Adapter Activator Application</a>.<P>
+
+
+<H2><a name="client">Client.java</a></H2>
+<P>The code for the example client initializes the ORB, resolves 
+<code>HelloServant</code>, and invokes the <tt>sayHello()</tt> method.
+<P>
+
+
+<UL><PRE><HR>
+<strong>//Client.java</strong>
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.CosNaming.NameComponent;
+
+public class Client {
+
+    public void run(String[] args) {
+        try {
+            //initialize the orb
+            ORB orb = ORB.init(args, null);
+            System.out.println("ORB initialized");
+
+            NamingContext namingContext = NamingContextHelper.narrow(
+                orb.resolve_initial_references("NameService"));
+            NameComponent[] nc = { new NameComponent("HelloServer", "") };
+
+            //resolve HelloServant and invoke sayHello()
+            Hello helloRef = HelloHelper.narrow(namingContext.resolve(nc));
+            System.out.println("Resolved HelloServant");
+
+            System.out.println(helloRef.sayHello());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        new Client().run(args);
+    }
+}
+<HR></PRE></UL>
+
+
+<H2><a name="server">Server.java</a></H2>
+
+<P>The code for the server does the following:
+<P>
+<UL>
+<LI>Initializes the ORB.
+<LI>Resolve <tt>RootPOA</tt>.
+<LI>Registers the adapter activator with <tt>rootPOA</tt> so that child POAs can
+be created on demand.
+<LI>Runs <tt>find_POA</tt> with an activate parameter of <tt>TRUE</tt> to cause
+the adapter activator associated with <tt>rootPOA</tt> to be invoked if
+'HelloPOA' does not exist.
+<LI>Creates the object reference for <tt>HelloServant</tt>
+and registers it with the naming service.
+<LI>Destroys 'HelloPOA'. This POA will be transparently recreated when
+the ORB receives a request on <tt>HelloPOA</tt> using the adapter activator we
+registered with the <tt>RootPOA</tt>.
+<LI>Activates <tt>rootPOA</tt>.
+<LI>Waits for incoming requests.
+<LI>Creates <tt>MyAdapterActivator</tt>  to create the POA with appropriate 
+policies, associate the servant with the new POA, and activate the new POA.
+</UL>
+
+
+<UL><PRE><HR>
+<strong>//Server.java</strong>
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
+import org.omg.PortableServer.AdapterActivator;
+import org.omg.PortableServer.IdAssignmentPolicyValue;
+import org.omg.PortableServer.LifespanPolicyValue;
+import org.omg.PortableServer.ImplicitActivationPolicyValue;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.CosNaming.NameComponent;
+
+public class Server {
+
+    public void run(String[] args) {
+        try {
+            //initialize the orb
+            ORB orb = ORB.init(args, null);
+            System.out.println("ORB initialized");
+
+            //resolve RootPOA
+            POA rootPOA = POAHelper.narrow(
+                orb.resolve_initial_references("RootPOA"));
+
+            //register adapter activator with rootPOA so that child POAs can
+            //be created on demand
+            rootPOA.the_activator(new MyAdapterActivator());
+
+            //find_POA with an activate parameter TRUE would cause the
+            //adapter activator associated with rootPOA to be invoked if
+            //'HelloPOA' does not exist
+            POA childPOA = rootPOA.find_POA("HelloPOA", true);
+
+            //Create the object reference for HelloServant
+            //and register with naming service
+            org.omg.CORBA.Object obj = childPOA.id_to_reference(
+                "abcd".getBytes());
+            Hello helloRef = HelloHelper.narrow(obj);
+
+            NamingContext namingContext = NamingContextHelper.narrow(
+                orb.resolve_initial_references("NameService"));
+            NameComponent[] nc = { new NameComponent("HelloServer", "") };
+            namingContext.rebind(nc, helloRef);
+
+            //Destroy 'HelloPOA'. This POA will be transparently recreated when
+            //ORB receives a request on HelloPOA using the adapter activator we
+            //registered with the RootPOA
+            childPOA.destroy(true, true);
+
+            //activate rootPOA
+            rootPOA.the_POAManager().activate();
+
+            //wait for incoming requests
+            System.out.println("Server ready and running....");
+            orb.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        new Server().run(args);
+    }
+}
+
+class MyAdapterActivator extends LocalObject implements AdapterActivator {
+
+    public boolean unknown_adapter(POA parent, String name) {
+        System.out.println("unknown_adapter() invoked for POA - " + name);
+        try {
+            // create the POA with appropriate policies
+            // this sample uses PERSISTENT, NO_IMPLICIT_ACTIVATION
+            // and USER_ID policies
+            Policy[] policy = new Policy[3];
+            policy[0] = parent.create_lifespan_policy(
+                LifespanPolicyValue.PERSISTENT);
+            policy[1] = parent.create_id_assignment_policy(
+                IdAssignmentPolicyValue.USER_ID);
+            policy[2] = parent.create_implicit_activation_policy(
+                ImplicitActivationPolicyValue.NO_IMPLICIT_ACTIVATION);
+
+            POA child = parent.create_POA(name, null, policy);
+
+            //Associate the servant with the new POA
+            HelloServant hello = new HelloServant();
+            child.activate_object_with_id("abcd".getBytes(), hello);
+
+            //activate the new POA
+            child.the_POAManager().activate();
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}
+<HR></PRE></UL>
+
+
+<H2><a name="helloidl">Hello.idl</a></H2>
+
+This Interface Definition Language (IDL) file is used in all of the "Hello World" example
+variations on this site.  This IDL file describes a CORBA object whose 
+<tt>sayHello()</tt> operation returns a string.
+
+<UL><PRE><HR>
+interface Hello {
+   string sayHello();
+};
+<HR></PRE></UL>
+
+
+<H2><a name="HelloServant">HelloServant.java</a></H2>
+The servant is the implementation of the Hello IDL interface; each <tt>Hello</tt>
+ instance is
+implemented by a <tt>HelloServant</tt> instance. The servant is a subclass of 
+<tt>HelloPOA</tt>, which is generated by the <tt>idlj</tt> compiler from 
+the example IDL. The servant contains one
+method for each IDL operation, in this example, the <tt>sayHello()</tt> method. 
+Servant methods are just like ordinary Java methods; the extra code to deal
+with the ORB, with marshaling arguments and results, and so on, is provided by the skeleton.
+ 
+<UL><PRE><HR>
+<strong>//HelloServant.java</strong>
+public class HelloServant extends HelloPOA {
+
+    public String sayHello() {
+        return "Hello :)";
+    }
+}
+<HR></PRE></UL>
+
+
+<H2><a name="makefile">Makefile</a></H2>
+<P>The <em>make</em> program generates a sequence of commands for execution 
+by the Unix shell.
+
+ 
+<UL><PRE><HR>
+JAVA_HOME=&lt;<em>path_to_your_Java_installation_bin_directory</em>&gt;
+
+#setup tools
+JAVA=$(JAVA_HOME)/bin/java
+JAVAC=$(JAVA_HOME)/bin/javac
+IDLJ=$(JAVA_HOME)/bin/idlj
+ORBD=$(JAVA_HOME)/bin/orbd
+
+all	: clean build run
+
+clean	:
+	- rm -rf classes orb.db
+
+build	:
+	mkdir -p classes
+	$(IDLJ) -fall -td classes Hello.idl
+	$(JAVAC) -classpath classes -d classes HelloServant.java Server.java Client.java
+
+run	: runorbd register runclient
+
+runorbd :
+	$(ORBD) -ORBInitialPort 10001 &
+	sleep 20
+
+register:
+	#servertool does not support script based register due to a bug
+	#using class instead
+	$(JAVA) com.sun.corba.se.internal.Activation.ServerTool \
+	-ORBInitialPort 10001 -cmd \
+	register -server Server -classpath classes
+
+runclient :
+	$(JAVA) -classpath classes Client -ORBInitialPort 10001
+
+
+<HR></PRE></UL>
+
+
+<H2><a name="runbat">run.bat</a></H2>
+<P>The <em>bat</em> utility generates a sequence of commands for execution 
+by the Microsoft Windows command shell.
+ 
+<UL><PRE><HR>
+SET JAVA_HOME=&lt;<em>path_to_your_Java_installation_build_directory</em>&gt;
+
+mkdir classes
+
+%JAVA_HOME%\bin\idlj -fall -td classes Hello.idl
+%JAVA_HOME%\bin\javac -classpath classes -d classes HelloServant.java Server.java Client.java
+
+REM - Start the ORB daemon
+
+start %JAVA_HOME%\bin\orbd -ORBInitialPort 10001 -ORBDebug orbd
+@echo Wait 10-15 seconds for the orbd to start
+@pause
+
+REM - Register the persistent server with orbd using servertool
+
+%JAVA_HOME%\bin\java com.sun.corba.se.internal.Activation.ServerTool -ORBInitialPort 10001 -cmd register -server Server -classpath classes
+
+%JAVA_HOME%\bin\java -classpath classes Client -ORBInitialPort 10001
+
+<HR></PRE></UL>
+
+
+<H2><a name="running">Running the Example Adapter Activator Application</a></H2>
+
+<P>To run this example,
+<P>
+<UL>
+<LI>Create the files using the code shown above.
+<LI>Run the example using either of these methods:<P>
+	<UL>
+	<LI>If you have the Make utility, run the application using the 
+	<a href="#makefile"><code>Makefile</code></a>:
+	<P><CODE>make all</CODE></P>
+	<LI>If you have the batch utility, run the application using
+	 <a href="#runbat"><code>run.bat</code></a>.  From the application directory, enter:
+	 <P><CODE>run</CODE></P>
+	 </UL>
+</UL>
+
+<P>You will see output generated to the terminal window similar to 
+that below when you run the Makefile:
+
+<P>
+<UL><PRE><HR>
+rm -rf classes orb.db
+mkdir -p classes
+/j2se1.4/bin/idlj -fall -td classes Hello.idl
+/j2se1.4/bin/javac -classpath classes -d classes HelloServant.java Server.java Client.java
+/j2se1.4/bin/orbd -ORBInitialPort 10001 &
+sleep 20
+#servertool does not support script based register due to a bug
+#using class instead
+/j2se1.4/bin/java com.sun.corba.se.internal.Activation.ServerTool \
+-ORBInitialPort 10001 -cmd \
+register -server Server -classpath classes
+
+        server registered (serverid = 257).
+
+/j2se1.4/bin/java -classpath classes Client -ORBInitialPort 10001
+ORB initialized
+Resolved HelloServant
+Hello :)
+<HR></PRE></UL>
+
+
+Shut down ORBD when you have completed this example.
+
+<UL>
+<LI>If using the Unix operating system, type <code>pkill orbd</code> in the terminal window.
+<LI>If using Microsoft Windows, enter <code>Ctrl+C</code> in the command prompt window.
+</UL>
+
+
+
+
+<H1>Further Information</H1>
+
+<P>For more information on Adapter Activators, 
+please refer to section 11.3.3 of the
+<em><a href="http://www.omg.org/docs/formal/99-10-07.pdf">CORBA 2.3.1 Specification</a></em> or the 
+<a 
+href="../../api/org/omg/PortableServer/AdapterActivatorOperations.html">
+<em>AdapterActivatorOperations 
+API documentation</em></a>.
+
+
+
+
+
+
+<P><HR>
+<CENTER><P>
+
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html">Java IDL Home</A></TD>
+</TR>
+<TR>
+  <TD ALIGN=CENTER>Last updated: July 23, 2002</TD>
+</TR>
+</TABLE>
+<P>
+<P>
+<!-- server side include for page footer -->
+
+  <!--#include virtual="/share/include/normal.footer.v4.0.html"-->
+
+<!-- end server side include for footer -->
+
+</CENTER>
+</BODY>
+</HTML>

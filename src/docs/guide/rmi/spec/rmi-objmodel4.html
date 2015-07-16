@@ -1,0 +1,92 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 2 - Distributed Object Model
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-objmodel3.html">PREV</a>
+ | <a href="rmi-objmodel5.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	2.3	</i> The Distributed and Nondistributed Models Contrasted
+</a></h2>
+
+<blockquote>
+<a name="3431"><!-- --></a>
+The Java platform&#39;s distributed object model is similar to the Java platform&#39;s object model in the following ways:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="184"><!-- --></a>
+A reference to a remote object can be passed as an argument or returned as a result in any method invocation (local or remote).
+</li>
+<li>
+<a name="185"><!-- --></a>
+A remote object can be cast to any of the set of remote interfaces supported by the implementation using the syntax for casting built into the Java programming language.
+</li>
+<li>
+<a name="186"><!-- --></a>
+The built-in <code>instanceof</code> operator can be used to test the remote interfaces supported by a remote object.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="187"><!-- --></a>
+The Java platform&#39;s distributed object model differs from the Java platform&#39;s object model in these ways:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="188"><!-- --></a>
+Clients of remote objects interact with remote interfaces, never with the implementation classes of those interfaces.
+</li>
+<li>
+<a name="190"><!-- --></a>
+Non-remote arguments to, and results from, a remote method invocation are passed by copy rather than by reference. This is because references to objects are only useful within a single virtual machine.
+</li>
+<li>
+<a name="3857"><!-- --></a>
+A remote object is passed by reference, not by copying the actual remote implementation.
+</li>
+<li>
+<a name="191"><!-- --></a>
+The semantics of some of the methods defined by class <code>java.lang.Object</code> are specialized for remote objects.
+</li>
+<li>
+<a name="1513"><!-- --></a>
+Since the failure modes of invoking remote objects are inherently more complicated than the failure modes of invoking local objects, clients must deal with additional exceptions that can occur during a remote method invocation.
+</li>
+</ul>
+</blockquote>
+
+</ul>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-objmodel3.html">PREV</a>
+ | <a href="rmi-objmodel5.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

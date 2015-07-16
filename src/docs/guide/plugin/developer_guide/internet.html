@@ -1,0 +1,45 @@
+<html>
+<head>
+<title>Deployment: Internet</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Internet Deployment</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<h2><br>
+  Deploying Java Plug-in with Internet Explorer</h2>
+<p>With Internet Explorer it is recommended that you use the <code>APPLET</code> 
+  tag for internet deployment. However, you could use the <code>OBJECT</code> 
+  tag in certain cases; e.g., if you want users to use a particular version of 
+  Java Plug-in. In the case that the you chose to use the <code>OBJECT</code> 
+  tag, the following is recommended.</p>
+<table summary="layout" width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr> 
+    <td> 
+      <h3 align="left"><u>Recommendations</u></h3>
+      <p>The following is recommeded for long-term reliability:</p>
+      <ul>
+        <li>For the <code>codebase</code> attribute in the <code>OBJECT</code> 
+          tag, it is recommended that you use the <code>.exe</code> version, rather 
+          than the <code>.cab</code> version, on <code>java.sun.com</code>. That 
+          <code>.cab</code> version on <code>java.sun.com</code> may point to 
+          an updated version that you do not want to use for your deployment.</li>
+        <li>It is also recommend that you create your own download site for the 
+          versions you need so that you do not rely on <code>java.sun.com</code>. 
+          Downloads on <code>java.sun.com</code> frequently change.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+<p>These are the same recommendations as for the intranet environment.</p>
+<h2>Deploying Java Plug-in with Netscape</h2>
+<p>With Netscape it is recommended that you use the APPLET tag for internet deployment.</p>
+</body>
+</html>

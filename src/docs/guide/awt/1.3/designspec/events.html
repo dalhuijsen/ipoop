@@ -1,0 +1,551 @@
+<html><head><title>Java AWT: Delegation Event Model</title></head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<a name="919249">
+<h1><img src="images/gun.sm.gif" alt="Duke logo holding a gun"> Java AWT: Delegation Event Model</h1>
+</a>
+<hr><p><a name="919578">
+<address>
+Last updated: February 3, 1997
+</address>
+<h2>Purpose</h2>
+</a>
+This document explains the rationale behind introducing a new event model into the AWT and describes specifically how the new model maps to the AWT API. This new model has also been adopted by the JavaBeans architecture for general event processing and is described at a high level in the <a href="../../../beans/index.html">JavaBeans Specification</a> document.<a name="919703">
+<p>
+<h3>The 1.0 Event Model</h3>
+</a>
+The model for event processing in version 1.0 of the AWT is based on inheritance. In order for a program to catch and process GUI events, it must subclass GUI components and override either action() or handleEvent() methods. Returning "true" from one of these methods consumes the event so it is not processed further; otherwise the event is propagated sequentially up the GUI hierarchy until either it is consumed or the root of the hierarchy is reached. The result of this model is that programs have essentially two choices for structuring their event-handling code:<ol>
+
+<li>Each individual component can be subclassed to specifically handle its target events. The result of this is a plethora of classes.
+
+<li>All events for an entire hierarchy (or subset thereof) can be handled by a particular container; the result is that the container's overridden action() or handleEvent() method must contain a complex conditional statement in order to process the events. 
+</ol>
+<p>
+<a name="919704">
+<h3>Issues with the 1.0 Event Model</h3>
+</a>
+While the above model works fine for small applets with simple interfaces, it does not scale well for larger java programs for the following reasons:<ul>
+<li>The requirement to subclass a component in order make any real use of its functionality is cumbersome to developers; subclassing should be reserved for circumstances where components are being extended in some functional or visual way.
+
+<li>The inheritance model does not lend itself well to maintaining a clean separation between the application model and the GUI because application code must be integrated directly into the subclassed components at some level.
+
+<li>Since ALL event types are filtered through the same methods, the logic to process the different event types (and possibly the event targets in approach #2) is complex and error-prone. It is not uncommon for programs to have perplexing bugs that are the result of returning an incorrect result (true or false) from the handleEvent() method. This becomes an even greater problem as new event types are added to the AWT; if the logic of existing handleEvent() methods isn't set up to deal properly with unknown types, programs could potentially break in very unpredictable ways.
+
+<li>There is no filtering of events. Events are always delivered to components regardless of whether the components actually handle them or not. This is a general performance problem, particularly with high-frequency type events such as mouse moves.
+
+<li>For many components, the action() method passes a String parameter which is equivalent to either the label of the component (Button, MenuItem) or the item selected (List, Choice). For programs which use approach #2, this often leads to poor coding and unwieldy string-compare logic that doesn't localize well.
+</ul><a name="919733">
+<p>
+<hr>
+<h2>The Delegation Model</h2>
+</a>
+Version 1.1 of the Java<sup><font size=-2>TM</font></sup> platform introduced 
+a new delegation-based event model in AWT in order to:<ul>
+<li>Resolve the problems mentioned previously
+
+<li>Provide a more robust framework to support more complex java programs.
+</ul><a name="919734">
+<p>
+<h3>Design Goals</h3>
+</a>
+The primary design goals of the new model in the AWT are the following:<ul>
+<li>Simple and easy to learn
+
+<li>Support a clean separation between application and GUI code
+
+<li>Facilitate the creation of robust event handling code which is less error-prone (strong compile-time checking)
+
+<li>Flexible enough to enable varied application models for event flow and propagation
+
+<li>For visual tool builders, enable run-time discovery of both events that a component generates as well as the events it may observe
+
+<li>Support backward binary compatibility with the old model
+</ul>
+<p>Note: These goals are described from the particular perspective of the AWT. Since this model has also been designed to accommodate the JavaBeans architecture, the design goals from the JavaBeans perspective are described in the "Events" section of the JavaBeans Specification and may vary slightly from these goals.<a name="919620">
+<p>
+<h3>Delegation Model Overview</h3>
+</a>
+Event types are encapsulated in a class hierarchy rooted at java.util.EventObject. An event is propagated from a "Source" object to a "Listener" object by invoking a method on the listener and passing in the instance of the event subclass which defines the event type generated.
+<p>A Listener is an object that implements a specific EventListener interface extended from the generic java.util.EventListener. An EventListener interface defines one or more methods which are to be invoked by the event source in response to each specific event type handled by the interface.
+<p>An Event Source is an object which originates or "fires" events. The source defines the set of events it emits by providing a set of set&lt;EventType&gt;Listener (for single-cast) and/or add&lt;EventType&gt;Listener (for mult-cast) methods which are used to register specific listeners for those events.
+<p>In an AWT program, the event source is typically a GUI component and the listener is commonly an "adapter" object which implements the appropriate listener (or set of listeners) in order for an application to control the flow/handling of events. The listener object could also be another AWT component which implements one or more listener interfaces for the purpose of hooking GUI objects up to each other.
+<p>
+<h3>Event Hierarchy</h3>
+
+Events are no longer represented by a single Event class (like java.awt.Event) with numeric ids, but instead by a hierarchy of event classes. Each event class is defined by the data representing that event type or related group of events types. 
+<p>Since a single event class may be used to represent more than one event type (i.e. MouseEvent represents mouse up, mouse down, mouse drag, mouse move, etc), some event classes may also contain an "id" (unique within that class) which maps to its specific event types.
+<p>The event classes contain no public fields; the data in the event is completely encapsulated by proper get&lt;Attr&gt;()/set&lt;Attr&gt;() methods (where set&lt;Attr&gt;() only exists for attributes on an event that could be modified by a listener).
+<p>Although these are the concrete set defined by the AWT, programs are free to define their own event types by subclassing either java.util.EventObject or one of the AWT event classes.   Programs should choose event ID values which are greater than the constant:
+<pre><code>        <a href="../../../../api/java/awt/AWTEvent.html#RESERVED_ID_MAX">java.awt.AWTEvent.RESERVED_ID_MAX</a>
+</code></pre>
+
+<p>
+<h3>Low-level vs. Semantic Events</h3>
+
+The AWT provides two conceptual types of events: low-level and semantic. 
+<p>A low-level event is one which represents a low-level input or window-system occurrence on a visual component on the screen. The low-level event classes defined by the AWT are as follows:
+<pre><code>	java.util.EventObject
+</code></pre>
+
+<pre><code>		<a
+href="../../../../api/java/awt/AWTEvent.html">java.awt.AWTEvent</a> </code></pre>
+
+<pre><code>		    <a href="../../../../api/java/awt/event/ComponentEvent.html">java.awt.event.ComponentEvent</a> (component resized, moved, etc.)
+</code></pre>
+
+<pre><code>			<a href="../../../../api/java/awt/event/FocusEvent.html">java.awt.event.FocusEvent</a> (component got focus, lost focus)
+</code></pre>
+
+<pre><code>			<a href="../../../../api/java/awt/event/InputEvent.html">java.awt.event.InputEvent</a>
+</code></pre>
+
+<pre><code>			    <a href="../../../../api/java/awt/event/KeyEvent.html">java.awt.event.KeyEvent</a> (component got key-press, key-release, etc.)
+</code></pre>
+
+<pre><code>			    <a href="../../../../api/java/awt/event/MouseEvent.html">java.awt.event.MouseEvent</a> (component got mouse-down, mouse-move, etc.)
+</code></pre>
+
+<pre><code>			<a href="../../../../api/java/awt/event/ContainerEvent.html">java.awt.event.ContainerEvent</a>
+</code></pre>
+
+<pre><code>			<a href="../../../../api/java/awt/event/WindowEvent.html">java.awt.event.WindowEvent</a>
+</code></pre>
+
+<p>Semantic events are defined at a higher-level to encapsulate the semantics of a user interface component's model. The semantic event classes defined by the AWT are as follows:
+<pre><code>	java.util.EventObject
+</code></pre>
+
+<pre><code>	    java.awt.AWTEvent
+</code></pre>
+
+<pre><code>		<a href="../../../../api/java/awt/event/ActionEvent.html">java.awt.event.ActionEvent</a> ("do a command")
+</code></pre>
+
+<pre><code>		<a href="../../../../api/java/awt/event/AdjustmentEvent.html">java.awt.event.AdjustmentEvent</a> ("value was adjusted")
+</code></pre>
+
+<pre><code>		<a href="../../../../api/java/awt/event/ItemEvent.html">java.awt.event.ItemEvent</a> ("item state has changed")
+</code></pre>
+
+<pre><code>		<a href="../../../../api/java/awt/event/TextEvent.html">java.awt.event.TextEvent</a> ("the value of the text object changed")
+</code></pre>
+
+
+
+<p>Note that these semantic events are not tied to specific screen-based component classes, but may apply across a set of components which implement a similar semantic model. For example, a Button object will fire an "action" event when it is pressed, a List object will fire an "action" event when an item is double-clicked, a MenuItem will fire an "action" event when it was selected from a menu, and a non-visual Timer object might fire an "action" when its timer goes off (the latter is a hypothetical case).
+<p>
+<h3>Event Listeners</h3>
+
+An EventListener interface will typically have a separate method for each distinct event type the event class represents. So in essence, particular event semantics are defined by the combination of an Event class paired with a particular method in an EventListener. For example, the FocusListener interface defines two methods, focusGained() and focusLost(), one for each event type that FocusEvent class represents. 
+<p>The API attempts to define a balance between providing a reasonable granularity of Listener interface types and not providing a separate interface for every single event type.
+<p>The low-level listener interfaces defined by the AWT are as follows:
+<pre><code>	java.util.EventListener
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/ComponentListener.html">java.awt.event.ComponentListener</a> 
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/ContainerListener.html">java.awt.event.ContainerListener</a> 
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/FocusListener.html">java.awt.event.FocusListener </a>
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/KeyListener.html">java.awt.event.KeyListener</a> 
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/MouseListener.html">java.awt.event.MouseListener </a>
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/MouseMotionListener.html">java.awt.event.MouseMotionListener </a>
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/WindowListener.html">java.awt.event.WindowListener</a>
+</code></pre>
+
+<p>The semantic listener interfaces defined by the AWT are as follows:
+<pre><code>	java.util.EventListener
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/ActionListener.html">java.awt.event.ActionListener</a> 
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/AdjustmentListener.html">java.awt.event.AdjustmentListener</a> 
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/ItemListener.html">java.awt.event.ItemListener </a>
+</code></pre>
+
+<pre><code>	    <a href="../../../../api/java/awt/event/TextListener.html">java.awt.event.TextListener </a>
+</code></pre>
+
+<p>
+<h3>Event Sources</h3>
+
+Because the events fired by an event source are defined by particular methods on that object, it is completely clear from the API documentation (as well as by using run-time introspection techniques) exactly which events an object supports. 
+<p>All AWT event sources support a multicast model for listeners.  This means that multiple listeners can be added and removed from a single source.  <strong>The API makes no guarantees about the order in which the events are delivered to a set of registered listeners for a given event on a given source.</strong>  Additionally, any event which allows its properties to be modified (via setXXX() methods) will be explicitly copied such that each listener receives a replica of the original event.  If the order in which events are delivered to listeners is a factor for your program, you should chain the listeners off a single listener which is registered on the source (the fact that the event data is encapsulated in a single object makes propagating the event extremely simple).
+<p>Event delivery is synchronous (as with 1.0's handleEvent()), however programs should not make the assumption that the delivery of an event to a set of listeners will occur on the same thread.
+<p>Once again, a distinction is drawn between low-level and semantic events. For low-level events, the source will be one of the visual component classes (Button, Scrollbar, etc) since the event is tightly bound to the actual component on the screen. The low-level listeners are defined on the following components:<ul>
+<li>java.awt.Component
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/Component.html#addComponentListener(java.awt.event.ComponentListener)">addComponentListener(ComponentListener l)</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/Component.html#addFocusListener(java.awt.event.FocusListener)">addFocusListener(FocusListener l)</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/Component.html#addKeyListener(java.awt.event.KeyListener)">addKeyListener(KeyListener l)</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/Component.html#addMouseListener(java.awt.event.MouseListener)">addMouseListener(MouseListener l)</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/Component.html#addMouseMotionListener(java.awt.event.MouseMotionListener)">addMouseMotionListener(MouseMotionListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.Container
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/Container.html#addContainerListener(java.awt.event.ContainerListener)">addContainerListener(ContainerListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.Dialog
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/Dialog.html#addWindowListener(java.awt.event.WindowListener)">addWindowListener(WindowListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.Frame
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/Frame.html#addWindowListener(java.awt.event.WindowListener)">addWindowListener(WindowListener l)</a>
+</code></pre>
+
+<p>For semantic events, the source is typically a higher-level interface representing the semantic model (and this higher-level interface is commonly `implemented' by components using the model). Following are the semantic listeners defined for AWT components:<ul>
+<li>java.awt.Button 
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/Button.html#addActionListener(java.awt.event.ActionListener)">addActionListener(ActionListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.Choice (implements <a href="../../../../api/java/awt/ItemSelectable.html">java.awt.ItemSelectable</a>)
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/Choice.html#addItemListener(java.awt.event.ItemListener)">addItemListener(ItemListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.Checkbox (implements <a href="../../../../api/java/awt/ItemSelectable.html">java.awt.ItemSelectable</a>)
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/Checkbox.html#addItemListener(java.awt.event.ItemListener)">addItemListener(ItemListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.CheckboxMenuItem (implements <a href="../../../../api/java/awt/ItemSelectable.html">java.awt.ItemSelectable</a>)
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/CheckboxMenuItem.html#addItemListener(java.awt.event.ItemListener)">addItemListener(ItemListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.List (implements <a href="../../../../api/java/awt/ItemSelectable.html">java.awt.ItemSelectable</a>)
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/List.html#addActionListener(java.awt.event.ActionListener)">addActionListener(ActionListener l)</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/List.html#addItemListener(java.awt.event.ItemListener)">addItemListener(ItemListener l)</a>
+</code></pre>
+
+<ul>
+<li>java.awt.MenuItem 
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/MenuItem.html#addActionListener(java.awt.event.ActionListener)">addActionListener(ActionListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.Scrollbar (implements <a href="../../../../api/java/awt/Adjustable.html">java.awt.Adjustable)</a>
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/Scrollbar.html#addAdjustmentListener(java.awt.event.AdjustmentListener)">addAdjustmentListener(AdjustmentListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.TextArea 
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/TextComponent.html#addTextListener(java.awt.event.TextListener)">addTextListener(TextListener l)</a>
+</code></pre>
+<ul>
+<li>java.awt.TextField 
+</ul>
+<pre><code>	<a href="../../../../api/java/awt/TextField.html#addActionListener">addActionListener(ActionListener l)</a>
+</code></pre>
+<pre><code>	<a href="../../../../api/java/awt/TextComponent.html#addTextListener">addTextListener(TextListener l)</a>
+</code></pre>
+
+<p>
+<h3>Adapters</h3>
+
+Since many of the EventListener interfaces are designed to listen to multiple event subtypes (i.e. the MouseListener listens to mouse-down, mouse-up, mouse-enter, etc.), the AWT will provide a a set of abstract "adapter" classes, one which implements each listener interface.  This will allow programs to easily subclass the Adapters and override ONLY the methods representing event types they are interested in. 
+<p>The Adapter classes provided by AWT are as follows:
+<pre><code>	<a href="../../../../api/java/awt/event/ComponentAdapter.html">java.awt.event.ComponentAdapter</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/event/ContainerAdapter.html">java.awt.event.ContainerAdapter</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/event/FocusAdapter.html">java.awt.event.FocusAdapter</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/event/KeyAdapter.html">java.awt.event.KeyAdapter</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/event/MouseAdapter.html">java.awt.event.MouseAdapter</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/event/MouseMotionAdapter.html">java.awt.event.MouseMotionAdapter</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/event/WindowAdapter.html">java.awt.event.WindowAdapter</a>
+</code></pre>
+
+<p>Note: There are no default Adapters provided for the semantic listeners, since each of those only contain a single method and an adapter would provide no real value.
+<p>
+<h3>Filtering for Performance</h3>
+</a>
+One of the great benefits of the new model is that since listeners are registered to handle specific event types, it's relatively easy for the toolkit to filter the events and deliver ONLY the events a component is interested in. This was not true with the old model!. Filtering should improve performance, especially with high frequency type events, such as mouse-moves. 
+<p>All platforms should see some performance improvement from reduced event traffic, but the Solaris implementation should gain exceptional improvement since it's a network-based window system.<a name="920212">
+<p>
+<h3>Code Example</h3>
+</a>
+Following is some sample code that uses the new model:
+<pre><code>	
+import java.awt.*;
+import java.awt.event.*;
+
+public class App {
+    public void search() { 
+        /* do search operation ...*/ 
+        System.out.println("Searching...");
+    }
+    public void sort() { 
+        /* do sort operation ...*/ 
+        System.out.println("Sorting....");
+    }
+
+    static public void main(String args[]) {
+       App app = new App();
+       GUI gui = new GUI(app);
+    }
+}
+
+<b>class Command implements ActionListener  {
+    static final int SEARCH = 0;
+    static final int SORT = 1;
+    int id;
+    App app;
+
+    public Command(int id, App app) {
+        this.id = id;
+        this.app = app;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        switch(id) {
+          case SEARCH: 
+            app.search();
+            break;
+          case SORT:
+            app.sort();
+            break;
+        }
+    }
+}</b>
+
+class GUI {
+
+    public GUI(App app) {
+        Frame f = new Frame();
+        f.setLayout(new FlowLayout());          
+
+        <b>Command searchCmd = new Command(Command.SEARCH, app);</b>
+        <b>Command sortCmd = new Command(Command.SORT, app);</b>
+
+        Button b;
+        f.add(b = new Button("Search"));
+        <b>b.addActionListener(searchCmd);</b>
+        f.add(b = new Button("Sort"));
+        <b>b.addActionListener(sortCmd);</b>
+
+        List l;
+        f.add(l = new List());
+        l.add("Alphabetical");
+        l.add("Chronological");
+        <b>l.addActionListener(sortCmd);</b>
+        f.pack();
+
+        f.show();
+    }
+}
+</code></pre>
+
+<p>Note in particular the following differences between this example and how this would have been implemented in the old model:<ul>
+<li>The application code/logic is completely separate from the GUI. The GUI can be modified (or alternatives provided) without touching the application-specific code. This benefit may not be as apparent from this over-simplified case. However, as applications get larger and more complex, this becomes extremely important.
+
+<li>Absolutely no subclassing of AWT components is required.
+
+<li>ONLY the action events are delivered to this program; in the old model all other events would have also been delivered even though they performed no required function.
+
+<li>This code is not necessarily leaner than the code that would have been required for the old event model. This is mostly due to the requirement for writing the adapter class which listens to the events and dispatches them into application commands appropriately. The adapter classes are required because the Java language supports neither method references nor closures. In this context, it was believed that using interfaces/adapters would be the most type-safe option for making connections between objects.  This code could be condensed by using the new JDK1.1 "Inner classes" java language feature.
+</ul>
+<p>
+<hr>
+<h2>Handling Events in Extended Components</h2>
+
+For Java programs which are extending component classes via subclassing, it would be burdensome to require the registration of separate listener objects to respond to events. Therefore, for this case, the AWT defines that each component provide specific protected methods (that can be overridden by subclasses) which actually dispatch the events to listeners if they exist. This way a subclass can simply override one of these methods in order to process an event.<p>
+In order to make this as flexible as possible, this event processing capability is provided in two levels.  The first is a single method on all components:
+
+<pre><code>     <a href="../../../../api/java/awt/Component.html#processEvent(java.awt.AWTEvent)">protected void processEvent(AWTEvent)</a>
+</code></pre>
+All events for a component are first funneled through this method so that subclasses can choose to handle all events in a single place (similar to the 1.0 model's "handleEvent" with the main difference being that events are NOT propagated up the containment hierarchy in the new model).
+<p>
+The second option for processing events is provided at the event class level; there is a separate method for each class of event handled by that component:
+<pre><code>     protected void process<gt>EventClass<lt>(<gt>EventClass<lt>)
+</code></pre>
+For example, the java.awt.List component has the following event-class processing methods:
+
+<pre><code>     <a href="../../../../api/java/awt/List.html#processActionEvent(java.awt.event.ActionEvent)">protected void processActionEvent(ActionEvent e)</a>
+
+     <a href="../../../../api/java/awt/List.html#processItemEvent(java.awt.event.ItemEvent)">protected void processItemEvent(ItemEvent e)</a>
+</code></pre> 
+
+By default, the single processEvent method will invoke the proper event-class processing method.  The event-class processing method by default will invoke any listeners which are registered.  It's important to remember that these methods perform a critical function in the event processing for an AWT component and so if you override them <b>you should remember to call the superclass's method somewhere within your own!</b>
+<p>
+<h3>Selecting for Event Types</h3>
+One of the goals of the listener model is to improve performance by NOT delivering events which components are not interested in.  <b>By default, if a listener type is not registered on a component, then those events will NOT be delivered and these processing methods will therefore NOT be called</b>.  So if you are using this extension mechanism for event-handling, you'll need to select for the specific types of events your component wishes to receive (in case no listener is registered).  This can be done by using the following method on java.awt.Component:
+<pre><code>     <a href="../../../../api/java/awt/Component.html#enableEvents(long)">protected final void enableEvents(long eventsToEnable)</a>
+</code></pre>
+The parameter to this method is a bitwise mask of the event types you wish to enable.  The event masks are defined in <a
+href="../../../../api/java/awt/AWTEvent.html">java.awt.AWTEvent</a>.  Note that changing this mask will not affect the delivery of events to listeners -- it only controls the delivery to the component's processing methods.  The bottom line is that the set of events which are delivered to processEvent() is defined by the union of event types which have listeners registered and event types explicitly turned on via enableEvents().
+<p>
+<h3>Example using Extension Mechanism</h3>
+Following is an example of how this extension mechanism may be used.
+For Example, if a subclass of java.awt.Canvas wishes to render some visual feedback when it receives/loses keyboard focus, it could do the following.
+<pre><code>     
+    public class TextCanvas extends Canvas {
+	  boolean haveFocus = false;
+
+	  public TextCanvas() {
+	      <b>enableEvents(AWTEvent.FOCUS_EVENT_MASK); // ensure we get focus events</b>
+	      ...
+	  }
+	  <b>protected void processFocusEvent(FocusEvent e) {</b>
+	      switch(e.getID()) {
+	        case FocusEvent.FOCUS_GAINED:
+	          haveFocus = true;
+	          break;
+	        case FocusEvent.FOCUS_LOST:
+	          haveFocus = false;
+	      }
+	      repaint(); // need to repaint with focus feedback on or off...
+
+	      <b>super.processFocusEvent(e); // let superclass dispatch to listeners</b>
+	  <b>}</b>
+	  public void paint(Graphics g) {
+	      if (haveFocus) {
+	          // render focus feedback...
+	      }
+	  }
+	  ...rest of TextCanvas class...
+    }
+
+</code></pre>
+<p>
+<h3>A Word of Caution</h3>
+In general we recommend you use the delegation-based listener model for most of your basic event handling needs and reserve the use of the above when you are truly extending the look or behavior of a component.  This is because the above mechanism suffers from some of the same ills as the 1.0 event model (complex, error-prone logic in processing methods, forgetting to call "super.processEvent", etc.), and unless you clearly understand what you are doing, your program may not behave as you expect!
+<p>
+An alternative to using the above approach would be to simply have your component subclass implement the particular listener interface for the events it wishes to receive and then register itself as a listener.  For example, the above code example would be rewritten to:
+<pre><code>     
+    public class TextCanvas extends Canvas <b>implements FocusListener</b> {
+	  boolean haveFocus = false;
+
+	  public TextCanvas() {
+	      <b>addFocusListener(this); // ensure we get focus events</b>
+	  }
+	  <b>public void focusGained(FocusEvent e) {</b>
+	       haveFocus = true;
+	       repaint();
+          }								
+	  <b>public void focusLost(FocusEvent e) {</b>
+	       haveFocus = false;	      
+	       repaint(); 
+	  }	      
+	  public void paint(Graphics g) {
+	      if (haveFocus) {
+	          // render focus feedback...
+	      }
+	  }
+	  ...rest of TextCanvas class...
+    }
+</code></pre>
+<p>
+<h3>Consuming Events</h3>
+There are cases where programs need to prevent certain types of events from being processed normally by a component (i.e. a builder wants to use mouse events to enable a user to graphically move a button around and it wants to prevent the mouse press from 'pushing' the button).
+<p>
+We have explicitly enabled this capability for <b>input events only</b> by providing two methods on java.awt.event.InputEvent:
+<pre><code>     <a href="../../../../api/java/awt/event/InputEvent.html#consume()">public void consume()</a>
+
+     <a href="../../../../api/java/awt/event/InputEvent.html#isConsumed()">public boolean isConsumed()</a>
+
+</code></pre>
+
+Note that if some object 'consumes' an input event, it is strictly an indication to the source component that the event should not be processed in its default manner (i.e. consuming a mousePressed event on a Button will prevent it from being activated).  <b>The event will still be dispatched to all listeners registered, regardless of whether a listener in the chain consumes the event.</b>	       
+	  
+<a name="919969">
+<p>
+<h3>The Event Queue</h3>
+Another feature of the 1.1 event model is the addition of an event queue class:
+<pre><code>     <a href="../../../../api/java/awt/EventQueue.html">java.awt.EventQueue</a>
+</code></pre>
+This class provides a number of public instance methods to manipulate the queue:
+<pre><code>     <a href="../../../../api/java/awt/EventQueue.html#postEvent(java.awt.AWTEvent)">public synchronized void postEvent(AWTEvent e)</a>
+
+     <a href="../../../../api/java/awt/EventQueue.html#getNextEvent()">public synchronized AWTEvent getNextEvent()</a>
+
+     <a href="../../../../api/java/awt/EventQueue.html#peekEvent()">public synchronized AWTEvent peekEvent()</a>
+
+     <a href="../../../../api/java/awt/EventQueue.html#peekEvent()">public synchronized AWTEvent peekEvent(int eventID)</a>
+</code></pre>
+Programs can actually use this class to instantiate their own event queue instances
+for the purpose of asynchronously posting events.  The EventQueue class automatically instantiates an internal thread for dispatching the events appropriately.
+<p>
+In the default JDK implementation, all events generated on components are first posted to a special "system" EventQueue instance before being dispatched to their target component.  
+<p>
+The Toolkit class provides a method to access the handle of the system EventQueue instance:
+<pre><code>     <a href="../../../../api/java/awt/Toolkit.html#getSystemEventQueue()">public final EventQueue getSystemEventQueue()</a>
+</code></pre>
+<p>
+It would obviously be a security problem to allow untrusted applets to freely manipulate the system event queue, therefore the getSystemEventQueue() method is protected by a SecurityManager check which disallows applets direct access to the system queue.  We realize that applets would also like access to an event queue which is scoped to their own containment hierarchies and we are working on an architecture to allow that for a follow-on release.
+<p>
+<hr>
+<h2>Compatibility with the old Model</h2>
+</a>
+Our intention is to maintain binary compatibility for programs written to the old model for the 1.1 release. However, we strongly recommend new java programs migrate to the new model.  <b>We do not encourage the explicit mixing of the two models within a single Applet.</b> However, we realize that programs which code to the new model may need/wish to use existing GUI classes which still use the old model and so we have done our best to ensure this works (for example, the hotjava browser is a java application which will need to be able to load both 1.0 and 1.1 style applets).
+<p>
+The way this works is that the AWT will recognize a component as being either a 1.0-event-model "target" OR a 1.1-event-model "source", <i>but not both</i>.  A component is recognized to be a 1.1-event-model "source" by meeting one of the following conditions:
+<ol>
+<li> A listener (of any kind) is registered
+<li> An event type (of any kind) was explicitly enabled by calling enableEvents()
+</ol>
+ELSE the component will be treated as a 1.0-event-model "target" and all events will be delivered to the 1.0 handleEvent method as before.
+<p>
+Note that this is an "all or nothing" distinction and that once the AWT determines a component is a particular event model type, ALL events on that component will be processed in that context.  For example, if a TextField object has only a FocusListener registered, then only focus events will be dispatched to the textfield in the 1.1 mechanism and the old 1.0 handleEvent method will NEVER be called (not even for other event types!).  So while it is possible to combine components which use the different models, it is not possible to get a single component to mix both models.
+<p>
+One key difference between the two models is that the old model would automatically propagate events up the containment hierarchy, while the new model does NOT propagate events in this way.  The way this works for compatibility is that if an event <i>originates</i> on a component which is a 1.0-event-model "target", then it WILL be propagated up the hierarchy in the 1.0 fashion, regardless of the event model type of its ancestor containers.  If an event <i>originates</i> on a 1.1-event-model "source", then that event will NOT propagate up the hierarchy, regardless of the event model type of its ancestor containers.
+
+<p>
+<hr><br>
+ 
+<address>
+Send feedback to: <a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1996, 1997 Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+<!-- This file was created with Quadralay WebWorks Publisher 3.0.5 -->
+<!-- -->
+<!-- For more information on how this document, and how the rest of -->
+<!-- this server was created, email yourEmail@xyzcorp.com -->
+<!-- -->
+<!-- Last updated: 09/13/96 17:40:16 -->
+
+</body>
+</html>

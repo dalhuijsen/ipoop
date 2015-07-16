@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Image I/O API Guide: 3 - Writing Image I/O Applications
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="apps.fm5.html">PREV</a>
+ | <a href="apps.fm7.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Image I/O API Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="997067"><i>3.6	</i> Transcoding
+</a></h2>
+
+<blockquote>
+<a name="998285"><!-- --></a>
+Transcoding refers to reading an image file with a reader plug-in, and writing out the image using a writer plug-in, especially, if the writer plug-in cannot directly understand the native metadata format of the reader. In such a case, there will always be some loss of information, even if both plug-ins deal with the same file format. A transcoder plug-in is responsible for converting the stream and image metadata that have been created by a reader plug-in into a better form for use by a writer plug-in. The API does not mandate the presence of any transcoder plug-ins, but they may be installed and registered just like readers and writers.<p>
+<a name="998289"><!-- --></a>
+A set of reader and writer plug-ins may be designed to interpret each other&#39;s metadata without the need for a separate transcoder. The relationships between plug-ins can be determined using the<code> ImageReaderSpi.getImageWriterSpiNames</code> and <code>ImageWriterSpi.getImageReaderSpiNames</code> methods, which indicate which plug-ins are known to work well with a given plug-in of the opposite type. If multiple plug-ins are being written by a single vendor, this mechanism will provide the best quality.<p>
+<a name="998283"><!-- --></a>
+However, when working with plug-ins that have not been designed to interoperate, a transcoder plug-in may be provided by a developer who understands the metadata formats of a given pair of reader and writer plug-ins, even though each was written without knowledge of the other.<p>
+<a name="998304"><!-- --></a>
+Given a particular pair of reader and writer plug-ins, the set of appropriate transcoder plug-ins may be located as follows:<p>
+</blockquote><blockquote><pre>
+ImageReader reader;
+ImageWriter writer;
+
+Iterator transcoders = ImageIO.getImageTranscoders(reader, writer);
+</pre></blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="apps.fm5.html">PREV</a>
+ | <a href="apps.fm7.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="copyright.fm.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Suzette Pelouch -->
+<!-- Last updated: Fri Apr 27 11:22:59 2001 -->
+ 
+
+
+</body>
+</html>

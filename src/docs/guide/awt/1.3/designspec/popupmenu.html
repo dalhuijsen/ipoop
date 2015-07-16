@@ -1,0 +1,138 @@
+<html><head><title>Java AWT: Popup Menu</title></head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+ 
+<a name="919735">
+<h1><img alt="Duke logo doing a cartwheel" src="images/flip.sm.gif"> Java AWT: Popup Menu</h1>
+</a>
+<hr><p><a name="919737">
+<address>Last Updated: February 3, 1997</address>
+
+<h2>Purpose</h2>
+</a>
+Popup menus (also known as "context menus") are now a very common UI element in modern GUIs (Win95, CDE, etc.).  The AWT in 1.0 supports only Pulldown menus (menus which are always attached to a menubar or menu-item) and needs an API to allow Java programs to be able to easily create popup menus. <a name="919739">
+<p>
+<h2>Popup Menu API</h2>
+</a>
+The primary goal for this API is to make the creation and invocation of popups extremely easy in Java programs. Additionally, we want to ensure that popups are not tightly bound to a single component and can be easily reused both within , as well as across, containment hierarchies.
+<p>The API consists of a new subclass of Menu:
+<pre><code>	<a href="../../../../api/java/awt/PopupMenu.html">java.awt.PopupMenu</a>
+</code></pre>
+
+<p>The main addition to this subclass is a method to invoke the popup:
+<pre><code>	<a href="../../../../api/java/awt/PopupMenu.html#show(java.awt.Component, int, int)">public void show(Component origin, int x, int y)</a>
+</code></pre>
+
+<p>This method will invoke the popup at the x,y coordinate position relative to the component parameter (the intention is that all parameters can easily be extracted from a given mouse-down event object).<a name="919746">
+<p>
+<h3>Popup Menu Ownership</h3>
+</a>
+Popup menus must have a valid "parent" component in order to be shown. This is to ensure that a popup menu can be instantiated and cached prior to being shown (to prevent any potential slow-down during the show operation, which from the user's perspective should happen simultaneously with the mouse event which triggered it). Popup menus can be attached-to/removed-from any component, using new methods in class java.awt.Component:
+<pre><code>	<a href="../../../../api/java/awt/Component.html#add(java.awt.PopupMenu)">add(PopupMenu popup)</a>
+</code></pre>
+
+<pre><code>	<a href="../../../../api/java/awt/Component.html#remove(java.awt.MenuComponent)">remove(MenuComponent popup)</a>
+</code></pre>
+<p>Note that a popup menu can only be owned by one component at a time.
+
+<p>The "origin" parameter passed into the show() method can be any component contained within the containment hierarchy defined with the popup's parent as the root (it need not be the parent itself). This is particularly useful if you need to define a single popup for an entire window; you would attach the popup menu to the frame, but could invoke it in response to a mouse-down event on any component within that frame.<a name="919813">
+<p>
+<h3>Popup Event Trigger</h3>
+</a>
+The main issue with popup menus is defining an appropriate event trigger definition, as this varies slightly across the different platforms:<ul>
+<li>In Windows, the menu is popped up on the mouse button *2* mouse UP.
+
+<li>In Motif, the menu is popped up on the mouse button *3* mouse DOWN (and it remains showing if the subsequent mouse UP happens within a small interval; else the menu is pulled down on the mouse DOWN)
+</ul>
+<p>The API provides a platform-independent abstraction so a program can detect a popup-menu trigger event without hard-coding platform-specific event-handling logic in the program. This is accomplished by providing the following method on java.awt.event.MouseEvent:
+<pre><code>	<a href="../../../../api/java/awt/event/MouseEvent.html#isPopupTrigger()">public boolean isPopupTrigger()</a>
+</code></pre>
+
+<p>
+<h3>Event Model Issues</h3>
+</a>
+The AWT's 1.0 event model has a limitation where menu events (the actions invoked when a menu item is selected) are not catchable in the menu itself, but must be caught on the parent frame. To work with the 1.0 event model, the popup menu events must be caught in the action() method of the component which owns it. Clearly this is not a desirable limitation for popup menus, as they are not designed to be tightly bound to a particular component. With the new 1.1 event model API, action listeners can be attached directly to the menu items themselves, alleviating this issue (See the <a href="./events.html">AWT Delegation Event Model</a> document for details).
+<a name="919769">
+<p>
+<h2>Sample Code</h2>
+</a>
+Following is a very simple sample program which shows the usage of this API using the 1.1 Delegation Event Model.  
+
+<pre><code>    
+    import java.awt.*;
+    import java.applet.*;
+    import java.awt.event.*;
+
+    public class PopupMenuTest extends Applet implements ActionListener {
+
+	<b>PopupMenu popup;</b>
+
+	public void init() {	    
+            MenuItem mi;
+
+	    <b>popup = new PopupMenu("Edit");</b>
+
+            mi = new MenuItem("Cut");
+            mi.addActionListener(this);
+	    <b>popup.add(mi);</b>
+
+            mi = new MenuItem("Copy");
+            mi.addActionListener(this);
+	    <b>popup.add(mi);</b>
+
+	    <b>popup.addSeparator();</b>
+
+            mi = new MenuItem("Paste");
+            mi.addActionListener(this);
+	    <b>popup.add(mi);</b>
+
+	    <b>add(popup); // add popup menu to applet</b>
+           
+            <b>enableEvents(AWTEvent.MOUSE_EVENT_MASK); </b>
+
+	    resize(200, 200);
+        }
+
+	public void processMouseEvent(MouseEvent e) {
+
+	    <b>if (e.isPopupTrigger()) {</b> 
+	        <b>popup.show(e.getComponent(), e.getX(), e.getY());</b>
+	    <b>}</b>
+	    super.processMouseEvent(e);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+	    String command = e.getActionCommand();
+
+            if (command.equals("Cut")) {
+	        // perform cut operation
+            } else if (command.equals("Copy")) {
+                // perform copy operation
+            } else if (command.equals("Paste")) {
+                // perform paste operation
+            }
+        }
+    }
+	
+</code></pre>
+
+<p>
+<hr><br>
+
+
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1996, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+<!-- This file was created with Quadralay WebWorks Publisher 3.0.5 -->
+<!-- -->
+<!-- For more information on how this document, and how the rest of -->
+<!-- this server was created, email yourEmail@xyzcorp.com -->
+<!-- -->
+<!-- Last updated: 09/13/96 15:17:22 -->
+
+</body>
+</html>

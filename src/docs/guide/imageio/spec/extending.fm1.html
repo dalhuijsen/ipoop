@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Image I/O API Guide: 4 - Writing Image I/O Plug-ins
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="apps.fm8.html">PREV</a>
+ | <a href="extending.fm2.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Image I/O API Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+<br>
+<U><B><FONT FACE="ARIAL,HELVETICA,TIMES ROMAN">CHAPTER</FONT>
+4
+</B></U>
+
+<a name="5529"><!-- --></a>
+<h1>
+Writing Image I/O Plug-ins
+</h1>
+
+<h2><a name="996730"><i>4.1	</i> The Plug-in Concept
+</a></h2>
+
+<blockquote>
+<a name="996892"><!-- --></a>
+The Image I/O API is designed as a pluggable framework into which any developer may add their own &#34;plug-ins.&#34; A plug-in is defined as a set of Java language classes which may be loaded into the API at run-time and which add functionality to the AP
+I. In the context of the Java Image I/O API, a plug-in may provide the ability to read image data from a new file format, to write image data in a new format, to &#34;transcode&#34; non-image metadata between two formats, or to read or write streaming dat
+a from or to a new data source or sink. A plug-in may also provide support for the same format as another plug-in, perhaps providing better performance, more features, or a different view of the data stored by the format.<p>
+<a name="996897"><!-- --></a>
+In order for plug-ins to be added to a running 
+Java<sup><font size="-1">TM</font></sup> Virtual Machine*, they
+must be compiled into Java bytecode files (class files). These class files will contain the code for subclasses of various classes defined by the API. For example, a plug-in that pr
+ovides the capability to read images will include a new subclass of the abstract <code>javax.imageio.ImageReader</code> class defined by the API. The usual reversed Internet domain name convention may be used to guarantee uniqueness of class names.<p>
+<a name="996910"><!-- --></a>
+Because loading and instantiating an entire plug-in may be expensive, an additional class is used as a &#34;stand-in&#34; to provide information about the plug-in. This class may be used, for example, to determine what formats are handled by the plug-in p
+rior to actually instantiating the plug-in.<p>
+<a name="996918"><!-- --></a>
+The &#34;stand-in&#34; object is lightweight enough that it can be loaded and a single instance instantiated every time the API is used within a given invocation of the Java virtual machine. This pattern, in which a small class is used to provide informat
+ion about an available service, is referred to as a &#34;service provider interface.&#34;<p>
+</blockquote>
+<br>
+* As used on this web site, the terms "Java Virtual Machine" or "JVM" mean
+a virtual machine for the Java platform.
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="apps.fm8.html">PREV</a>
+ | <a href="extending.fm2.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="copyright.fm.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+</body>
+</html>

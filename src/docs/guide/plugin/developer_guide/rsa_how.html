@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>How RSA Signed Applet Verification Works in Java Plug-in</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>How RSA Signed Applet Verification Works in Java Plug-in</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This section covers the following topics:</p>
+<ul>
+  <li><a href="#intro">Introduction</a>&nbsp; </li>
+  <li><a href="#verification">Support for RSA Verification</a></li>
+  <li> <a href="#trust">Support for Dynamic Trust Management</a>&nbsp; </li>
+  <li> <a href="#use"><code>usePolicy</code> Permission</a>&nbsp;</li>
+</ul>
+<h2><a name="intro"></a>Introduction</h2>
+<p> This page provides an overview of how RSA signed applet support is implemented 
+  in Java<font size="-2"></font> Plug-in. For an overview of how to use RSA signed 
+  applets, see <a href=rsa_deploying.html>How to Deploy RSA-Signed Applets in 
+  Java Plug-in</a>. 
+<h2><a name="verification"></a>Support for RSA Verification</h2>
+<p> So that Java Plug-in can verify RSA signatures in a browser-independent way, 
+  Java Plug-in includes a Cryptographic Service Provider (CSP). The CSP supports 
+  the "MD2withRSA", "MD5withRSA", and "SHA1withRSA" digital signature algorithms. 
+  It is automatically registered with the Java Cryptographic Architecture framework 
+  as part of the static initializer of the <code>PluginClassLoader</code>. 
+<h2><a name="trust"></a>Support for Dynamic Trust Management</h2>
+<p> Java 2 SDK, Standard Edition v 1.3 introduced fine-grained access control 
+  based on "codesource" and "protection domain," as described below:
+<p> Every class that is loaded from a JAR file has a codesource, which encapsulates 
+  two pieces of information: 
+<ol>
+  <li>The location (URL) where the class came from;</li>
+  <li>The list of principals who signed it (its certificates). </li>
+</ol>
+<p>Each signer principal in the codesource is represented by its X.509 public-key 
+  certificate and supporting certificate chain. </p>
+<p> In addition, every class that is loaded by a classloader belongs to one and 
+  only one protection domain, based on its codesource (i.e., based on where the 
+  class came from and who signed it). Every protection domain has a set of permissions 
+  associated with it, based on the configured security policy. This means that 
+  a protection domain encapsulates two things: 
+<ol>
+  <li>A codesource;</li>
+  <li>The set of permissions granted to it.</li>
+</ol>
+<p>A certificate chain is a list of hierarchically ordered public-key certificates, 
+  starting at the signer's public-key certificate and ending at the certificate 
+  of a Root Certification Authority ("Root CA"). The public key of one certificate 
+  in the chain is used to verify the signature on the previous certificate in 
+  the chain. The Root CA certificate is self-signed. The assumption is that the 
+  Root CA is trusted because it is well known and widely published.
+<p> The <code>PluginClassLoader</code> checks the configured security policy to 
+  determine which permissions to grant to a given codesource. The codesource and 
+  the set of permissions granted to it then form a protection domain. This behaviour 
+  is common to all secure classloaders (i.e., instances of <tt>java.security.SecureClassLoader</tt>). 
+  (Note: <tt>sun.plugin.security.PluginClassLoader</tt> extends <tt>sun.applet.AppletClassLoader</tt>, 
+  which is a subclass of <tt>java.net.URLClassLoader</tt>, which in turn extends 
+  <tt>java.security.SecureClassLoader</tt>.) 
+<p> The <code>PluginClassLoader</code> does additional work: If the applet is 
+  signed, and the permissions granted to it do not include the special <a href="#use"><code>usePolicy</code></a> 
+  permission, the <code>PluginClassLoader</code> extracts the signers (and their 
+  supporting certificate chains) from the applet's codesource and attempts to 
+  verify them.
+<p> If Plug-in can verify the certificate chain all the way up to its Root CA 
+  certificate, it checks if that Root CA certificate is contained in the database 
+  of trusted Root CA certificates. If so, Plug-in will display the certificate 
+  chain of the authenticated signer and ask the user whether or not to grant <code>AllPermission</code> 
+  to code signed by that principal. Java code that is assigned the <code>AllPermission</code> 
+  permission is treated the same as system code, meaning it has all the privileges 
+  that system code has. The user can then choose whether or not to grant <code>AllPermission</code> 
+  to code signed by that principal, and whether such permission should be granted 
+  to any code signed by that principal for all subsequent sessions or for the 
+  current session only. 
+<p>(For the case of unsigned applets, or signed applets whose permissions include 
+  the <code>usePolicy</code>, see <a href="security.html">Overview&#151;Applet 
+  Security Basics</a>.)
+<h2><a name="use"></a><code>usePolicy</code> Permission</h2>
+<p> A permission named <code>usePolicy</code> (introduced with version 1.3) allows 
+  system administrators to turn off the <code>PluginClassLoader</code> behaviour. 
+  If the <code>usePolicy</code> permission is granted to the codesource by the 
+  configured security policy, no user prompting will take place; only the permissions 
+  specified in the security policy will be granted to the codesource.</p>
+<p>&nbsp;</p>
+</body>
+</html>

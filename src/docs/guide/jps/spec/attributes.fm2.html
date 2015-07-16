@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide: 2 - Attributes
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="attributes.fm1.html">PREV</a>
+ | <a href="attributes.fm3.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="1001108"><i></i> Attribute Roles
+</a></h2>
+
+<blockquote>
+<a name="1000352"><!-- --></a>
+When submitting a print job to a printer, the client provides the attributes describing the characteristics of the print data, such as the document name, and how the print data should be printed, such as double-sided, five copies. If a print job consists of multiple pieces of print data, different pieces might have different processing instructions, such as 8 x 11 inch media for the first document, and 11 x 17 inch media for another document. <p>
+<a name="1000353"><!-- --></a>
+Once the printer starts processing the print job, additional information about the job becomes available, which might include: the job state (such as completed or queued) and the number of pages printed so far. These pieces of information are also attributes. Attributes can also describe the printer itself, such as: the printer name, the printer location, and the number of jobs queued. <p>
+<a name="998885"><!-- --></a>
+The Java Print Service API defines these different kinds of attribute roles with five subinterfaces of Attribute:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="998765"><!-- --></a>
+PrintRequestAttribute is used by an application to represents a setting applied to an entire print job and to specify how the entire print job should be printed.
+</li>
+<li>
+<a name="998767"><!-- --></a>
+DocAttribute is used by an application to specify a characteristic of a single document and the print job settings to be applied to the document.
+</li>
+<li>
+<a name="998771"><!-- --></a>
+PrintJobAttribute is used by a print service to report how a job is being printed. These values will usually be identical the requested attribute values. However, if the printer does not support the value of a print request attribute then the corresponding print job attribute contains a different value that is supported by the printer
+</li>
+<li>
+<a name="998940"><!-- --></a>
+PrintServiceAttribute is used by a print service to report the status of the print service.
+</li>
+<li>
+<a name="1000759"><!-- --></a>
+SupportedValuesAttribute is used by a print service o indicate the range of values supported for a request attribute. For example, a printer might support only a certain range of copies. When a print service is queried for the supported range of copies, it returns this information in a CopiesSupported object, which implements SupportedValuesAttribute.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="998775"><!-- --></a>
+Many attributes can be members of more than one role. For example, the Media attribute belongs to the doc, print job, and print request roles because the Media attribute can describe the paper size, the paper tray, or paper type. In fact, most doc attributes are also request attributes, and all request attributes are also job attributes.<p>
+<a name="999612"><!-- --></a>
+The next section describes how to collect attributes together into attribute sets, which also have roles.<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="attributes.fm1.html">PREV</a>
+ | <a href="attributes.fm3.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

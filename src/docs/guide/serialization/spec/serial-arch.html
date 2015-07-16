@@ -1,0 +1,381 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Mon Jan 27 15:22:14 2003" />
+    <title>System Architecture</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="serialTOC.html" />
+    <link rel="Previous" href="serialTOC.html" />
+    <link rel="Next" href="output.html" />
+    <link rel="Index" href="examples.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="serialTOC.html">Previous</a> | 
+        <a accesskey="n" href="output.html">Next</a>
+       </td>
+	   <td align="right"><i>Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp5800"> </a><h2 class="pNewHTMLPage">
+System Architecture
+</h2>
+<hr class="pHr"/>
+<a name="wp5801"> </a><h2 class="pChapNum">
+Chapter &#160; 1
+</h2>
+<a name="wp5802"> </a><h4 class="pHeading3">
+		Topics:
+</h4>
+<ul class="pBullet1"><a name="wp3543"> </a><div class="pBullet1"><li><a  href="serial-arch.html#wp6428">Overview</a></li></div>
+<a name="wp3548"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp4176">Writing to an Object Stream</a></li></div>
+<a name="wp3549"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp4188">Reading from an Object Stream</a></li></div>
+<a name="wp4171"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp962">Object Streams as Containers</a></li></div>
+<a name="wp6275"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp6250">Defining Serializable Fields for a Class</a></li></div>
+<a name="wp6447"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp5251">Documenting Serializable Fields and Data for a Class</a></li></div>
+<a name="wp5868"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp5253">Accessing Serializable Fields of a Class</a></li></div>
+<a name="wp4556"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp4542">The ObjectOutput Interface</a></li></div>
+<a name="wp4561"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp4548">The ObjectInput Interface</a></li></div>
+<a name="wp4526"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp4539">The Serializable Interface</a></li></div>
+<a name="wp4889"> </a><div class="pBullet1Plus"><li><a  href="serial-arch.html#wp7185">The Externalizable Interface</a></li></div>
+<a name="wp6425"> </a><div class="pBullet1Last"><li><a  href="serial-arch.html#wp6469">Protecting Sensitive Information</a></li></div>
+</ul>
+<a name="wp6428"> </a><h2 class="pHeading1">
+	1.1	Overview
+</h2>
+<a name="wp3539"> </a><p class="pBody">
+The ability to store and retrieve Java&#8482; objects is essential to building all but the most transient applications. The key to storing and retrieving objects in a serialized form is representing the state of objects sufficient to reconstruct the object(s). Objects to be saved in the stream may support either the <code class="cCode">Serializable</code> or the <code class="cCode">Externalizable</code> interface. For Java&#8482; objects, the serialized form must be able to identify and verify the Java&#8482; class from which the contents of the object were saved and to restore the contents to a new instance. For serializable objects, the stream includes sufficient information to restore the fields in the stream to a compatible version of the class. For Externalizable objects, the class is solely responsible for the external format of its contents.
+</p>
+<a name="wp1081"> </a><p class="pBody">
+Objects to be stored and retrieved frequently refer to other objects. Those other objects must be stored and retrieved at the same time to maintain the relationships between the objects. When an object is stored, all of the objects that are reachable from that object are stored as well.
+</p>
+<a name="wp999"> </a><p class="pBody">
+The goals for serializing Java&#8482; objects are to:
+</p>
+<ul class="pBullet1"><a name="wp1010"> </a><div class="pBullet1"><li>Have a simple yet extensible mechanism.</li></div>
+<a name="wp1011"> </a><div class="pBullet1Plus"><li>Maintain the Java&#8482; object type and safety properties in the serialized form.</li></div>
+<a name="wp3223"> </a><div class="pBullet1Plus"><li>Be extensible to support marshaling and unmarshaling as needed for remote objects.</li></div>
+<a name="wp1003"> </a><div class="pBullet1Plus"><li>Be extensible to support simple persistence of Java&#8482; objects.</li></div>
+<a name="wp1041"> </a><div class="pBullet1Plus"><li>Require per class implementation only for customization.</li></div>
+<a name="wp3844"> </a><div class="pBullet1Last"><li>Allow the object to define its external format.</li></div>
+</ul>
+<a name="wp4176"> </a><h2 class="pHeading1">
+	1.2	Writing to an Object Stream
+</h2>
+<a name="wp4177"> </a><p class="pBody">
+Writing objects and primitives to a stream is a straightforward process. For example:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+// Serialize today&#8217;s date to a file.    
+	FileOutputStream f = new FileOutputStream(&quot;tmp&quot;);    
+	ObjectOutput&#160;s&#160;=&#160;new&#160;ObjectOutputStream(f);    
+	s.writeObject(&quot;Today&quot;);    
+	s.writeObject(new Date());    
+	s.flush();<a name="wp4178"> </a>
+</pre></div>
+<a name="wp4179"> </a><p class="pBody">
+First an <code class="cCode">OutputStream</code>, in this case a <code class="cCode">FileOutputStream</code>, is needed to receive the bytes. Then an <code class="cCode">ObjectOutputStream</code> is created that writes to the <code class="cCode">FileOutputStream</code>. Next, the string &#8220;Today&#8221; and a Date object are written to the stream. More generally, objects are written with the <code class="cCode">writeObject</code> method and primitives are written to the stream with the methods of <code class="cCode">DataOutput</code>.
+</p>
+<a name="wp4184"> </a><p class="pBody">
+The <code class="cCode"><a  href="output.html#wp1038">writeObject</a></code> method (see <a  href="output.html#wp861">Section&#160;1.3 &quot;The writeObject Method</a>&#8221;) serializes the specified object and traverses its references to other objects in the object graph recursively to create a complete serialized representation of the graph. Within a stream, the first reference to any object results in the object being serialized or externalized and the assignment of a handle for that object. Subsequent references to that object are encoded as the handle. Using object handles preserves sharing and circular references that occur naturally in object graphs. Subsequent references to an object use only the handle allowing a very compact representation.
+</p>
+<a name="wp4185"> </a><p class="pBody">
+Special handling is required for objects of type <code class="cCode">Class</code>, <code class="cCode">ObjectStreamClass</code>, <code class="cCode">String</code>, and arrays. Other objects must implement either the <code class="cCode">Serializable</code> or the <code class="cCode">Externalizable</code> interface to be saved in or restored from a stream. 
+</p>
+<a name="wp5809"> </a><p class="pBody">
+Primitive data types are written to the stream with the methods in the <code class="cCode">DataOutput</code> interface, such as <code class="cCode">writeInt</code>, <code class="cCode">writeFloat</code>, or <code class="cCode">writeUTF</code>. Individual bytes and arrays of bytes are written with the methods of <code class="cCode">OutputStream</code>. Except for serializable fields, primitive data is written to the stream in block-data records, with each record prefixed by a marker and an indication of the number of bytes in the record. 
+</p>
+<a name="wp5817"> </a><p class="pBody">
+<code class="cCode">ObjectOutputStream</code> can be extended to customize the information about classes in the stream or to replace objects to be serialized. Refer to the <code class="cCode">annotateClass</code> and <code class="cCode">replaceObject</code> method descriptions for details.
+</p>
+<a name="wp4188"> </a><h2 class="pHeading1">
+	1.3	Reading from an Object Stream
+</h2>
+<a name="wp4189"> </a><p class="pBody">
+Reading an object from a stream, like writing, is straightforward:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+// Deserialize a string and date from a file.    
+	FileInputStream in = new FileInputStream(&#8220;tmp&#8221;);    
+	ObjectInputStream s = new ObjectInputStream(in);    
+	String today = (String)s.readObject();    
+	Date date = (Date)s.readObject();<a name="wp4190"> </a>
+</pre></div>
+<a name="wp4191"> </a><p class="pBody">
+First an <code class="cCode">InputStream</code>, in this case a <code class="cCode">FileInputStream</code>, is needed as the source stream. Then an <code class="cCode">ObjectInputStream</code> is created that reads from the <code class="cCode">InputStream</code>. Next, the string &#8220;Today&#8221; and a Date object are read from the stream. Generally, objects are read with the <code class="cCode">readObject</code> method and primitives are read from the stream with the methods of <code class="cCode">DataInput</code>.
+</p>
+<a name="wp4195"> </a><p class="pBody">
+The <code class="cCode"><a  href="input.html#wp2971">readObject</a></code> method deserializes the next object in the stream and traverses its references to other objects recursively to create the complete graph of objects serialized.
+</p>
+<a name="wp4248"> </a><p class="pBody">
+Primitive data types are read from the stream with the methods in the <code class="cCode">DataInput</code> interface, such as <code class="cCode">readInt</code>, <code class="cCode">readFloat</code>, or <code class="cCode">readUTF</code>. Individual bytes and arrays of bytes are read with the methods of <code class="cCode">InputStream</code>. Except for serializable fields, primitive data is read from block-data records.
+</p>
+<a name="wp4199"> </a><p class="pBody">
+<code class="cCode">ObjectInputStream</code> can be extended to utilize customized information in the stream about classes or to replace objects that have been deserialized. Refer to the <code class="cCode">resolveClass</code> and <code class="cCode">resolveObject</code> method descriptions for details.
+</p>
+<a name="wp962"> </a><h2 class="pHeading1">
+	1.4	Object Streams as Containers
+</h2>
+<a name="wp4267"> </a><p class="pBody">
+Object Serialization produces and consumes a stream of bytes that contain one or more primitives and objects. The objects written to the stream, in turn, refer to other objects, which are also represented in the stream. Object Serialization produces just one stream format that encodes and stores the contained objects.
+</p>
+<a name="wp4374"> </a><p class="pBody">
+Each object that acts as a container implements an interface which allows primitives and objects to be stored in or retrieved from it. These interfaces are the <code class="cCode">ObjectOutput</code> and <code class="cCode">ObjectInput</code> interfaces which:
+</p>
+<ul class="pBullet1"><a name="wp4417"> </a><div class="pBullet1"><li>Provide a stream to write to and to read from</li></div>
+<a name="wp7056"> </a><div class="pBullet1Plus"><li>Handle requests to write primitive types and objects to the stream</li></div>
+<a name="wp4418"> </a><div class="pBullet1Last"><li>Handle requests to read primitive types and objects from the stream</li></div>
+</ul>
+<a name="wp4357"> </a><p class="pBody">
+Each object which is to be stored in a stream must explicitly allow itself to be stored and must implement the protocols needed to save and restore its state. Object Serialization defines two such protocols. The protocols allow the container to ask the object to write and read its state. 
+</p>
+<a name="wp7090"> </a><p class="pBody">
+To be stored in an Object Stream, each object must implement either the <code class="cCode">Serializable</code> or the <code class="cCode">Externalizable</code> interface:
+</p>
+<ul class="pBullet1"><a name="wp5805"> </a><div class="pBullet1"><li>For a <code class="cCode">Serializable</code> class, Object Serialization can automatically save and restore fields of each class of an object and automatically handle classes that evolve by adding fields or supertypes. A serializable class can declare which of its fields are saved or restored, and write and read optional values and objects.</li></div>
+<a name="wp6552"> </a><div class="pBullet1Last"><li>For an <code class="cCode">Externalizable</code> class, Object Serialization delegates to the class complete control over its external format and how the state of the supertype(s) is saved and restored.</li></div>
+</ul>
+<a name="wp6250"> </a><h2 class="pHeading1">
+	1.5	Defining Serializable Fields for a Class
+</h2>
+<a name="wp6289"> </a><p class="pBody">
+The serializable fields of a class can be defined two different ways. Default serializable fields of a class are defined to be the non-transient and non-static fields. This default computation can be overridden by declaring a special field in the <code class="cCode">Serializable</code> class, <code class="cCode">serialPersistentFields</code>. This field must be initialized with an array of <code class="cCode">ObjectStreamField</code> objects that list the names and types of the serializable fields. The modifiers for the field are required to be private, static, and final.
+</p>
+<a name="wp6852"> </a><p class="pBody">
+For example, the following declaration duplicates the default behavior.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+class List implements Serializable {    
+	List next;    
+	
+	private static final ObjectStreamField[] serialPersistentFields
+			= {new ObjectStreamField(&#8220;next&#8221;, List.class)};<a name="wp6853"> </a>
+}<a name="wp6854"> </a>
+</pre></div>
+<a name="wp7105"> </a><p class="pBody">
+By using <code class="cCode">serialPersistentFields</code> to define the Serializable fields for a class, there no longer is a limitation that a serializable field must be a field within the current definition of the <code class="cCode">Serializable</code> class. The <code class="cCode">writeObject</code> and <code class="cCode">readObject</code> methods of the <code class="cCode">Serializable</code> class can map the current implementation of the class to the serializable fields of the class using the interface that is described in <a  href="serial-arch.html#wp5253">Section&#160;1.7 &quot;Accessing Serializable Fields of a Class</a>.&#8221; Therefore, the fields for a <code class="cCode">Serializable</code> class can change in a later release, as long as it maintains the mapping back to its Serializable fields that must remain compatible across release boundaries.
+</p>
+<hr class="pHr"/><div class="note">
+<a name="wp7110"> </a>
+<b>Note &#8211;</b>  There is, however, a limitation to the use of this mechanism to specify serializable fields for inner classes. Inner classes can only contain final static fields that are initialized to constants or expressions built up from constants.  Consequently, it is not possible to set <code class="cCode">serialPersistentFields</code> for an inner class (though it is possible to set it for static member classes).  For other restrictions pertaining to serialization of inner class instances, see section <a  href="serial-arch.html#wp4539">Section&#160;1.10 &quot;The Serializable Interface</a>&#8221;.
+<hr class="pHr"/></note>
+<a name="wp5251"> </a><h2 class="pHeading1">
+	1.6	Documenting Serializable Fields and Data for a Class
+</h2>
+<a name="wp6925"> </a><p class="pBody">
+It is important to document the serializable state of a class to enable interoperability with alternative implementations of a Serializable class and to document class evolution. Documenting a serializable field gives one a final opportunity to review whether or not the field should be serializable. The serialization javadoc tags, <code class="cCode">@serial</code>, <code class="cCode">@serialField</code>, and <code class="cCode">@serialData</code>, provide a way to document the serialized form for a Serializable class within the source code.
+</p>
+<ul class="pBullet1"><a name="wp6812"> </a><div class="pBullet1"><li>The <code class="cCode">@serial</code> tag should be placed in the javadoc comment for a default serializable field. The syntax is as follows:<br /><code class="cCode"><br />@serial</code> <em class="cEmphasis">field-description<br /></em><br />The optional <em class="cEmphasis">field-description</em> describes the meaning of the field and its acceptable values. The <em class="cEmphasis">field-description</em> can span multiple lines. When a field is added after the initial release, a <code class="cCode">@since</code> tag indicates the version the field was added. The <em class="cEmphasis">field-description</em> for <code class="cCode">@serial</code> provides serialization-specific documentation and is appended to the javadoc comment for the field within the serialized form documentation. </li></div>
+<a name="wp6813"> </a><div class="pBullet1Plus"><li>The <code class="cCode">@serialField</code> tag is used to document an <code class="cCode">ObjectStreamField</code> component of a <code class="cCode">serialPersistentFields</code> array. One of these tags should be used for each <code class="cCode">ObjectStreamField</code> component. The syntax is as follows:<br /><code class="cCode"><br />@serialField</code> <em class="cEmphasis">field-name field-type field-description</em></li></div>
+<a name="wp6814"> </a><div class="pBullet1Last"><li>The <code class="cCode">@serialData</code> tag describes the sequences and types of data written or read. The tag describes the sequence and type of optional data written by <code class="cCode">writeObject</code> or all data written by the <code class="cCode">Externalizable.writeExternal</code> method. The syntax is as follows:<br /><code class="cCode"><br />@serialData</code> <em class="cEmphasis">data-description</em></li></div>
+</ul>
+<a name="wp6835"> </a><p class="pBody">
+The javadoc application recognizes the serialization javadoc tags and generates a specification for each Serializable and Externalizable class. See <a  href="examples.html#wp4420">Section&#160;C.1 &quot;Example Alternate Implementation of java.io.File</a>&#8221; for an example that uses these tags.
+</p>
+<a name="wp6836"> </a><p class="pBody">
+When a class is declared Serializable, the serializable state of the object is defined by serializable fields (by name and type) plus optional data. Optional data can only be written explicitly by the <code class="cCode">writeObject</code> method of a <code class="cCode">Serializable</code> class. Optional data can be read by the <code class="cCode">Serializable</code> class&#8217; <code class="cCode">readObject</code> method or serialization will skip unread optional data. 
+</p>
+<a name="wp6834"> </a><p class="pBody">
+When a class is declared Externalizable, the data that is written to the stream by the class itself defines the serialized state. The class must specify the order, types, and meaning of each datum that is written to the stream. The class must handle its own evolution, so that it can continue to read data written by and write data that can be read by previous versions. The class must coordinate with the superclass when saving and restoring data. The location of the superclasses data in the stream must be specified.
+</p>
+<a name="wp6915"> </a><p class="pBody">
+The designer of a Serializable class must ensure that the information saved for the class is appropriate for persistence and follows the serialization-specified rules for interoperability and evolution. Class evolution is explained in greater detail in <a  href="version.html#wp9420">Chapter&#160;5</a>, &#8220;Versioning of Serializable Objects.&#8221; 
+</p>
+<a name="wp5253"> </a><h2 class="pHeading1">
+	1.7	Accessing Serializable Fields of a Class
+</h2>
+<a name="wp5520"> </a><p class="pBody">
+Serialization provides two mechanisms for accessing the serializable fields in a stream:
+</p>
+<ul class="pBullet1"><a name="wp6679"> </a><div class="pBullet1"><li>The default mechanism requires no customization</li></div>
+<a name="wp6680"> </a><div class="pBullet1Last"><li>The Serializable Fields API allows a class to explicitly access/set the serializable fields by name and type</li></div>
+</ul>
+<a name="wp5254"> </a><p class="pBody">
+The default mechanism is used automatically when reading or writing objects that implement the <code class="cCode">Serializable</code> interface and do no further customization. The serializable fields are mapped to the corresponding fields of the class and values are either written to the stream from those fields or are read in and assigned respectively. If the class provides <code class="cCode">writeObject</code> and <code class="cCode">readObject</code> methods, the default mechanism can be invoked by calling <code class="cCode">defaultWriteObject</code> and <code class="cCode">defaultReadObject</code>. When the <code class="cCode">writeObject</code> and <code class="cCode">readObject</code> methods are implemented, the class has an opportunity to modify the serializable field values before they are written or after they are read.
+</p>
+<a name="wp5255"> </a><p class="pBody">
+When the default mechanism cannot be used, the serializable class can use the <code class="cCode">putFields</code> method of <code class="cCode">ObjectOutputStream</code> to put the values for the serializable fields into the stream. The <code class="cCode">writeFields</code> method of <code class="cCode">ObjectOutputStream</code> puts the values in the correct order, then writes them to the stream using the existing protocol for serialization. Correspondingly, the <code class="cCode">readFields</code> method of <code class="cCode">ObjectInputStream</code> reads the values from the stream and makes them available to the class by name in any order. See <a  href="output.html#wp5068">Section&#160;1.2 &quot;The ObjectOutputStream.PutField Class</a>&#8221; and <a  href="input.html#wp4936">Section&#160;1.2 &quot;The ObjectInputStream.GetField Class</a>.&#8221; for a detailed description of the Serializable Fields API.
+</p>
+<a name="wp4542"> </a><h2 class="pHeading1">
+	1.8	The ObjectOutput Interface
+</h2>
+<a name="wp4543"> </a><p class="pBody">
+The <code class="cCode">ObjectOutput</code> interface provides an abstract, stream-based interface to object storage. It extends the DataOutput interface so those methods can be used for writing primitive data types. Objects that implement this interface can be used to store primitives and objects.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+package java.io;
+
+public interface ObjectOutput extends DataOutput
+{    
+	public void writeObject(Object obj) throws IOException;    
+	public void write(int b) throws IOException;    
+	public void write(byte b[]) throws IOException;     
+	public void write(byte b[], int off, int len) throws IOException;    
+	public void flush() throws IOException;    
+	public void close() throws IOException;
+}<a name="wp4930"> </a>
+</pre></div>
+<a name="wp4545"> </a><p class="pBody">
+<code class="cCode">The </code><code class="cCode">writeObject</code> method is used to write an object. The exceptions thrown reflect errors while accessing the object or its fields, or exceptions that occur in writing to storage. If any exception is thrown, the underlying storage may be corrupted. If this occurs, refer to the object that is implementing this interface for more information.
+</p>
+<a name="wp4548"> </a><h2 class="pHeading1">
+	1.9	The ObjectInput Interface
+</h2>
+<a name="wp4909"> </a><p class="pBody">
+The <code class="cCode">ObjectInput</code> interface provides an abstract stream based interface to object retrieval. It extends the <code class="cCode">DataInput</code> interface so those methods for reading primitive data types are accessible in this interface.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+package java.io;
+
+public interface ObjectInput extends DataInput
+{    
+	public Object readObject()        
+		throws ClassNotFoundException, IOException;    
+	public int read() throws IOException;    
+	public int read(byte b[]) throws IOException;    
+	public int read(byte b[], int off, int len) throws IOException;    
+	public long skip(long n) throws IOException;    
+	public int available() throws IOException;    
+	public void close() throws IOException;
+}<a name="wp5029"> </a>
+</pre></div>
+<a name="wp4551"> </a><p class="pBody">
+The <code class="cCode">readObject</code> method is used to read and return an object. The exceptions thrown reflect errors while accessing the objects or its fields or exceptions that occur in reading from the storage. If any exception is thrown, the underlying storage may be corrupted. If this occurs, refer to the object implementing this interface for additional information.
+</p>
+<a name="wp4539"> </a><h2 class="pHeading1">
+	1.10	The Serializable Interface
+</h2>
+<a name="wp4444"> </a><p class="pBody">
+Object Serialization produces a stream with information about the Java&#8482; classes for the objects which are being saved. For serializable objects, sufficient information is kept to restore those objects even if a different (but compatible) version of the implementation of the class is present. The <code class="cCode">Serializable</code> interface is defined to identify classes which implement the serializable protocol:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+package java.io;public interface Serializable {};<a name="wp4461"> </a>
+</pre></div>
+<a name="wp4425"> </a><p class="pBody">
+A Serializable class must do the following:
+</p>
+<ul class="pBullet1"><a name="wp4426"> </a><div class="pBullet1"><li>Implement the <code class="cCode">java.io.Serializable</code> interface</li></div>
+<a name="wp5928"> </a><div class="pBullet1Plus"><li>Identify the fields that should be serializable</li></div>
+<a name="wp7084"> </a><p class="pIndented1">
+(Use the <code class="cCode">serialPersistentFields</code> member to explicitly declare them serializable or use the transient keyword to denote nonserializable fields.)
+</p>
+<a name="wp5929"> </a><div class="pBullet1Plus"><li>Have access to the no-arg constructor of its first nonserializable superclass</li></div>
+<a name="wp7085"> </a><p class="pBody">
+The class can optionally define the following methods:
+</p>
+<a name="wp4428"> </a><div class="pBullet1Plus"><li>A <code class="cCode">writeObject</code> method to control what information is saved or to append additional information to the stream</li></div>
+<a name="wp6300"> </a><div class="pBullet1Plus"><li>A <code class="cCode">readObject</code> method either to read the information written by the corresponding <code class="cCode">writeObject</code> method or to update the state of the object after it has been restored</li></div>
+<a name="wp6532"> </a><div class="pBullet1Plus"><li>A <code class="cCode">writeReplace</code> method to allow a class to nominate a replacement object to be written to the stream</li></div>
+<a name="wp7086"> </a><p class="pIndented1">
+(See <a  href="output.html#wp5324">Section&#160;1.5 &quot;The writeReplace Method</a>&#8221; for additional information.)
+</p>
+<a name="wp6533"> </a><div class="pBullet1Last"><li>A <code class="cCode">readResolve</code> method to allow a class to designate a replacement object for the object just read from the stream</li></div>
+</ul>
+<a name="wp7081"> </a><p class="pIndented1">
+(See <a  href="input.html#wp5903">Section&#160;1.7 &quot;The readResolve Method</a>&#8221; for additional information.)
+</p>
+<a name="wp5895"> </a><p class="pBody">
+<code class="cCode">ObjectOutputStream</code> and <code class="cCode">ObjectInputStream</code> allow the serializable classes on which they operate to evolve (allow changes to the classes that are compatible with the earlier versions of the classes). See <a  href="version.html#wp6519">Section&#160;5.5 &quot;Compatible Java&#8482; Type Evolution</a>&#8221; for information about the mechanism which is used to allow compatible changes.
+</p>
+<hr class="pHr"/><div class="note">
+<a name="wp7182"> </a>
+<b>Note &#8211;</b>  Serialization of inner classes (i.e., nested classes that are not static member classes), including local and anonymous classes, is strongly discouraged for several reasons.  Because inner classes declared in non-static contexts contain implicit non-transient references to enclosing class instances, serializing such an inner class instance will result in serialization of its associated outer class instance as well.  Synthetic fields generated by <code class="cCode">javac</code> (or other Java&#8482; compilers) to implement inner classes are implementation dependent and may vary between compilers; differences in such fields can disrupt compatibility as well as result in conflicting default <code class="cCode">serialVersionUID</code> values.  The names assigned to local and anonymous inner classes are also implementation dependent and may differ between compilers.  Since inner classes cannot declare static members other than compile-time constant fields, they cannot use the <code class="cCode">serialPersistentFields</code> mechanism to designate serializable fields.  Finally, because inner classes associated with outer instances do not have zero-argument constructors (constructors of such inner classes implicitly accept the enclosing instance as a prepended parameter), they cannot implement <code class="cCode">Externalizable</code>.  None of the issues listed above, however, apply to static member classes.
+<hr class="pHr"/></note>
+<a name="wp7185"> </a><h2 class="pHeading1">
+	1.11	The Externalizable Interface
+</h2>
+<a name="wp4334"> </a><p class="pBody">
+For Externalizable objects, only the identity of the class of the object is saved by the container; the class must save and restore the contents. The <code class="cCode">Externalizable</code> interface is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+package java.io;
+
+public interface Externalizable extends Serializable
+{    
+	public void writeExternal(ObjectOutput out)        
+		throws IOException;    
+	public void readExternal(ObjectInput in)        
+		throws IOException, java.lang.ClassNotFoundException;
+}<a name="wp4465"> </a>
+</pre></div>
+<a name="wp3920"> </a><p class="pBody">
+The class of an Externalizable object must do the following:
+</p>
+<ul class="pBullet1"><a name="wp3928"> </a><div class="pBullet1"><li>Implement the <code class="cCode">java.io.Externalizable</code> interface</li></div>
+<a name="wp3933"> </a><div class="pBullet1Plus"><li>Implement a <code class="cCode">writeExternal</code> method to save the state of the object</li></div>
+<a name="wp7082"> </a><p class="pIndented1">
+(It must explicitly coordinate with its supertype to save its state.)
+</p>
+<a name="wp3936"> </a><div class="pBullet1Plus"><li>Implement a <code class="cCode">readExternal</code> method to read the data written by the <code class="cCode">writeExternal</code> method from the stream and restore the state of the object</li></div>
+<a name="wp7083"> </a><p class="pIndented1">
+(It must explicitly coordinate with the supertype to save its state.)
+</p>
+<a name="wp3934"> </a><div class="pBullet1Plus"><li>Have the <code class="cCode">writeExternal</code> and <code class="cCode">readExternal</code> methods be solely responsible for the format, if an externally defined format is written</li></div>
+<hr class="pHr"/><div class="note">
+<a name="wp6336"> </a>
+<b>Note &#8211;</b>  The <code class="cCode">writeExternal</code> and <code class="cCode">readExternal</code> methods are public and raise the risk that a client may be able to write or read information in the object other than by using its methods and fields. These methods must be used only when the information held by the object is not sensitive or when exposing it does not present a security risk.
+<hr class="pHr"/></note>
+<a name="wp7141"> </a><div class="pBullet1Last"><li>Have a public no-arg constructor</li></div>
+</ul>
+<hr class="pHr"/><div class="note">
+<a name="wp7146"> </a>
+<b>Note &#8211;</b>  Inner classes associated with enclosing instances cannot have no-arg constructors, since constructors of such classes implicitly accept the enclosing instance as a prepended parameter. Consequently the <code class="cCode">Externalizable</code> interface mechanism cannot be used for inner classes and they should implement the <code class="cCode">Serializable</code> interface, if they must be serialized.  Several limitations exist for serializable inner classes as well, however; see <a  href="serial-arch.html#wp4539">Section&#160;1.10 &quot;The Serializable Interface</a>&#8221;, for a full enumeration.
+<hr class="pHr"/></note>
+<a name="wp7139"> </a><p class="pBody">
+An Externalizable class can optionally define the following methods:
+</p>
+<ul class="pBullet1"><a name="wp6385"> </a><div class="pBullet1"><li>A <code class="cCode">writeReplace</code> method to allow a class to nominate a replacement object to be written to the stream</li></div>
+<a name="wp7079"> </a><p class="pIndented1">
+(See <a  href="output.html#wp5324">Section&#160;1.5 &quot;The writeReplace Method</a>&#8221; for additional information.)
+</p>
+<a name="wp6338"> </a><div class="pBullet1Last"><li>A <code class="cCode">readResolve</code> method to allow a class to designate a replacement object for the object just read from the stream</li></div>
+</ul>
+<a name="wp7080"> </a><p class="pIndented1">
+(See <a  href="input.html#wp5903">Section&#160;1.7 &quot;The readResolve Method</a>&#8221; for additional information.)
+</p>
+<a name="wp6469"> </a><h2 class="pHeading1">
+	1.12	Protecting Sensitive Information
+</h2>
+<a name="wp1414"> </a><p class="pBody">
+When developing a class that provides controlled access to resources, care must be taken to protect sensitive information and functions. During deserialization, the private state of the object is restored. For example, a file descriptor contains a handle that provides access to an operating system resource. Being able to forge a file descriptor would allow some forms of illegal access, since restoring state is done from a stream. Therefore, the serializing runtime must take the conservative approach and not trust the stream to contain only valid representations of objects. To avoid compromising a class, the sensitive state of an object must not be restored from the stream, or it must be reverified by the class. Several techniques are available to protect sensitive data in classes.
+</p>
+<a name="wp1415"> </a><p class="pBody">
+The easiest technique is to mark fields that contain sensitive data as <code class="cCode">private transient</code>. Transient fields are not persistent and will not be saved by any persistence mechanism. Marking the field will prevent the state from appearing in the stream and from being restored during deserialization. Since writing and reading (of private fields) cannot be superseded outside of the class, the transient fields of the class are safe.
+</p>
+<a name="wp1416"> </a><p class="pBody">
+Particularly sensitive classes should not be serialized at all. To accomplish this, the object should not implement either the <code class="cCode">Serializable</code> or the <code class="cCode">Externalizable</code> interface.
+</p>
+<a name="wp5785"> </a><p class="pBody">
+Some classes may find it beneficial to allow writing and reading but specifically handle and revalidate the state as it is deserialized. The class should implement <code class="cCode">writeObject</code> and <code class="cCode">readObject</code> methods to save and restore only the appropriate state. If access should be denied, throwing a <code class="cCode">NotSerializableException</code> will prevent further access.
+</p>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="serialTOC.html">Previous</a> | 
+        <a accesskey="n" href="output.html">Next</a>
+       </td>
+        <td align="right">
+          <span class="copyright">Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification  </span>
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

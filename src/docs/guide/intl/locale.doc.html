@@ -1,0 +1,1574 @@
+<!--This file created by Claris Home Page version 2.0-->
+<HTML>
+<HEAD>
+   <TITLE>Supported Locales</TITLE>
+   <META NAME=GENERATOR CONTENT="Claris Home Page 2.0">
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" VLINK="#000077">
+
+<P><TABLE BORDER=0 WIDTH="100%" summary="layout">
+   <TR>
+      <TD WIDTH=60>
+         <P><IMG SRC="../../images/javalogo52x88.gif" ALT="Java"
+         WIDTH=52 HEIGHT=88 BORDER=0 ALIGN=bottom>
+      </TD><TD>
+         <H1><CENTER>Supported Locales</CENTER></H1>
+      </TD><TD WIDTH=60>
+         <P>
+      </TD></TR>
+</TABLE><!-- Body text begins here --></P>
+
+<P>The set of supported locales varies between different
+implementations of the Java 2 platform as well as between different
+areas of functionality.</P>
+
+<P>This page documents locale support in Sun's Java 2 Software
+Development Kit, Standard Edition, v. 1.4.2 (J2SDK), and Java 2
+Runtime Environment, Standard Edition, v. 1.4.2 (J2RE) in the
+following areas:</P>
+
+<OL>
+   <LI><A HREF="#util-text">Enabled Locales for java.util and
+   java.text Functionality</A>
+   
+   <LI><A HREF="#jfc">Enabled Writing Systems for Java Foundation
+   Classes</A>
+   
+   <OL>
+      <LI TYPE="1"><A HREF="#overview">Overview</A>
+      
+      <LI><A HREF="#input">Text Input</A>
+      
+      <LI><A HREF="#rendering">Text Rendering</A>
+      
+      <LI><A HREF="#orientation">Component Orientation</A>
+      
+      <LI><A HREF="#dnd">Drag and Drop</A>
+   </OL>
+   
+   <LI><A HREF="#translation">User Interface Translation</A>
+</OL>
+
+<P>Sun's Java 2 Runtime Environment, Standard Edition, v. 1.4.2 for
+Windows may be installed as a complete international version or as a
+European languages version. The J2RE installer by default installs a
+European languages version if it recognizes that the host operating
+system only supports European languages. If the installer recognizes
+that any other language is needed, or if the user requests support
+for non-European languages in a customized installation, a complete
+international version is installed. The J2RE for Solaris and Linux
+and the J2SDK for any platform are always installed as complete
+international versions.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="util-text"></A>1. Enabled Locales for java.util and
+java.text Functionality</H2>
+
+<P>The support for locale-sensitive behavior in the java.util and
+java.text packages is almost entirely platform independent, so all
+locales are supported in the same way and simultaneously, independent
+of the host operating system and its localization. The only platform
+dependent functionality is the setting of the initial default locale
+and the initial default time zone based on the host operating
+system's locale and time zone.</P>
+
+<P>Sun's Java 2 Software Development Kit, Standard Edition, v. 1.4.2
+and the international versions of the Java 2 Runtime Environment,
+Standard Edition, v. 1.4.2 support all locales shown below. The
+European languages version of the Java 2 Runtime Environment,
+Standard Edition, v. 1.4.2 supports all locales for the following
+languages: Albanian, Belorussian, Bulgarian, Catalan, Croatian,
+Czech, Danish, Dutch, English, Estonian, Finnish, French, German,
+Greek, Hungarian, Icelandic, Italian, Latvian, Lithuanian,
+Macedonian, Norwegian, Polish, Portuguese, Romanian, Russian,
+Serbian, Serbo-Croatian, Slovak, Slovenian, Spanish, Swedish,
+Turkish, Ukrainian.</P>
+
+<H4>Fully Supported Locales</H4>
+
+<P><TABLE BORDER=1 summary="fully supported locales">
+   <TR>
+      <TH WIDTH=150>
+         <P><B>Language</B>
+      </TH><TH WIDTH=150>
+         <P><B>Country</B>
+      </TH><TH WIDTH=150>
+         <P><B>Locale ID</B>
+      </TH></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Saudi Arabia
+      </TD><TD WIDTH=150>
+         <P>ar_SA
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Chinese (Simplified)
+      </TD><TD WIDTH=150>
+         <P>China
+      </TD><TD WIDTH=150>
+         <P>zh_CN
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Chinese (Traditional)
+      </TD><TD WIDTH=150>
+         <P>Taiwan
+      </TD><TD WIDTH=150>
+         <P>zh_TW
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Dutch
+      </TD><TD WIDTH=150>
+         <P>Netherlands
+      </TD><TD WIDTH=150>
+         <P>nl_NL
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>Australia
+      </TD><TD WIDTH=150>
+         <P>en_AU
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>Canada
+      </TD><TD WIDTH=150>
+         <P>en_CA
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>United Kingdom
+      </TD><TD WIDTH=150>
+         <P>en_GB
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>United States
+      </TD><TD WIDTH=150>
+         <P>en_US
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>French
+      </TD><TD WIDTH=150>
+         <P>Canada
+      </TD><TD WIDTH=150>
+         <P>fr_CA
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>French
+      </TD><TD WIDTH=150>
+         <P>France
+      </TD><TD WIDTH=150>
+         <P>fr_FR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>German
+      </TD><TD WIDTH=150>
+         <P>Germany
+      </TD><TD WIDTH=150>
+         <P>de_DE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Hebrew
+      </TD><TD WIDTH=150>
+         <P>Israel
+      </TD><TD WIDTH=150>
+         <P>iw_IL
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Hindi
+      </TD><TD WIDTH=150>
+         <P>India
+      </TD><TD WIDTH=150>
+         <P>hi_IN
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Italian
+      </TD><TD WIDTH=150>
+         <P>Italy
+      </TD><TD WIDTH=150>
+         <P>it_IT
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Japanese
+      </TD><TD WIDTH=150>
+         <P>Japan
+      </TD><TD WIDTH=150>
+         <P>ja_JP
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Korean
+      </TD><TD WIDTH=150>
+         <P>South Korea
+      </TD><TD WIDTH=150>
+         <P>ko_KR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Portuguese
+      </TD><TD WIDTH=150>
+         <P>Brazil
+      </TD><TD WIDTH=150>
+         <P>pt_BR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Spain
+      </TD><TD WIDTH=150>
+         <P>es_ES
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Swedish
+      </TD><TD WIDTH=150>
+         <P>Sweden
+      </TD><TD WIDTH=150>
+         <P>sv_SE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Thai (Western digits)
+      </TD><TD WIDTH=150>
+         <P>Thailand
+      </TD><TD WIDTH=150>
+         <P>th_TH
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Thai (Thai digits)
+      </TD><TD WIDTH=150>
+         <P>Thailand
+      </TD><TD WIDTH=150>
+         <P>th_TH_TH
+      </TD></TR>
+</TABLE></P>
+
+<H4>Also Provided, but not Tested</H4>
+
+<P><TABLE BORDER=1 summary="provided, but not tested, locales">
+   <TR>
+      <TH WIDTH=150>
+         <P><B>Language</B>
+      </TH><TH WIDTH=150>
+         <P><B>Country</B>
+      </TH><TH WIDTH=150>
+         <P><B>Locale ID</B>
+      </TH></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Albanian
+      </TD><TD WIDTH=150>
+         <P>Albania
+      </TD><TD WIDTH=150>
+         <P>sq_AL
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Algeria
+      </TD><TD WIDTH=150>
+         <P>ar_DZ
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Bahrain
+      </TD><TD WIDTH=150>
+         <P>ar_BH
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Egypt
+      </TD><TD WIDTH=150>
+         <P>ar_EG
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Iraq
+      </TD><TD WIDTH=150>
+         <P>ar_IQ
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Jordan
+      </TD><TD WIDTH=150>
+         <P>ar_JO
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Kuwait
+      </TD><TD WIDTH=150>
+         <P>ar_KW
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Lebanon
+      </TD><TD WIDTH=150>
+         <P>ar_LB
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Libya
+      </TD><TD WIDTH=150>
+         <P>ar_LY
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Morocco
+      </TD><TD WIDTH=150>
+         <P>ar_MA
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Oman
+      </TD><TD WIDTH=150>
+         <P>ar_OM
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Qatar
+      </TD><TD WIDTH=150>
+         <P>ar_QA
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Sudan
+      </TD><TD WIDTH=150>
+         <P>ar_SD
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Syria
+      </TD><TD WIDTH=150>
+         <P>ar_SY
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Tunisia
+      </TD><TD WIDTH=150>
+         <P>ar_TN
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>United Arab Emirates
+      </TD><TD WIDTH=150>
+         <P>ar_AE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Arabic
+      </TD><TD WIDTH=150>
+         <P>Yemen
+      </TD><TD WIDTH=150>
+         <P>ar_YE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Belorussian
+      </TD><TD WIDTH=150>
+         <P>Belorussia
+      </TD><TD WIDTH=150>
+         <P>be_BY
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Bulgarian
+      </TD><TD WIDTH=150>
+         <P>Bulgaria
+      </TD><TD WIDTH=150>
+         <P>bg_BG
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Catalan
+      </TD><TD WIDTH=150>
+         <P>Spain
+      </TD><TD WIDTH=150>
+         <P>ca_ES
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Chinese
+      </TD><TD WIDTH=150>
+         <P>Hong Kong
+      </TD><TD WIDTH=150>
+         <P>zh_HK
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Croatian
+      </TD><TD WIDTH=150>
+         <P>Croatia
+      </TD><TD WIDTH=150>
+         <P>hr_HR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Czech
+      </TD><TD WIDTH=150>
+         <P>Czech Republic
+      </TD><TD WIDTH=150>
+         <P>cs_CZ
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Danish
+      </TD><TD WIDTH=150>
+         <P>Denmark
+      </TD><TD WIDTH=150>
+         <P>da_DK
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Dutch
+      </TD><TD WIDTH=150>
+         <P>Belgium
+      </TD><TD WIDTH=150>
+         <P>nl_BE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>India
+      </TD><TD WIDTH=150>
+         <P>en_IN
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>Ireland
+      </TD><TD WIDTH=150>
+         <P>en_IE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>New Zealand
+      </TD><TD WIDTH=150>
+         <P>en_NZ
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>South Africa
+      </TD><TD WIDTH=150>
+         <P>en_ZA
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Estonian
+      </TD><TD WIDTH=150>
+         <P>Estonia
+      </TD><TD WIDTH=150>
+         <P>et_EE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Finnish
+      </TD><TD WIDTH=150>
+         <P>Finland
+      </TD><TD WIDTH=150>
+         <P>fi_FI
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>French
+      </TD><TD WIDTH=150>
+         <P>Belgium
+      </TD><TD WIDTH=150>
+         <P>fr_BE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>French
+      </TD><TD WIDTH=150>
+         <P>Luxembourg
+      </TD><TD WIDTH=150>
+         <P>fr_LU
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>French
+      </TD><TD WIDTH=150>
+         <P>Switzerland
+      </TD><TD WIDTH=150>
+         <P>fr_CH
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>German
+      </TD><TD WIDTH=150>
+         <P>Austria
+      </TD><TD WIDTH=150>
+         <P>de_AT
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>German
+      </TD><TD WIDTH=150>
+         <P>Luxembourg
+      </TD><TD WIDTH=150>
+         <P>de_LU
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>German
+      </TD><TD WIDTH=150>
+         <P>Switzerland
+      </TD><TD WIDTH=150>
+         <P>de_CH
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Greek
+      </TD><TD WIDTH=150>
+         <P>Greece
+      </TD><TD WIDTH=150>
+         <P>el_GR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Hungarian
+      </TD><TD WIDTH=150>
+         <P>Hungary
+      </TD><TD WIDTH=150>
+         <P>hu_HU
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Icelandic
+      </TD><TD WIDTH=150>
+         <P>Iceland
+      </TD><TD WIDTH=150>
+         <P>is_IS
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Italian
+      </TD><TD WIDTH=150>
+         <P>Switzerland
+      </TD><TD WIDTH=150>
+         <P>it_CH
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Latvian
+      </TD><TD WIDTH=150>
+         <P>Latvia
+      </TD><TD WIDTH=150>
+         <P>lv_LV
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Lithuanian
+      </TD><TD WIDTH=150>
+         <P>Lithuania
+      </TD><TD WIDTH=150>
+         <P>lt_LT
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Macedonian
+      </TD><TD WIDTH=150>
+         <P>Macedonia
+      </TD><TD WIDTH=150>
+         <P>mk_MK
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Norwegian (Bokm&aring;l)
+      </TD><TD WIDTH=150>
+         <P>Norway
+      </TD><TD WIDTH=150>
+         <P>no_NO
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Norwegian (Nynorsk)
+      </TD><TD WIDTH=150>
+         <P>Norway
+      </TD><TD WIDTH=150>
+         <P>no_NO_NY
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Polish
+      </TD><TD WIDTH=150>
+         <P>Poland
+      </TD><TD WIDTH=150>
+         <P>pl_PL
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Portuguese
+      </TD><TD WIDTH=150>
+         <P>Portugal
+      </TD><TD WIDTH=150>
+         <P>pt_PT
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Romanian
+      </TD><TD WIDTH=150>
+         <P>Romania
+      </TD><TD WIDTH=150>
+         <P>ro_RO
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Russian
+      </TD><TD WIDTH=150>
+         <P>Russia
+      </TD><TD WIDTH=150>
+         <P>ru_RU
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Serbian (Cyrillic)
+      </TD><TD WIDTH=150>
+         <P>Yugoslavia
+      </TD><TD WIDTH=150>
+         <P>sr_YU
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Serbo-Croatian
+      </TD><TD WIDTH=150>
+         <P>Yugoslavia
+      </TD><TD WIDTH=150>
+         <P>sh_YU
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Slovak
+      </TD><TD WIDTH=150>
+         <P>Slovakia
+      </TD><TD WIDTH=150>
+         <P>sk_SK
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Slovenian
+      </TD><TD WIDTH=150>
+         <P>Slovenia
+      </TD><TD WIDTH=150>
+         <P>sl_SI
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Argentina
+      </TD><TD WIDTH=150>
+         <P>es_AR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Bolivia
+      </TD><TD WIDTH=150>
+         <P>es_BO
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Chile
+      </TD><TD WIDTH=150>
+         <P>es_CL
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Colombia
+      </TD><TD WIDTH=150>
+         <P>es_CO
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Costa Rica
+      </TD><TD WIDTH=150>
+         <P>es_CR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Dominican Republic
+      </TD><TD WIDTH=150>
+         <P>es_DO
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Ecuador
+      </TD><TD WIDTH=150>
+         <P>es_EC
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>El Salvador
+      </TD><TD WIDTH=150>
+         <P>es_SV
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Guatemala
+      </TD><TD WIDTH=150>
+         <P>es_GT
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Honduras
+      </TD><TD WIDTH=150>
+         <P>es_HN
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Mexico
+      </TD><TD WIDTH=150>
+         <P>es_MX
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Nicaragua
+      </TD><TD WIDTH=150>
+         <P>es_NI
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Panama
+      </TD><TD WIDTH=150>
+         <P>es_PA
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Paraguay
+      </TD><TD WIDTH=150>
+         <P>es_PY
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Peru
+      </TD><TD WIDTH=150>
+         <P>es_PE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Puerto Rico
+      </TD><TD WIDTH=150>
+         <P>es_PR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Uruguay
+      </TD><TD WIDTH=150>
+         <P>es_UY
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>Venezuela
+      </TD><TD WIDTH=150>
+         <P>es_VE
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Turkish
+      </TD><TD WIDTH=150>
+         <P>Turkey
+      </TD><TD WIDTH=150>
+         <P>tr_TR
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Ukrainian
+      </TD><TD WIDTH=150>
+         <P>Ukraine
+      </TD><TD WIDTH=150>
+         <P>uk_UA
+      </TD></TR>
+</TABLE></P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="jfc"></A>2. Enabled Writing Systems for Java Foundation
+Classes</H2>
+
+<H3><A NAME="overview"></A>2.1 Overview</H3>
+
+<P>For the Java Foundation Classes (AWT, Swing, 2D, input method
+framework, drag and drop), locales can generally be characterized by
+just the writing system; there are no country or language specific
+distinctions. Writing system support in the JFC depends to some
+extent on the host operating system, and full support for
+simultaneous use of multiple languages is not always possible.</P>
+
+<P>We consider a writing system supported by JFC if all functionality
+provided by JFC works adequately for this writing system in the
+following situations:</P>
+
+<UL>
+   <LI>On Windows 98, ME, and NT 4.0, when running on a Windows
+   system localized for a language using that writing system.
+   
+   <LI>On Windows 2000 and XP, when running on a Windows system with
+   both the user locale and the system locale set to a language using
+   that writing system. For writing systems that don't have a Windows
+   code page (for example, Devanagari), the system locale should be
+   set to English (United States).
+   
+   <LI>On Solaris and Linux, when running on a host operating system
+   with the locale set to one using that writing system and one of
+   the encodings shown for that writing system in the table below.
+</UL>
+
+<P>Sun's Java 2 Software Development Kit, Standard Edition, v. 1.4.2
+and the international version of the Java 2 Runtime Environment,
+Standard Edition, v. 1.4.2 support all writing systems shown below.
+The European languages version of the Java 2 Runtime Environment,
+Standard Edition, v. 1.4.2 supports only the Cyrillic, Greek, and
+Latin writing systems. Peered AWT components are only supported for a
+subset of the writing systems - see the last column.</P>
+
+<P>Details on various areas of functionality are provided in the
+sections below.</P>
+
+<H4><A NAME="jfc-table"></A><A NAME="full"></A>Fully Supported
+Writing Systems</H4>
+
+<P><TABLE BORDER=1 summary="fully supported writing systems">
+   <TR>
+      <TH WIDTH="20%">
+         <P><B>Writing System</B>
+      </TH><TH WIDTH="20%">
+         <P><B>Languages</B>
+      </TH><TH WIDTH="15%">
+         <P><B>Windows Encodings</B>
+      </TH><TH WIDTH="15%">
+         <P><B>Solaris Encodings</B>
+      </TH><TH WIDTH="15%">
+         <P><B>Linux Encodings</B>
+      </TH><TH WIDTH="15%">
+         <P><B>Peered AWT Components</B>
+      </TH></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Arabic
+      </TD><TD WIDTH="20%">
+         <P>Arabic
+      </TD><TD WIDTH="15%">
+         <P>1256
+      </TD><TD WIDTH="15%">
+         <P>8859-6
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Chinese (Simplified)
+      </TD><TD WIDTH="20%">
+         <P>Chinese
+      </TD><TD WIDTH="15%">
+         <P>936, GB18030
+      </TD><TD WIDTH="15%">
+         <P>gb2312, UTF-8, GBK, gb18030
+      </TD><TD WIDTH="15%">
+         <P>gb2312<SUP><A HREF="#turbo7">(3)</A></SUP>,
+         gb18030<SUP><A HREF="#turbo7">(3)</A>
+         <A HREF="#redhat80">(4)</A></SUP>
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Chinese (Traditional)
+      </TD><TD WIDTH="20%">
+         <P>Chinese
+      </TD><TD WIDTH="15%">
+         <P>950, HKSCS
+      </TD><TD WIDTH="15%">
+         <P>cns11643, UTF-8, BIG5, BIG5HK
+      </TD><TD WIDTH="15%">
+         <P>(see <A HREF="#also">below</A>)
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Devanagari
+      </TD><TD WIDTH="20%">
+         <P>Hindi
+      </TD><TD WIDTH="15%">
+         <P>UTF-8<SUP>(<A HREF="#devanagari">1</A>)</SUP>
+      </TD><TD WIDTH="15%">
+         <P>UTF-8
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Hebrew
+      </TD><TD WIDTH="20%">
+         <P>Hebrew
+      </TD><TD WIDTH="15%">
+         <P>1255
+      </TD><TD WIDTH="15%">
+         <P>8859-8
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Japanese
+      </TD><TD WIDTH="20%">
+         <P>Japanese
+      </TD><TD WIDTH="15%">
+         <P>932
+      </TD><TD WIDTH="15%">
+         <P>eucJP<SUP><A HREF="#eucJP">(2)</A></SUP>, UTF-8, PCK
+      </TD><TD WIDTH="15%">
+         <P>eucJP<SUP><A HREF="#eucJP">(2)</A><A HREF="#turbo7">(3)</A><A HREF="#redhat80">(4)</A></SUP>
+      
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Korean
+      </TD><TD WIDTH="20%">
+         <P>Korean
+      </TD><TD WIDTH="15%">
+         <P>949
+      </TD><TD WIDTH="15%">
+         <P>5601, UTF-8
+      </TD><TD WIDTH="15%">
+         <P>(see <A HREF="#also">below</A>)
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Latin - Western European subset
+      </TD><TD WIDTH="20%">
+         <P>English, French, German, Italian, Spanish, Swedish, etc.
+      </TD><TD WIDTH="15%">
+         <P>1252
+      </TD><TD WIDTH="15%">
+         <P>8859-1, 8859-15
+      </TD><TD WIDTH="15%">
+         <P>UTF-8 <SUP><A HREF="#redhat80">(4)</A></SUP>,
+         8859-1<SUP><A HREF="#latin">(5)</A></SUP>
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Thai
+      </TD><TD WIDTH="20%">
+         <P>Thai
+      </TD><TD WIDTH="15%">
+         <P>874
+      </TD><TD WIDTH="15%">
+         <P>TIS620.2533, UTF-8
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD></TR>
+</TABLE><A NAME="devanagari"></A>(1) For Devanagari, the user locale
+should be set to Hindi and the system locale to English (United
+States).<BR>
+
+<A NAME="eucJP"></A>(2) eucJP on Solaris supports the JIS character
+sets X&nbsp;0201, X&nbsp;0208, and X&nbsp;0212; eucJP on Linux only
+X&nbsp;0201 and X&nbsp;0208.<BR>
+
+<A NAME="turbo7"></A>(3) on Turbolinux 7 Workstation.<BR>
+
+<A NAME="redhat80"></A>(4) on Red Hat 8.0.<BR>
+
+<A NAME="latin"></A>(5) on RedHat 7.3, SuSE 8.0, Turbolinux 7
+Workstation.</P>
+
+<P>&nbsp;</P>
+
+<H4><A NAME="also"></A>Also Provided, but not Tested</H4>
+
+<P><TABLE BORDER=1 summary="provided, but no tested">
+   <TR>
+      <TH WIDTH="20%">
+         <P><B>Writing System</B>
+      </TH><TH WIDTH="20%">
+         <P><B>Languages</B>
+      </TH><TH WIDTH="15%">
+         <P><B>Windows Code Page</B>
+      </TH><TH WIDTH="15%">
+         <P><B>Solaris Encodings</B>
+      </TH><TH WIDTH="15%">
+         <P><B>Linux Encodings</B>
+      </TH><TH WIDTH="15%">
+         <P><B>Peered AWT Components</B>
+      </TH></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Chinese (Traditional)
+      </TD><TD WIDTH="20%">
+         <P>Chinese
+      </TD><TD WIDTH="15%">
+         <P>(see <A HREF="#full">above</A>)
+      </TD><TD WIDTH="15%">
+         <P>(see <A HREF="#full">above</A>)
+      </TD><TD WIDTH="15%">
+         <P>BIG5<SUP><A HREF="#also-redhat80">(1)</A></SUP>
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Cyrillic
+      </TD><TD WIDTH="20%">
+         <P>Belorussian, Russian etc.
+      </TD><TD WIDTH="15%">
+         <P>1251
+      </TD><TD WIDTH="15%">
+         <P>8859-5, KOI8-R, ANSI1251
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Greek
+      </TD><TD WIDTH="20%">
+         <P>Greek
+      </TD><TD WIDTH="15%">
+         <P>1253
+      </TD><TD WIDTH="15%">
+         <P>8859-7
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Korean
+      </TD><TD WIDTH="20%">
+         <P>Korean
+      </TD><TD WIDTH="15%">
+         <P>(see <A HREF="#full">above</A>)
+      </TD><TD WIDTH="15%">
+         <P>(see <A HREF="#full">above</A>)
+      </TD><TD WIDTH="15%">
+         <P>5601<SUP><A HREF="#also-redhat80">(1)</A></SUP>
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Latin - Baltic subset
+      </TD><TD WIDTH="20%">
+         <P>Latvian, Lithuanian
+      </TD><TD WIDTH="15%">
+         <P>1257
+      </TD><TD WIDTH="15%">
+         <P>8859-4, 8859-13
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Latin - Central European subset
+      </TD><TD WIDTH="20%">
+         <P>Czech, Hungarian, Polish, etc.
+      </TD><TD WIDTH="15%">
+         <P>1250
+      </TD><TD WIDTH="15%">
+         <P>8859-2
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+   <TR>
+      <TD WIDTH="20%">
+         <P>Latin - Turkic subset
+      </TD><TD WIDTH="20%">
+         <P>Turkish etc.
+      </TD><TD WIDTH="15%">
+         <P>1254
+      </TD><TD WIDTH="15%">
+         <P>8859-9
+      </TD><TD WIDTH="15%">
+         <P>unsupported
+      </TD><TD WIDTH="15%">
+         <P>supported
+      </TD></TR>
+</TABLE><A NAME="also-redhat80"></A>(1) on Red Hat 8.0.</P>
+
+<P>&nbsp;</P>
+
+<H3><A NAME="input"></A>2.2 Text Input</H3>
+
+<P>Support for text input consists of two parts: interpretation of
+keyboard layouts, and text composition using input methods. For
+interpretation of keyboard layouts, the Java 2 platform relies
+entirely on the host operating system. For text composition using
+input methods, Java 2 platform supports native input methods using
+the host operating system's input method manager as well as input
+methods developed in the Java programming language.</P>
+
+<P>Locale support in input methods implemented in the Java
+programming language depends solely on the set of installed input
+methods, not on the host operating system and its localization.
+However, support for the use of input methods implemented in the Java
+programming language with peered components is implementation
+dependent - see below.</P>
+
+<P>Support for keyboard layouts and and native input methods varies
+between platforms.</P>
+
+<H4>Windows</H4>
+
+<P>On Windows 98, ME, and NT, the J2RE supports use of any keyboard
+layout or IMM-based input method that can be installed into a
+particular localized version of the host operating system.</P>
+
+<P>On Windows 2000 and XP, the J2RE supports use of any keyboard
+layout or IMM-based input method.</P>
+
+<P>Global IME is not supported.</P>
+
+<P>Input methods implemented in the Java programming language are
+supported in all components on all versions of Windows.</P>
+
+<H4>Solaris and Linux</H4>
+
+<P>The J2RE supports use of any keyboard layout or input method that
+can be used with a particular Solaris locale.</P>
+
+<P>Input methods implemented in the Java programming language are
+supported in lightweight components (such as Swing text components),
+but not in peered components (such as AWT text components).</P>
+
+<H3><A NAME="rendering"></A>2.3 Text Rendering</H3>
+
+<P>Applications have two options for selecting fonts:</P>
+
+<UL>
+   <LI>Using the logical font names Serif, SansSerif, Dialog,
+   DialogInput, Monospaced.
+   
+   <LI>Using a physical font, either requesting it by name or
+   instantiating it using the
+   <CODE><A HREF="../../api/java/awt/Font.html#createFont(int, java.io.InputStream)">Font.createFont</A></CODE>
+   method.
+</UL>
+
+<H4>Text Rendering in Lightweight Components</H4>
+
+<P>When using logical font names, text in at least the writing system
+of the host locale and the Western European subset of the Latin
+writing system is supported.</P>
+
+<P>When using physical fonts, we need to distinguish between simple
+and complex writing systems. Simple writing systems have a one-to-one
+mapping from characters to glyphs, and glyphs are placed on the
+baseline continuously from left to right. Complex writing systems may
+use different glyphs for the same character based on context, may for
+ligatures, may be written from right to left, and may reorder glyphs
+during line layout, or may have other rules for placing glyphs (in
+particular for combining marks).</P>
+
+<P>The 2D text rendering system supports any combination of simple
+writing systems and the complex writing systems listed in the
+<A HREF="#jfc-table">table above</A>. Within these limitations, the
+range of supported writing systems is determined by the font. A
+single TrueType font might provide glyphs covering the entire Unicode
+character set and a Unicode based character-to-glyph mapping. Given
+such a font, 2D can support all simple writing systems as well as the
+complex writing systems shown in the table above. Other complex
+writing systems are not supported.</P>
+
+<H4>Text Rendering in Peered Components</H4>
+
+<P>When using logical font names, text in the writing system of the
+host operating system's locale is supported.</P>
+
+<P>Physical fonts are not supported in peered components.</P>
+
+<H4>Text Rendering in Printing</H4>
+
+<P>There are three printing APIs:</P>
+
+<UL>
+   <LI>The 2D printing API, using the
+   java.awt.print.PrinterJob.getPrinterJob method.
+   
+   <LI>The AWT printing API, using the java.awt.Toolkit.getPrintJob
+   method.
+   
+   <LI>The pluggable services printing API, using the javax.print
+   package.
+</UL>
+
+<P>Text rendering using the AWT and 2D printing API works to the same
+extent as text rendering on the screen. Text rendering using the
+pluggable services printing API depends on the printing service used;
+the services provided by the J2RE work to the same extent as text
+rendering on the screen.</P>
+
+<H3><A NAME="orientation"></A>2.4 Component Orientation</H3>
+
+<P>The component orientation property is respected only by Swing
+components and layout managers, not by peered AWT components. It is
+independent of the host operating system. The following classes
+support component orientation:</P>
+
+<P><TABLE BORDER=1 summary="layout">
+   <TR>
+      <TD VALIGN=top>
+         <P>java.awt.BorderLayout<BR>
+         
+         java.awt.FlowLayout<BR>
+         
+         java.awt.GridBagLayout<BR>
+         
+         javax.swing.BorderFactory<BR>
+         
+         javax.swing.BoxLayout<BR>
+         
+         javax.swing.JApplet<BR>
+         
+         javax.swing.JButton<BR>
+         
+         javax.swing.JCheckBox<BR>
+         
+         javax.swing.JCheckBoxMenuItem<BR>
+         
+         javax.swing.JColorChooser<BR>
+         
+         javax.swing.JComboBox<BR>
+         
+         javax.swing.JDesktopPane<BR>
+         
+         javax.swing.JDialog<BR>
+         
+         javax.swing.JEditorPane<BR>
+         
+         javax.swing.JFileChooser
+      </TD><TD VALIGN=top>
+         <P>javax.swing.JFrame<BR>
+         
+         javax.swing.JInternalFrame<BR>
+         
+         javax.swing.JLabel<BR>
+         
+         javax.swing.JLayeredPane<BR>
+         
+         javax.swing.JListBox<BR>
+         
+         javax.swing.JMenu<BR>
+         
+         javax.swing.JMenuBar<BR>
+         
+         javax.swing.JMenuItem<BR>
+         
+         javax.swing.JOptionPane<BR>
+         
+         javax.swing.JPanel<BR>
+         
+         javax.swing.JPasswordField<BR>
+         
+         javax.swing.JPopupMenu<BR>
+         
+         javax.swing.JProgressBar<BR>
+         
+         javax.swing.JRadioButton
+      </TD><TD VALIGN=top>
+         <P>javax.swing.JRadioButtonMenuItem<BR>
+         
+         javax.swing.JRootPane<BR>
+         
+         javax.swing.JScrollPane<BR>
+         
+         javax.swing.JSlider<BR>
+         
+         javax.swing.JTabbedPane<BR>
+         
+         javax.swing.JTextArea<BR>
+         
+         javax.swing.JTextField<BR>
+         
+         javax.swing.JTextPane<BR>
+         
+         javax.swing.JToggleButton<BR>
+         
+         javax.swing.JToolBar<BR>
+         
+         javax.swing.JToolTip<BR>
+         
+         javax.swing.JTree<BR>
+         
+         javax.swing.ProgressMonitor<BR>
+         
+         javax.swing.border.Border
+      </TD></TR>
+</TABLE></P>
+
+<H3><A NAME="dnd"></A>2.5 Drag and Drop</H3>
+
+<P>On Windows 98, and ME, text in the writing system of the host
+operating system's localization can be transferred between
+applications.</P>
+
+<P>On Windows NT, 2000, and XP, arbitrary Unicode text can be
+transferred between applications.</P>
+
+<P>On Solaris and Linux, text in the character encoding of the host
+operating system's locale can be transferred between applications.
+</P>
+
+<P>Applications that need to transfer arbitrary Unicode text
+independent of the host operating system, can do so using
+serialization: Create a Transferable which supports only one flavor:
+DataFlavor.stringFlavor. This flavor represents the serialized
+representation of a String. Make sure that the target supports
+stringFlavor as well. When the transfer occurs, the AWT will
+serialize out the String on one end and deserialize on the other.
+This is much slower than a native platform text transfer, but it will
+succeed where native transfers may not.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="translation"></A>3. User Interface Translation</H2>
+
+<H4>Java 2 Runtime Environment</H4>
+
+<P>The user interface elements provided by the Java 2 Runtime
+Environment, Standard Edition, v. 1.4.2, include Swing dialogs,
+messages written by the runtime environment to the standard output
+and standard error streams, as well as messages produced by the tools
+provided with the J2RE. These user interface elements are localized
+into the following languages:</P>
+
+<P><TABLE BORDER=1 summary="languages for UI elements">
+   <TR>
+      <TH WIDTH=150>
+         <P><B>Language</B>
+      </TH><TH WIDTH=150>
+         <P><B>Locale ID</B>
+      </TH></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Chinese (Simplified)
+      </TD><TD WIDTH=150>
+         <P>zh_CN
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Chinese (Traditional)
+      </TD><TD WIDTH=150>
+         <P>zh_TW
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>en
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>French
+      </TD><TD WIDTH=150>
+         <P>fr
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>German
+      </TD><TD WIDTH=150>
+         <P>de
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Italian
+      </TD><TD WIDTH=150>
+         <P>it
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Japanese
+      </TD><TD WIDTH=150>
+         <P>ja
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Korean
+      </TD><TD WIDTH=150>
+         <P>ko
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Spanish
+      </TD><TD WIDTH=150>
+         <P>es
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Swedish
+      </TD><TD WIDTH=150>
+         <P>sv
+      </TD></TR>
+</TABLE></P>
+
+<H4>Java 2 Software Development Kit</H4>
+
+<P>The user interface elements provided by the Java 2 Software
+Development Kit, Standard Edition, v. 1.4.2, include messages
+produced by the tools that are only part of the J2SDK in addition to
+the elements provided by the J2RE. The additional user interface
+elements are localized into the following languages:</P>
+
+<P><TABLE BORDER=1 summary="additional UI elements">
+   <TR>
+      <TH WIDTH=150>
+         <P><B>Language</B>
+      </TH><TH WIDTH=150>
+         <P><B>Locale ID</B>
+      </TH></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>English
+      </TD><TD WIDTH=150>
+         <P>en
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Japanese
+      </TD><TD WIDTH=150>
+         <P>ja
+      </TD></TR>
+</TABLE></P>
+
+<P><!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE="3" NOSHADE>
+<TABLE BORDER=0 WIDTH="100%" summary="layout">
+   <TR>
+      <TD VALIGN=top>
+         <P><FONT
+         SIZE="-2"><A HREF="../../relnotes/SMICopyright.html">Copyright
+         &copy;</A></FONT><FONT SIZE="-2"> 2003 </FONT><FONT
+         SIZE="-2"><A HREF="http://www.sun.com/">Sun Microsystems,
+         Inc.</A></FONT><FONT SIZE="-2"> All Rights Reserved.</FONT>
+         </P>
+         
+         <P><FONT SIZE="-1">Please send comments to: </FONT><FONT
+         SIZE="-1"><A HREF="mailto:java-intl@java.sun.com">java-intl@java.sun.com</A></FONT><FONT
+         SIZE="-1"> </FONT>
+      </TD><TD VALIGN=top align=RIGHT>
+         <P ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif"
+         ALT="Sun" WIDTH=64 HEIGHT=30 BORDER=0 ALIGN=bottom><BR>
+         
+         <I><FONT SIZE="+1">Java Software</FONT></I><FONT SIZE="+1">
+         </FONT>
+      </TD></TR>
+</TABLE></P>
+</BODY>
+</HTML>

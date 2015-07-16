@@ -1,0 +1,121 @@
+<HTML>
+<HEAD>
+  <TITLE>Appendix C: JNDI Change History</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="legend.html">PREV</A>
+    | NEXT</TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<P><FONT COLOR="#707070">Appendix 4:</FONT></P>
+
+<H1 CLASS="appendix"><A NAME="pgfId=150244"></A>JNDI Change History</H1>
+
+<DIV>
+
+<H2 CLASS="Heading1"><A NAME="pgfId=151997"></A>JNDI 1.2: Changes
+Since JNDI 1.1<DIV> </DIV></H2>
+
+<UL>
+  <LI CLASS="Bulleted"><A NAME="pgfId=152001"></A>Added <CODE>javax.naming.event</CODE>
+  package.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152002"></A>Added <CODE>javax.naming.ldap</CODE>
+  package.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152004"></A>Added support
+  for configuration using resource files. See Chapter 6 of the
+  JNDI API document.
+</UL>
+
+<DIV>
+
+<H3 CLASS="Heading2"><A NAME="pgfId=152008"></A>API-related Changes</H3>
+
+<UL>
+  <LI CLASS="Bulleted"><A NAME="pgfId=152003"></A>Added <CODE>NamingEnumeration.close()</CODE>
+  for cancelling or terminating enumerations.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152014"></A>Added <CODE>ReferralException.getReferralContext(Hashtable
+  env)</CODE> and <CODE>ReferralException.retryReferral()</CODE>
+  to allow creation and retry of referral context with different
+  environment properties.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152015"></A>Clarified how
+  context methods that accept <CODE>Name</CODE> argument should
+  deal with <CODE>CompositeName</CODE> and non<CODE> CompositeName</CODE>
+  arguments. Specifically, instances of <CODE>CompositeName</CODE>
+  are treated as composite name, while all others are treated as
+  compound name.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152016"></A>Added <CODE>Context.getNameInNamespace()</CODE>
+  for retrieving the full name of a context within its own namespace.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152018"></A>Clarified definition
+  of the class factory location of a <CODE>Reference</CODE> object.
+  Specifically, the location is a codebase, which consists of a
+  list space-separated URLs.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152019"></A>Added support
+  for ordered multivalued attributes to <CODE>Attribute</CODE>
+  and <CODE>BasicAttribute</CODE> .
+  <LI CLASS="Bulleted"><A NAME="pgfId=152053"></A>Added <CODE>BasicAttributes.equals()</CODE>
+  and <CODE>BasicAttributes.hashCode()</CODE> .
+  <LI CLASS="Bulleted"><A NAME="pgfId=152020"></A>Redefined semantics
+  of <CODE>DirContext.getSchemaClassDefinition()</CODE> so that
+  it returns a context that contains the <CODE>DirContext</CODE>
+  objects of class definitions, rather than returning one (arbitrary)
+  class definition.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152037"></A>Added protected
+  <CODE>InitialContext</CODE> /<CODE> InitialDirContext</CODE>
+  constructors to allow lazy initialization. Useful for subclass
+  implementations.
+</UL>
+
+</DIV><DIV>
+
+<H3 CLASS="Heading2"><A NAME="pgfId=152011"></A>SPI-related Changes</H3>
+
+<UL>
+  <LI CLASS="Bulleted"><A NAME="pgfId=152061"></A>Added <CODE>StateFactory</CODE>
+  /<CODE> NamingManager.getStateToBind()</CODE> , analogous to
+  <CODE>ObjectFactory</CODE> /<CODE> NamingManager.getObjectInstance()</CODE>
+  , for transforming an object's state before the object is bound
+  in the naming/directory service.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152060"></A>Added interfaces
+  <CODE>DirObjectFactory</CODE> and <CODE>DirStateFactory</CODE>
+  to better support service providers that implement the <CODE>DirContext</CODE>
+  interface. Added <CODE>DirectoryManager.getObjectInstance()</CODE>
+  and <CODE>DirectoryManager.getStateToStore()</CODE> to use these
+  interfaces.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152009"></A>Refined definition
+  of <CODE>NamingManager.getObjectInstance()</CODE> to not treat
+  URL strings specially. Instead, the URL should be wrapped inside
+  a <CODE>Reference</CODE> whose <CODE>RefAddr</CODE> type is &quot;URL&quot;.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152058"></A>Made <CODE>ResolveResult</CODE>
+  implement <CODE>Serializable</CODE> .
+  <LI CLASS="Bulleted"><A NAME="pgfId=152073"></A>Defined a special
+  form of <CODE>Reference</CODE> called a next naming system (nns)
+  reference for supporting &quot;dynamic federation&quot;. This
+  reference has a <CODE>RefAddr</CODE> type of &quot;nns&quot;
+  and a content consisting of the resolved object.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152085"></A>Added the string
+  constant <CODE>NamingManager.CPE</CODE> which names a property
+  set by <CODE>NamingManager.getContinuationContext()</CODE> /<CODE>
+  DirectoryManager.getContinuationContext()</CODE> . The value
+  of this property is an instance of <CODE>CannotProceedException</CODE>
+  . This is useful to service providers that implement federation
+  by chaining the CPEs.
+  <LI CLASS="Bulleted"><A NAME="pgfId=152100"></A>Defined a convention
+  for service providers to use when naming environment properties.
+  See Section 6.1.
+</UL>
+
+<P><BR>
+<HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="legend.html">PREV</A>
+| NEXT<HR ALIGN=LEFT><I><FONT SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">
+Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

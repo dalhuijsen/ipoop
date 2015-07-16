@@ -1,0 +1,726 @@
+<html>
+
+<head>
+    <title>JAAS Authentication</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#000077" alink="#FF0000">
+
+
+<table summary="layout" width="550">
+<tr>
+<td align="left" valign="center">
+<a href="BasicClientServer.html" target="_top">
+<img src="images/PreviousArrow.gif" width="26" height="26" align="center" 
+border="0" alt="Previous Tutorial"></a>
+<a href="index.html" target="_top"><img src="images/TOCIcon.gif" width="26" 
+height="26" align="center" border="0" alt="Tutorials Introduction and TOC"></a>
+<a href="AcnAndAzn.html" target="_top"><img src="images/NextArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Next Tutorial"></a></td>
+
+
+<td align="right" valign="center">
+<font size="-1">
+<a href="Feedback.html">Feedback</a>
+</font>
+</td>
+
+</tr>
+</table>
+
+<hr>
+
+
+<center>
+<H1>JAAS Authentication</H1>
+</center>
+
+<br>
+<br>
+
+<blockquote>
+
+<p> The Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Authentication
+and Authorization Service (JAAS) was introduced as an optional package to the
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition (J2SDK), v 1.3.
+JAAS has now been integrated into the J2SDK, v 1.4.
+
+<p> JAAS can be used for two purposes:
+
+<ul>
+
+<li>for <i>authentication</i> of users, to reliably
+and securely determine who is currently executing Java code,
+regardless of whether the code is running as an application, an applet,
+a bean, or a servlet; and<p>
+
+<li>for <i>authorization</i> of users to ensure they have the 
+access control rights (permissions) required to do the actions performed.
+
+</ul>
+
+<p>This section provides a basic tutorial for the authentication component.
+The authorization component will be
+described in the <a href="AcnAndAzn.html">JAAS Authorization</a> tutorial.
+
+<p> JAAS authentication is performed in a <i>pluggable</i> fashion.
+This permits Java applications to remain independent from underlying
+authentication technologies.  New or updated 
+technologies can be plugged in without requiring
+modifications to the application itself. An implementation for a
+particular authentication technology to be used
+is determined at runtime. The implementation is 
+specified in a login configuration file.
+The authentication technology used for this tutorial is Kerberos.
+(See <a href="KerberosReq.html">Kerberos Requirements</a>.)
+
+<p>The rest of this tutorial consists of the
+following sections:
+
+<ol>
+
+<li><a href="#AcCode">The Authentication Tutorial Code</a> <p>
+
+<li><a href="#ConfigFile">The Login Configuration</a> <p>
+
+<li><a href="#RunAc">Running the Code</a><p>
+
+<li><a href="#RunAcWSM">Running the Code with a Security Manager</a>
+
+</ol>
+
+<p>If you want to first see the tutorial code in action,
+you can skip directly to 
+<a href="#RunAc">Running the Code</a>
+and then go back to the other sections to learn about
+coding and configuration file details.
+
+
+<a name="AcCode">
+<H2>The Authentication Tutorial Code</H2></a>
+
+<blockquote>
+
+<p>Our authentication tutorial code is contained in a single source
+file, <a href = "JaasAcn.java">JaasAcn.java</a>. 
+This file's <code>main</code> method 
+performs the authentication and then reports whether or not 
+authentication succeeded.
+
+<p>The code for authenticating the user is
+very simple, consisting of just two steps:
+
+<ol>
+
+<li><a href="#ClientLC">Instantiate a LoginContext.</a> <p>
+<li><a href="#ClientLogin">Call the LoginContext's <code>login</code> 
+method.</a>
+
+</ol> 
+
+<p>First the basic code is shown, followed by a 
+<a href="#AcnFullCode">complete listing</a> 
+of the <code>JaasAcn.java</code> source file, complete with import statements
+and error handling.
+
+<H3><a name="ClientLC">Instantiating a LoginContext</H3></a>
+
+<blockquote>
+
+<p>In order to authenticate a user, you first need a 
+<code>javax.security.auth.login.LoginContext</code>.
+Here is the basic way to instantiate a LoginContext:
+
+<blockquote>
+<pre>
+import javax.security.auth.login.*;
+. . .
+LoginContext lc = 
+    new LoginContext(&lt;config file entry name&gt;,
+           &lt;CallbackHandler to be used for user interaction&gt;); 
+</pre>
+</blockquote>
+
+and here is the specific way our tutorial code does
+the instantiation:
+
+<blockquote>
+<pre>
+import javax.security.auth.login.*;
+import com.sun.security.auth.callback.TextCallbackHandler;
+. . .
+<b>LoginContext lc = 
+    new LoginContext("JaasSample", 
+          new TextCallbackHandler());</b>
+</pre>
+</blockquote>
+
+<p>The arguments are the following: 
+
+<ol>
+
+<li><b>The name of an entry in the JAAS login configuration file</b>
+
+<p>This is the name for the LoginContext to use to look up an entry 
+for this application in the JAAS login configuration file, described 
+<a href="#ConfigFile">here</a>. Such an entry specifies the class(es)
+that implement the desired underlying authentication technology(ies).
+The class(es) must implement the LoginModule interface, which is in the
+<code>javax.security.auth.spi</code> package.
+
+<p>In our sample code, we use the <code>Krb5LoginModule</code> in the
+<code>com.sun.security.auth.module</code> package, which 
+performs Kerberos authentication.
+
+<p>The entry in the login configuration file we 
+use for this tutorial (see <a href = "jaas.conf">jaas.conf</a>)
+has the name "JaasSample", 
+so that is the name we specify
+as the first argument to the LoginContext constructor.
+
+<p>
+
+<li><b>A CallbackHandler instance.</b>
+
+<p>When a LoginModule needs to communicate with the user, for example
+to ask for a user name and password, it does not do so directly.
+That is because there are various ways of communicating with a
+user, and it is desirable for LoginModules to remain independent of the
+different types of user interaction. Rather, the LoginModule invokes
+a CallbackHandler to perform the user interaction and obtain the requested
+information, such as the user name and password. 
+(CallbackHandler is an interface in the
+<code>javax.security.auth.callback</code> pkg.)
+
+<p>An instance of the particular
+CallbackHandler to be used is specified as the second argument to
+the LoginContext constructor. 
+The LoginContext forwards that instance to the underlying LoginModule
+(in our case Krb5LoginModule). 
+An application typically provides its own CallbackHandler implementation.
+Two simple CallbackHandlers, TextCallbackHandler and DialogCallbackHandler,
+are provided in the <code>com.sun.security.auth.callback</code> package
+as sample implementations. Our code uses the TextCallbackHandler,
+which outputs information to and reads input from the command line.
+
+</ol>
+
+</blockquote>
+
+
+<H3><a name="ClientLogin">Calling the LoginContext's <code>login</code> 
+Method</a></H3>
+
+<blockquote>
+
+<p>Once we have a LoginContext <code>lc</code>, 
+we can call its <code>login</code> method to
+carry out the authentication process:
+
+<blockquote>
+<pre>
+<b>lc.login();</b>
+</pre>
+</blockquote>
+
+<p>The LoginContext instantiates a new empty 
+<a href="../../../../api/javax/security/auth/Subject.html">
+<code>javax.security.auth.Subject</code></a> object (which
+represents the user or service being authenticated).
+The LoginContext constructs the configured LoginModule 
+(in our case Krb5LoginModule) and initializes it with
+this new Subject and TextCallbackHandler.
+
+<p>The LoginContext's <code>login</code> method then
+calls methods in the Krb5LoginModule to
+perform the login and authentication. 
+The Krb5LoginModule will utilize the TextCallbackHandler
+to obtain the user name and password.
+Then the Krb5LoginModule will use this information to get
+the user credentials from the Kerberos KDC. 
+See the <a href="http://web.MIT.edu/kerberos/www/index.html">Kerberos 
+reference documentation</a>.
+
+<p>If authentication is successful, the Krb5LoginModule 
+populates the Subject with (1) a Kerberos Principal representing the user and
+(2) the user's credentials (TGT). 
+See <a href="glossary.html">Subjects, Principals, Authentication, and
+Credentials</a> for information on these terms.
+
+<p>The calling application can subsequently retrieve the
+authenticated Subject by calling the
+LoginContext's <code>getSubject</code> method, although doing so is not 
+necessary for this tutorial.
+
+
+</blockquote>
+
+
+<a name="AcnFullCode">
+<H3>The Complete <code>JaasAcn.java</code> Code</H3></a>
+
+<blockquote>
+
+<p>Now that you have seen the basic code required to authenticate the
+user, we can put it all together into the full class in 
+<a href = "JaasAcn.java">JaasAcn.java</a>, which includes relevant
+import statements and error handling:
+
+<blockquote>
+<pre>
+import javax.security.auth.*;
+import javax.security.auth.callback.*;
+import javax.security.auth.login.*;
+import com.sun.security.auth.callback.TextCallbackHandler;
+
+/**
+ * This JaasAcn application attempts to authenticate a user
+ * and reports whether or not the authentication was successful.
+ */
+public class <b>JaasAcn</b> {
+
+  public static void main(String[] args) {
+
+      // Obtain a LoginContext, needed for authentication. Tell 
+      // it to use the LoginModule implementation specified by 
+      // the entry named "JaasSample" in the JAAS login 
+      // configuration file and to also use the specified 
+      // CallbackHandler.
+      LoginContext lc = null;
+      try {
+          <b>lc = new LoginContext("JaasSample", 
+                      new TextCallbackHandler());</b>
+      } catch (LoginException le) {
+          System.err.println("Cannot create LoginContext. "
+              + le.getMessage());
+          System.exit(-1);
+      } catch (SecurityException se) {
+          System.err.println("Cannot create LoginContext. "
+              + se.getMessage());
+          System.exit(-1);
+      } 
+
+      try {
+    
+          // attempt authentication
+          <b>lc.login();</b>
+    
+      } catch (LoginException le) {
+    
+          System.err.println("Authentication failed: "
+          System.err.println("  " + le.getMessage());
+          System.exit(-1);
+    
+      }
+    
+      System.out.println("Authentication succeeded!");
+    
+    }
+}
+</pre>
+</blockquote>
+
+
+</blockquote>
+
+
+</blockquote>
+
+
+
+<a name="ConfigFile">
+<H2>The Login Configuration</H2></a>
+
+<blockquote>
+
+<p> JAAS authentication is performed in a pluggable fashion, so
+applications can remain independent from underlying
+authentication technologies. A system administrator determines
+the authentication technologies, or LoginModules, to be used
+for each application and configures them in a login Configuration.
+The source of the configuration information 
+(for example, a file or a database) is up to the current 
+<a href="../../../../api/javax/security/auth/login/Configuration.html">
+javax.security.auth.login.Configuration</a> implementation.
+The default <code>Configuration</code> implementation from Sun Microsystems 
+reads configuration information from configuration files, as described in
+<a href="../../jaas/spec/com/sun/security/auth/login/ConfigFile.html">
+com.sun.security.auth.login.ConfigFile.html</a>.
+
+<p>See <a href="LoginConfigFile.html">JAAS Login Configuration 
+File</a> for information as to what a login configuration file is, what it 
+contains, and how to specify which login configuration file should be used.
+
+
+
+<a name="AcLCF">
+<H3>The Login Configuration File for This Tutorial</H3></a>
+
+<blockquote>
+
+<p>As noted, the login configuration file we use for this tutorial, 
+<a href = "jaas.conf">jaas.conf</a>, contains just one
+entry, which is
+
+<blockquote>
+<pre>
+<b>JaasSample {
+  com.sun.security.auth.module.Krb5LoginModule required;
+};</b>
+</pre>
+</blockquote>
+
+<p>This entry is named "JaasSample" and that is the name that our
+tutorial application, <code>JaasAcn</code>, uses to refer to this entry.
+The entry specifies that the LoginModule to be used to do the
+user authentication is the Krb5LoginModule in the 
+<code>com.sun.security.auth.module</code> package and that
+this Krb5LoginModule is required to "succeed" in order for
+authentication to be considered successful.
+The Krb5LoginModule succeeds only if the name and password supplied
+by the user are successfully used to log the user into the Kerberos KDC.
+
+<p>For information about all the possible options that can be
+passed to Krb5LoginModule, see the
+<a href="../../jaas/spec/com/sun/security/auth/module/Krb5LoginModule.html">
+Krb5LoginModule documentation</a>.
+
+
+</blockquote>
+
+
+</blockquote>
+
+
+<a name="RunAc">
+<H2>Running the Code</H2></a>
+
+<blockquote>
+
+<p>To execute our JAAS authentication tutorial code, all you
+have to do is 
+
+<ol>
+
+<li>Place the <a href = "JaasAcn.java">JaasAcn.java</a> application 
+source file and the
+<a href = "jaas.conf">jaas.conf</a> login configuration file 
+into a directory. <p>
+
+<li>Compile <code>JaasAcn.java</code>:
+
+<blockquote>
+<pre>
+javac JaasAcn.java
+</pre>
+</blockquote>
+
+<li>Execute the <code>JaasAcn</code> application, specifying <p>
+
+<ul>
+
+<li>by <code>-Djava.security.krb5.realm=&lt;your_realm&gt;</code> that 
+your Kerberos realm is the one specified. For example, if your realm is 
+"KRBNT-OPERATIONS.ABC.COM" you'd put 
+<code>-Djava.security.krb5.realm=KRBNT-OPERATIONS.ABC.COM</code>.<p>
+
+<li>by <code>-Djava.security.krb5.kdc=&lt;your_kdc&gt;</code> that 
+your Kerberos KDC is the one specified. For example, if your KDC is
+"samplekdc.abc.com" you'd put 
+<code>-Djava.security.krb5.kdc=samplekdc.abc.com</code>.<p>
+
+<li>by <code>-Djava.security.auth.login.config=jaas.conf</code> that the
+login configuration file to be used is <code>jaas.conf</code>.
+
+</ul>
+
+</ol>
+
+<p>The full command is below. <b>Be sure to replace 
+<code>&lt;your_realm&gt;</code> with your Kerberos realm,
+and <code>&lt;your_kdc&gt;</code> with your Kerberos KDC.</b>
+
+<blockquote>
+<pre>
+java -Djava.security.krb5.realm=&lt;your_realm&gt; 
+ -Djava.security.krb5.kdc=&lt;your_kdc&gt; 
+ -Djava.security.auth.login.config=jaas.conf JaasAcn
+</pre>
+</blockquote>
+
+<p>Type all that on one line. Multiple lines are used here for legibility.
+
+<p>You will be prompted for your Kerberos user name and password,
+and the underlying Kerberos authentication mechanism 
+specified in the login configuration file will log you into
+Kerberos. If your login is successful, you will see the following
+message:
+
+<blockquote>
+<pre>
+Authentication succeeded!
+</pre>
+</blockquote>
+
+If the login is not successful (for example, if you misspell your
+password), you will see
+
+<blockquote>
+<pre>
+Authentication failed:
+</pre>
+</blockquote>
+
+followed by a reason for the failure. For example, if you mistype
+your user name, you may see a message like the following (where the
+formatting is slightly modified here to increase legibility):
+
+<blockquote>
+<pre>
+Authentication failed:
+  Kerberos Authentication Failed:
+    javax.security.auth.login.LoginException: 
+      KrbException: Client not found in Kerberos database
+</pre>
+</blockquote>
+
+<p>For login troubleshooting suggestions, see 
+<a href = "Troubleshooting.html">Troubleshooting</a>.
+
+<p>After fixing any problems, re-run the program to try again.
+
+</ol>
+
+</blockquote>
+
+
+
+<a name="RunAcWSM">
+<H2>Running the Code with a Security Manager</H2></a>
+
+<blockquote>
+
+<p>When a Java program is run with a security manager installed,
+the program is not allowed to access resources or otherwise perform
+security-sensitive operations unless it is explicitly granted
+<a href = "../../permissions.html">
+permission</a> to do so by the security policy in effect. In Java 
+platforms that are compatible with J2SE v 1.2 and later, the
+permission must be granted by an entry in a 
+<a href = "../../PolicyFiles.html">
+policy file</a>.
+
+<p>Most browsers install a security manager, so <i>applets</i> typically run
+under the scrutiny of a security manager. <i>Applications</i>, on the 
+other hand, do not, since a security manager is not automatically
+installed when an application is running. Thus an application, like our
+<code>JaasAcn</code> application, by default has full access to resources.
+
+<p><b>To run an application with a security manager</b>, simply invoke the
+interpreter with a <code>-Djava.security.manager</code> argument included 
+on the command line. 
+
+<p>If you try invoking <code>JaasAcn</code> with a security manager but 
+without specifying any policy file, you will get the following (unless
+you have a default policy setup elsewhere that grants the required
+permissions or grants <code>AllPermission</code>):
+
+<pre>
+% java -Djava.security.manager \
+ -Djava.security.krb5.realm=&lt;your_realm&gt; \
+ -Djava.security.krb5.kdc=&lt;your_kdc&gt; \
+ -Djava.security.auth.login.config=jaas.conf JaasAcn
+Exception in thread "main" java.security.AccessControlException: 
+  access denied (
+  javax.security.auth.AuthPermission createLoginContext.JaasSample)
+</pre>
+
+<p>As you can see, you get an AccessControlException, because 
+we haven't created and used a policy file granting our code the permission that
+is required in order to be allowed to create a LoginContext.
+
+<p>Here are the complete steps required in order to be able to run our
+<code>JaasAcn</code> application with a security manager installed. 
+You can skip the
+first two steps if you have already done them, as described in
+<a href="#RunAc">Running the Code</a>. 
+
+<ol>
+
+<li>Place the <a href = "JaasAcn.java">JaasAcn.java</a> application 
+source file and the
+<a href = "jaas.conf">jaas.conf</a> login configuration file 
+into a directory. <p>
+
+<li>Compile <code>JaasAcn.java</code>:
+
+<blockquote>
+<pre>
+javac JaasAcn.java
+</pre>
+</blockquote>
+
+<li>Create a JAR file containing <code>JaasAcn.class</code>:
+
+<blockquote>
+<pre>
+jar -cvf JaasAcn.jar JaasAcn.class
+</pre>
+</blockquote>
+
+<p>This command creates a JAR file, <code>JaasAcn.jar</code>, and
+places the <code>JaasAcn.class</code> file inside it.
+
+<p>
+
+<li>Create a policy file granting the code in the JAR file 
+the required permission.
+
+<p>The permission that is needed by code attempting to instantiate
+a LoginContext is a <code>javax.security.auth.AuthPermission</code> with target 
+"createLoginContext.&lt;entry name&gt;". Here, &lt;entry name&gt;
+refers to the name of the login configuration file entry that
+the application references in its instantiation of LoginContext.
+The name used by our <code>JaasAcn</code> application's LoginContext instantiation 
+is "JaasSample", as you can see in the code:
+
+<blockquote>
+<pre>
+LoginContext lc = 
+    new LoginContext("JaasSample", 
+          new TextCallbackHandler());
+</pre>
+</blockquote>
+
+Thus, the permission that needs to be granted to <code>JaasAcn.jar</code> is
+
+<blockquote>
+<pre>
+permission javax.security.auth.AuthPermission 
+  "createLoginContext.JaasSample";
+</pre>
+</blockquote>
+ 
+Copy the policy file <a href = "jaasacn.policy">jaasacn.policy</a>
+to the same directory as that in which you stored <code>JaasAcn.java</code>, 
+etc. This
+is a text file containing the following <code>grant</code> statement to
+grant <code>JaasAcn.jar</code> (in the current directory) 
+the required permission:
+
+<blockquote>
+<pre>
+grant codebase "file:./JaasAcn.jar" {
+   permission javax.security.auth.AuthPermission 
+                    "createLoginContext.JaasSample";
+};</pre>
+</blockquote>
+
+<p>Note: Policy files and the structure of entries within them
+are described in <a href = "../../PolicyFiles.html">
+Default Policy Implementation and Policy File Syntax</a>.
+Permissions are described 
+<a href = "../../permissions.html">here</a>.<p>
+
+<li>Execute the <code>JaasAcn</code> application, specifying <p>
+
+<ol>
+
+<li>by an appropriate <code>-classpath</code> clause that classes should be 
+searched for in the <code>JaasAcn.jar</code> JAR file, <p>
+
+<li>by <code>-Djava.security.manager</code> that a
+security manager should be installed, <p>
+
+<li>by <code>-Djava.security.krb5.realm=&lt;your_realm&gt;</code> that 
+your Kerberos realm is the one specified. For example, if your realm is 
+"KRBNT-OPERATIONS.ABC.COM" you'd put 
+<code>-Djava.security.krb5.realm=KRBNT-OPERATIONS.ABC.COM</code>.<p>
+
+<li>by <code>-Djava.security.krb5.kdc=&lt;your_kdc&gt;</code> that 
+your Kerberos KDC is the one specified. For example, if your KDC is
+"samplekdc.abc.com" you'd put 
+<code>-Djava.security.krb5.kdc=samplekdc.abc.com</code>.<p>
+
+<li>by <code>-Djava.security.policy=jaasacn.policy</code> that
+the policy file to be used is <code>jaasacn.policy</code>, and <p>
+
+<li>by <code>-Djava.security.auth.login.config=jaas.conf</code> that the
+login configuration file to be used is <code>jaas.conf</code>.
+
+</ol>
+
+<p>The full command is below. <b>Be sure to replace 
+<code>&lt;your_realm&gt;</code> with your Kerberos realm,
+and <code>&lt;your_kdc&gt;</code> with your Kerberos KDC.</b>
+
+<pre>
+java -classpath JaasAcn.jar -Djava.security.manager 
+ -Djava.security.krb5.realm=&lt;your_realm&gt; 
+ -Djava.security.krb5.kdc=&lt;your_kdc&gt; 
+ -Djava.security.policy=jaasacn.policy 
+ -Djava.security.auth.login.config=jaas.conf JaasAcn
+</pre>
+
+<p>Type all that on one line. Multiple lines are used here for legibility.
+If the command is too long for your system, you may
+need to place it in a .bat file (for Windows) or a .sh file
+(for UNIX) and then run that file to execute the command.
+
+<p>Since the specified policy file contains an entry granting the
+code the required permission, <code>JaasAcn</code> will be allowed to 
+instantiate a LoginContext and continue execution.
+You will be prompted for your Kerberos user name and password,
+and the underlying Kerberos authentication mechanism 
+specified in the login configuration file will log you into
+Kerberos. If your login is successful, you will see the 
+message "Authentication succeeded!" and if not, you will see
+"Authentication failed:" followed by a reason for the failure.
+
+<p>For login troubleshooting suggestions, see 
+<a href = "Troubleshooting.html">Troubleshooting</a>.
+
+
+</blockquote>
+
+
+
+
+
+
+</blockquote>
+
+
+</blockquote>
+
+
+<br>
+
+<hr>
+
+<table summary="layout" width="550">
+<tr>
+<td align="left" valign="center">
+<a href="BasicClientServer.html" target="_top">
+<img src="images/PreviousArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Previous Tutorial"></a>
+<a href="index.html" target="_top"><img src="images/TOCIcon.gif" width="26" 
+height="26" align="center" border="0" alt="Tutorials Introduction and TOC"></a>
+<a href="AcnAndAzn.html" target="_top"><img src="images/NextArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Next Tutorial"></a></td>
+
+
+<td align="right" valign="center">
+<font size="-1">
+<a href="Feedback.html">Feedback</a>
+</font>
+</td>
+
+</tr>
+</table>
+
+
+</body>
+
+</html>
+

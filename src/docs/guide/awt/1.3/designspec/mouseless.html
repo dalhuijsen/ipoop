@@ -1,0 +1,158 @@
+<html><head><title>Java AWT: Mouseless Operation</title></head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+ 
+<a name="920106">
+<h1><img align=middle alt="Duke logo" src="images/hips.sm.gif"> Java AWT: Mouseless Operation</h1>
+</a>
+<hr><p><a name="920108">
+<address>
+Last Updated: February 3, 1997
+</address>
+
+<h2>Purpose</h2>
+</a>
+Although typical GUIs today are designed to be driven with a mouse, there are numerous circumstances where mouseless operation in a GUI becomes important (and sometimes even critical) for usability.  Some of those circumstances include:<ul>
+<li>Accelerated operation for the "power" user
+
+<li>Disabled access
+
+<li>Avoidance or treatment for RSI (repetitive stress injury)
+</ul>
+<p>AWT1.0 does not provide any explicit facilities for building mouseless operation into Java programs, except where the native peers components provide it by default (i.e. tabbed focus traversal, space-bar activation, etc.). For JDK1.1, the AWT will add some baseline support to better enable mouseless mode in Java programs, although it by no means provides a 100% solution to this problem. This support will be expanded in subsequent releases. The two features in the 
+Java<sup><font size=-2>TM</font></sup> platform since version 1.1 are:<ul>
+<li><a href="#focus">Focus Traversal</a>
+
+<li><a href="#shortcuts">Menu Shortcuts</a>
+</ul><a name="920121">
+<hr>
+<h2><a name="focus">Focus Traversal</h2>
+</a>
+Focus traversal is defined to be the ability to use keystrokes (not the mouse) to traverse components capable of accepting keyboard focus. Those keystrokes are defined to be &lt;Tab&gt; to move forward and &lt;Shift-Tab&gt; to move backward. Once the focus is owned by a component then it should be possible to activate/drive that component with further defined keystrokes (such as &lt;space&gt; to press a Button). It is the responsibility of the component (not the AWT), to implement the proper activation once it has focus
+<p>A component which is capable of accepting focus in this way should always render some form of visual feedback when it gets focus so that the user can easily see which component has focus as the user traverses using Tab/Shift-Tab. Typically this feedback takes the form of a colored bounding box drawn around the component.
+<p>The native toolkits on each platform provide varying degrees of support for focus traversal by default. However, explicit support for this has been implemented in the common java AWT code so that the behavior is more consistent across platforms.<a name="920129">
+<p>
+<h3>The Focus Traversal API</h3>
+</a>
+The API is extremely simple; it consists of a new method on 
+java.awt.Component and java.awt.peer.ComponentPeer:
+<pre><code>	<a href="../../../../api/java/awt/Component.html#isFocusTraversable()">public boolean isFocusTraversable()</a>
+</code></pre>
+
+<p>This method returns true if the component is a type inherently capable of accepting keyboard focus and returns false otherwise.
+<p>The reason this method also exists for the peer class is because 
+the native peer components that are created by the AWT components have 
+different traversal rules on different platforms. This allows the tailoring 
+of this attribute appropriately on each platform 
+(for example, on the Mac, Buttons cannot take focus, but 
+on Motif and Microsoft Windows, they can).
+<p>
+All existing AWT components should have this attribute set properly by default, but there is the option to subclass a component and override this method to return a value appropriate for your program. In particular, if you are subclassing java.awt.Canvas to build your own custom component that is designed to take keyboard focus, then you should do the following three things:<ol>
+
+<li>override isFocusTraversable() to return true (Canvas returns false by default) 
+
+<li>catch the mouse-down event on the component and invoke requestFocus() (to implement click-to-type for your component) 
+
+<li>when your component gets focus, provide visual feedback indicating it has the focus
+</ol>
+
+<p>If your component does not adhere to the above steps, users may have trouble getting focus into your component.
+<p>The AWT internally tracks which component has the focus so that it can move the focus forward or backward in response to a Tab or Shift-Tab keyboard event. This is handled by a private FocusManager object that is registered on the Window. The FocusManager can manage this focus migration correctly, no matter how deeply nested a window's containers are. The order of this traversal will be equal to the order of the components contained in the containers; by default this will be equal to the order the children were added to the container, however the Container's add(Component c, int pos) method can be used to control this ordering. The FocusManager automatically checks to see if a "focusTraversable" component is both visible and active before it assigns it the focus (hence, the isFocusTraversable() method need not take this state into account for its return value).<a name="920146">
+<p>
+Note: We realize that a more flexible mechanism for configuring the order of traversal is needed and we are currently working on a solution to that problem.
+<p>
+<hr>
+<h2><a name= "shortcuts">Menu Shortcuts</h2>
+</a>
+The goal for the AWT Shortcut API is to provide an easy way for application developers to provide shortcuts as an aid to menu navigation. This API only addresses menu shortcuts, and does not touch on any other mouseless menu navigation issues.
+<p>A Shortcut is defined to be a keyboard equivalent of a menu command, such that invoking the appropriate key combination will cause the same action to be initiated as if the menu item had been selected. Shortcuts are also known as keyboard equivalents or accelerators.<a name="920155">
+<p>
+<h3>The Shortcuts API</h3>
+</a>
+The API consists of a class:
+<pre><code>	<a href="../../../../api/java/awt/MenuShortcut.html">java.awt.MenuShortcut</a>
+</code></pre>
+
+<p><a href="../../../../api/java/awt/MenuItem.html">java.awt.MenuItem</a> then has the following additional methods:
+<pre><code>	public MenuItem(String label, MenuShortcut s)
+</code></pre>
+
+<pre><code>	public MenuShortcut getShortcut()
+</code></pre>
+
+<pre><code>	public void setShortcut(MenuShortcut s)
+</code></pre>
+
+<pre><code>	public void deleteShortcut();
+</code></pre>
+
+<p><a href="../../../../api/java/awt/MenuBar.html">java.awt.MenuBar</a> has the following additional methods:
+<p>
+<pre><code>	public MenuItem getShortcutMenuItem(MenuShortcut s);
+</code></pre>
+
+<pre><code>	public Enumeration shortcuts();
+</code></pre>
+
+<pre><code>	boolean handleShortcut(KeyEvent e);
+</code></pre>
+
+<pre><code>	public void deleteShortcut(MenuShortcut s);
+</code></pre>
+
+<h3>Modifiers</h3>
+
+Application shortcuts all have a common key modifier per-platform: <ul>
+<li>&lt;Command&gt; on Macs
+
+<li>&lt;Control&gt; on Windows 
+
+<li>&lt;Control&gt; Motif 
+</ul>
+<p><em>Note: ALT isn't supposed to be used for application shortcuts, other than QUIT, which is already mapped by the AWT. </em>
+<p>Although most of the shortcut API is implemented in shared code, one method has been added to java.awt.Toolkit to return the appropriate modifier per platform:
+<pre><code>	    <a href="../../../../api/java/awt/Toolkit.html#getMenuShortcutKeyMask()">public int getMenuShortcutKeyMask();</a>
+</code></pre>
+<h3>Visual Indicators</h3>
+In order for users to learn and use menu shortcuts, it's important that a menu item display some visual indicator for the shortcut it supports.  This will be handled automatically by the AWT, in a manner most appropriate for the given platform.
+<a name="920189">
+<h3>Sample Code</h3>
+</a>
+The code to create menu-items in 1.0: 
+<pre><code>	    menu.add(new MenuItem("Save..."));
+</code></pre>
+
+<pre><code>	    menu.add(new MenuItem("Send..."));
+</code></pre>
+
+<p>The code to create menu-items with shortcuts in 1.1:
+<pre><code>	    // Specify an 's' shortcut for save, and 'shift-s' for send.
+</code></pre>
+
+<pre><code>	    menu.add(new MenuItem("Save...", new MenuShortcut('s'));
+</code></pre>
+
+<pre><code>	    menu.add(new MenuItem("Send...", new MenuShortcut('s', true));
+</code></pre>
+
+<p>
+<p>
+<hr><br>
+ 
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+
+<i>Copyright &#169; 1996, 1997 Sun Microsystems, Inc.   All rights
+reserved.</i
+
+<!-- This file was created with Quadralay WebWorks Publisher 3.0.5 -->
+<!-- -->
+<!-- For more information on how this document, and how the rest of -->
+<!-- this server was created, email yourEmail@xyzcorp.com -->
+<!-- -->
+<!-- Last updated: 09/13/96 16:30:50 -->
+
+</body>
+</html>

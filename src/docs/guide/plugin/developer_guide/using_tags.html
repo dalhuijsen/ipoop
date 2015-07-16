@@ -1,0 +1,1530 @@
+<html>
+<head>
+<title>Using OBJECT, EMBED and APPLET Tags in Java Plug-in</title>
+
+<LINK REL=STYLESHEET TYPE="text/css" HREF="styles/style1.css">
+</head>
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Using <code>OBJECT</code>, <code>EMBED</code> and <code>APPLET</code> Tags 
+  in Java Plug-in </h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>&nbsp;</p><p>This chapter includes the following topics:</p>
+<ul>
+  <li> <a href="#intro">Introduction</a></li>
+  <li><a href="#in-ie">Java<sup><font size="-2">TM</font></sup> Plug-in in IE 
+    on Windows</a> </li>
+  <li><a href="#in-nav">Java Plug-in in Navigator<sup><font size="-2">TM</font></sup> 
+    on Windows or Solaris<sup><font
+size="-2">TM</font></sup> operating environments</a> </li>
+  <li><a href="#ie-nav">Java Plug-in in IE and Navigator</a> </li>
+  <li><a href="#anywhere">Java Plug-in Anywhere</a> </li>
+  <li><a href="#summary">Summary</a> </li>
+</ul>
+<h2><a name="intro"></a>Introduction</h2>
+<p> This document explains the tagging structure, involving <code>OBJECT</code> 
+  and <code>EMBED</code> tags, required by Java Plug-in. It is intended for web 
+  authors who want to manually insert Java Plug-in tags in their HTML pages. 
+<p>&nbsp;
+<table summary="layout" width="80%" border="1" cellpadding="5" bgcolor="#FFFFCC" align="center" bordercolor="#000000" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u>Notes</u></h2>
+      <ol>
+        <li>There is a Java Plug-in <a href="html_converter.html">HTML Converter</a>, 
+          available free-of-charge from Sun Microsystems, that can automatically 
+          generate the tagging structure. It is highly recommended that most web 
+          authors use it.</li>
+        <li>This converter can convert pages into any of the formats described 
+          below.</li>
+        <li>For a complete list of JRE releases that can be autodownloaded via 
+          <code>.cab</code> files, as mentioned below, see <a href="../../deployment/autodl/autodl-files.html">Autodownload 
+          Files (Windows Only)</a>.</li>
+      </ol>
+    </td>
+  </tr>
+</table>
+<p> Applets are normally specified in an HTML file as follows: </p>
+<table summary="layout" width="90%" cellpadding="5" bgcolor="#CCCCCC" align="center">
+  <tr>
+    <td> 
+      <pre>
+<font color="#000000">&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;
+&lt;PARAM name=&quot;model&quot; value=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4.2 support for APPLET!!
+&lt;/APPLET&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p> And normally the <code>APPLET</code> tag specifies information about the applet, 
+  while the <code>&lt;PARAM</code>&gt; tags, located between the <code>&lt;APPLET&gt;</code> 
+  and <code>&lt;/APPLET&gt;</code> tags, store per-instance applet information.</p>
+<p>However, an <tt>APPLET</tt> is rendered by the browser and there is no easy 
+  way to interrupt the browser and force it to use Sun's Java Runtime Environment 
+  (JRE) to run the applet. To force the browser to do so, however, you may use 
+  a special Java Plug-in tagging structure&#151;involving the <code>OBJECT</code> 
+  or <code>EMBED</code> tag or both, as described below&#151;in place of the usual 
+  <code>APPLET</code> tag in an your HTML pages. This will cause the browser to 
+  launch Java Plug-in, which will then run the applet using Sun's JRE.</p>
+<p>For various combinations of browsers and platforms, the following sections 
+  tell you exactly what you need to do</p>
+<table summary="layout" width="80%" border="1" cellpadding="5" bgcolor="#FFFFCC" align="center" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u><a name="note"></a>Note on Version Numbers</u></h2>
+      <p><i>Product version numbers</i> are of the form:</p>
+      <blockquote> 
+        <p><code>n1.n2.n3_n4n5</code></p>
+      </blockquote>
+      <p>where <code>n1.n2</code> is the <i>major version number</i>, the <code>n3</code> 
+        is the <i>minor version number</i> (also referred to as the <i>maintenance 
+        version number</i>), and <code>n4n5</code> is the <i>patch version number</i> 
+        (also referred to as the <i>update version number</i>).</p>
+      <p>The version numbers used in the examples below refer to the <code>1.4</code> 
+        major release with minor release number of <code>2</code> and, at times, 
+        <span class="bg">hypothetical patch number</span> of <code><span class="bg">mn</span></code>. 
+        Do not put hypothetical values into actual HTML for web pages.</p>
+      </td>
+  </tr>
+</table>
+<h2><a name="in-ie"></a>Java Plug-in in IE on Windows</h2>
+<p> To use Java Plug-in in IE on Windows, use the <tt>OBJECT</tt> tag. The following 
+  is an example of mapping an <tt>APPLET</tt> tag to a Java Plug-in tag: </p>
+<h3> Original <code>APPLET</code> tag:</h3>
+<table summary="layout" width="90%" cellpadding="5" bgcolor="#CCCCCC" align="center">
+  <tr>
+    <td> 
+      <pre>
+<font color="#000000">&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;
+&lt;PARAM name=&quot;model&quot; value=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4.2 support for APPLET!!
+&lt;/APPLET&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<h3><a name="new_object_tag"></a>New <code>OBJECT</code> tag: </h3>
+<table summary="layout" width="90%" cellpadding="5" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <pre>
+<font color="#000000">&lt;OBJECT classid=&quot;clsid:CAFEEFAC-0014-0002-0000-ABCDEFFEDCBA&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot; align=&quot;baseline&quot;&nbsp;
+&nbsp;&nbsp;&nbsp; codebase=&quot;http://java.sun.com/products/plugin/autodl/jinstall-1_4_2-windows-i586.cab#Version=1,4,2,0&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM name=&quot;code&quot; value=&quot;XYZApp.class&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM name=&quot;codebase&quot; value=&quot;html/&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM name=&quot;type&quot; value=&quot;application/x-java-applet;jpi-version=1.4.2&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM name=&quot;model&quot; value=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM name=&quot;scriptable&quot; value=&quot;true&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4.2 support for APPLET!!
+&lt;/OBJECT&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p><table summary="layout" width="80%" border="1" cellpadding="5" bgcolor="#FFFFCC" align="center" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u><a name="note_3"></a>Note</u></h2>
+      <p>For <i>static versioning</i>, set <code>codebase</code> equal to: </p>
+      <blockquote> 
+        <p><code>http://java.sun.com/products/plugin/autodl/&lt;.cab file for 
+          the version you want&gt;</code></p>
+      </blockquote>
+      <p>For example, for static versioning for the 1.4.2 release (which uses 
+        <code>classid</code> of <code>clsid:CAFEEFAC-0014-0002-0000-ABCDEFFEDCBA</code>), 
+        set <code>codebase</code> to:</p>
+      <blockquote> 
+        <p><code>http://java.sun.com/products/plugin/autodl/jinstall-1_4_2-win.cab</code></p>
+      </blockquote>
+      <p>For a complete list of JRE releases that can be autodownloaded via <code>.cab</code> 
+        files, see <a href="../../deployment/autodl/autodl-files.html">Autodownload 
+        Files (Windows Only)</a>.</p>
+      <p>For <i>dynamic versioning</i> (which uses <code>classid</code> of <code>clsid:8AD9C840-044E-11D1-B3E9-00805F499D93</code>), 
+        set codebase equal to:</p>
+      <blockquote> 
+        <p><code>http://java.sun.com/products/plugin/autodl/jinstall-&lt;major 
+          version of family in underscore format&gt;-windows-i586.cab#Version=&lt;full 
+          version number for lowest version in family in comma-separated format&gt;</code></p>
+      </blockquote>
+      <p>If no version of Java is installed, or a version less than the major 
+        version of the family is installed, then this will cause automatic redirection 
+        to the latest <code>.cab</code> for the latest version in the family.</p>
+      <p>For example, for the 1.4.2 release you would set <code>codebase</code> 
+        as follows:</p>
+      <blockquote>
+        <p><code>http://java.sun.com/products/plugin/autodl/jinstall-1_4-windows-i586.cab#Version=1,4,0,0</code></p>
+      </blockquote>
+      <p>If the user had version 1.3.1 installed, then the latest version in the 
+        1.4 family would be downloaded and installed. But if any version in the 
+        1.4 family were installed, then it would be used and no download would 
+        take place.</p>
+      <p>Note that the autodownload <code>.cab</code> files can change as patch 
+        releases are released. See below for more about the interpretation of 
+        <code><a href="#codebase">codebase</a></code>.</p>
+    </td>
+  </tr>
+</table>
+<p>Note that the <tt>OBJECT</tt> tag contains similar information to the <tt>APPLET</tt> 
+  tag. It is sufficient to launch Java Plug-in in IE. The <tt>classid</tt> in 
+  the <tt>OBJECT</tt> tag is the class identifier for Java Plug-in itself. When 
+  IE renders this class identifier in the <tt>OBJECT</tt> tag, it will try to 
+  load Java Plug-in into the browser.&nbsp; See <a href="#classid">classid attribute</a> 
+  below for information about versioning.</p>
+<p></p>
+<p> There are several attributes in the <tt>OBJECT</tt> tag, such as <tt>width</tt>, 
+  <tt>height</tt> and <tt>align</tt>, that are mapped directly from the corresponding 
+  attributes in the <tt>APPLET</tt> tag. These contain formatting information 
+  that IE will use to position Java Plug-in. Since this information is mapped 
+  directly without changes, the position and appearance of the applets using Java 
+  Plug-in should be the same as those applets using the <tt>APPLET</tt> tag.&nbsp; 
+</p>
+<p> Not all attributes in the <tt>APPLET</tt> tag can be mapped to the <tt>OBJECT</tt> 
+  tag attributes. For example, the attributes <tt>code</tt> and <tt>codebase</tt> 
+  in the <tt>APPLET</tt> tag are not mapped into the <tt>OBJECT</tt> tag attribute. 
+  Instead, the attribute <tt>code</tt> is mapped into the <tt>PARAM</tt> <tt>code</tt> 
+  because, according to the w3c.org HTML specification, the attribute <tt>code</tt> 
+  does not exist in the <tt>OBJECT</tt> tag. There are other attributes that do 
+  not correspond in the <tt>OBJECT</tt> tag attributes. These attributes, with 
+  one exception, should be mapped to <tt>PARAM</tt> tags.&nbsp;</p>
+<table summary="layout" width="80%" border="1" cellpadding="5" bgcolor="#FFFFCC" align="center" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u>Note</u></h2>
+      <p>Duplicate parameter names should never be used with the <code>OBJECT</code> 
+        tag in Java Plug-in. </p>
+    </td>
+  </tr>
+</table>
+<p><a name="codebase"></a>The one exception is the <tt>codebase</tt> attribute. 
+  In the <tt>APPLET</tt> tag, the <tt>codebase</tt> attribute represents the location 
+  from which to download additional class and jar files. However, in the <tt>OBJECT</tt> 
+  tag, the <tt>codebase</tt> attribute represents the location from which to download 
+  Java Plug-in when it is not found on the local machine. Because the <tt>codebase</tt> 
+  attribute has two different meanings in the <tt>APPLET</tt> and <tt>OBJECT</tt> 
+  tags, the <code>codebase</code> attribute in the <code>APPLET</code> tag is 
+  mapped into a <tt>PARAM</tt> <tt>codebase</tt> in the <tt>OBJECT</tt> tag to 
+  resolve the conflict.&nbsp; </p>
+<p> In the above example, the <tt>code</tt> and <tt>codebase</tt> attributes in 
+  the <tt>APPLET</tt> tag are mapped into the <tt>OBJECT</tt> tag parameters. 
+  The <tt>PARAM</tt> <tt>code</tt> identifies the applet, and its value should 
+  be the same as the <tt>code</tt> attribute in the <tt>APPLET</tt> tag. The <tt>PARAM 
+  codebase</tt> identifies the <code>codebase</code> of the applet. Java Plug-in 
+  knows where to download the applet or JavaBeans component because it can read 
+  this information from the parameters. The parameter <tt>type</tt> is not mapped 
+  from the <tt>APPLET</tt> tag, but it is required in the <tt>OBJECT</tt> tag. 
+  It identifies the type of the Java executable, such as an applet or a JavaBean, 
+  so that Java Plug-in knows how to initialize the Java executable. These three 
+  <tt>PARAM</tt> tags (<tt>code</tt>, <tt>codebase</tt>, and <tt>type</tt>) in 
+  the above example are specified for Java Plug-in. They do not exist in the <tt>PARAM</tt> 
+  of the original <tt>APPLET</tt> tag. Note that the <tt>model</tt> parameter 
+  within the <tt>OBJECT</tt> tag is identical to the <tt>model</tt> parameter 
+  inside the <tt>APPLET</tt> tag. Except for these first three parameters specified 
+  for Java Plug-in, the remainder of the parameters are the same as those inside 
+  the <tt>APPLET</tt> tag.&nbsp; </p>
+<p> A new addition for Java Plug-in 1.3 (and valid in 1.4.x) was the <tt>PARAM 
+  scriptable</tt>. This was added to improve performance of applets that do not 
+  require the use of JavaScript or VBScript. The value should be <tt>true</tt> 
+  if the applet requires scripting support and <tt>false</tt> if it does not. 
+  The value is <tt>false</tt> by default. 
+<p> Please note that <tt>PARAM scriptable</tt> is not the same as the <tt>PARAM 
+  mayscript</tt>. <tt>mayscript</tt> provides support for communication from Java 
+  applets to JavaScript only, while <tt>scriptable</tt> allows communication from 
+  JavaScript to Java applets in Internet Explorer only.
+<p> The text <tt>&quot;No Java 2 SDK, Standard Edition v 1.4.2 support for APPLET!!&quot;</tt> 
+  in the <tt>APPLET</tt> tag is mapped inside the <tt>&lt;OBJECT&gt;</tt> and 
+  <tt>&lt;/OBJECT&gt;</tt> tags. Originally, this text is displayed only if the 
+  browser does not have Java support. By mapping it inside the <tt>OBJECT</tt> 
+  tag, this text will be displayed if the browser does not support the <tt>OBJECT</tt> 
+  tag.&nbsp; </p>
+<p> The <tt>APPLET</tt>-to-<tt>OBJECT</tt> tag attributes mapping is as follows: 
+</p>
+<table summary="tag attribute mapping" border="2" cellpadding="2" width="90%" align="center">
+  <tr bgcolor="#CCCCCC" align="center" valign="middle"> 
+    <th><b><font size="+1">Attribute Name</font></b></th>
+    <th><b><tt><font size="+1">APPLET</font></tt><font size="+1"> Tag Support</font></b></th>
+    <th><b><tt><font size="+1">OBJECT</font></tt><font size="+1"> Tag Support</font></b></th>
+    <th><b><font size="+1">Attribute Mapping to <tt>OBJECT</tt> Tag</font></b></th>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>align</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td><code>OBJECT</code> attribute <code>align</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>alt</code></td>
+    <td>X</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>archive</code></td>
+    <td>X</td>
+    <td>&nbsp;</td>
+    <td><code>PARAM</code> element <code>archive</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>code</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td><code>PARAM</code> element <code>code</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>codebase</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td><code>PARAM</code> element <code>codebase</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>height</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td><code>OBJECT</code> attribute <code>height</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>hspace</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td><code>OBJECT</code> attribute <code>hspace</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>name</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td>
+      <p><code>OBJECT</code> attribute <code>name</code>, <code>PARAM</code> element 
+        <code>name</code></p>
+      <p>This case is an exception. The <code>name</code> attribute in the orginal 
+        <code>APPLET</code> element must be mapped both to the <code>name</code> 
+        attribute in the <code>OBJECT</code> element and to a nested <code>PARAM</code>. 
+        If the original applet were as follows:</p>
+      <p><code>&lt;APPLET name=&quot;clock&quot; ...&gt;<br>
+        &lt;/APPLET&gt;</code></p>
+      <p>Then the mapping would be:</p>
+      <p><code>&lt;OBJECT name=&quot;clock&quot; ...&gt;<br>
+        &lt;PARAM name=&quot;name&quot; value=&quot;clock&quot;&gt;<br>
+        &lt;/OBJECT&gt;</code></p>
+      </td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>object</code></td>
+    <td>X</td>
+    <td>&nbsp;</td>
+    <td><code>PARAM</code> element <code>object</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>title</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td><code>OBJECT</code> attribute <code>title</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>vspace</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td><code>OBJECT</code> attribute <code>vspace</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>width</code></td>
+    <td>X</td>
+    <td>X</td>
+    <td><code>OBJECT</code> attribute <code>width</code></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><code>mayscript</code></td>
+    <td>X</td>
+    <td>&nbsp;</td>
+    <td><code>PARAM</code> element <code>mayscript</code></td>
+  </tr>
+</table>
+<p>Some <code>OBJECT</code> attributes and nested <code>PARAM</code> elements 
+  are special to the <tt>OBJECT</tt> tag. They are the following: </p>
+<table summary="special attributes and elements" border="2" cellpadding="2" width="90%" align="center">
+  <tr bgcolor="#CCCCCC" align="center" valign="middle"> 
+    <th><b><font size="+1">Attribute/<code>PARAM</code></font></b></th>
+    <th><font size="+1"><b>Meaning in <tt>OBJECT</tt> tag</b></font></th>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><a name="classid"></a>Attribute <code>classid</code></td>
+    <td align="left" valign="top"> 
+      <p>It should always have the same value for dynamic version support, i.e. 
+        <code>clsid:8AD9C840-044E-11D1-B3E9-00805F499D93</code>. For static version 
+        support it will have a unique value for the version, e.g., <code>clsid:CAFEEFAC-0014-0002-0000-ABCDEFFEDCBA</code>.</p>
+      <p>For more information about static vs. dynamic versioning, see <a href="http://java.sun.com/products/plugin/versions.html">Encountering 
+        OBJECT, EMBED, and APPLET Tags With Different Plug-in Versions and Browsers</a>.</p>
+      <p><font size="4"><b>Note:</b></font> The example above uses static versioning. 
+      </p>
+    </td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top">Attribute <code>codebase</code></td>
+    <td align="left" valign="top">
+      <p>It should be a full URL pointing to a <code>.cab</code> file somewhere 
+        on the network. It's purpose is to allow downloading and installation 
+        of Plug-in if either no version of Plug-in is installed on a user's computer 
+        or if no appropriate version of Plug-in is installed. The URL should, 
+        by default, point to a page on the Java Software website.</p>
+      <p><b>Examples:</b></p>
+      <p>In the <a href="#new_object_tag">above example</a>, <code>codebase</code> 
+        is:</p>
+      <p><font color="#000000"><code>codebase=&quot;http://java.sun.com/products/plugin/autodl/jinstall-1_4_2-windows-i586.cab#Version=1,4,2,0&quot;</code></font></p>
+      <p><font color="#000000">Note that this was for static versioning and that 
+        the version number appended to the <code>.cab</code> file indicates that 
+        <code>1.4.2</code> version of Plug-in needs to be installed on the user's 
+        computer, otherwise an attempt will be made to download and install it.</font></p>
+      <p><font color="#000000">For dynamic versioning, <code>codebase</code> would 
+        be as follows:</font></p>
+      <p><font color="#000000"><code>codebase=&quot;http://java.sun.com/products/plugin/autodl/jinstall-1_4-windows-i586.cab#Version=1,4,0,0&quot;</code></font></p>
+      <p><font color="#000000">The appended version number indicates that if the 
+        user has version <code>1.4.0</code> or higher of the Plug-in installed 
+        on the computer, no download will occur. In other words, if the installed 
+        Plug-in is in the 1.4 family (major version <code>1.4</code>), then it 
+        will run. If the installed version is lower, however, then an attempt 
+        will be made to download and install a newer version via the <code>.cab</code> 
+        file.</font></p>
+    </td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>PARAM</code> element <code>type</code></td>
+    <td align="left" valign="top"> 
+      <p>The <code>value</code> for parameter <code>type</code> should be as follows:</p>
+      <blockquote> 
+        <p><code>&quot;application/x-java-&lt;object_type&gt;;&lt;version_type&gt;=&lt;implementation_version&gt;&quot;</code></p>
+      </blockquote>
+      <p>where</p>
+      <blockquote> 
+        <p><code>object_type</code> is <code>applet</code> or <code>bean</code>;</p>
+        <p><code>version_type</code> is <code>jpi-version</code> for static versioning 
+          or <code>version</code> for dynamic versioning; </p>
+        <p><code>implementation_version</code> is Implementation-Version as defined 
+          in <a href="version_format.html">Appendix 6: Sun-Supported <code>Specification-Version</code> 
+          and <code>Implemenation-Version</code> Formats</a>.</p>
+      </blockquote>
+      <p>For more information about static vs. dynamic versioning, see <a href="http://java.sun.com/products/plugin/versions.html">Encountering 
+        OBJECT, EMBED, and APPLET Tags With Different Plug-in Versions and Browsers</a>.</p>
+      <p><b>Examples:</b></p>
+      <p>For an applet deployed for static versioning with Plug-in version <code>1.4.1</code> 
+        patch release <code>02</code>, <code>value</code> for <code>type</code> 
+        would be as follows:</p>
+      <blockquote> 
+        <p><code>&quot;application/x-java-applet;jpi-version=1.4.1_02&quot;</code></p>
+      </blockquote>
+      <p>For a bean deployed for dynamic versioning with Plug-in version <code>1.4.1</code> 
+        patch release <code>03</code>, <code>value</code> for <code>type</code> 
+        would be:</p>
+      <blockquote> 
+        <p><code>&quot;application/x-java-bean;version=1.4&quot;</code></p>
+      </blockquote>
+      <p>This is because for dynamic versioning only the major version number 
+        is checked; i.e., if the installed Plug-in is in the major version family, 
+        no download is required.</p>
+    </td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>PARAM</code> element <code>codebase</code></td>
+    <td align="left" valign="top">Specifies the base URL of the applet. The URL 
+      can be relative or absolute but it should be in the domain of the current 
+      document. This <code>PARAM</code> element is required only if the applet 
+      is not located in the same directory as the document.</td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>PARAM</code> element <code>code</code></td>
+    <td align="left" valign="top">Specifies the name of the Java applet or JavaBeans 
+      component. It cannot be used with <code>PARAM</code> element <tt>object</tt> 
+      nested inside the same <tt>OBJECT</tt> tag.</td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>PARAM</code> element <code>scriptable</code></td>
+    <td align="left" valign="top">Specifies whether the applet is scriptable from 
+      the HTML page using JavaScript or VBScript. The value can be either <code>true</code> 
+      or <code>false</code>. This attribute is new in Java Plug-in 1.4.</td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>PARAM</code> element <code>object</code></td>
+    <td align="left" valign="top">Specifies the name of the serialized Java applet 
+      or JavaBeans component. It cannot be used with <code>PARAM</code> element 
+      <tt>code</tt> nested inside the same <tt>OBJECT</tt> tag. This attribute 
+      is optional.</td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>PARAM</code> element <code>archive</code></td>
+    <td align="left" valign="top">Specifies the name of the Java archive. This 
+      attribute is optional.</td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>PARAM</code> element <code>mayscript</code></td>
+    <td align="left" valign="top">Specifies whether the applet is allowed to access 
+      <code>netscape.javascript.JSObject</code>. The value can be either <code>true</code> 
+      or <code>false</code>. This attribute is optional.</td>
+  </tr>
+</table>
+<p>If the original <code>APPLET</code> element uses attributes <tt>type</tt>, 
+  <tt>codebase</tt>, <tt>code</tt>, <tt>object</tt> or <tt>archive</tt>, and also 
+  has nested <code>PARAM</code> element attributes <tt>type</tt>, <tt>codebase</tt>, 
+  <tt>code</tt>, <tt>object</tt> or <tt>archive</tt>, there will be a problem 
+  with the direct mapping of the <code>APPELET</code> attributes to <code>PARAM</code> 
+  attributes , as there will then be <code>PARAM</code> elements with duplicate 
+  <code>name</code> attributes, e.g.,</p>
+<p>If the orginal applet were as follows:</p>
+<blockquote> 
+  <p><code>&lt;APPLET codebase = &quot;a/b/c ...&gt;<br>
+    &lt;PARAM name=&quot;codebase&quot; value=&quot;my.jar&quot;&gt;<br>
+    &lt;/APPLET&gt;</code></p>
+</blockquote>
+<p>Then the direct mapping would be:</p>
+<blockquote> 
+  <p><code>&lt;OBJECT ...&gt;<br>
+    &lt;PARAM <font color="#000000">name=&quot;codebase&quot;</font> value=&quot;a/b/c&quot;&gt;<br>
+    &lt;PARAM name=&quot;codebase&quot; value=&quot;my.jar&quot;&gt;<br>
+    &lt;/OBJECT&gt;</code></p>
+</blockquote>
+<p>To avoid this problem, any <code>APPLET</code> attribute that has a corresponding 
+  <code>PARAM</code> element in the orignal applet should be mapped as shown below.</p>
+<table summary="APPLET and PARAM mapping" border="2" cellpadding="2" align="center" width="75%">
+  <tr bgcolor="#CCCCCC" align="center" valign="middle"> 
+    <th><b><font size="+1">Original attribute in the <code>APPLET</code> element</font></b></th>
+    <th> <b><font size="+1">New <code>PARAM</code> attribute with <code>OBJECT</code> element</font></b></th>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>code</tt></td>
+    <td><tt>java_code</tt></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>codebase</tt></td>
+    <td><tt>java_codebase</tt></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><tt>archive</tt></td>
+    <td><tt>java_archive</tt></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>object</tt></td>
+    <td><tt>java_object</tt></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>type</tt></td>
+    <td><tt>java_type</tt></td>
+  </tr>
+</table>
+<p> These new <code>PARAM</code> element attribute names should be used only when 
+  necessary. If both the new and original <code>PARAM</code> names exist in the 
+  same <tt>OBJECT</tt> tag, the values associated with the new <code>PARAM</code> 
+  element names are used by Java Plug-in to load the applet or JavaBean. </p>
+<h3>Example</h3>
+<p>Suppose the orginal applet was as follows:</p>
+<blockquote>
+  <p><code>&lt;APPLET codebase = &quot;a/b/c ...&gt;<br>
+    &lt;PARAM name=&quot;codebase&quot; value=&quot;my.jar&quot;&gt;<br>
+    &lt;/APPLET&gt;</code></p>
+</blockquote>
+<p>Then the mapping should be as shown below:</p>
+<blockquote>
+  <p><code>&lt;OBJECT ...&gt;<br>
+    &lt;PARAM name=&quot;java_codebase&quot; value=&quot;a/b/c&quot;&gt;<br>
+    &lt;PARAM name=&quot;codebase&quot; value=&quot;my.jar&quot;&gt;<br>
+    &lt;/OBJECT&gt;</code></p>
+</blockquote>
+<h2><a name="in-nav"></a>Java Plug-in in Netscape Navigator on Windows or Solaris<sup><font size="-2">TM</font></sup> 
+  operating environments</h2>
+<p> To use Java Plug-in with Netscape Navigator 4.x on Windows or Solaris operating 
+  environments, you must use the <tt>EMBED</tt> tag. The following example shows 
+  the mapping of a traditional <tt>APPLET</tt> tag to a Java Plug-in <tt>EMBED</tt> 
+  tag:</p>
+<h3>Original <code>APPLET</code> tag:</h3>
+<table summary="layout" width="90%" cellpadding="5" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <pre>
+<font color="#000000">&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+ &nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;
+&lt;PARAM name=&quot;model&quot; value=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4.1 support for APPLET!!
+&lt;/APPLET&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<h3>New <code>EMBED</code> tag:</h3>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre>
+<font color="#000000">&lt;EMBED type=&quot;application/x-java-applet;jpi-version=1.4.1&quot; width=&quot;200&quot;
+&nbsp;&nbsp; height=&quot;200&quot; align=&quot;baseline&quot; code=&quot;XYZApp.class&quot;
+&nbsp;&nbsp;&nbsp;codebase=&quot;html/&quot; model=&quot;models/HyaluronicAcid.xyz&quot;
+&nbsp;&nbsp;&nbsp;pluginspage=&quot;http://java.sun.com/j2se/1.4.1/download.html&quot;&gt;
+&lt;NOEMBED&gt;
+&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4.1 support for APPLET!!
+&lt;/NOEMBED&gt;
+&lt;/EMBED&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p>Note that the <tt>EMBED</tt> tag contains similar information to the <tt>APPLET</tt> 
+  tag.It is sufficient to launch Java Plug-in in Navigator. The attribute <tt>type</tt> 
+  in the <tt>EMBED</tt> tag is used to identify the type of the Java executable, 
+  such as an applet or a bean. When Navigator renders this attribute in the <tt>EMBED</tt> 
+  tag, it will try to load Java Plug-in into the browser. Note that a version 
+  number is also appended. It is used for comparing the version installed on a 
+  user's computer and deciding if another version needs to be installed. The second 
+  table below describes this in greater detail.</p>
+<p> In the above example, several attributes in the <tt>EMBED</tt> tag, such as 
+  <tt>width</tt>, <tt>height</tt> and <tt>align</tt>, map directly from the corresponding 
+  attributes in the <tt>APPLET</tt> tag. These contain formatting information 
+  that Navigator uses to position Java Plug-in. Since this information is mapped 
+  directly without changes, the position and appearance of the applets using Java 
+  Plug-in should be the same as those applets using the <tt>APPLET</tt> tag.&nbsp; 
+</p>
+<p>Unlike the <tt>OBJECT</tt> tag, all information must be stored inside the <tt>&lt;EMBED&gt;</tt> 
+  tag. No <tt>PARAM</tt> elements are used with the <tt>EMBED</tt> tag. Therefore, 
+  all <code>APPLET</code> attributes and related <code>PARAM</code> elements must 
+  be mapped as attribute <code>name=&quot;value&quot;</code> pairs inside the 
+  <tt>EMBED</tt> tag.&nbsp; </p>
+<p>In the above example, the <tt>code</tt> and <tt>codebase</tt> attributes in 
+  the <tt>APPLET</tt> tag are mapped into the <tt>EMBED</tt> tag attributes. Attribute 
+  <tt>code</tt> identifies the applet. Its value should be the same as the <tt>code</tt> 
+  attribute in the <tt>APPLET</tt> tag. Attribute <tt>codebase</tt> identifies 
+  the codebase of the applet. Java Plug-in knows where to download the applet 
+  or JavaBeans component because it can read this information from the attributes. 
+  Also notice that the <tt>model</tt> attribute within the <tt>EMBED</tt> tag 
+  is mapped from the nested <code>PARAM</code> element <tt>model</tt> inside the 
+  <tt>APPLET</tt> tag.&nbsp; </p>
+<p>Like the <tt>codebase</tt> attribute in the <tt>OBJECT</tt> tag, attribute 
+  <tt>pluginspage</tt> in the <tt>EMBED</tt> tag is used by Navigator if Java 
+  Plug-in is not installed on the user's computer, or if the wrong version of 
+  Java Plug-in is installed. It should point to the Java Plug-in Download Page 
+  on the Java Software website; or, for intranet deployment, to a page on the 
+  intranet from which Java Plug-in may be downloaded.</p>
+<p> The text <tt>&quot;No Java 2 SDK, Standard Edition v 1.4.1 support for APPLET!!&quot;</tt> 
+  in the <tt>APPLET</tt> tag is mapped inside the <tt>&lt;NOEMBED&gt;</tt> and 
+  <tt>&lt;/NOEMBED&gt;</tt> tags. With the traditional APPLET tag this text is 
+  displayed only if the browser does not have internal support for Java. By mapping 
+  it inside the <tt>NOEMBED</tt> tag, this text will be displayed if the browser 
+  does not support the <tt>EMBED</tt> tag, or if Navigator fails to start the 
+  Java Plug-in.&nbsp; </p>
+<p> The <tt>APPLET</tt>-to-<tt>EMBED</tt> tag attributes mapping is as follows:</p>
+<table summary="APPLET EMBED tag attribute mapping" border="2" cellpadding="2" align="center" width="90%">
+  <tr bgcolor="#CCCCCC" align="center" valign="middle"> 
+    <th> 
+      <div align="center"><font size="+1"><b>Attributes</b></font></div>
+    </th>
+    <th> 
+      <div align="center"><font size="+1"><b><tt>APPLET</tt> tag support</b></font></div>
+    </th>
+    <th> 
+      <div align="center"><font size="+1"><b><tt>EMBED</tt> tag support</b></font></div>
+    </th>
+    <th> 
+      <div align="center"><font size="+1"><b>Attribute map to <tt>EMBED</tt> tag</b></font></div>
+    </th>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"> 
+      <p><code>align</code></p>
+      </td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">Attribute <code>align</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>alt</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">Attribute <code>alt</code></td>
+  </tr>
+  <tr> 
+    <td><code>archive</code></td>
+    <td>X</td>
+    <td>&nbsp;</td>
+    <td>Attribute <code>archive</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>code</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">&nbsp;</td>
+    <td align="left" valign="top">Attribute <code>code</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>codebase</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">&nbsp;</td>
+    <td align="left" valign="top">Attribute <code>codebase</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>height</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">Attribute <code>height</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>hspace</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">Attribute <code>hspace</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>name</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">Attribute <code>name</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>object</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">&nbsp;</td>
+    <td align="left" valign="top">Attribute <code>object</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>title</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">Attribute <code>title</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>vspace</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">Attribute <code>vspace</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>width</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">Attribute <code>width</code></td>
+  </tr>
+  <tr> 
+    <td align="left" valign="top"><code>mayscript</code></td>
+    <td align="left" valign="top">X</td>
+    <td align="left" valign="top">&nbsp;</td>
+    <td align="left" valign="top">Attribute <code>mayscript</code></td>
+  </tr>
+</table>
+<p>Some attributes are special to the <tt>EMBED</tt> tag. These attributes are: 
+</p>
+<table summary="special EMBED tag attributes" border="2" cellpadding="2" align="center" width="90%">
+  <tr bgcolor="#CCCCCC"> 
+    <th>
+      <div align="center"><b><font size="+1">Attribute</font></b></div>
+    </th>
+    <th>
+      <div align="center"><font size="+1"><b>Meaning in <tt>EMBED</tt> tag</b></font></div>
+    </th>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td>Attribute <code>type</code></td>
+    <td> 
+      <p><code>type</code> should be as follows:</p>
+      <blockquote> 
+        <p><code>&quot;application/x-java-&lt;object_type&gt;;&lt;version_type&gt;=&lt;implementation_version&gt;&quot;</code></p>
+      </blockquote>
+      <p>where</p>
+      <blockquote> 
+        <p><code>object_type</code> is <code>applet</code> or <code>bean</code>;</p>
+        <p><code>version_type</code> is <code>jpi-version</code> for static versioning 
+          or <code>version</code> for dynamic versioning; </p>
+        <p><code>implementation_version</code> is Implementation-Version as defined 
+          in <a href="version_format.html">Appendix 6: Sun-Supported <code>Specification-Version</code> 
+          and <code>Implemenation-Version</code> Formats</a>.</p>
+      </blockquote>
+      <p>For more information about static vs. dynamic versioning, see <a href="http://java.sun.com/products/plugin/versions.html">Encountering 
+        OBJECT, EMBED, and APPLET Tags With Different Plug-in Versions and Browsers</a>.</p>
+      <p><b>Examples:</b></p>
+      <p>For an applet deployed for static versioning with Plug-in version <code>1.4.1</code> 
+        patch release <code>02</code>, <code>type</code> would be as follows:</p>
+      <blockquote> 
+        <p><code>&quot;application/x-java-applet;jpi-version=1.4.1_02&quot;</code></p>
+      </blockquote>
+      <p>For a bean deployed for dynamic versioning with Plug-in version <code>1.4.1</code> 
+        patch release <code>03</code>, <code>type</code> would be:</p>
+      <blockquote> 
+        <p><code>&quot;application/x-java-bean;version=1.4&quot;</code></p>
+      </blockquote>
+      <p>This is because for dynamic versioning only the major version number 
+        is checked; i.e., if the installed Plug-in is in the major version family, 
+        no download is required).</p>
+    </td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td>Attribute <code>codebase</code></td>
+    <td>Specifies the base URL of the applet or JavaBeans component. The URL can 
+      be relative or absolute but it should be in the domain of the current document. 
+      This attribute is required only if the applet is not located in the same 
+      directory as the document.</td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td>Attribute <code>code</code></td>
+    <td>Specifies the name of the Java applet or JavaBeans component. It cannot 
+      be used with param <tt>object</tt> inside the same <tt>EMBED</tt> tag.</td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td>Attribute <code>object</code></td>
+    <td>Specifies the name of the serialized Java applet or JavaBeans component. 
+      It cannot be used with the <tt>code</tt> attribute inside the same <tt>EMBED</tt> 
+      tag. This attribute is optional.</td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td>Attribute <code>archive</code></td>
+    <td>Specifies the name of the Java archive. This attribute is optional.</td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td>Attribute <code>pluginspage</code></td>
+    <td>It should be a full URL pointing to an HTML page from which Java Plug-in 
+      can be downloaded. If there is no Plug-in installed on a user's computer, 
+      or if the version of the Plug-in is not the one specified via the the <code>type</code> 
+      attribute, then this page will be presented to the user.</td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td>Attribute <code>mayscript</code></td>
+    <td>Specifies whether the applet is allowed to access <code>netscape.javascript.JSObject</code>.&nbsp; 
+      The value can be either <code>true</code> or <code>false</code>. This attribute 
+      is optional.</td>
+  </tr>
+</table>
+<p>Similar to the case of the <tt>OBJECT</tt> tag, if the original <tt>APPLET</tt> 
+  tag has <tt>PARAM</tt> element <tt>type</tt>, <tt>codebase</tt>, <tt>code</tt>, 
+  <tt>object</tt>, or <tt>archive</tt>, mapping it to the <tt>EMBED</tt> tag attribute 
+  will cause a problem. To avoid this, Java Plug-in also supports the same new 
+  set of attribute names for the <code>EMBED</code> tag, as specified below:</p>
+<p>Similar to the case of the <tt>OBJECT</tt> element, if the original <code>APPLET</code> 
+  element uses attributes <tt>type</tt>, <tt>codebase</tt>, <tt>code</tt>, <tt>object</tt> 
+  or <tt>archive</tt>, and also has nested <code>PARAM</code> element attributes 
+  <tt>type</tt>, <tt>codebase</tt>, <tt>code</tt>, <tt>object</tt> or <tt>archive</tt>, 
+  there will be a problem with the direct mapping of the <code>APPELET</code> 
+  attributes to <code>EMBED</code> attributes. To avoid this problem, Java Plug-in 
+  also supports the same new set of attribute names for the <code>EMBED</code> 
+  tag, as specified below:</p>
+<table summary="new attribute names" border="2" cellpadding="2" align="center" width="50%">
+  <tr bgcolor="#CCCCCC"> 
+    <th>
+      <div align="center"><b><font size="+1">Original Attribute Names</font></b></div>
+    </th>
+    <th>
+      <div align="center"><b><font size="+1">New Attribute Names</font></b></div>
+    </th>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>code</tt></td>
+    <td><tt>java_code</tt></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>codebase</tt></td>
+    <td><tt>java_codebase</tt></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>archive</tt></td>
+    <td><tt>java_archive</tt></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>object</tt></td>
+    <td><tt>java_object</tt></td>
+  </tr>
+  <tr align="left" valign="top"> 
+    <td><tt>type</tt></td>
+    <td><tt>java_type</tt></td>
+  </tr>
+</table>
+<p>These new attribute names should be used only when necessary. If both new and 
+  original attribute names exist in the same <tt>EMBED</tt> tag, the value associated 
+  with the new attribute name is used by Java Plug-in to load the applet or bean.</p>
+<h2><a name="ie-nav"></a>Java Plug-in in IE and Navigator</h2>
+<p>The new <code>OBJECT</code> element scheme described above allows a web page 
+  with an applet to use Java Plug-in with Internet Explorer, and the new <code>EMBED</code> 
+  element scheme allows a web page with an applet to use Java Plug-in with Netscape. 
+  However, changes are a web page will be browsed by both browsers. Hence, there 
+  needs to be a way to use the <code>OBJECT</code> scheme when a page is browser 
+  by Internet Explorer, and the EMBED scheme when the page is browsed by Netscape. 
+  Such a scheme is described below.</p>
+<h3>Original <code>APPLET</code> element:</h3>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre>
+<font color="#000000">&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;
+&lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Editoin v 1.4 support for APPLET!!
+&lt;/APPLET&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<h3>New <code>OBJECT</code> element with nested <code>EMBED</code> element:</h3>
+<p>
+<table summary="layout" width="90%" cellpadding="5" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <pre>
+<font color="#000000">&lt;OBJECT classid=&quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp; codebase=&quot;http://java.sun.com/products/plugin/1.4/jinstall-14-win32.cab#Version=1,4,0,mn&quot;&gt;
+    &lt;PARAM NAME=&quot;code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+    &lt;PARAM NAME=&quot;codebase&quot; VALUE=&quot;html/&quot;&gt;
+    &lt;PARAM NAME=&quot;type&quot; VALUE=&quot;application/x-java-applet;jpi-version=1.4&quot;&gt;
+    &lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+    &lt;PARAM NAME=&quot;scriptable&quot; VALUE=&quot;true&quot;&gt;
+    &lt;COMMENT&gt;
+&nbsp;&nbsp;&nbsp;     &lt;EMBED type=&quot;application/x-java-applet;jpi-version=1.4&quot; width=&quot;200&quot;
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     height=&quot;200&quot; align=&quot;baseline&quot; code=&quot;XYZApp.class&quot;&nbsp;
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;     codebase=&quot;html/&quot; model=&quot;models/HyaluronicAcid.xyz&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     pluginspage=&quot;http://java.sun.com/products/plugin/1.4/plugin-install.html&quot;&gt;
+&nbsp;&nbsp;&nbsp;         &lt;NOEMBED&gt;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;        No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&nbsp;&nbsp;&nbsp;         &lt;/NOEMBED&gt;
+        &lt;/EMBED&gt;
+    &lt;/COMMENT&gt;
+&lt;/OBJECT&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p> 
+<p></p>
+<p>Because IE understands the <tt>&lt;OBJECT&gt;</tt> tag, it will try to launch 
+  Java Plug-in. Notice that the <tt>&lt;COMMENT&gt;</tt> tag is a special HTML 
+  tag understood only by IE. IE ignores text between the <tt>&lt;COMMENT&gt;</tt> 
+  and <tt>&lt;/COMMENT&gt;</tt> tags. In effect, the above tags actually become:</p>
+<p>Note that the <code>&lt;COMMENT&gt;</code> element is unique to IE. IE ignores 
+  text between the <code>&lt;COMMENT&gt;</code> and <code>&lt;/COMMENT&gt;</code> 
+  elements. For IE, then, the above structure of elements looks like this:</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre>
+<font color="#000000">&lt;OBJECT classid=&quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot; align=&quot;baseline&quot;
+ &nbsp;&nbsp; codebase=&quot;http://java.sun.com/products/plugin/1.4/jinstall-14-win32.cab#Version=1,4,0,mn&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;codebase&quot; VALUE=&quot;html/&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;type&quot; VALUE=&quot;application/x-java-applet;jpi-version=1.4&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;scriptable&quot; VALUE=&quot;true&quot;&gt;
+&lt;/OBJECT&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p>This is identical to the new <tt>OBJECT</tt> tag example described above.</p>
+<p> Now because Navigator understands neither the <tt>OBJECT</tt> nor the <tt>COMMENT</tt> 
+  elements, Navigator 4 views the above structure as follows: </p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td>
+      <pre><font color="#000000">&lt;EMBED type=&quot;application/x-java-applet;jpi-version=1.4&quot; width=&quot;200&quot;
+ &nbsp;&nbsp;height=&quot;200&quot; align=&quot;baseline&quot; code=&quot;XYZApp.class&quot;&nbsp;
+&nbsp; &nbsp;codebase=&quot;html/&quot; model=&quot;models/HyaluronicAcid.xyz&quot;
+&nbsp;&nbsp;&nbsp;pluginspage=&quot;http://java.sun.com/products/plugin/1.4/plugin-install.html&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;NOEMBED&gt;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&nbsp;&nbsp;&nbsp; &lt;/NOEMBED&gt;
+&lt;/EMBED&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p>This is identical to the new <tt>EMBED</tt> element example described above. 
+</p>
+<p>Thus you can use the new element structure&#151;<code>OBJECT</code> element 
+  with nested <code>EMBED</code> element&#151;to invoke Java Plug-in when either 
+  IE or Netcape encounters a page with an applet. The is the recommeded format 
+  to use.<br>
+</p>
+<h2><a name="anywhere"></a>Java Plug-in Anywhere</h2>
+<table summary="layout" width="80%" border="1" cellpadding="5" bgcolor="#FFFFCC" align="center" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u><font color="#FF0000">Warning!</font></u></h2>
+      <p>The material in this section is out of date. It will be updated in the 
+        future. The description of the script below corresponds to the Extended 
+        option with the HtmlConverter. It is recommended that you do not use this 
+        option at this time. The Standard option is the recommended option.</p>
+    </td>
+  </tr>
+</table>
+<p>In most environments, Internet or intranet, an HTML page is likely to be viewed 
+  on different browsers on different platforms. Ideally, then, you should activate 
+  Java Plug-in only on the right browser-platform combination. Otherwise, an applet 
+  should use the browser's default JVM. You can achieve this using the following 
+  Java Plug-in format:</p>
+<h3>Original <code>APPLET</code> element: </h3>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre>
+<font color="#000000">&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;
+&lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&lt;/APPLET&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<h3>New-style format: </h3>
+<p>The following is an example of an equivalent Java Plug-in format. (The example 
+  includes comments.)</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre>
+<font color="#000000">&lt;!-- The following code is specified at the beginning of the &lt;BODY&gt; tag. --&gt;
+&lt;SCRIPT LANGUAGE=&quot;JavaScript&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp; var _info = navigator.userAgent; 
+    var _ns = false;
+&nbsp;&nbsp;&nbsp; var _ie = (_info.indexOf(&quot;MSIE&quot;) &gt; 0 &amp;&amp; _info.indexOf(&quot;Win&quot;) &gt; 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; _info.indexOf(&quot;Windows 3.1&quot;) &lt; 0);
+//--&gt;&lt;/SCRIPT&gt;
+&lt;COMMENT&gt;&lt;SCRIPT LANGUAGE=&quot;JavaScript1.1&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp; var _ns = (navigator.appName.indexOf(&quot;Netscape&quot;) &gt;= 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; ((_info.indexOf(&quot;Win&quot;) &gt; 0 &amp;&amp; _info.indexOf(&quot;Win16&quot;) &lt; 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; java.lang.System.getProperty(&quot;os.version&quot;).indexOf(&quot;3.5&quot;) &lt; 0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; || _info.indexOf(&quot;Sun&quot;) &gt; 0));
+//--&gt;&lt;/SCRIPT&gt;&lt;/COMMENT&gt;
+
+
+&lt;!-- The following code is repeated for each APPLET tag --&gt;
+&lt;SCRIPT LANGUAGE=&quot;JavaScript&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp; if (_ie == true) document.writeln('
+&lt;OBJECT
+&nbsp;&nbsp;&nbsp; classid=&quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot; align=&quot;baseline&quot;
+codebase=&quot;http://java.sun.com/products/plugin/1.4/jinstall-14-win32.cab#Version=1,4,0,mn&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;NOEMBED&gt;&lt;XMP&gt;');
+&nbsp;&nbsp;&nbsp; else if (_ns == true) document.writeln('
+&lt;EMBED
+&nbsp;&nbsp;&nbsp; type=&quot;application/x-java-applet;jpi-version=1.4&quot; width=&quot;200&quot; height=&quot;200&quot;
+&nbsp;&nbsp;&nbsp; align=&quot;baseline&quot; code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot;
+&nbsp;&nbsp;&nbsp; model=&quot;models/HyaluronicAcid.xyz&quot;
+&nbsp;&nbsp;&nbsp; pluginspage=&quot;http://java.sun.com/products/plugin/1.4/plugin-install.html&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;NOEMBED&gt;&lt;XMP&gt;');
+//--&gt;&lt;/SCRIPT&gt;
+&nbsp;&nbsp;&nbsp;&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;
+&lt;/XMP&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_codebase&quot; VALUE=&quot;html/&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_type&quot; VALUE=&quot;application/x-java-applet;jpi-version=1.4&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;scriptable&quot; VALUE=&quot;true&quot;&gt;
+&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&lt;/APPLET&gt;&lt;/NOEMBED&gt;&lt;/EMBED&gt;
+&lt;/OBJECT&gt;
+
+&lt;!--
+&nbsp;&nbsp;&nbsp; &lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&nbsp;&nbsp;&nbsp; &lt;/APPLET&gt;
+--&gt;</font><font color="#8000FF">
+</font></pre>
+    </td>
+  </tr>
+</table>
+<p>Although this tag seems complicated compared to the old <tt>APPLET</tt> tag, 
+  it is not. Most of the Java Plug-in tag is the same regardless of the applet 
+  used. For the majority of cases, a webmaster can copy and paste the Java Plug-in 
+  tag.&nbsp; </p>
+<p>The first block of the script extracts the browser and platform. You must determine 
+  the browser and platform on which the applet is running. You do this by using 
+  JavaScript<sup><font size="-2">TM</font></sup> to extract first the browser 
+  name, then the platform. This is done once per HTML document. 
+<p> The second block of the script replaces the <tt>APPLET</tt> tag. You must 
+  replace each <tt>APPLET</tt> tag with a similar block of code. The script replaces 
+  the <tt>APPLET</tt> tag with either an <tt>EMBED</tt> tag or <tt>OBJECT</tt> 
+  tag, depending on the browser. You use the <tt>OBJECT</tt> tag for IE and the 
+  <tt>EMBED</tt> tag for Netscape Navigator. Finally, the original <tt>APPLET</tt> 
+  tag is included as a comment at the end. It is always a good idea to keep the 
+  original <tt>APPLET</tt> tag in case you want to remove the Java Plug-in invocation.&nbsp; 
+</p>
+<p>The first JavaScript establishes the browser and the platform on which the 
+  browser is running. You must do this because, currently, Java Plug-in supports 
+  only Windows 95, Windows 98, Windows NT 4.0, and Solaris. Note that Windows 
+  NT 3.51 is the only Win32 platform that Java Plug-in does not support. Java 
+  Plug-in should be invoked only on the supported browser and platform. The script 
+  sets the variable <tt>_ie</tt> to true if the browser is Internet Explorer. 
+  It sets the variable <tt>_ns</tt> to true if the browser is Navigator. (Note 
+  that all variable names in the JavaScript start with &quot;_&quot;. This is 
+  done to avoid conflicting with other JavaScript variables in the same page.)&nbsp; 
+</p>
+<p>To detect the right browser, the JavaScript evaluates three strings that are 
+  within the JavaScript's Navigator object: <tt>userAgent</tt>, <tt>appVersion</tt>, 
+  and <tt>appName</tt>. These strings contain information about the browser and 
+  the platform. By looking at some examples of the string <tt>userAgent</tt>, 
+  you can see how to evaluate <tt>userAgent</tt> and use it to determine the browser. 
+  The following are some examples of the <tt>userAgent</tt> string for different 
+  platforms as it appears in Internet Explorer.&nbsp; </p>
+<table summary="example userAgent strings" border="2" cellpadding="2" align="center" width="90%">
+  <tr bgcolor="#CCCCCC"> 
+    <th><b>Platform and Browser</b></th>
+    <th><b>JavaScript's </b><b><tt>Navigator.userAgent</tt></b><b> string</b></th>
+  </tr>
+  <tr> 
+    <td>Windows 2000 w/IE 5.0</td>
+    <td>&quot;Mozilla/4.0 (compatible; MSIE 5.01; Window NT5.0)</td>
+  </tr>
+  <tr> 
+    <td>Windows NT 4.0 w/IE 4.0</td>
+    <td>&quot;Mozilla/4.0 (compatible; MSIE 4.0; Windows NT)&quot;&nbsp;</td>
+  </tr>
+  <tr> 
+    <td>Windows NT 4.0 w/IE 3.02</td>
+    <td>&quot;Mozilla/2.0 (compatible; MSIE 3.02; Windows NT)&quot;&nbsp;</td>
+  </tr>
+  <tr> 
+    <td>Windows 95 w/IE 4.0</td>
+    <td>&quot;Mozilla/4.0 (compatible; MSIE 4.0; Windows 95)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows 95 w/IE 3.02</td>
+    <td>&quot;Mozilla/2.0 (compatible; MSIE 3.02; Windows 95)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows NT 3.51 w/IE 4.0</td>
+    <td>&quot;Mozilla/4.0 (compatible; MSIE 4.0; Windows 3.1)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows 3.1 w/IE 4.0</td>
+    <td>&quot;Mozilla/4.0 (compatible; MSIE 4.0; Windows 3.1)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows NT 4.0 w/Navigator 4.04</td>
+    <td>&quot;Mozilla/4.04 [en] (WinNT; I)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows NT 4.0 w/Navigator 3.04</td>
+    <td>&quot;Mozilla/3.04 (WinNT; I)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows NT 3.51 w/Navigator 4.04&nbsp;</td>
+    <td>&quot;Mozilla/4.04 [en] (WinNT; I)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows NT 3.51 w/Navigator 3.04&nbsp;</td>
+    <td>&quot;Mozilla/3.04 (WinNT; I)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows 95 w/Navigator 4.03</td>
+    <td>&quot;Mozilla/4.03 [en] (Win95; I)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Windows 95 w/Navigator 3.03</td>
+    <td>&quot;Mozilla/3.03 (Win95; I)&quot;</td>
+  </tr>
+  <tr> 
+    <td>Solaris 2.6 w/Navigator 4.02</td>
+    <td>&quot;Mozilla/4.02 [en] (X11; l; SunOS 5.6 sun4u)</td>
+  </tr>
+</table>
+<p>Note that in each case the substring &quot;MSIE&quot; is always in the <tt>userAgent</tt> 
+  string in Internet Explorer. Also, the <tt>userAgent</tt> string in IE under 
+  Windows 3.1 and Windows 3.51 would contain the substring &quot;Windows 3.1&quot; 
+  because IE in these platforms is 16-bit. While IE 4 is also available on Solaris 
+  and Mac, in these versions the <tt>userAgent</tt> string does not contain the 
+  substring &quot;Win&quot;. In addition, IE on Windows CE does not support JavaScript. 
+  This can be summarized as follows:&nbsp; </p>
+<table summary="summary of useAgent strings" border="2" cellpadding="2" width="90%" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <th align="center" valign="top">userAgent string / Browsers</th>
+    <th align="center" valign="top">Windows 3.1 w/ IE 3/4</th>
+    <th align="center" valign="top">Windows NT 3.51 w/ IE 3/4</th>
+    <th align="center" valign="top">Windows 95 w/ IE 3/4</th>
+    <th align="center" valign="top">Windows NT 4.0 w/ IE 3/4</th>
+    <th align="center" valign="top">Windows CE w/ IE</th>
+    <th align="center" valign="top">Mac w/ IE</th>
+    <th align="center" valign="top">UNIX w/ IE</th>
+    <th align="center" valign="top">Other browsers on any platform</th>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">contains &quot;MSIE&quot;</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">&nbsp;</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">contains &quot;Win&quot;</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">&nbsp;</td>
+    <td align="center" valign="top">&nbsp;</td>
+    <td align="center" valign="top">&nbsp;</td>
+    <td align="center" valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center" valign="top">does not contain &quot;Windows 3.1&quot;</td>
+    <td align="center" valign="top">&nbsp;</td>
+    <td align="center" valign="top">&nbsp;</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">&nbsp;</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+    <td align="center" valign="top">X</td>
+  </tr>
+</table>
+<p>The above table shows that only Windows 95 and Windows NT 4.0 with IE can pass 
+  the Java Plug-in browser and platform requirements. However, this logic makes 
+  no assumptions about future releases of IE or future releases of Windows with 
+  IE. As long as the <tt>userAgent</tt> string contains &quot;MSIE&quot; and &quot;Win&quot;, 
+  the above code should work in future releases of IE on Win32.&nbsp; </p>
+<p>The above logic summarizes into the following:&nbsp; </p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;SCRIPT LANGUAGE=&quot;JavaScript&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp; var _info = navigator.userAgent;
+&nbsp;&nbsp;&nbsp; var _ie = (_info.indexOf(&quot;MSIE&quot;) &gt; 0 &amp;&amp; _info.indexOf(&quot;Win&quot;) &gt; 0
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; _info.indexOf(&quot;Windows 3.1&quot;) &lt; 0);
+//--&gt;&lt;/SCRIPT&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p>It is harder to detect Navigator on the right platform. Using just JavaScript, 
+  there is no way to determine if the browser is running on the Windows NT 3.51 
+  or Windows NT 4.0 operating platform. (Refer to the above table and examine 
+  the <tt>userAgent</tt> string. Notice that the <tt>userAgent</tt> strings in 
+  Windows NT 3.51 and Windows NT 4.0 operating platforms are the same in Navigator.) 
+  It is important to make this distinction because Java Plug-in supports only 
+  the Windows NT 4.0 operating platform. To run Java Plug-in on the right platform, 
+  you must use LiveConnect in Navigator to determine the OS version number. This 
+  can be summarized as follows:&nbsp; </p>
+<table summary="summary" border="2" cellpadding="0" width="90%" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <th align="center">Testing logic / Browsers</th>
+    <th align="center">Windows 3.1 w/ NS 3/4</th>
+    <th align="center">Windows NT 3.51 w/ NS 3/4</th>
+    <th align="center">Windows 95 w/ NS 3/4</th>
+    <th align="center">Windows NT 4.0 w/ NS 3/4</th>
+    <th align="center">NS on Solaris</th>
+    <th align="center">IE on Solaris</th>
+    <th align="center">NS on other platform</th>
+    <th align="center">IE on other platform</th>
+    <th align="center">Other browsers on any platform</th>
+  </tr>
+  <tr> 
+    <td align="center">appName contains &quot;Netscape&quot;</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center">userAgent contains &quot;Win&quot;</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center">userAgent does not contain &quot;Win16&quot;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center">os.version does not contain 3.5</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">Depends on OS</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td align="center">userAgent contains &quot;Sun&quot;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">X</td>
+    <td align="center">X</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+  </tr>
+</table>
+<p>The above logic translates into the following code:&nbsp;</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;SCRIPT LANGUAGE=&quot;JavaScript&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp; var _info = navigator.userAgent; var _ns = false;
+//--&gt;&lt;/SCRIPT&gt;
+&lt;COMMENT&gt;&lt;SCRIPT LANGUAGE=&quot;JavaScript1.1&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp;&nbsp; var _ns = (navigator.appName.indexOf(&quot;Netscape&quot;) &gt;= 0
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; ((_info.indexOf(&quot;Win&quot;) &gt; 0&nbsp; &amp;&amp; _info.indexOf(&quot;Win16&quot;) &lt; 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; java.lang.System.getProperty(&quot;os.version&quot;).indexOf(&quot;3.5&quot;) &lt; 0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; || _info.indexOf(&quot;Sun&quot;) &gt; 0));
+//--&gt;&lt;/SCRIPT&gt;&lt;/COMMENT&gt;</font></pre>
+      <p></p>
+
+</td>
+  </tr>
+</table>
+<p>Referring to the previous table, note that only Windows 95, Windows NT 4.0, 
+  and Solaris operating environments with Navigator pass all the tests. Because 
+  LiveConnect is used to get the OS version number and only Navigator supports 
+  LiveConnect, a JavaScript that accesses LiveConnect will not be understood by 
+  IE. To prevent this from causing a problem, you block out this piece of the 
+  script using the <tt>COMMENT</tt> tag since <tt>COMMENT</tt> is an IE-specific 
+  comment tag. The text between the <tt>COMMENT</tt> tag is ignored by IE but 
+  not by Navigator. In addition, you must specify the script language as JavaScript1.1 
+  to block this out if the browser is Navigator 2.&nbsp; </p>
+<p>At this point, the above logic for IE and Navigator summarizes to a script 
+  that should look as follows:&nbsp; </p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;!-- The following code is specified at the beginning of the &lt;BODY&gt; tag. --&gt;
+&lt;SCRIPT LANGUAGE=&quot;JavaScript&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp; var _info = navigator.userAgent; var _ns = false;
+&nbsp;&nbsp;&nbsp; var _ie = (_info.indexOf(&quot;MSIE&quot;) &gt; 0 &amp;&amp; _info.indexOf(&quot;Win&quot;) &gt; 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; _info.indexOf(&quot;Windows 3.1&quot;) &lt; 0);
+//--&gt;&lt;/SCRIPT&gt;
+&lt;COMMENT&gt;&lt;SCRIPT LANGUAGE=&quot;JavaScript1.1&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp; var _ns = (navigator.appName.indexOf(&quot;Netscape&quot;) &gt;= 0
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; ((_info.indexOf(&quot;Win&quot;) &gt; 0 &amp;&amp; _info.indexOf(&quot;Win16&quot;) &lt; 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; java.lang.System.getProperty(&quot;os.version&quot;).indexOf(&quot;3.5&quot;) &lt; 0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; || _info.indexOf(&quot;Sun&quot;) &gt; 0));
+//--&gt;&lt;/SCRIPT&gt;&lt;/COMMENT&gt;&nbsp;</font></pre>
+    </td>
+  </tr>
+</table>
+<p>Remember that this block of JavaScript should be put at the top of the <tt>&lt;BODY&gt;</tt> 
+  of the HTML file. It is put at the top so that other JavaScripts can reference 
+  the variables <tt>_ie</tt> and <tt>_ns</tt>. This JavaScript is the same in 
+  all HTML files, and it is only needed once for each HTML body.&nbsp; </p>
+<p>The second block of HTML tags are actually the corresponding <tt>OBJECT</tt> 
+  and <tt>EMBED</tt> tags that are mapped from the data in the <tt>APPLET</tt> 
+  tag. Note that JavaScript outputs the <tt>OBJECT</tt> tag when the browser is 
+  IE running on the Windows 95, Windows 98 or Windows NT 4.0 operating environments. 
+  If the browser is Navigator 3/4 on Windows 95, Windows 98, Windows NT 4.0, or 
+  Solaris operating environments, then JavaScript also outputs the <tt>EMBED</tt> 
+  tag, though with a slightly different syntax. Recall that the mechanism for 
+  detecting the browser and the platform has been described in the above section. 
+  (Tags &lt;!-- and --&gt; are used for comments in HTML.)&nbsp; </p>
+<h3>Original <code>APPLET</code> tag:</h3>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;
+&lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&lt;/APPLET&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<h3>New style tag:&nbsp; </h3>
+<table summary="layout" width="90%" cellpadding="5" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <pre><font color="#000000">&lt;SCRIPT LANGUAGE=&quot;JavaScript&quot;&gt;&lt;!--
+&nbsp;&nbsp;&nbsp; if (_ie == true) document.writeln('&lt;OBJECT
+&nbsp;&nbsp;&nbsp; classid=&quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot; align=&quot;baseline&quot;
+codebase=&quot;http://java.sun.com/products/plugin/1.4/jinstall-14-win32.cab#Version=1,4,0,mn&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;NOEMBED&gt;&lt;XMP&gt;');
+&nbsp;&nbsp;&nbsp; else if (_ns == true) document.writeln('&lt;EMBED
+&nbsp;&nbsp;&nbsp; type=&quot;application/x-java-applet;jpi-version=1.4&quot; width=&quot;200&quot; height=&quot;200&quot;
+&nbsp;&nbsp;&nbsp; align=&quot;baseline&quot; code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot;
+&nbsp;&nbsp;&nbsp; model=&quot;models/HyaluronicAcid.xyz&quot;
+&nbsp;&nbsp;&nbsp; pluginspage=&quot;http://java.sun.com/products/plugin/1.4/plugin-install.html&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;NOEMBED&gt;&lt;XMP&gt;');
+//--&gt;&lt;/SCRIPT&gt;
+&nbsp;&nbsp;&nbsp; &lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;&lt;/XMP&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_codebase&quot; VALUE=&quot;html/&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_type&quot; VALUE=&quot;application/x-java-applet;jpi-version=1.4&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;LUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;scriptable&quot; VALUE=&quot;true&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&nbsp;&nbsp;&nbsp; &lt;/APPLET&gt;&lt;/NOEMBED&gt;&lt;/EMBED&gt;&lt;/OBJECT&gt;&nbsp;</font></pre>
+      </td>
+  </tr>
+</table>
+<p>Note that the original <tt>APPLET</tt> tag is also mapped in the new Java Plug-in 
+  tag. This is done because Java Plug-in is intended to be used only on supported 
+  platforms. Leaving the <tt>APPLET</tt> tag in the script ensures that browsers 
+  that do not support Java Plug-in, or browsers that do not support JavaScript 
+  can gracefully handle the applet using the default JVM. HotJava Browser, IE, 
+  and Navigator on non-Java Plug-in supported platforms, or browsers without JavaScript 
+  support, read the above tags as follows:&nbsp; </p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;&lt;/XMP&gt;
+&lt;PARAM NAME=&quot;java_code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+&lt;PARAM NAME=&quot;java_codebase&quot; VALUE=&quot;html/&quot;&gt;
+&lt;PARAM NAME=&quot;java_type&quot; VALUE=&quot;application/x-java-applet;jpi-version=1.4&quot;&gt;
+&lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&lt;PARAM NAME=&quot;scriptable&quot; VALUE=&quot;true&quot;&gt;
+&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&lt;/APPLET&gt;&lt;/NOEMBED&gt;&lt;/EMBED&gt;&lt;/OBJECT&gt;&nbsp;</font></pre>
+    </td>
+  </tr>
+</table>
+<p>These browsers ignore the tags <tt>&lt;/XMP&gt;</tt>, <tt>&lt;/OBJECT&gt;</tt>, 
+  <tt>&lt;/EMBED&gt;</tt>, and <tt>&lt;/NOEMBED&gt;</tt> as well because there 
+  is no corresponding <tt>&lt;XMP&gt;</tt>, <tt>&lt;OBJECT&gt;</tt>, <tt>&lt;EMBED&gt;</tt>, 
+  and <tt>&lt;NOEMBED&gt;</tt> tags. Because Java Plug-in is targeted for features 
+  in the Java 2 SDK, Standard Edition v 1.4 or future releases, those browsers 
+  without full Java 2 SDK 1.4 support and who do not support Java Plug-in will 
+  display the message &quot;No Java 2 SDK, Standard Edition v 1.4 support for 
+  APPLET&quot;.&nbsp; </p>
+<p>Unlike the previous examples, the mapped <tt>PARAM</tt> names contain <tt>java_code</tt>, 
+  <tt>java_codebase</tt>, and <tt>java_type</tt> instead of <tt>code</tt>, <tt>codebase</tt>, 
+  and <tt>type</tt>. This is necessary because specifying <tt>code</tt> and <tt>codebase</tt> 
+  in the <tt>&lt;PARAM&gt;</tt> inside the <tt>&lt;APPLET&gt;</tt> and <tt>&lt;/APPLET&gt;</tt> 
+  tag causes problems in some browsers.&nbsp; </p>
+<p>IE on Windows reads the tags as follows:&nbsp; </p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;OBJECT classid=&quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot; align=&quot;baseline&quot;
+codebase=&quot;http://java.sun.com/products/plugin/1.4/jinstall-14-win32.cab#Version=1,4,0,mn&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;NOEMBED&gt;&lt;XMP&gt;
+&nbsp;&nbsp;&nbsp; &lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;&lt;/XMP&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_codebase&quot; VALUE=&quot;html/&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_type&quot; VALUE=&quot;application/x-java-applet;jpi-version=1.4&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;scriptable&quot; VALUE=&quot;true&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&nbsp;&nbsp;&nbsp; &lt;/APPLET&gt;&lt;/NOEMBED&gt;&lt;/EMBED&gt;
+&lt;/OBJECT&gt;</font>&nbsp;</pre>
+      <p></p>
+
+</td>
+  </tr>
+</table>
+<p>Be careful when you use the <tt>&lt;XMP&gt;</tt> tag. Because IE renders the 
+  <tt>&lt;OBJECT&gt;</tt> tag, you must disable the <tt>&lt;APPLET&gt;</tt> tag. 
+  If not disabled, two applets will simultaneously show up in the browser&#151;one 
+  applet will be running in Microsoft's JVM, and the other will be running in 
+  Sun's JVM using Java Plug-in. The <tt>&lt;XMP&gt;</tt> tag provides a solution. 
+  The <tt>&lt;XMP&gt;</tt> and <tt>&lt;/XMP&gt;</tt> tags basically transform 
+  any HTML tag that occurs between them into a stream of static text. In the above 
+  example, the <tt>&lt;XMP&gt;</tt> and <tt>&lt;/XMP&gt;</tt> tags cause the browser 
+  to treat the <tt>&lt;APPLET&gt;</tt> tag as static text instead of an HTML tag. 
+  Because the browser ignores any static text between the <tt>&lt;OBJECT&gt;</tt> 
+  tag and the <tt>&lt;PARAM&gt;</tt> tag, the above tags actually become:&nbsp; 
+</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;OBJECT classid=&quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;
+&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot; align=&quot;baseline&quot;
+codebase=&quot;http://java.sun.com/products/plugin/1.4/jinstall-14-win32.cab#Version=1,4,0,mn&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_codebase&quot; VALUE=&quot;html/&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_type&quot; VALUE=&quot;application/x-java-applet;jpi-version=1.4&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;scriptable&quot; VALUE=&quot;true&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&lt;/OBJECT&gt;&nbsp;</font></pre>
+      <p></p>
+</td>
+  </tr>
+</table>
+<p>This is identical to the <tt>OBJECT</tt> tag example outlined above. Note that 
+  the <tt>&lt;OBJECT&gt;</tt> tag ignores the <tt>&lt;NOEMBED&gt;</tt>, <tt>&lt;/NOEMBED&gt;</tt>, 
+  and <tt>&lt;/EMBED&gt;</tt> tags.&nbsp; </p>
+<p>Navigator on Windows operating environments reads tags as follows:&nbsp; </p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;EMBED type=&quot;application/x-java-applet;jpi-version=1.4&quot; width=&quot;200&quot; height=&quot;200&quot;
+&nbsp;&nbsp;&nbsp; align=&quot;baseline&quot; code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot;
+&nbsp;&nbsp;&nbsp; model=&quot;models/HyaluronicAcid.xyz&quot;
+&nbsp;&nbsp;&nbsp; pluginspage=&quot;http://java.sun.com/products/plugin/1.4/plugin-install.html&quot;&gt;
+&lt;NOEMBED&gt;&lt;XMP&gt;
+&nbsp;&nbsp;&nbsp; &lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width=&quot;200&quot; height=&quot;200&quot;&gt;&lt;/XMP&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_codebase&quot; VALUE=&quot;html/&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;java_type&quot; VALUE=&quot;application/x-java-applet;jpi-version=1.4&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+&nbsp;&nbsp;&nbsp; &lt;PARAM NAME=&quot;scriptable&quot; VALUE=&quot;true&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&nbsp;&nbsp;&nbsp; &lt;/APPLET&gt;&lt;/NOEMBED&gt;&lt;/EMBED&gt;&lt;/OBJECT&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p>Note that the <tt>&lt;XMP&gt;</tt> tag is used again in the <tt>&lt;EMBED&gt;</tt> 
+  tag to also disable the <tt>&lt;APPLET&gt;</tt> tag. The <tt>&lt;EMBED&gt;</tt> 
+  tag ignores the <tt>&lt;PARAM&gt;</tt> and <tt>&lt;/OBJECT&gt;</tt> tags as 
+  well. In effect, the above tags actually become:&nbsp;</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td> 
+      <pre><font color="#000000">&lt;EMBED type=&quot;application/x-java-applet;jpi-version=1.4&quot; width=&quot;200&quot; height=&quot;200&quot;
+&nbsp;&nbsp;&nbsp; align=&quot;baseline&quot; code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot;
+&nbsp;&nbsp;&nbsp; model=&quot;models/HyaluronicAcid.xyz&quot;
+&nbsp;&nbsp;&nbsp; pluginspage=&quot;http://java.sun.com/products/plugin/1.4/plugin-install.html&quot;&gt;
+&lt;NOEMBED&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No Java 2 SDK, Standard Edition v 1.4 support for APPLET!!
+&lt;/NOEMBED&gt;
+&lt;/EMBED&gt;&nbsp;</font></pre>
+      <p></p>
+
+</td>
+  </tr>
+</table>
+<p>This is identical to the <tt>EMBED</tt> tag example outlined above.&nbsp; </p>
+<p>You can use the combined <tt>OBJECT-EMBED-JavaScript</tt> tag to activate Java 
+  Plug-in in the right browser on the right platform. This combined tag is complicated 
+  and it should be used only if your HTML page is browsed by users in a heterogenous 
+  environment.&nbsp; <br>
+</p>
+<h2><a name="summary"></a>Summary</h2>
+<p>This document describes the <tt>OBJECT</tt> tag and <tt>EMBED</tt> tag styles 
+  used by Java Plug-in. It focuses on the conversion from an <tt>APPLET</tt> tag 
+  to the <tt>OBJECT</tt> and <tt>EMBED</tt> tags. Currently, HTML 4.0 suggests 
+  that the <tt>OBJECT</tt> tag is the best way to insert Java applets and JavaBeans 
+  components into a HTML page. This document will be updated in the near future 
+  should there be a need to convert the <tt>OBJECT</tt> tag to the Java Plug-in 
+  tag style. Information disclosed in this document is intended to assist ISVs 
+  for writing HTML migration tools and to assist webmasters with Java Plug-in 
+  migration. The tag style described in this document is subject to change in 
+  the future.&nbsp; </p>
+<p>Note that the use of Java Plug-in is not limited to the tag styles described 
+  in this document. In fact, webmasters are encouraged to modify the tag style 
+  or mix the tag with JavaScript to fit their needs. As long as the described 
+  <tt>OBJECT</tt> tag is used in IE and <tt>EMBED</tt> tag is used in Navigator, 
+  there should be no problems running Java Plug-in. Currently, there are several 
+  conversion templates shipped with the Java Plug-in HTML converter. Webmasters 
+  may find one template better than others for their needs, and are encouraged 
+  to modify these templates themselves if necessary.&nbsp;</p>
+<p>&nbsp;</p>
+                </body>
+</html>

@@ -1,0 +1,3950 @@
+
+<html>
+  <head>
+        <title>Java(tm) Virtual Machine Debug Interface Reference</title>
+  </head>
+
+  <body BGCOLOR=white LINK=blue VLINK=blue ALINK=red>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH=30>
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT
+=88>
+</TD>
+
+
+<TD ALIGN=CENTER>
+     <H1>Java<sup><font size="-2">TM</font></sup> Virtual Machine Debug Interface Reference</H1>
+</TD>
+
+<!--
+<TD ALIGN=RIGHT VALIGN=TOP>
+   <a href="../../index.html"><FONT SIZE="-1">Documentation Contents</FONT></a> 
+</TD>
+-->
+</TR>
+
+</TABLE>
+
+
+<h2>Contents</h2>
+<blockquote>
+<a href="#intro"><b>Introduction</b></a><br>
+<a href="#using"><b>Using JVMDI Functions</b></a><br>
+<a href="#errors"><b>Errors</b></a><br>
+<a href="#handlingevents"><b>Handling Events</b></a><br>
+<a href="#starting"><b>Starting a VM with a JVMDI Client</b></a>
+</blockquote>
+<p><hr noshade size=3>
+<a name="intro"><h2>Introduction</h2></a>
+The Java<sup><font size="-2">TM</font></sup> Virtual Machine Debug 
+Interface (JVMDI) is a programming interface used by debuggers and other
+programming tools. It provides a way both to inspect the state and 
+to control the execution of applications running in the
+Java<sup><font size="-2">TM</font></sup> Virtual Machine.
+<p>
+JVMDI is a two-way interface. The JVMDI client can be notified of
+interesting occurrences through <a href="#events">events</a>. The JVMDI
+can query and control the application through many different 
+<a href="#events">functions</a>, either in response to events or 
+independent of them.
+<p>
+JVMDI clients run
+in the same virtual machine as the application being debugged and access
+JVMDI through a native interface. The native, in-process interface allows
+maximal control with minimal intrusion on the part of a debugging tool. 
+Typically, JVMDI clients are relatively compact. They can be controlled
+by a separate process which implements the bulk of a debugger's
+function without interfering with the target application's normal execution.
+<p>
+JVMDI is the lowest layer within the Java Platform Debugger Architecture. 
+This architecture also
+contains higher-level, out-of-process debugger interfaces. The higher-level 
+interfaces are more appropriate than JVMDI for most debugging tools. 
+For more information on the Java Platform Debugger Architecture, see the 
+<a href="index.html">Java Platform Debugger Architecture documentation</a>
+for this release and the
+<a href="http://java.sun.com/products/jpda">Java Platform Debugger Architecture website</a>. 
+
+<p><hr noshade size=3>
+<a name="using"><h2>Using JVMDI Functions</h2></a>
+<p>
+For function and constant definitions, add
+<pre>
+        #include &lt;jvmdi.h&gt;
+</pre>
+to your source code.
+<p>
+Like Java Native Interface (JNI) functions, JVMDI functions 
+are accessed through a function table. 
+The JVMDI function table can be obtained through the JNI 
+<code>GetEnv</code> function.
+For example, the following code obtains the function table for version 1
+of the JVMDI.
+<pre>
+        JVMDI_Interface_1 *jvmdi;
+        ...
+        (*jvm)->GetEnv(jvm, &jvmdi, JVMDI_VERSION_1);
+</pre>
+<p>
+JVMDI functions always return a 
+<a href="#errors"><code>jvmdiError</code></a> value
+indicating return status. Some functions can return additional
+values through pointers provided by the calling function. 
+In some cases, JVMDI functions allocate memory that your program must
+explicitly deallocate. This is indicated in the individual JVMDI
+function descriptions.  Empty lists, arrays, sequences, etc are 
+returned as allocated zero length arrays (not as NULL).
+<p>
+JVMDI functions identify objects with JNI references. References passed to 
+JVMDI functions can be either global or local, but they must be 
+strong references. All references returned by JVMDI functions are 
+strong, global references.  
+<p>
+In the event that the JVMDI function encounters
+an error (any return value other than JVMDI_ERROR_NONE) the values
+of memory referenced by argument pointers is undefined, but no memory
+will have been allocated and no global references will have been allocated.
+<p>
+JVMDI extends the data types defined by JNI with the following: 
+<code>jthread</code> and <code>jthreadGroup</code> are subtypes of
+ <code>jobject</code>, representing the corresponding objects; 
+<code>jframeID</code> is a pointer type representing a single stack frame
+of a suspended or current thread (it is invalid upon
+the resumption of the thread); <code>jlocation</code> is a 64 bit 
+unsigned value, representing a monotonically increasing 
+executable position within a method; 
+<code>jvmdiError</code> is a <code>jint</code>, discussed above.
+<p>
+JVMDI functions fall into these categories:
+<ul>
+    <li><a href=#memory><b>Memory Management</b></a>
+	<ul>
+	<li><a href=#SetAllocationHooks>Set Allocation Hooks</a>
+	<li><a href=#Allocate>Allocate Memory</a>
+	<li><a href=#Deallocate>Deallocate Memory</a>
+	</ul>
+    <li><a href=#thread><b>Thread Execution Functions</b></a>
+	<ul>
+	<li><a href=#GetThreadStatus>Get Thread Status</a>
+	<li><a href=#GetAllThreads>Get All Threads</a>
+	<li><a href=#SuspendThread>Suspend Thread</a>
+        <li><a href=#SuspendThreadList>Suspend Thread List</a>
+	<li><a href=#ResumeThread>Resume Thread</a>
+        <li><a href=#ResumeThreadList>Resume Thread List</a>
+	<li><a href=#StopThread>Stop Thread</a>
+	<li><a href=#InterruptThread>Interrupt Thread</a>
+	<li><a href=#GetThreadInfo>Get Thread Info</a>
+	<li><a href=#GetOwnedMonitorInfo>Get Owned Monitor Info</a>
+	<li><a href=#GetCurrentContendedMonitor>Get Current Contended Monitor</a>
+	<li><a href=#RunDebugThread>Run Debug Thread</a>
+	</ul>
+	<li><a href=#thread_groups><b>Thread Groups</b></a>
+	<ul>
+	<li><a href=#GetTopThreadGroups>Get Top Thread Groups</a>
+	<li><a href=#GetThreadGroupInfo>Get Thread Group Info</a>
+	<li><a href=#GetThreadGroupChildren>Get Thread Group Children</a>
+	</ul>
+    <li><a href=#stack><b>Stack Frame Access</b></a>
+	<ul>
+	<li><a href=#GetFrameCount>Get Thread's Frame Count</a>
+	<li><a href=#GetCurrentFrame>Get Thread's Current Frame</a>
+	<li><a href=#PopFrame>Pop Frame from Thread's Stack</a>
+	<li><a href=#GetCallerFrame>Get Caller Frame</a>
+	<li><a href=#GetFrameLocation>Frame Location</a>
+	<li><a href=#NotifyFramePop>Notify Frame Pop</a>
+	</ul>
+    <li><a href=#local><b>Local Variable Access</b></a>
+	<ul>
+	<li><a href=#GetLocalVariable>Get Local Variable</a>
+	<li><a href=#SetLocalVariable>Set Local Variable</a>
+	</ul>
+    <li><a href=#breakpoint><b>Breakpoints</b></a>
+	<ul>
+	<li><a href=#SetBreakpoint>Set a Breakpoint</a>
+	<li><a href=#ClearBreakpoint>Clear a Breakpoint</a>
+	<li><a href=#ClearAllBreakpoints>Clear All Breakpoints</a>
+	</ul>
+    <li><a href=#fieldWatch><b>Watched Fields</b></a>
+	<ul>
+	<li><a href=#SetFieldAccessWatch>Set a Field Access Watch</a>
+	<li><a href=#ClearFieldAccessWatch>Clear a Field Access Watch</a>
+	<li><a href=#SetFieldModificationWatch>Set a Field Modification Watch</a>
+	<li><a href=#ClearFieldModificationWatch>Clear a Field Modification Watch</a>
+	</ul>
+    <li><a href=#class><b>Class Information</b></a>
+	<ul>
+	<li><a href=#GetClassSignature>Class Signature</a>
+	<li><a href=#GetClassStatus>Class Status</a>
+	<li><a href=#GetSourceFileName>Source File Name</a>
+	<li><a href=#GetClassModifiers>Class Modifier Flags</a>
+	<li><a href=#GetClassMethods>Class Methods</a>
+	<li><a href=#GetClassFields>Class Fields</a>
+	<li><a href=#GetImplementedInterfaces>Implemented Interfaces</a>
+	<li><a href=#IsInterface>Is an Interface</a>
+	<li><a href=#IsArrayClass>Is an Array</a>
+	<li><a href=#GetClassLoader>Class Loader</a>
+	<li><a href=#GetSourceDebugExtension>Source Debug Extension</a>
+	</ul>
+    <li><a href=#object><b>Object Information</b></a>
+	<ul>
+	<li><a href=#GetObjectHashCode>Object Hash Code</a>
+	<li><a href=#GetMonitorInfo>Get Monitor Info</a>
+        </ul>
+    <li><a href=#field><b>Field Information</b></a>
+	<ul>
+	<li><a href=#GetFieldName>Field Name and Signature</a>
+	<li><a href=#GetFieldDeclaringClass>Field Declaring Class</a>
+	<li><a href=#GetFieldModifiers>Field Modifier Flags</a>
+	<li><a href=#IsFieldSynthetic>Is Field Synthetic</a>
+	</ul>
+    <li><a href=#method><b>Method Information</b></a>
+	<ul>
+	<li><a href=#GetMethodName>Method Name and Signature</a>
+	<li><a href=#GetMethodDeclaringClass>Method Declaring Class</a>
+	<li><a href=#GetMethodModifiers>Method Modifier Flags</a>
+	<li><a href=#GetMaxStack>Maximum Stack</a>
+	<li><a href=#GetMaxLocals>Local Slots</a>
+	<li><a href=#GetArgumentsSize>Argument Slots</a>
+	<li><a href=#GetLineNumberTable>Source Line Numbers</a>
+	<li><a href=#GetMethodLocation>Method Location</a>
+	<li><a href=#GetLocalVariableTable>Local Variables</a>
+	<li><a href=#GetExceptionHandlerTable>Exception Handlers</a>
+	<li><a href=#GetThrownExceptions>Thrown Exceptions</a>
+	<li><a href=#GetBytecodes>Get Bytecodes</a>
+	<li><a href=#IsMethodNative>Is Method Native</a>
+	<li><a href=#IsMethodSynthetic>Is Method Synthetic</a>
+	</ul>
+	<li><a href=#debugger_monitor><b>Raw Monitor Support</b></a>
+	<ul>
+	<li><a href=#CreateRawMonitor>Create Raw Monitor</a>
+	<li><a href=#DestroyRawMonitor>Destroy Raw Monitor</a>
+	<li><a href=#RawMonitorEnter>Raw Monitor Enter</a>
+	<li><a href=#RawMonitorExit>Raw Monitor Exit</a>
+	<li><a href=#RawMonitorWait>Raw Monitor Wait</a>
+	<li><a href=#RawMonitorNotify>Raw Monitor Notify</a>
+	<li><a href=#RawMonitorNotifyAll>Raw Monitor Notify All</a>
+	</ul>
+    <li><a href=#events><b>Events</b></a>
+	<ul>
+	<li><a href=#SetEventHook>Set Event Hook</a>
+	<li><a href=#SetEventNotificationMode>Enable/Disable Events</a>
+	</ul>
+    <li><a href=#miscellaneous><b>Miscellaneous Functions</b></a>
+	<ul>
+	<li><a href=#GetLoadedClasses>Get Loaded Classes</a>
+	<li><a href=#GetClassLoaderClasses>Get Classloader Classes</a>
+	<li><a href=#RedefineClasses>Redefine Classes</a>
+	<li><a href=#GetVersionNumber>Get Version Number</a>
+	<li><a href=#GetCapabilities>Get Capabilities</a>
+	</ul>
+</ul>
+<a name="memory"></a>
+<p><hr noshade size=3>
+<h2>Memory Management</h2>
+<p>
+Many JVMDI functions require memory allocation.
+By default, memory comes from platform-specific allocation functions,
+such as a <code>malloc()</code>.
+A system built on JVMDI can provide its own memory allocation scheme.
+This might be useful, for example, to allocate memory in advance, so a
+debugger can continue to function in low-memory situations. Also,
+replacing the default memory allocation functions with debugger-specific
+functions can reduce the potential for deadlock on systems where 
+<code>malloc</code> cannot be entered by a debugger thread while 
+an application thread is suspended while executing inside a memory
+management function.
+<hr noshade width=75%>
+<a name="SetAllocationHooks"></a>
+<h3>Set Allocation Hooks</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetAllocationHooks(JVMDI_AllocHook ahook, JVMDI_DeallocHook dhook)</pre></blockquote>
+<p>
+Set the functions which will perform allocation and deallocation. The 
+hook functions are defined as follows.
+<pre>
+typedef jvmdiError (*JVMDI_AllocHook)(jlong size, jbyte** memPtr)
+typedef jvmdiError (*JVMDI_DeallocHook)(jbyte* buffer)
+</pre>
+<p>
+JVMDI will call <code>ahook</code> to allocate memory, <code>dhook</code> to
+deallocate memory. This overrides JVMDI's default memory allocator. To
+restore the default allocator, call
+<code>SetAllocationHooks</code> with <code>ahook</code> and
+<code>dhook</code> set to <code>NULL</code>.
+<p>
+The <code>ahook</code> function should look in <code>size</code> for
+the number of bytes to allocate and return them via
+<code>memPtr</code>. The function should return
+<A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A> if passed null pointers,
+<A HREF="#JVMDI_ERROR_OUT_OF_MEMORY">JVMDI_ERROR_OUT_OF_MEMORY</A> if it cannot honor a memory request, and
+<A HREF="#JVMDI_ERROR_NONE">JVMDI_ERROR_NONE</A> otherwise.
+<p>
+The <code>dhook</code> function should look in <code>buffer</code> for the
+memory to be deallocated. The function should return
+<A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A> if passed null pointers, <A HREF="#JVMDI_ERROR_NONE">JVMDI_ERROR_NONE</A>
+otherwise.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>ahook<dd>the function to use for memory allocation, or NULL 
+to revert to the default allocator.
+<dt>dhook<dd>the function to use for memory deallocation, or NULL 
+to revert to the default deallocator.
+</dl></blockquote>
+<p>
+<code>SetAllocationHooks</code> always returns
+<code><A HREF="#JVMDI_ERROR_NONE">JVMDI_ERROR_NONE</A></code>.
+<a name="Allocate"></a>
+<hr noshade width=75%>
+<h3>Allocate Memory</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+Allocate(jlong size, jbyte** memPtr)</pre></blockquote>
+<p> 
+Allocate an area of memory through the JVMDI allocator. The allocated
+memory should be freed with <a href="#Deallocate"><code>Deallocate</code></a>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>size<dd>the number of bytes to allocate.
+<dt>memPtr<dd>on return, a pointer to the beginning of the memory allocated
+by the allocator specified in
+<a href="#SetAllocationHooks"><code>SetAllocationHooks</code></a>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+</dl></blockquote>
+<a name="Deallocate"></a>
+<hr noshade width=75%>
+<h3>Deallocate Memory</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+Deallocate(jbyte* mem)</pre>
+</blockquote>
+Deallocate <code>mem</code>  using the JVMDI allocator. This function should
+be used to deallocate any memory allocated and returned by a JVMDI function
+or any memory allocated with <a href="#Allocate"><code>Allocate</code></a>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>mem<dd>a pointer to the beginning of the allocated memory.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+</dl></blockquote>
+
+<a name=thread></a>
+<p><hr noshade size=3>
+<h2>Thread Execution Functions</h2>
+<p>
+<a name="GetThreadStatus"></a>
+<hr noshade width=75%>
+<h3>Get Thread Status</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetThreadStatus(jthread thread, jint *threadStatusPtr, jint *suspendStatusPtr)
+</pre></blockquote>
+<p>
+Get status information for a thread.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to query
+<dt>threadStatusPtr <dd>on return, points to the current status of the thread.
+If the thread is suspended, the returned status refers 
+to the thread status before suspension.
+The thread status is one of the following values. 
+<blockquote><dl>
+    <dt><code>JVMDI_THREAD_STATUS_UNKNOWN</code>
+        <dd>
+        Status unknown.
+    <p><dt><code>JVMDI_THREAD_STATUS_ZOMBIE</code>
+        <dd>
+        Thread has completed execution.
+    <p><dt><code>JVMDI_THREAD_STATUS_RUNNING</code>
+        <dd>
+        Thread is runnable.
+    <p><dt><code>JVMDI_THREAD_STATUS_SLEEPING</code>
+        <dd>
+        Thread sleeping. (<code>Thread.sleep()</code> has been
+        called.)
+    <p><dt><code>JVMDI_THREAD_STATUS_MONITOR</code>
+        <dd>
+        Thread is waiting to enter a synchronization block.
+    <p><dt><code>JVMDI_THREAD_STATUS_WAIT</code>
+        <dd>
+        Thread waiting. (<code>Object.wait()</code>
+        has been called.)
+</dl></blockquote>
+<dt>suspendStatusPtr<dd>on return, points to information on suspension. The
+suspend status is a combination of zero or more of the following bit flags.
+<blockquote><dl>
+    <p><dt><code>JVMDI_SUSPEND_STATUS_SUSPENDED</code>
+        <dd>
+        Thread suspended.
+        (<code>java.lang.Thread.suspend()</code> or 
+        <a href="#SuspendThread"><code>SuspendThread</code></a> or 
+<a href="#SuspendThreadList"><code>SuspendThreadList</code></a> has been 
+called.) 
+    <p><dt><code>JVMDI_SUSPEND_STATUS_BREAK</code>
+        <dd>
+        Thread has hit a breakpoint.  This bit is only valid if the thread
+is the current thread or the thread is suspended.
+</dl></blockquote>
+</dl></blockquote>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+        <dd>
+        <code>thread</code> was invalid.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+</dl></blockquote>
+<a name="GetAllThreads"></a>
+<hr noshade width=75%>
+<h3>Get All Threads</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetAllThreads(jint *threadsCountPtr, jthread **threadsPtr)</pre></blockquote>
+<p>
+Get all running threads known to the virtual machine. Native threads which 
+are not attached to the VM are not included in the returned list.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>threadsCountPtr<dd>on return, points to the number of running threads.
+<dt>threadsPtr<dd>on return, points to an array of references, one
+for each running thread.
+Threads in the array are JNI global references and must be explicitly
+freed with the JNI function <code>DeleteGlobalRef</code>. 
+The returned thread array should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>.
+</dl></blockquote>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+</dl></blockquote>
+<p>
+<a name="SuspendThread"></a>
+<hr noshade width=75%>
+<h3>Suspend Thread</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SuspendThread(jthread thread)</pre></blockquote>
+<p>
+Suspend the specified thread. If the calling thread is specified, 
+this function will not return until some other thread calls 
+<a href="#ResumeThread"><code>ResumeThread</code></a> or 
+<a href="#ResumeThreadList"><code>ResumeThreadList</code></a>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to suspend
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+        <dd>
+        <code>thread</code> was invalid.
+    <p><dt><code><A HREF="#JVMDI_ERROR_THREAD_SUSPENDED">JVMDI_ERROR_THREAD_SUSPENDED</A></code>
+        <dd>
+        Thread already suspended.
+</dl></blockquote>
+
+<a name="SuspendThreadList"></a>
+<hr noshade width=75%>
+<h3>Suspend Thread List</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SuspendThreadList(jint reqCount, jthread *reqList, jvmdiError *results)</pre></blockquote>
+Suspend the reqCount threads specified in the reqList array. If the
+calling thread is specified in the reqList array, this function will
+not return until some other thread calls 
+<a href="#ResumeThread"><code>ResumeThread</code></a> or
+<a href="#ResumeThreadList"><code>ResumeThreadList</code></a>.
+<p>Parameters:
+<blockquote><dl>
+<dt>reqCount<dd>the number of threads to suspend
+<dt>reqList<dd>the list of threads to suspend
+<dt>results<dd>the list of per-thread suspend results
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal 
+error</a> or one of the following errors:
+<blockquote><dl>
+<p><dt><code><A href="#JVMDI_ERROR_ILLEGAL_ARGUMENT">JVMDI_ERROR_ILLEGAL_ARGUMENT</A></code>
+      <dd>
+      reqCount is less than zero (0).
+</dl></blockquote>
+<p>
+Note that the function return value does not include per-thread error
+conditions; per-thread error conditions are returned via the results
+array.
+<p>
+The results array element for a specific thread contains either a
+universal error or one of the following errors:
+<blockquote><dl>
+<p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+      <dd> 
+      <code>thread</code> was invalid. 
+
+<p><dt><code><A HREF="#JVMDI_ERROR_THREAD_SUSPENDED">JVMDI_ERROR_THREAD_SUSPENDED</A></code>
+      <dd> 
+      Thread already suspended. 
+
+<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</a></code>
+      <dd>
+      Invalid pointer.
+</dl></blockquote>
+
+
+
+<a name="ResumeThread"></a>
+<hr noshade width=75%>
+<h3>Resume Thread</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+ResumeThread(jthread thread)</pre></blockquote>
+<p>
+Resume a suspended thread. Any thread suspended through 
+<code>java.lang.Thread.suspend()</code>, 
+<a href="#SuspendThread"><code>SuspendThread</code></a> or 
+<a href="#SuspendThreadList"><code>SuspendThreadList</code></a> will 
+resume execution.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to resume
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+        <dd>
+        <code>thread</code> was invalid.
+    <p><dt><code><A HREF="#JVMDI_ERROR_THREAD_NOT_SUSPENDED">JVMDI_ERROR_THREAD_NOT_SUSPENDED</A></code>
+        <dd>
+        Thread was not suspended.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_TYPESTATE">JVMDI_ERROR_INVALID_TYPESTATE</a></code>
+        <dd>The state of the thread has been modified, and is now inconsistent.
+</dl></blockquote>
+
+
+
+<a name="ResumeThreadList"></a>
+<hr noshade width=75%>
+<h3>Resume Thread List</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+ResumeThreadList(jint reqCount, jthread *reqList, jvmdiError *results)</pre></blockquote>
+<p>
+Resume the reqCount threads specified in the reqList array. Any thread
+suspended through <code>java.lang.Thread.suspend()</code>, 
+<a href="#SuspendThread"><code>SuspendThread</code></a>, or 
+<a href="#SuspendThreadList"><code>SuspendThreadList</code></a> will 
+resume execution.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>reqCount<dd>the number of threads to resume
+<dt>reqList<dd>the list of threads to resume
+<dt>results<dd>the list of per-thread resume results
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal 
+error</a> or one of the following errors:
+<blockquote><dl>
+<p><dt><code><A href="#JVMDI_ERROR_ILLEGAL_ARGUMENT">JVMDI_ERROR_ILLEGAL_ARGUMENT</A></code>
+    <dd>reqCount is less than zero (0).
+</dl></blockquote>
+<p>
+The results array element for a specific thread contains either a
+universal error or one of the following errors:
+<p>
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+        <dd>
+        <code>thread</code> was invalid.
+    <p><dt><code><A HREF="#JVMDI_ERROR_THREAD_NOT_SUSPENDED">JVMDI_ERROR_THREAD_NOT_SUSPENDED</A></code>
+        <dd>
+        Thread was not suspended.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_TYPESTATE">JVMDI_ERROR_INVALID_TYPESTATE</a></code>
+        <dd>The state of the thread has been modified, and is now inconsistent.
+<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</a></code>
+      <dd>
+      Invalid pointer.
+</dl></blockquote>
+
+
+
+
+
+
+
+
+
+
+<a name="StopThread"></a>
+<hr noshade width=75%>
+<h3>Stop Thread</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+StopThread(jthread thread, jobject exception)</pre></blockquote>
+<p>
+Send the specified asynchronous exception to the specified thread 
+(similar to <code>java.lang.Thread.stop</code>).
+Normally, this function is used to kill the specified thread with an 
+instance of the exception ThreadDeath.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to stop
+<dt>exception<dd>the asynchronous exception object
+</dl></blockquote>
+<p>
+The function returns one of the following error code:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</a></code>
+</dl></blockquote>
+<a name="InterruptThread"></a>
+<hr noshade width=75%>
+<h3>Interrupt Thread</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+InterruptThread(jthread thread)</pre></blockquote>
+<P>
+Interrupt the specified thread
+(similar to <code>java.lang.Thread.interrupt</code>).
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to interrupt
+</dl></blockquote>
+<p>
+The function returns one of the following error code:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</a></code>
+	</dl></blockquote>
+<a name="GetThreadInfo"></a>
+<hr noshade width=75%>
+<h3>Get Thread Info</h3>
+<blockquote><pre>
+typedef struct {
+	char *name;             /* Name in UTF-8 */
+	jint priority;
+	jboolean is_daemon;
+	jthreadGroup thread_group;
+	jobject context_class_loader;
+} JVMDI_thread_info;
+
+<a href="#errors">jvmdiError</a>
+GetThreadInfo(jthread thread, JVMDI_thread_info *infoPtr)</pre></blockquote>
+<P>
+Get thread information. The fields of the JVMDI_thread_info structure 
+are filled in with details of the specified thread.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to query
+<dt>infoPtr<dd>on return, filled with information describing the specified thread.
+Returned objects (thread group and context class loader)
+are global references and must be explicitly freed with the JNI 
+function <code>DeleteGlobalRef</code>.
+The returned thread name string should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+<p>
+For JDK 1.1 implementations which don't
+recognize context class loaders, 
+the <code>context_class_loader</code> field should be NULL.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</a></code>
+		<dd>
+		<code>thread</code> was invalid.
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+		<dd>
+		Invalid pointer.
+</dl></blockquote>
+<a name="GetOwnedMonitorInfo"></a>
+<hr noshade width=75%>
+<h3>Get Owned Monitor Info</h3>
+<blockquote><pre>
+typedef struct {
+    jint owned_monitor_count;
+    jobject *owned_monitors;
+} JVMDI_owned_monitor_info;
+
+
+<a href="#errors">jvmdiError</a>
+GetOwnedMonitorInfo(jthread thread, JVMDI_owned_monitor_info *infoPtr)</pre></blockquote>
+<P>
+Get information about the monitors owned by the 
+specified thread. The fields of the JVMDI_owned_monitor_info structure 
+are filled in with details of the owned monitors.
+If this function is called for a thread different than the current thread, 
+the specified thread must be suspended.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Use <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this and other features are supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to query
+<dt>infoPtr<dd>on return, filled with owned monitor information.
+Returned objects (array of owned monitors)
+are global references and must be explicitly freed with the JNI function <code>DeleteGlobalRef</code>.
+The <code>owned_monitors</code> buffer containing the array should be 
+freed with <code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</a></code>
+		<dd>
+		<code>thread</code> was invalid.
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+		<dd>
+		Invalid pointer.
+	<p><dt><code><A HREF="#JVMDI_ERROR_THREAD_NOT_SUSPENDED">JVMDI_ERROR_THREAD_NOT_SUSPENDED</A></code>
+		<dd>
+		<code>thread</code> must be suspended before calling.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        Optional feature not present in this VM.
+</dl></blockquote>
+<a name="GetCurrentContendedMonitor"></a>
+<hr noshade width=75%>
+<h3>Get Current Contended Monitor</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetCurrentContendedMonitor(jthread thread, jobject *monitorPtr)</pre></blockquote>
+<P>
+Get the object, if any, whose monitor the specified thread is waiting to 
+enter or waiting to regain through <code>java.lang.Object.wait</code>.
+If this function is called for a thread different than the current thread, 
+the specified thread must be suspended.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Use <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this and other features are supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to query
+<dt>monitorPtr<dd>on return, filled with the current contended monitor, or
+NULL if there is none.
+The contended monitor object is a global reference and must be explicitly freed 
+with the JNI function <code>DeleteGlobalRef</code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</a></code>
+		<dd>
+		<code>thread</code> was invalid.
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+		<dd>
+		Invalid pointer.
+	<p><dt><code><A HREF="#JVMDI_ERROR_THREAD_NOT_SUSPENDED">JVMDI_ERROR_THREAD_NOT_SUSPENDED</A></code>
+		<dd>
+		<code>thread</code> must be suspended before calling.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        Optional feature not present in this VM.
+</dl></blockquote>
+<a name="RunDebugThread"></a>
+<hr noshade width=75%>
+<h3>Run Debug Thread</h3>
+<blockquote><pre>
+typedef void (*JVMDI_StartFunction)(void *);
+<a href="#errors">jvmdiError</a>
+RunDebugThread(jthread thread, JVMDI_StartFunction proc, void *arg, int priority);</pre></blockquote>
+<p>
+Starts the execution of a debugger thread. with the specified native function.
+The start function is given the single argument, <code>arg</code>,
+and the specified
+priority. This function allows the creation of debugger threads 
+for handling communication with another process or for handling events 
+without the need to load a special subclass of java.lang.Thread or 
+implementor of java.lang.Runnable. Instead, the created thread can completely
+native. However, the created thread does require a newly created instance
+of java.lang.Thread (referenced by the argument <code>thread</code>) to 
+which it will be associated.
+The thread object can be created with JNI calls, but it is recommended that
+all such calls to Java programming language
+code be done during debugger initialization
+to avoid any interaction with the application being debugged.
+<p>
+The new thread is started as a daemon thread. 
+<p>
+Upon execution of <code>proc</code>, the new thread will be attached to the
+VM.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>the thread to run
+<dt>proc<dd>the start function
+<dt>arg<dd>the argument to the start function
+<dt>priority<dd>the priority of the started thread. Any thread
+priority allowed by java.lang.Thread.setPriority can be used including
+<blockquote><ul compact>
+    <li><code>JVMDI_THREAD_MIN_PRIORITY</code>
+    <li><code>JVMDI_THREAD_NORM_PRIORITY</code>
+    <li><code>JVMDI_THREAD_MAX_PRIORITY</code>
+</ul></blockquote>
+</dl></blockquote>
+<p>
+This function returns one of the following error codes:
+<blockquote><dl>
+     <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+	    	<dd>
+			Invalid pointer.
+     <p><dt><code><a href="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</a></code>
+			 <dd>
+			 <code>thread</code> was invalid.
+  <p><dt><code><a href="#JVMDI_ERROR_INVALID_PRIORITY">JVMDI_ERROR_INVALID_PRIORITY</a></code>
+</dl></blockquote>
+<a name=thread_groups></a>
+<p><hr noshade size=3>
+<h2>Thread Groups</h2>
+<a name="GetTopThreadGroups"></a>
+<hr noshade width=75%>
+<h3>Get Top Thread Groups</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetTopThreadGroups(jint *groupCountPtr, jthreadGroup **groupsPtr)</pre></blockquote>
+<P>
+Return all top-level (parentless) thread groups in the VM.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>groupCountPtr<dd>on return, points to the number of top-level thread groups
+<dt>groupsPtr<dd>on return, refers to a pointer to the top-level thread group array.
+Returned group array contains 
+global references which must be explicitly freed with the JNI function
+<code>DeleteGlobalRef</code>.
+The group array array buffer should be 
+freed with <code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns one of the following error codes:
+<blockquote><dl>
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+			<dd>
+			Invalid pointer.
+</dl></blockquote>
+<a name="GetThreadGroupInfo"></a>
+<hr noshade width=75%>
+<h3>Get Thread Group Info</h3>
+<blockquote><pre>
+typedef struct {
+    jthreadGroup parent;
+    char *name;             /* Name in UTF-8 */
+    jint  max_priority;
+    jboolean is_daemon;
+} JVMDI_thread_group_info;
+
+<a href="#errors">jvmdiError</a>
+GetThreadGroupInfo(jthreadGroup group, JVMDI_thread_group_info *infoPtr)</pre></blockquote>
+<p>
+Get information about the thread group. The fields of the 
+JVMDI_thread_group_info structure 
+are filled in with details of the specified thread group.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>group<dd>the thread group to query
+<dt>infoPtr<dd>on return, filled with information describing the specified
+thread group. 
+The returned thread group parent
+is a global references and must be explicitly freed with the JNI 
+function <code>DeleteGlobalRef</code>.
+The returned thread group name string should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns one of the following error codes:
+<blockquote><dl>
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+			<dd>
+			Invalid pointer.
+	<p><dt><code><a href="#JVMDI_ERROR_INVALID_THREAD_GROUP">JVMDI_ERROR_INVALID_THREAD_GROUP</a></code>
+</dl></blockquote>
+<a name="GetThreadGroupChildren"></a>
+<hr noshade width=75%>
+<h3>Get Thread Group Children</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetThreadGroupChildren(jthreadGroup group,
+                 jint *threadCountPtr, jthread **threadsPtr,
+                 jint *groupCountPtr, jthreadGroup **groupsPtr)
+</pre></blockquote>
+Get the threads and thread groups created within the given thread group.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>group<dd>the group to query.
+<dt>threadCountPtr<dd>on return, points to the number of owned threads
+<dt>threadsPtr<dd>on return, refers to a pointer to the owned thread array.
+Returned thread array contains 
+global references which must be explicitly freed with the JNI function
+<code>DeleteGlobalRef</code>.
+The thread array buffer should be 
+freed with <code><a href="#Deallocate">Deallocate</a></code>
+<dt>groupCountPtr<dd>on return, points to the number of child thread groups
+<dt>groupsPtr<dd>on return, refers to a pointer to the child thread group array.
+Returned group array contains 
+global references which must be explicitly freed with the JNI function
+<code>DeleteGlobalRef</code>.
+The group array array buffer should be 
+freed with <code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns one of the following error codes:
+<blockquote><dl>
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+			<dd>
+			Invalid pointer.
+	<p><dt><code><a href="#JVMDI_ERROR_INVALID_THREAD_GROUP">JVMDI_ERROR_INVALID_THREAD_GROUP</a></code>
+</dl></blockquote>
+<a name=stack></a>
+<p><hr noshade size=3>
+<h2>Stack Frame Access</h2>
+<a name="GetFrameCount"></a>
+<hr noshade width=75%>
+<h3>Get Thread's Frame Count</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetFrameCount(jthread thread, jint *countPtr)</pre></blockquote>
+<p>
+Get the number of frames currently in the specified thread's call stack.
+<p>
+If this function is called for a thread different than the current thread, 
+the specified thread must be suspended.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>The thread to query
+<dt>countPtr<dd>on return, points to the number of frames in the call stack.
+</dl></blockquote>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+        <dd>
+        <code>thread</code> was invalid.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_THREAD_NOT_SUSPENDED">JVMDI_ERROR_THREAD_NOT_SUSPENDED</A></code>
+        <dd>
+        Thread was not suspended.
+        
+</dl></blockquote>
+<a name="GetCurrentFrame"></a>
+<hr noshade width=75%>
+<h3>Get Thread's Current Frame</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetCurrentFrame(jthread thread, jframeID *framePtr)</pre></blockquote>
+<p>
+Get the <code>jframeID</code> value for the current stack frame of
+<code>thread</code> and return via
+<code>framePtr</code>.
+<p>
+If this function is called for a thread different than the current thread, 
+the specified thread must be suspended.
+The returned frame ID value
+remains valid only until <code>thread</code> continues executing.
+The thread must be in a Java programming language or JNI method.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>The thread to query
+<dt>framePtr<dd>on return, points to the frame ID for the current stack frame
+of this thread.
+</dl></blockquote>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+        <dd>
+        <code>thread</code> was invalid.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_THREAD_NOT_SUSPENDED">JVMDI_ERROR_THREAD_NOT_SUSPENDED</A></code>
+        <dd>
+        Thread was not suspended.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NO_MORE_FRAMES">JVMDI_ERROR_NO_MORE_FRAMES</A></code>
+        <dd>
+        There are no more Java programming language or JNI frames on the call stack.
+        
+</dl></blockquote>
+<a name="PopFrame"></a>
+<hr noshade width=75%>
+<h3>Pop Frame from Thread's Stack</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+PopFrame(jthread thread)</pre></blockquote>
+<p>
+Pop the topmost stack frame of <code>thread</code>'s stack.
+Popping a frame takes you to the frame for the caller of
+the topmost stack frame..  
+When the thread is resumed, the thread state is reset to the state
+immediately before the called method was invoked:
+the operand stack is restored (objectref if appropriate 
+and arguments are added back), 
+note however, that any changes to the arguments, which
+occurred in the called method, remain; 
+when execution continues, the first instruction to 
+execute will be the invoke. 
+<p>
+Between calling <code>PopFrame</code> and resuming the 
+thread the state of the stack is undefined.  
+To pop frames beyond the first, 
+these three steps must be repeated:
+<ul>
+<li>suspend the thread via an event (step, breakpoint, ...)
+<li>call <code>PopFrame</code>
+<li>resume the thread
+</ul>
+<p>
+Locks acquired by a popped frame are released when it is popped. This
+applies to synchronized methods that are popped, and to any synchronized
+blocks within them.
+<p>
+Finally blocks are not executed.
+<p>
+Changes to global state are not addressed.
+<p>
+If this function is called for a thread different than the current thread, 
+the specified thread must be suspended.
+The thread must be in a Java programming language or JNI method.
+<p>
+All frame IDs for this thread are invalidated.
+<p>
+No JVMDI events are generated by this function.
+<p>
+Native frames may not be popped, nor may a Java frame be popped if
+its caller is native code.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Examine <code>can_pop_frame</code> of
+ <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this feature is supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>thread<dd>The thread whose top frame is to be popped.
+</dl></blockquote>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+        <dd>
+        <code>thread</code> was invalid.
+    <p><dt><code><A HREF="#JVMDI_ERROR_OPAQUE_FRAME">JVMDI_ERROR_OPAQUE_FRAME</A></code>
+            <dd>
+        <code>frame</code> is a native frame.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_THREAD_NOT_SUSPENDED">JVMDI_ERROR_THREAD_NOT_SUSPENDED</A></code>
+        <dd>
+        Thread was not suspended or current thread.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NO_MORE_FRAMES">JVMDI_ERROR_NO_MORE_FRAMES</A></code>
+        <dd>
+        There are no more Java programming language frames on the call stack.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        This functionality is not implemented (can_pop_frame capability
+        is false).
+        
+</dl></blockquote>
+<a name="GetCallerFrame"></a>
+<hr noshade width=75%>
+<h3>Get Caller Frame</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetCallerFrame(jframeID called, jframeID *framePtr)
+</pre></blockquote>
+For <code>frame</code>, return the frame that called it via
+<code>framePtr</code>.
+Both <code>called</code> and the caller must be in a Java programming language or JNI
+method.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>called<dd>the called frame.
+<dt>framePtr<dd>on return, points to the frame ID for the calling frame.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FRAMEID">JVMDI_ERROR_INVALID_FRAMEID</A></code>
+            <dd>
+        Invalid <code>jframeID</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NO_MORE_FRAMES">JVMDI_ERROR_NO_MORE_FRAMES</A></code>
+        <dd>
+        The caller frame is not in a Java programming language or JNI method.
+</dl></blockquote>
+<a name="GetFrameLocation"></a>
+<hr noshade width=75%>
+<h3>Frame Location</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetFrameLocation(jframeID frame, jclass *classPtr, jmethodID *methodPtr,
+                       jlocation *locationPtr)</pre></blockquote>
+<p>
+For a Java programming language frame, return the location of the instruction
+currently executing.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>frame<dd>the frame to query.
+<dt>classPtr<dd>on return, points to the class for the current location.
+The returned class is a JNI global reference must be explicitly freed
+with the JNI function <code>DeleteGlobalRef</code>. 
+<dt>methodPtr<dd>on return, points to the method for the current location.
+<dt>locationPtr<dd>on return, points to the index of the currently 
+executing instruction.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FRAMEID">JVMDI_ERROR_INVALID_FRAMEID</A></code>
+            <dd>
+        <code>frame</code> is not a valid frame ID.
+</dl></blockquote>
+<a name="NotifyFramePop"></a>
+<hr noshade width=75%>
+<h3>Notify Frame Pop</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+NotifyFramePop(jframeID frame); 
+</pre></blockquote>
+When <code>frame</code> is popped from the stack, generate a
+<code>JVMDI_EVENT_FRAME_POP</code> event. See <a href=#events>Events</a>.
+</blockquote>
+<p>
+Parameters:
+<blockquote><dl>
+<dt>frame<dd>the frame for which the frame pop event will be generated.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FRAMEID">JVMDI_ERROR_INVALID_FRAMEID</A></code>
+            <dd>
+        <code>frame</code> is not a valid frame ID.
+</dl></blockquote>
+<a name=local></a>
+<p><hr noshade size=3>
+<h2>Local Variable Access</h2>
+<a name="GetLocalVariable"></a>
+<hr noshade width=75%>
+<h3>Get Local Variable</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetLocalObject(jframeID frame, jint slot, jobject *valuePtr)</pre></blockquote>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetLocalInt(jframeID frame, jint slot, jint *valuePtr)</pre></blockquote>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetLocalLong(jframeID frame, jint slot, jlong *valuePtr)</pre></blockquote>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetLocalFloat(jframeID frame, jint slot, jfloat *valuePtr)</pre></blockquote>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetLocalDouble(jframeID frame, jint slot, jdouble *valuePtr)</pre></blockquote>
+<p>
+These functions are used to retrieve the value of a local variable. 
+<code>GetLocalInt</code> can be used to retrieve int, char, byte, and 
+boolean values. The variable is identified by the frame containing its
+value and the variable's slot number. The mapping of variables to 
+slot numbers can be obtained with the function 
+<a href="#GetLocalVariableTable"><code>GetLocalVariableTable</code></a>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>frame<dd>the frame containing the variable's value.
+<dt>slot<dd>the variable's slot number.
+<dt>valuePtr<dd>on return, points to the variable's value. For GetLocalObject,
+the returned value is a global reference 
+and must be explicitly freed with the JNI function <code>DeleteGlobalRef()</code>.
+</dl></blockquote>
+
+<p>
+The functions return one of the following error codes:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FRAMEID">JVMDI_ERROR_INVALID_FRAMEID</A></code>
+        <dd>
+        Invalid <code>frame</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_SLOT">JVMDI_ERROR_INVALID_SLOT</A></code>
+        <dd>
+        Invalid <code>slot</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_TYPE_MISMATCH">JVMDI_ERROR_TYPE_MISMATCH</A></code>
+            <dd>
+        The variable is not an appropriate type for the function used.
+	<p><dt><code><a href="#JVMDI_ERROR_OPAQUE_FRAME">JVMDI_ERROR_OPAQUE_FRAME</a></code>
+</dl></blockquote>
+<a name="SetLocalVariable"></a>
+<hr noshade width=75%>
+<h3>Set Local Variable</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetLocalObject(jframeID frame, jint slot, jobject value)</pre></blockquote>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetLocalInt(jframeID frame, jint slot, jint value)</pre></blockquote>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetLocalLong(jframeID frame, jint slot, jlong value)</pre></blockquote>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetLocalFloat(jframeID frame, jint slot, jfloat value)</pre></blockquote>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetLocalDouble(jframeID frame, jint slot, jdouble value)</pre></blockquote>
+<p>
+These functions are used to set the value of a local variable. 
+<code>SetLocalInt</code> can be used to set int, char, byte, and 
+boolean values. The variable is identified by the frame containing its
+value and the variable's slot number. The mapping of variables to 
+slot numbers can be obtained with the function 
+<a href="#GetLocalVariableTable"><code>GetLocalVariableTable</code></a>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>frame<dd>the frame containing the variable's value.
+<dt>slot<dd>the variable's slot number.
+<dt>value<dd>the new value for the variable
+</dl></blockquote>
+<p>
+The functions return one of the following error codes:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_OPAQUE_FRAME">JVMDI_ERROR_OPAQUE_FRAME</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FRAMEID">JVMDI_ERROR_INVALID_FRAMEID</A></code>
+        <dd>
+        Invalid <code>frame</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_SLOT">JVMDI_ERROR_INVALID_SLOT</A></code>
+        <dd>
+        Invalid <code>slot</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_TYPE_MISMATCH">JVMDI_ERROR_TYPE_MISMATCH</A></code>
+            <dd>
+        The variable is not an appropriate type for the function used.
+</dl></blockquote>
+<a name=breakpoint></a>
+<p><hr noshade size=3>
+<h2>Breakpoints</h2>
+<a name="SetBreakpoint"></a>
+<hr noshade width=75%>
+<h3>Set a Breakpoint</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetBreakpoint(jclass clazz, jmethodID method, jlocation location)</pre></blockquote>
+<p>
+Set a breakpoint at the instruction indicated by <code>clazz</code>,
+<code>method</code>, and <code>location</code>.
+An instruction can only have one breakpoint.
+<p>
+Whenever the designated instruction is about to be executed, a
+<code>JVMDI_EVENT_BREAKPOINT</code> event is generated. See 
+<a href=#events>Events</a>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class in which to set the breakpoint
+<dt>method<dd>the method in which to set the breakpoint
+<dt>location<dd>the index of the instruction at which to set the breakpoint
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_LOCATION">JVMDI_ERROR_INVALID_LOCATION</A></code>
+            <dd>
+        Invalid location.
+    <p><dt><code><A HREF="#JVMDI_ERROR_DUPLICATE">JVMDI_ERROR_DUPLICATE</A></code>
+            <dd>
+        The designated bytecode already has a breakpoint.
+</dl></blockquote>
+<a name="ClearBreakpoint"></a>
+<hr noshade width=75%>
+<h3>Clear a Breakpoint</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+ClearBreakpoint(jclass clazz, jmethodID method, jlocation location)
+</pre></blockquote>
+<p>
+Clear the breakpoint at the bytecode indicated by <code>clazz</code>,
+<code>method</code>, and <code>location</code>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class in which to clear the breakpoint
+<dt>method<dd>the method in which to clear the breakpoint
+<dt>location<dd>the index of the instruction at which to clear the breakpoint
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_LOCATION">JVMDI_ERROR_INVALID_LOCATION</A></code>
+            <dd>
+        Invalid location.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_FOUND">JVMDI_ERROR_NOT_FOUND</A></code>
+            <dd>
+        There's no breakpoint at the designated bytecode.
+</dl></blockquote>
+<a name="ClearAllBreakpoints"></a>
+<hr noshade width=75%>
+<h3>Clear All Breakpoints</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+ClearAllBreakpoints()
+</pre></blockquote>
+Clear all breakpoints in this virtual machine.
+<p>
+<a name=fieldWatch></a>
+<p><hr noshade size=3>
+<h2>Watched Fields</h2>
+<a name="SetFieldAccessWatch"></a>
+<hr noshade width=75%>
+<h3>Set a Field Access Watch</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetFieldAccessWatch(jclass clazz, jfieldID field)</pre></blockquote>
+<p>
+Generate a JVMDI_EVENT_FIELD_ACCESS <a href=#events>event</a> 
+when the field specified
+by <code>clazz</code> and
+<code>field</code> is about to be accessed.
+An event will be generated for each access of the field
+until it is cancelled with 
+<a href="#ClearFieldAccessWatch">ClearFieldAccessWatch</a>.
+Field accesses from Java programming language code or from JNI are watched,
+fields modified by other means are not watched.
+Note that JVMDI users should be aware that their own field accesses
+will trigger the watch.
+A field can only have one field access watch set.
+Modification of a field is not considered an access - use 
+<a href="#SetFieldModificationWatch">SetFieldModificationWatch</a>
+to monitor modifications.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Use <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this and other features are supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class containing the field to watch
+<dt>field<dd>the field to watch
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FIELDID">JVMDI_ERROR_INVALID_FIELDID</A></code>
+            <dd>
+        The jfieldID specified in <code>field</code> is not a valid field ID.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        The jclass specified in <code>clazz</code> is no a valid class.
+    <p><dt><code><A HREF="#JVMDI_ERROR_DUPLICATE">JVMDI_ERROR_DUPLICATE</A></code>
+            <dd>
+        The designated field is already being watched for accesses.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        Optional feature not present in this VM.
+</dl></blockquote>
+<p>
+<a name="ClearFieldAccessWatch"></a>
+<hr noshade width=75%>
+<h3>Clear a Field Access Watch</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+ClearFieldAccessWatch(jclass clazz, jfieldID field)</pre></blockquote>
+<p>
+Cancel a field access watch previously set by 
+<a href="#SetFieldAccessWatch">SetFieldAccessWatch</a>, on the 
+field specified
+by <code>clazz</code> and
+<code>field</code>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class containing the field to watch
+<dt>field<dd>the field to watch
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FIELDID">JVMDI_ERROR_INVALID_FIELDID</A></code>
+            <dd>
+        The jfieldID specified in <code>field</code> is not a valid field ID.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        The jclass specified in <code>clazz</code> is no a valid class.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_FOUND">JVMDI_ERROR_NOT_FOUND</A></code>
+            <dd>
+        The designated field is not being watched for accesses.
+</dl></blockquote>
+<p><a name="SetFieldModificationWatch"></a>
+<hr noshade width=75%>
+<h3>Set a Field Modification Watch</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetFieldModificationWatch(jclass clazz, jfieldID field)</pre></blockquote>
+<p>
+Generate a JVMDI_EVENT_FIELD_MODIFICATION <a href=#events>event</a> 
+when the field specified
+by <code>clazz</code> and
+<code>field</code> is about to be modified.
+An event will be generated for each modification of the field
+until it is cancelled with 
+<a href="#ClearFieldModificationWatch">ClearFieldModificationWatch</a>.
+Field modifications from Java programming language code or from JNI are watched,
+fields modified by other means are not watched.
+Note that JVMDI users should be aware that their own field modifications
+will trigger the watch.
+A field can only have one field modification watch set.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Use <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this and other features are supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class containing the field to watch
+<dt>field<dd>the field to watch
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FIELDID">JVMDI_ERROR_INVALID_FIELDID</A></code>
+            <dd>
+        The jfieldID specified in <code>field</code> is not a valid field ID.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        The jclass specified in <code>clazz</code> is no a valid class.
+    <p><dt><code><A HREF="#JVMDI_ERROR_DUPLICATE">JVMDI_ERROR_DUPLICATE</A></code>
+            <dd>
+        The designated field is already being watched for modifications.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        Optional feature not present in this VM.
+</dl></blockquote>
+<p>
+<a name="ClearFieldModificationWatch"></a>
+<hr noshade width=75%>
+<h3>Clear a Field Modification Watch</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+ClearFieldModificationWatch(jclass clazz, jfieldID field)</pre></blockquote>
+<p>
+Cancel a field modification watch previously set by 
+<a href="#SetFieldModificationWatch">SetFieldModificationWatch</a>, on the 
+field specified
+by <code>clazz</code> and
+<code>field</code>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class containing the field to watch
+<dt>field<dd>the field to watch
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FIELDID">JVMDI_ERROR_INVALID_FIELDID</A></code>
+            <dd>
+        The jfieldID specified in <code>field</code> is not a valid field ID.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        The jclass specified in <code>clazz</code> is no a valid class.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_FOUND">JVMDI_ERROR_NOT_FOUND</A></code>
+            <dd>
+        The designated field is not being watched for modifications.
+</dl></blockquote>
+<p>
+<a name=class></a>
+<p><hr noshade size=3>
+<h2>Class Information</h2>
+<a name="GetClassSignature"></a>
+<hr noshade width=75%>
+<h3>Class Signature</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetClassSignature(jclass clazz, char **sigPtr)
+</pre></blockquote>
+For the class indicated by <code>clazz</code>, return the class signature
+via <code>sigPtr</code>. The return value is a UTF-8 string. 
+<p>
+The returned signature for primitive classes (for example, java.lang.Integer.TYPE) 
+is the signature of the corresponding primitive type (for example, "I").
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>sigPtr<dd>on return, refers to a pointer to the class's signature (UTF-8).
+The returned signature string should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetClassStatus"></a>
+<hr noshade width=75%>
+<h3>Class Status</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetClassStatus(jclass clazz, jint *statusPtr)
+</pre></blockquote>
+Get the status of the class. Zero or more of the following bits can be 
+set.
+<blockquote><dl>
+<dt><code>JVMDI_CLASS_STATUS_VERIFIED</code>
+<dd>Class bytecodes have been verified.
+<dt><code>JVMDI_CLASS_STATUS_PREPARED</code>
+<dd>Class preparation is complete.
+<dt><code>JVMDI_CLASS_STATUS_INITIALIZED</code>
+<dd>Class initialization is complete. Static initializer has been run.
+<dt><code>JVMDI_CLASS_STATUS_ERROR</code>
+<dd>Error during initialization makes class unusable.
+</dl></blockquote></blockquote>
+<p>
+The status value for primitive classes (for example, java.lang.Integer.TYPE) 
+and for arrays is undefined.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>statusPtr<dd>on return, points to the current state of this class as one or 
+more of flags described above.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+			<dd>
+			Invalid pointer.
+	<p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+			<dd>
+			Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetSourceFileName"></a>
+<hr noshade width=75%>
+<h3>Source File Name</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetSourceFileName(jclass clazz, char **sourceNamePtr)
+</pre></blockquote>
+For the class indicated by <code>clazz</code>, return the source file
+name via <code>sourceNamePtr</code>. The returned UTF-8 string 
+is a file name only and never contains a directory name. 
+<p>
+For primitive classes (for example, java.lang.Integer.TYPE) 
+and for arrays this function returns 
+<A HREF="#JVMDI_ERROR_ABSENT_INFORMATION">JVMDI_ERROR_ABSENT_INFORMATION</A>.
+
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>sourceNamePtr<dd>on return, refers to a pointer to the class's source
+file name (UTF-8).
+The returned file name string should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_ABSENT_INFORMATION">JVMDI_ERROR_ABSENT_INFORMATION</A></code>
+	    <dd>
+	    Class information does not include a source path. This includes
+            the case where the class is an array class or primitive class.
+</dl></blockquote>
+<a name="GetClassModifiers"></a>
+<hr noshade width=75%>
+<h3>Class Modifier Flags</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetClassModifiers(jclass clazz, jint *modifiersPtr)
+</pre></blockquote>
+For the class indicated by <code>clazz</code>, return the access
+flags
+via <code>modifiersPtr</code>.
+<a href=http://java.sun.com/docs/books/vmspec/2nd-edition/html/ClassFile.doc.html#23242>Access flag</a>
+definitions and information about
+<a href=http://java.sun.com/docs/books/vmspec/2nd-edition/html/Concepts.doc.html#20340>class modifiers</a>
+can be found in the
+<a href=http://java.sun.com/docs/books/vmspec/>Java
+virtual machine specification</a>.
+<p>
+If the class is an array class, then its public, private and protected 
+modifiers are the same as those of its component type. For arrays of 
+primitives, this component type is represented by one of the primitive 
+classes (for example, java.lang.Integer.TYPE). 
+<p>
+If the class is a primitive class, its public modifier is always true, 
+and its protected and private modifiers are always false. 
+<p>
+If the class is an array class or a primitive class then its final 
+modifier is always true and its interface modifier is always false. 
+The values of its other modifiers are not determined by this specification. 
+
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>modifiersPtr<dd>on return, points to the current access flags of this class.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetClassMethods"></a>
+<hr noshade width=75%>
+<h3>Class Methods</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetClassMethods(jclass clazz, jint *methodCountPtr, jmethodID **methodsPtr)
+</pre></blockquote>
+For the class indicated by <code>clazz</code>, return a count of
+methods via <code>methodCountPtr</code> and a list of
+method IDs via <code>methodsPtr</code>. The method list contains 
+constructors and static initializers as well as true methods.
+Only directly declared methods are returned (not inherited methods).
+Methods are returned in the order they occur in the class file.
+An empty method list is returned for array classes and primitive classes
+(for example, java.lang.Integer.TYPE).
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>methodCountPtr<dd>on return, points to the number of methods declared in this class.
+<dt>methodsPtr<dd>on return, points to the method ID array.
+The JVMDI allocator provides
+memory for the array. You must deallocate the array using
+<code>Deallocate()</code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_CLASS_NOT_PREPARED">JVMDI_ERROR_CLASS_NOT_PREPARED</A></code>
+</dl></blockquote>
+<a name="GetClassFields"></a>
+<hr noshade width=75%>
+<h3>Class Fields</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetClassFields(jclass clazz, jint *fieldCountPtr, jfieldID **fieldsPtr)
+</pre></blockquote>
+For the class indicated by <code>clazz</code>, return a count of fields
+via <code>fieldCountPtr</code> and a list of field IDs via
+<code>fieldsPtr</code>.
+Only directly declared fields are returned (not inherited fields).
+Fields are returned in the order they occur in the class file.
+An empty field list is returned for array classes and primitive classes
+(for example, java.lang.Integer.TYPE).
+Use JNI to determine the length of an array.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>fieldCountPtr<dd>on return, points to the number of fields declared in this class.
+<dt>fieldsPtr<dd>on return, points to the field ID array.
+The JVMDI allocator provides
+memory for the array. You must deallocate it using
+<code>Deallocate()</code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_CLASS_NOT_PREPARED">JVMDI_ERROR_CLASS_NOT_PREPARED</A></code>
+</dl></blockquote>
+<a name="GetImplementedInterfaces"></a>
+<hr noshade width=75%>
+<h3>Implemented Interfaces</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetImplementedInterfaces(jclass clazz,
+                       jint *interfaceCountPtr, 
+                       jclass **interfacesPtr);
+</blockquote></pre>
+Return the direct super-interfaces of this class. For a class, this 
+function returns the interfaces declared in its <code>implements</code>
+clause. For an interface, this function returns the interfaces declared in
+its <code>extends</code> clause.
+An empty interface list is returned for array classes and primitive classes
+(for example, java.lang.Integer.TYPE).
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>interfaceCountPtr<dd>on return, points to the number of interfaces.
+<dt>interfacesPtr<dd>on return, points to the interface array.
+Interfaces in the array are JNI global references and must be explicitly
+freed with the JNI function <code>DeleteGlobalRef</code>. 
+The returned interface array should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_CLASS_NOT_PREPARED">JVMDI_ERROR_CLASS_NOT_PREPARED</A></code>
+</dl></blockquote>
+
+<a name="IsInterface"></a>
+<hr noshade width=75%>
+<h3>Is an Interface</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+IsInterface(jclass clazz, jboolean *isInterfacePtr)
+</pre></blockquote>
+Determines whether a class object reference represents an interface.
+The <code>jboolean</code> result is
+<code>JNI_TRUE</code> if the "class" is actually an interface,
+<code>JNI_FALSE</code> otherwise. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>isInterfacePtr<dd>on return, points to the boolean result of this function.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="IsArrayClass"></a>
+<hr noshade width=75%>
+<h3>Is an Array</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+IsArrayClass(jclass clazz, jboolean *isArrayClassPtr)
+</pre></blockquote>
+Determines whether a class object reference represents an array.
+The <code>jboolean</code> result is
+<code>JNI_TRUE</code> if the class is an array,
+<code>JNI_FALSE</code> otherwise. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>isArrayClassPtr<dd>on return, points to the boolean result of this function.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetClassLoader"></a>
+<hr noshade width=75%>
+<h3>Class Loader</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetClassLoader(jclass clazz, jobject *classloaderPtr)
+</pre></blockquote>
+For the class indicated by <code>clazz</code>, return via
+<code>classloaderPtr</code> a reference to the class loader for the
+class. If the class was not created by a class loader,
+<code>classloaderPtr</code> points to <code>NULL</code>. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>classloaderPtr<dd>on return, points to the class loader that loaded
+this class or interface, or NULL if there it has no class loader. The
+returned classloader 
+is a JNI global reference and
+must be explicitly freed with the JNI function
+<code>DeleteGlobalRef</code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+			<dd>
+			Invalid pointer.
+	<p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+			<dd>
+			Invalid <code>clazz</code>.
+</dl></blockquote>
+
+<a name="GetSourceDebugExtension"></a>
+<hr noshade width=75%>
+<h3>Source Debug Extension</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetSourceDebugExtension(jclass clazz, char **sourceDebugExtensionPtr)
+</pre></blockquote>
+For the class indicated by <code>clazz</code>, return the debug extension via <code>sourceDebugExtensionPtr</code>. The returned UTF-8 string 
+contains exactly the debug extension information present in the
+class file of <code>clazz</code>. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>sourceDebugExtensionPtr<dd>on return, refers to a pointer to the class's debug extension name (UTF-8).
+The returned debug extension string should be freed with 
+<code>Deallocate</code>
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+			<dd>
+			Invalid pointer.
+	<p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+			<dd>
+			Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_ABSENT_INFORMATION">JVMDI_ERROR_ABSENT_INFORMATION</A></code>
+	    <dd>
+	    Class information does not include a debug extension.
+</dl></blockquote>
+<a name=object></a>
+<p><hr noshade size=3>
+<h2>Object Information</h2>
+<a name="GetObjectHashCode"></a>
+<hr noshade width=75%>
+<h3>Object Hash Code</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetObjectHashCode(jobject object, jint *hashCodePtr) 
+</pre></blockquote>
+For the object indicated by <code>object</code>
+return via <code>hashCodePtr</code> a hash code that can be used in 
+maintaining hash table of object references. This function guarantees 
+the same  hash code value for a particular object throughout its life
+<p>
+Parameters:
+<blockquote><dl>
+<dt>object<dd>the object to query
+<dt>hashCodePtr<dd>on return, points to the object's hash code
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_OBJECT">JVMDI_ERROR_INVALID_OBJECT</A></code>
+            <dd>
+        Invalid <code>object</code>.
+</dl></blockquote>
+<a name="GetMonitorInfo"></a>
+<hr noshade width=75%>
+<h3>Get Monitor Info</h3>
+<blockquote><pre>
+typedef struct {
+    jthread owner;
+    jint entry_count;
+    jint waiter_count;
+    jthread *waiters;
+} JVMDI_monitor_info;
+
+<a href="#errors">jvmdiError</a>
+GetMonitorInfo(jobject object, JVMDI_monitor_info *infoPtr)</pre></blockquote>
+<P>
+Get information about the the object's monitor
+The fields of the JVMDI_owned_monitor_info structure 
+are filled in with details of the monitor.
+Each thread that might affect the monitor state must either be suspended
+or must be the current thread.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Use <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this and other features are supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>object<dd>the object to query
+<dt>infoPtr<dd>on return, filled with monitor information for the 
+specified object.
+Returned objects (owner, array of waiters)
+are global references and must be explicitly freed with the JNI 
+function <code>DeleteGlobalRef</code>.
+The returned waiter array buffer should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_OBJECT">JVMDI_ERROR_INVALID_OBJECT</a></code>
+		<dd>
+		<code>thread</code> was invalid.
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+		<dd>
+		Invalid pointer.
+	<p><dt><code><A HREF="#JVMDI_ERROR_THREAD_NOT_SUSPENDED">JVMDI_ERROR_THREAD_NOT_SUSPENDED</A></code>
+		<dd>
+		thread must be suspended before calling.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        Optional feature not present in this VM.
+</dl></blockquote>
+<a name=field></a>
+<p><hr noshade size=3>
+<h2>Field Information</h2>
+<a name="GetFieldName"></a>
+<hr noshade width=75%>
+<h3>Field Name and Signature</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetFieldName(jclass clazz, jfieldID field, 
+                   char **namePtr, char **signaturePtr)
+</pre></blockquote>
+For the field indicated by <code>clazz</code> and <code>field</code>,
+return the field name via <code>namePtr</code> and field signature via
+<code>signaturePtr</code>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>field<dd>the field to query
+<dt>namePtr<dd>on return, refers to a pointer to the UTF-8 field name.
+The string should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+<dt>signaturePtr<dd>on return, refers to a pointer to the UTF-8 field signature.
+The string should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FIELDID">JVMDI_ERROR_INVALID_FIELDID</A></code>
+            <dd>
+        Invalid <code>field</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetFieldDeclaringClass"></a>
+<hr noshade width=75%>
+<h3>Field Declaring Class</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetFieldDeclaringClass(jclass clazz, jfieldID field, jclass *declaringClassPtr)
+</pre></blockquote>
+For the field indicated by <code>clazz</code> and <code>field</code>
+return the class that defined it via <code>declaringClassPtr</code>.
+The declaring class will either be <code>clazz</code>. a superclass, or
+an implemented interface.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>field<dd>the field to query
+<dt>declaringClassPtr<dd>on return, points to the declaring class
+The returned class is a JNI global reference and
+must be explicitly freed with freed with the JNI 
+function <code>DeleteGlobalRef</code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FIELDID">JVMDI_ERROR_INVALID_FIELDID</A></code>
+            <dd>
+        Invalid <code>field</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetFieldModifiers"></a>
+<hr noshade width=75%>
+<h3>Field Modifier Flags</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetFieldModifiers(jclass clazz, jfieldID field, jint *modifiersPtr)
+</pre></blockquote>
+For the field indicated by <code>clazz</code> and <code>field</code>
+return the access flags via <code>modifiersPtr</code>.
+<a href=http://java.sun.com/docs/books/vmspec/2nd-edition/html/ClassFile.doc.html#2877>Access flag</a>
+definitions and information about
+<a href=http://java.sun.com/docs/books/vmspec/2nd-edition/html/Concepts.doc.html#29882>field modifiers</a>
+can be found in the
+<a href=http://java.sun.com/docs/books/vmspec/>Java
+virtual machine specification</a>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>field<dd>the field to query
+<dt>modifiersPtr<dd>on return, points to the access flags.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FIELDID">JVMDI_ERROR_INVALID_FIELDID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="IsFieldSynthetic"></a>
+<hr noshade width=75%>
+<h3>Is Field Synthetic</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+IsFieldSynthetic(jclass clazz, jfieldID field, jboolean *isSyntheticPtr)
+</pre></blockquote>
+<p>
+For the field indicated by <code>clazz</code> and <code>field</code>, return a
+value indicating whether the field is synthetic via <code>isSyntheticPtr</code>
+Synthetic fields are generated by the compiler but not present in the 
+original source code.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Use <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this and other features are supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>field<dd>the field to query
+<dt>isSyntheticPtr<dd>on return, points to the boolean result of this function.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_FIELDID">JVMDI_ERROR_INVALID_FIELDID</A></code>
+            <dd>
+        Invalid <code>field</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        Optional feature not present in this VM.
+</dl></blockquote>
+
+<a name=method></a>
+<p><hr noshade size=3>
+<h2>Method Information</h2>
+<a name="GetMethodName"></a>
+<hr noshade width=75%>
+<h3>Method Name and Signature</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetMethodName(jclass clazz, jmethodID method, 
+                    char **namePtr, char **signaturePtr)
+</pre></blockquote>
+<p>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return the method name via <code>namePtr</code> and method signature via
+<code>signaturePtr</code>.
+The signature is a JNI signature also called a method descriptor 
+in the Java Virtual Machine Specification; note this is different
+then method signature as defined in the Java Language Specification.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>namePtr<dd>on return, refers to a pointer to the UTF-8 method name.
+The string should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+<dt>signaturePtr<dd>on return, refers to a pointer to the UTF-8 method signature.
+The string should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetMethodDeclaringClass"></a>
+<hr noshade width=75%>
+<h3>Method Declaring Class</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetMethodDeclaringClass(jclass clazz, jmethodID method,
+                                 jclass *declaringClassPtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return the Class that defined it via <code>declaringClassPtr</code>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>declaringClassPtr<dd>on return, points to the declaring class
+The returned class is a JNI global reference and
+must be explicitly freed with freed with the JNI 
+function <code>DeleteGlobalRef</code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetMethodModifiers"></a>
+<hr noshade width=75%>
+<h3>Method Modifier Flags</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetMethodModifiers(jclass clazz, jmethodID method,
+                         jint *modifiersPtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>
+return the access flags via <code>modifiersPtr</code>.
+<a href=http://java.sun.com/docs/books/vmspec/2nd-edition/html/ClassFile.doc.html#1522>Access flag</a>
+definitions and information about
+<a href=http://java.sun.com/docs/books/vmspec/2nd-edition/html/Concepts.doc.html#16348>method modifiers</a>
+can be found in the
+<a href=http://java.sun.com/docs/books/vmspec/>Java
+virtual machine specification</a>.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>modifiersPtr<dd>on return, points to the access flags.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetMaxStack"></a>
+<hr noshade width=75%>
+<h3>Maximum Stack</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetMaxStack(jclass clazz, jmethodID method, jint *maxPtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return via <code>maxPtr</code> the maximum number of words that can be
+on the stack while the method is executing. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>maxPtr<dd>on return, points to the maximum number of stack words
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetMaxLocals"></a>
+<hr noshade width=75%>
+<h3>Locals Slots</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetMaxLocals(jclass clazz, jmethodID method,
+                  jint *maxPtr);
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return via <code>maxPtr</code> the number of local variable slots used
+by the whole method.
+Note that two-word arguments use two slots.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>maxPtr<dd>on return, points to the maximum number of local slots
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetArgumentsSize"></a>
+<hr noshade width=75%>
+<h3>Argument Slots</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetArgumentsSize(jclass clazz, jmethodID method, jint *sizePtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return via <code>maxPtr</code> the number of local variable slots used
+by the method's arguments.
+Note that two-word arguments use two slots.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>sizePtr<dd>on return, points to the number of argument slots
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetLineNumberTable"></a>
+<hr noshade width=75%>
+<h3>Source Line Numbers</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetLineNumberTable(jclass clazz, jmethodID method,
+ 			 jint *entryCountPtr, 
+             JVMDI_line_number_entry **tablePtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return a table of source line number entries. The size of the table is
+returned via <code>entryCountPtr</code> and the table itself is
+returned via <code>tablePtr</code>. 
+A table entry is an instance of the following structure:
+<blockquote><pre>
+typedef struct {
+    jlocation start_location;
+    jint line_number;
+} JVMDI_line_number_entry;
+</blockquote></pre>
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>entryCountPtr<dd>on return, points to the number of entries in the table
+<dt>tablePtr<dd>on return, points to the line number table pointer.
+The JVMDI allocator provides space
+for the table. You must deallocate the table using
+<code>Deallocate()</code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <dt><code><A HREF="#JVMDI_ERROR_NONE">JVMDI_ERROR_NONE</A></code>
+        <dd>
+        No error.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_ABSENT_INFORMATION">JVMDI_ERROR_ABSENT_INFORMATION</A></code>
+	    <dd>
+	    Class information does not include line numbers.
+</dl></blockquote>
+<a name="GetMethodLocation"></a>
+<hr noshade width=75%>
+<h3>Method Location</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetMethodLocation(jclass clazz, jmethodID method,
+                        jlocation *startLocationPtr, 
+                        jlocation *endLocationPtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return the beginning and ending addresses through
+<code>startLocationPtr</code> and <code>endLocationPtr</code>. In a
+conventional byte code indexing scheme, these values are always zero
+and the byte code count minus one. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>startLocationPtr<dd>on return, points to the first location, or 
+-1 if location information is not available.
+<dt>endLocationPtr<dd>on return, points to the last location,
+or -1 if location information is not available.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_ABSENT_INFORMATION">JVMDI_ERROR_ABSENT_INFORMATION</A></code>
+	    <dd>
+	    Class information does not include method sizes.
+</dl></blockquote>
+<a name="GetLocalVariableTable"></a>
+<hr noshade width=75%>
+<h3>Local Variables</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetLocalVariableTable(jclass clazz, jmethodID method,
+                            jint *entryCountPtr, 
+                            JVMDI_local_variable_entry **tablePtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return a table of local variables.
+The size of the table is
+returned via <code>entryCountPtr</code> and the table itself is
+returned via <code>tablePtr</code>. 
+A table entry has this structure:
+<blockquote><pre>
+typedef struct {
+    jlocation start_location;   /* variable valid start_location */
+    jint length;                /* up to start_location+length */ 
+    char *name;                 /* name in UTF-8 */
+    char *signature;            /* type signature in UTF-8 */
+    jint slot;                  /* variable slot, see JVMDI_GetLocal*()  */
+} JVMDI_local_variable_entry;
+</pre></blockquote>
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>entryCountPtr<dd>on return, points to the number of entries in the table
+<dt>tablePtr<dd>on return, points to the local variable table pointer.
+The JVMDI allocator provides space
+for the table. In addition, each name and signature string
+in the table is allocated with the JVMDI allocator.
+You must deallocate these buffers using
+<a href="#Deallocate"><code>Deallocate</code></a>. 
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_ABSENT_INFORMATION">JVMDI_ERROR_ABSENT_INFORMATION</A></code>
+	    <dd>
+	    Class information does not include local variable
+	    information.
+</dl></blockquote>
+<a name="GetExceptionHandlerTable"></a>
+<hr noshade width=75%>
+<h3>Exception Handlers</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetExceptionHandlerTable(jclass clazz, jmethodID method,
+                               jint *entryCountPtr, 
+                               JVMDI_exception_handler_entry **tablePtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return a table of exception handlers.
+The size of the table is
+returned via <code>entryCountPtr</code> and the table itself is
+returned via <code>tablePtr</code>. 
+A table entry has this structure:
+<blockquote><pre>
+typedef struct {
+    jlocation start_location;
+    jlocation end_location;
+    jlocation handler_location;
+    jclass exception;           /* if null, all exceptions */
+} JVMDI_exception_handler_entry;
+</pre></blockquote>
+<p>
+A call to this function may trigger class loading for the thrown exception
+classes that have not yet been loaded. It should not be called while
+threads are suspended.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>entryCountPtr<dd>on return, points to the number of entries in the table
+<dt>tablePtr<dd>on return, points to the exception handler table pointer.
+The JVMDI allocator provides space
+for the table. You must deallocate the table using
+<code>Deallocate()</code>.
+The classes returned in the "exception" field of JVMDI_exception_handler_entry are global 
+references and must be explicitly freed 
+with the JNI function
+<a href="#Deallocate"><code>Deallocate</code></a></dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="GetThrownExceptions"></a>
+<hr noshade width=75%>
+<h3>Thrown Exceptions</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetThrownExceptions(jclass clazz, jmethodID method,
+                          jint *exceptionCountPtr, jclass **exceptionsPtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return an array of exception classes the method might throw.
+The number of exceptions is returned via <code>exceptionCountPtr</code>.
+The exceptions array is returned via <code>exceptionsPtr</code>.
+<p>
+A call to this function may trigger class loading for the thrown exception
+classes that have not yet been loaded. It should not be called while
+threads are suspended.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>exceptionCountPtr<dd>on return, points to the number of running threads.
+<dt>exceptionsPtr<dd>on return, points to an array of references, one
+for each thrown exception.
+Exception classes in the array are JNI global references and must be explicitly
+freed with the JNI function <code>DeleteGlobalRef</code>. 
+The returned exception array should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+        <dd>
+        Invalid <tt>method</tt>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+        <dd>
+        Invalid <tt>class</tt>.
+</dl></blockquote>
+<a name="GetBytecodes"></a>
+<hr noshade width=75%>
+<h3>Get Bytecodes</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetBytecodes(jclass clazz, jmethodID method, jint *bytecodeCountPtr,
+                         jbyte **bytecodesPtr)
+</pre></blockquote>
+For the method indicated by <code>clazz</code> and <code>method</code>,
+return the byte codes that implement the method. The number of
+bytecodes is returned via <code>bytecodeCountPtr</code>. The byte codes
+themselves are returned via <code>bytecodesPtr</code>.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Use <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this and other features are supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>bytecodeCountPtr<dd>on return, points to the length of the byte code array
+<dt>bytecodesPtr<dd>on return, points to the pointer to the byte code array
+The JVMDI memory
+allocator provides memory for the byte code array.
+You must deallocate the table using
+<code>Deallocate()</code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+	<p><dt><code><a href="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</a></code>
+		<dd>
+		Invalid <code>clazz</code>.
+	<p><dt><code><a href="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</a></code>
+		<dd>
+		Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        Optional feature not present in this VM.
+</dl></blockquote>
+<a name="IsMethodNative"></a>
+<hr noshade width=75%>
+<h3>Is Method Native</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+IsMethodNative(jclass clazz, jmethodID method, jboolean *isNativePtr)
+</pre></blockquote>
+<p>
+For the method indicated by <code>clazz</code> and <code>method</code>, return a
+value indicating whether the method is native via <code>isNativePtr</code>
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>isNativePtr<dd>on return, points to the boolean result of this function.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+</dl></blockquote>
+<a name="IsMethodSynthetic"></a>
+<hr noshade width=75%>
+<h3>Is Method Synthetic</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+IsMethodSynthetic(jclass clazz, jmethodID method, jboolean *isSyntheticPtr)
+</pre></blockquote>
+<p>
+For the method indicated by <code>clazz</code> and <code>method</code>, return a
+value indicating whether the method is synthetic via <code>isSyntheticPtr</code>.
+Synthetic methods are generated by the compiler but not present in the 
+original source code.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Use <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this and other features are supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>method<dd>the method to query
+<dt>isSyntheticPtr<dd>on return, points to the boolean result of this function.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_METHODID">JVMDI_ERROR_INVALID_METHODID</A></code>
+            <dd>
+        Invalid <code>method</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        Optional feature not present in this VM.
+</dl></blockquote>
+
+<a name=debugger_monitor></a>
+<p><hr noshade size=3>
+<h2>Raw Monitor Support</h2>
+<p>
+<a name="CreateRawMonitor"></a>
+<hr noshade width=75%>
+<h3>Create Raw Monitor</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+CreateRawMonitor(char *name, JVMDI_RawMonitor *monitorPtr)
+</pre></blockquote>
+Create a raw monitor.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>name<dd>a name in UTF-8 to identify the monitor
+<dt>monitorPtr<dd>on return, points to the created monitor.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</a></code>
+		<dd>
+		Invalid pointer.
+</dl></blockquote>
+<a name="DestroyRawMonitor"></a>
+<hr noshade width=75%>
+<h3>Destroy Raw Monitor</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+DestroyRawMonitor(JVMDI_RawMonitor monitor)
+</pre></blockquote>
+Destroy the raw monitor.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>monitor<dd>the monitor
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <dt><code><a href="#JVMDI_ERROR_INVALID_MONITOR">JVMDI_ERROR_INVALID_MONITOR</a></code>
+		 <dd>
+		 Invalid monitor.
+</dl></blockquote>
+<a name="RawMonitorEnter"></a>
+<hr noshade width=75%>
+<h3>Raw Monitor Enter</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+RawMonitorEnter(JVMDI_RawMonitor monitor)
+</pre></blockquote>
+Gain exclusive ownership of a raw monitor.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>monitor<dd>the monitor
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_MONITOR">JVMDI_ERROR_INVALID_MONITOR</a></code>
+			 <dd>
+			  Invalid monitor.
+</dl></blockquote>
+<a name="RawMonitorExit"></a>
+<hr noshade width=75%>
+<h3>Raw Monitor Exit</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+RawMonitorExit(JVMDI_RawMonitor monitor)
+</pre></blockquote>
+Release exclusive ownership of a raw monitor.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>monitor<dd>the monitor
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_MONITOR">JVMDI_ERROR_INVALID_MONITOR</a></code>
+			<dd>
+		   Invalid monitor.
+	<p><dt><code><a href="#JVMDI_ERROR_NOT_MONITOR_OWNER">JVMDI_ERROR_NOT_MONITOR_OWNER</a></code>
+</dl></blockquote>
+<a name="RawMonitorWait"></a>
+<hr noshade width=75%>
+<h3>Raw Monitor Wait</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+RawMonitorWait(JVMDI_RawMonitor monitor, jlong millis)
+</pre></blockquote>
+Wait for notification of the raw monitor.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>monitor<dd>the monitor
+<dt>millis<dd>the timeout, in milliseconds
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_MONITOR">JVMDI_ERROR_INVALID_MONITOR</a></code>
+		<dd>
+		Invalid monitor.
+	<p><dt><code><a href="#JVMDI_ERROR_NOT_MONITOR_OWNER">JVMDI_ERROR_NOT_MONITOR_OWNER</a></code>
+	<p><dt><code><a href="#JVMDI_ERROR_INTERRUPT">JVMDI_ERROR_INTERRUPT</a></code>
+</dl></blockquote>
+<a name="RawMonitorNotify"></a>
+<hr noshade width=75%>
+<h3>Raw Monitor Notify</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+RawMonitorNotify(JVMDI_RawMonitor monitor)
+</pre></blockquote>
+Notify a single thread waiting on the raw monitor.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>monitor<dd>the monitor
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_MONITOR">JVMDI_ERROR_INVALID_MONITOR</a></code>
+			<dd>
+			Invalid monitor.
+	<p><dt><code><a href="#JVMDI_ERROR_NOT_MONITOR_OWNER">JVMDI_ERROR_NOT_MONITOR_OWNER</a></code>
+</dl></blockquote>
+<a name="RawMonitorNotifyAll"></a>
+<hr noshade width=75%>
+<h3>Raw Monitor Notify All</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+RawMonitorNotifyAll(JVMDI_RawMonitor monitor)
+</pre></blockquote>
+Notify all threads waiting on the raw monitor.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>monitor<dd>the monitor
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<dt><code><a href="#JVMDI_ERROR_INVALID_MONITOR">JVMDI_ERROR_INVALID_MONITOR</a></code>
+			<dd>
+			Invalid monitor.
+	<p><dt><code><a href="#JVMDI_ERROR_NOT_MONITOR_OWNER">JVMDI_ERROR_NOT_MONITOR_OWNER</a></code>
+</dl></blockquote>
+<a name="SetEventHook">
+<p><hr noshade size=3>
+<h2>Events</h2>
+</a>
+<hr noshade width=75%>
+<h3>Set Event Hook</h3>
+<blockquote><pre>
+typedef void (*JVMDI_EventHook)(JNIEnv *env , JVMDI_Event *event);
+
+<a href="#errors">jvmdiError</a>
+SetEventHook(JVMDI_EventHook hook)
+</pre></blockquote>
+Set the function to be called on every event. Details on events are 
+described <a href="#handlingevents">later</a> in this document.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>hook<dd>the new event hook, or NULL to remove the existing hook.
+</dl></blockquote>
+<p>
+This function returns a <a href="#universal-error">universal error</a> on
+error.
+<a name="SetEventNotificationMode"></a>
+<hr noshade width=75%>
+<h3>Enable/Disable Events</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+SetEventNotificationMode(jint mode, jint eventType, jthread thread, ...)
+</pre></blockquote>
+Control the generation of events. If <code>mode</code> is JVMDI_ENABLE, 
+the event <code>eventType</code> is enabled; if <code>mode</code> is 
+JVMDI_DISABLE, the event is disabled. If <code>thread</code> is NULL,
+the event is enabled or disabled globally; otherwise, it is 
+enabled or disabled for a particular thread. 
+An event is generated for 
+a particular thread if it is enabled either at the thread or global
+levels.
+<p>
+Global and per-thread enabling of events is independent.  For example,
+if MethodEntry is initially disabled both globally and on each thread,
+MethodEntry is still disabled per-thread when it is enabled globally.
+When an executing thread encounters a potential event condition,
+an event will be sent if either that event is globally enabled OR
+that event is enabled for the executing thread.
+Thus globally enabling an event applies to threads created
+after the call as well. 
+<p>
+See <a href="#handlingevents">below</a> for information on specific events.
+<p>
+The following events cannot be controlled (enabled or disabled) 
+at the thread level through this function. 
+<ul>
+<li>JVMDI_EVENT_VM_INIT
+<li>JVMDI_EVENT_VM_DEATH
+<li>JVMDI_EVENT_THREAD_START
+<li>JVMDI_EVENT_CLASS_UNLOAD
+</ul>
+<p>
+The following event cannot be controlled (enabled or disabled) 
+at the global level through this function. 
+<ul>
+<li>JVMDI_EVENT_SINGLE_STEP
+</ul>
+<p>
+Initially, no events are enabled at the thread level. All events 
+<b>except</b> the following are enabled at the global level.
+<ul>
+<li>JVMDI_EVENT_SINGLE_STEP
+<li>JVMDI_EVENT_EXCEPTION_CATCH
+<li>JVMDI_EVENT_METHOD_ENTRY
+<li>JVMDI_EVENT_METHOD_EXIT
+</ul>
+Set the function to be called on every event. Details on events are 
+described <a href="#handlingevents">later</a> in this document.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>mode<dd>JVMDI_ENABLE or JVMDI_DISABLE
+<dt>eventType<dd>the event to control
+<dt>thread<dd>the thread to control, or NULL for all threads
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_THREAD">JVMDI_ERROR_INVALID_THREAD</A></code>
+        <dd>
+        If <code>thread</code> is invalid or the thread has not run.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_EVENT_TYPE">JVMDI_ERROR_INVALID_EVENT_TYPE</A></code>
+        <dd>
+        If <code>eventType</code> is invalid value.
+    <p><dt><code><A HREF="#JVMDI_ERROR_ILLEGAL_ARGUMENT">JVMDI_ERROR_ILLEGAL_ARGUMENT</A></code>
+        <dd>
+        If <code>thread</code> argument is specified with one of the following events:
+        <ul>
+        <li>JVMDI_EVENT_VM_INIT</li>
+        <li>JVMDI_EVENT_VM_DEATH</li>
+        <li>JVMDI_EVENT_THREAD_START</li>
+        <li>JVMDI_EVENT_CLASS_UNLOAD</li>
+        </ul>
+</dl></blockquote>
+<a name=miscellaneous></a>
+<p><hr noshade size=3>
+<h2>Miscellaneous Functions</h2>
+<a name="GetLoadedClasses"></a>
+<hr noshade width=75%>
+<h3>Get Loaded Classes</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetLoadedClasses(jint *classCountPtr, jclass **classesPtr)
+</pre></blockquote>
+<p>
+Return an array of all classes loaded in the virtual machine.
+The number of classes in the array is returned via
+<code>classCountPtr</code>, and the array itself via
+<code>classesPtr</code>.
+You must deallocate the array using
+<code>Deallocate()</code>.
+<p>
+Array classes of all types (including arrays of primitive types) are 
+included in the returned list. Primitive classes (for example, 
+java.lang.Integer.TYPE) are <i>not</i> included in this list. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>classCountPtr<dd>on return, points to the number of classes.
+<dt>classesPtr<dd>on return, points to an array of references, one
+for each class.
+Classes in the array are JNI global references and must be explicitly
+freed with the JNI function <code>DeleteGlobalRef</code>. 
+The returned class array should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+</dl></blockquote>
+<a name="GetClassLoaderClasses"></a>
+<hr noshade width=75%>
+<h3>Get Classloader Classes</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetClassLoaderClasses(jobject initiatingLoader, jint *classCountPtr, jclass **classesPtr)
+</pre></blockquote>
+<p>
+Returns an array of all classes for which this class loader has
+been recorded as the initiating loader. Each 
+class in the returned array was created by this class loader, 
+either by defining it directly or by delegation to another class loader.
+<p>
+For JDK 1.1 implementations which don't
+recognize the distinction between initiating and defining classloaders,
+this function should return all classes loaded in the virtual machine.
+The number of classes in the array is returned via
+<code>classCountPtr</code>, and the array itself via
+<code>classesPtr</code>.
+You must deallocate the array using
+<code>Deallocate()</code>.
+<p>
+The <code>initiatingLoader</code> argument must not be null. The set of 
+classes initiated by the system class loader is identical to the set of 
+classes defined by that loader. This set can be determined by calling
+<a href=#GetLoadedClasses>GetLoadedClasses</a> and selecting those 
+classes with a null class loader. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>initiatingLoader<dd>the initiating class loader.
+<dt>classCountPtr<dd>on return, points to the number of classes.
+<dt>classesPtr<dd>on return, points to an array of references, one
+for each class.
+Classes in the array are JNI global references and must be explicitly
+freed with the JNI function <code>DeleteGlobalRef</code>. 
+The returned class array should be freed with 
+<code><a href="#Deallocate">Deallocate</a></code>.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer.
+</dl></blockquote>
+
+<a name="RedefineClasses"></a>
+<hr noshade width=75%>
+<h3>Redefine Classes</h3>
+<blockquote><pre>
+typedef struct {
+    jclass clazz;              /* Class to be redefined */
+    jint class_byte_count;     /* number of bytes defining class (below) */
+    jbyte *class_bytes;        /* bytes defining class */
+                               /* (in Class File Format of JVM spec) */
+} JVMDI_class_definition;
+
+<a href="#errors">jvmdiError</a>
+RedefineClasses(jint classCount, JVMDI_class_definition *classDefs)</pre></blockquote>
+<p>
+All classes given are redefined according to the definitions
+supplied. If any redefined methods have active stack frames,
+those active frames continue to run the bytecodes of the original 
+method.  The redefined methods will be used on new invokes.  
+Any JVMDI function or event which returns a <code>jmethodID</code>, will return
+<code>OBSOLETE_METHOD_ID</code> when referring to the original
+method (for example, when examining a stack frame where the
+original method is still executing)
+unless it is equivalent to the redefined method (see below).
+The original method ID refers to the redefined method.
+Care should be taken thoughout a JVMDI client to handle 
+<code>OBSOLETE_METHOD_ID</code>.
+If reseting of stack frames is desired, use 
+<a href="#PopFrame"><code>PopFrame</code></a>
+to pop frames with <code>OBSOLETE_METHOD_ID</code>s.
+<p>
+An original and a redefined method should be considered equivalent
+if:
+<ul>
+<li>their bytecodes are the same except for indicies into the
+constant pool and 
+<li>the referenced constants are equal.
+</ul>
+<p>
+This function does not cause any initialization except that which 
+would occur under the customary JVM semantics.
+In other words, redefining a class does not cause its initializers to be
+run. The values of preexisting static variables will remain as they were
+prior to the call. However, completely uninitialized (new) static variables
+will be assigned their default value.
+<p>
+If a redefined class has instances then all those instances will have the
+fields defined by the redefined class at the completion of the call.
+Preexisting fields will retain their previous values. Any new fields will
+have their default values; no instance initializers or constructors are run.
+<p>
+Threads need not be suspended.
+<p>
+All breakpoints in the class are cleared.
+<p>
+All attributes are updated.
+<p>
+No JVMDI events are generated by this function.
+<p>
+This is an optional feature which may not be implemented for all
+virtual machines. Examine 
+<code>can_redefine_classes, can_add_method</code> and 
+<code>can_unrestrictedly_redefine_classes</code> of
+ <a href="#GetCapabilities"><code>GetCapabilities</code></a>
+to determine whether this feature is supported in a 
+particular virtual machine.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>classCount<dd>the number of classes specified in <code>classDefs</code>
+<dt>classDefs<dd>the array of new class definitions
+</dl></blockquote>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+    <p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+        <dd>
+        Invalid pointer: classDefs or one of class_bytes is NULL.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS">JVMDI_ERROR_INVALID_CLASS</A></code>
+        <dd>
+        An element of classDefs is not a valid class.
+    <p><dt><code><A HREF="#JVMDI_ERROR_UNSUPPORTED_VERSION">JVMDI_ERROR_UNSUPPORTED_VERSION</A></code>
+        <dd>
+        A new class file has a version number not supported by this VM.
+    <p><dt><code><A HREF="#JVMDI_ERROR_INVALID_CLASS_FORMAT">JVMDI_ERROR_INVALID_CLASS_FORMAT</A></code>
+        <dd>
+        A new class file is malformed (The VM would return a ClassFormatError).
+    <p><dt><code><A HREF="#JVMDI_ERROR_CIRCULAR_CLASS_DEFINITION">JVMDI_ERROR_CIRCULAR_CLASS_DEFINITION</A></code>
+        <dd>
+        The new class file definitions would lead to a circular definition (the VM would return a ClassCircularityError).
+    <p><dt><code><A HREF="#JVMDI_ERROR_FAILS_VERIFICATION">JVMDI_ERROR_FAILS_VERIFICATION</A></code>
+        <dd>
+        The class bytes fail verification.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NAMES_DONT_MATCH">JVMDI_ERROR_NAMES_DONT_MATCH</A></code>
+        <dd>
+        The class name defined in the new class file is
+        different from the name in the old class object.
+    <p><dt><code><A HREF="#JVMDI_ERROR_NOT_IMPLEMENTED">JVMDI_ERROR_NOT_IMPLEMENTED</A></code>
+        <dd>
+        No aspect of this functionality is implemented 
+        (can_redefine_classes capability is false).
+    <p><dt><code><A HREF="#JVMDI_ERROR_ADD_METHOD_NOT_IMPLEMENTED">JVMDI_ERROR_ADD_METHOD_NOT_IMPLEMENTED</A></code>
+        <dd>
+        A new class file would require adding a method, 
+        (and can_add_method capability is false).
+    <p><dt><code><A HREF="#JVMDI_ERROR_SCHEMA_CHANGE_NOT_IMPLEMENTED">JVMDI_ERROR_SCHEMA_CHANGE_NOT_IMPLEMENTED</A></code>
+        <dd>
+        The new class version changes fields
+        (and can_unrestrictedly_redefine_classes is false).
+    <p><dt><code><A HREF="#JVMDI_ERROR_HIERARCHY_CHANGE_NOT_IMPLEMENTED">JVMDI_ERROR_HIERARCHY_CHANGE_NOT_IMPLEMENTED</A></code>
+        <dd>
+        A direct superclass is different for the new class
+        version, or the set of directly implemented
+        interfaces is different
+        (and can_unrestrictedly_redefine_classes is false).
+    <p><dt><code><A HREF="#JVMDI_ERROR_DELETE_METHOD_NOT_IMPLEMENTED">JVMDI_ERROR_DELETE_METHOD_NOT_IMPLEMENTED</A></code>
+        <dd>
+        The new class version does not declare a method
+        declared in the old class version.
+        (and can_unrestrictedly_redefine_classes is false).
+    <p><dt><code><A HREF="#JVMDI_ERROR_CLASS_MODIFIERS_CHANGE_NOT_IMPLEMENTED">JVMDI_ERROR_CLASS_MODIFIERS_CHANGE_NOT_IMPLEMENTED</A></code>
+        <dd>
+        The new version of a class has different class modifiers
+        (public, abstract, final, ...) then the old version
+        (and can_unrestrictedly_redefine_classes is false).
+    <p><dt><code><A HREF="#JVMDI_ERROR_METHOD_MODIFIERS_CHANGE_NOT_IMPLEMENTED">JVMDI_ERROR_METHOD_MODIFIERS_CHANGE_NOT_IMPLEMENTED</A></code>
+        <dd>
+        The new version of a class has a different method modifier
+        (public, abstract, synchronized, ...) then the old version
+        (and can_unrestrictedly_redefine_classes is false).
+
+</dl></blockquote>
+
+<a name="GetVersionNumber"></a>
+<hr noshade width=75%>
+<h3>Get Version Number</h3>
+<blockquote><pre>
+<a href="#errors">jvmdiError</a>
+GetVersionNumber(jint *versionPtr)
+</pre></blockquote>
+Return the JVMDI version via <code>versionPtr</code>
+The return value is the version identifier. The low-order 16 bits represent
+the minor version number. The next 12 bits represent the major version
+number. The high-order 4 bits are undefined.
+<p>
+Parameters:
+<blockquote><dl>
+<dt>versionPtr<dd>on return, points to the JVMDI version.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+			<dd>
+			Invalid pointer.
+</dl></blockquote>
+<a name="GetCapabilities"></a>
+<hr noshade width=75%>
+<h3>Get Capabilities</h3>
+<blockquote><pre>
+typedef struct {
+    unsigned int can_watch_field_modification        : 1;
+    unsigned int can_watch_field_access              : 1;
+    unsigned int can_get_bytecodes                   : 1;
+    unsigned int can_get_synthetic_attribute         : 1;
+    unsigned int can_get_owned_monitor_info          : 1;
+    unsigned int can_get_current_contended_monitor   : 1;
+    unsigned int can_get_monitor_info                : 1;
+    unsigned int reserved1                           : 1;
+    unsigned int reserved2                           : 1;
+    unsigned int reserved3                           : 1;
+    unsigned int can_pop_frame                       : 1;
+    unsigned int reserved4                           : 1;
+    unsigned int can_redefine_classes                : 1; 
+    unsigned int can_add_method                      : 1;
+    unsigned int can_unrestrictedly_redefine_classes : 1;
+    unsigned int reserved5                           : 1;
+} JVMDI_capabilities;
+
+<a href="#errors">jvmdiError</a>
+GetCapabilities(JVMDI_capabilities *capabilitiesPtr)
+</pre></blockquote>
+Return via <code>capabilitiesPtr</code> the optional JVMDI 
+features supported by this implementation. The capabilities 
+structure contains a number of boolean flags indicating whether
+the named feature is supported. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>capabilitiesPtr<dd>on return, points to the JVMDI capabilities.
+</dl></blockquote>
+<p>
+This function returns either a <a href="#universal-error">universal error</a> or one of the following errors:
+<blockquote><dl>
+	<p><dt><code><A HREF="#JVMDI_ERROR_NULL_POINTER">JVMDI_ERROR_NULL_POINTER</A></code>
+			<dd>
+			Invalid pointer.
+</dl></blockquote>
+<a name="errors"></a>
+<p><hr noshade size=3>
+<a name="errors"><h2>Errors</h2></a>
+<p>
+Every JVMDI function returns a <b><code>jvmdiError</code></b> error code.
+<p>
+<a name="universal-error"></a>
+<h4>Universal Errors</h4>
+The following errors may be returned by any JVMDI function (and are
+thus not listed in the function descriptions):
+<p>
+<dl>
+<A NAME="JVMDI_ERROR_NONE"></A><DT><CODE>JVMDI_ERROR_NONE</CODE>
+  <DD>No error has occurred.  This is the error code that is returned
+      on successful completion of the function.<P>
+<A NAME="JVMDI_ERROR_OUT_OF_MEMORY"></A><DT><CODE>JVMDI_ERROR_OUT_OF_MEMORY</CODE>
+  <DD>The function needed to allocate memory and no more memory was 
+      available for allocation.<P>
+<A NAME="JVMDI_ERROR_ACCESS_DENIED"></A><DT><CODE>JVMDI_ERROR_ACCESS_DENIED</CODE>
+  <DD>Debugging has not been enabled in this virtual machine.
+      JVMDI cannot be used.<P>
+<A NAME="JVMDI_ERROR_UNATTACHED_THREAD"></A><DT><CODE>JVMDI_ERROR_UNATTACHED_THREAD</CODE>
+  <DD>The thread being used to call this function is not attached
+      to the virtual machine.  Calls must be made from attached threads.
+      See AttachCurrentThread() in the JNI invocation API.<P>
+<A NAME="JVMDI_ERROR_VM_DEAD"></A><DT><CODE>JVMDI_ERROR_VM_DEAD</CODE>
+  <DD>The virtual machine is not running.<P>
+<A NAME="JVMDI_ERROR_INTERNAL"></A><DT><CODE>JVMDI_ERROR_INTERNAL</CODE>
+  <DD>An unexpected internal error has occurred.<P>
+</dl>
+<p>
+<h4>Function Specific Errors</h4>
+The following errors are returned by some JVMDI functions (and are
+listed in the function descriptions):
+<p>
+<dl>
+<A NAME="JVMDI_ERROR_INVALID_THREAD"></A><DT><CODE>JVMDI_ERROR_INVALID_THREAD</CODE>
+  <DD>passed thread is NULL, is not a valid thread or has exited<P>
+<A NAME="JVMDI_ERROR_INVALID_FIELDID"></A><DT><CODE>JVMDI_ERROR_INVALID_FIELDID</CODE>
+  <DD>invalid field<P>
+<A NAME="JVMDI_ERROR_INVALID_METHODID"></A><DT><CODE>JVMDI_ERROR_INVALID_METHODID</CODE>
+  <DD>invalid method<P>
+<A NAME="JVMDI_ERROR_INVALID_LOCATION"></A><DT><CODE>JVMDI_ERROR_INVALID_LOCATION</CODE>
+  <DD>invalid location<P>
+<A NAME="JVMDI_ERROR_INVALID_FRAMEID"></A><DT><CODE>JVMDI_ERROR_INVALID_FRAMEID</CODE>
+  <DD>invalid <code>jframeID</code><P>
+<A NAME="JVMDI_ERROR_NO_MORE_FRAMES"></A><DT><CODE>JVMDI_ERROR_NO_MORE_FRAMES</CODE>
+  <DD>There are no more Java programming language or JNI frames on the call stack.<P>
+<A NAME="JVMDI_ERROR_OPAQUE_FRAME"></A><DT><CODE>JVMDI_ERROR_OPAQUE_FRAME</CODE>
+  <DD>information about the frame is not available (e.g. for native frames)<P>
+<A NAME="JVMDI_ERROR_NOT_CURRENT_FRAME"></A><DT><CODE>JVMDI_ERROR_NOT_CURRENT_FRAME</CODE>
+  <DD>operation can only be performed on current frame <P>
+<A NAME="JVMDI_ERROR_TYPE_MISMATCH"></A><DT><CODE>JVMDI_ERROR_TYPE_MISMATCH</CODE>
+  <DD>the variable is not an appropriate type for the function used<P>
+<A NAME="JVMDI_ERROR_INVALID_SLOT"></A><DT><CODE>JVMDI_ERROR_INVALID_SLOT</CODE>
+  <DD>invalid slot<P>
+<A NAME="JVMDI_ERROR_DUPLICATE"></A><DT><CODE>JVMDI_ERROR_DUPLICATE</CODE>
+  <DD>item already set <P>
+<A NAME="JVMDI_ERROR_THREAD_NOT_SUSPENDED"></A><DT><CODE>JVMDI_ERROR_THREAD_NOT_SUSPENDED</CODE>
+  <DD>thread was not suspended<P>
+<A NAME="JVMDI_ERROR_THREAD_SUSPENDED"></A><DT><CODE>JVMDI_ERROR_THREAD_SUSPENDED</CODE>
+  <DD>thread already suspended<P>
+<A NAME="JVMDI_ERROR_INVALID_OBJECT"></A><DT><CODE>JVMDI_ERROR_INVALID_OBJECT</CODE>
+  <DD>invalid object <P>
+<A NAME="JVMDI_ERROR_INVALID_CLASS"></A><DT><CODE>JVMDI_ERROR_INVALID_CLASS</CODE>
+  <DD>invalid class<P>
+<A NAME="JVMDI_ERROR_CLASS_NOT_PREPARED"></A><DT><CODE>JVMDI_ERROR_CLASS_NOT_PREPARED</CODE>
+  <DD>class has been loaded but not yet prepared <P>
+<A NAME="JVMDI_ERROR_NULL_POINTER"></A><DT><CODE>JVMDI_ERROR_NULL_POINTER</CODE>
+  <DD>invalid pointer<P>
+<A NAME="JVMDI_ERROR_ABSENT_INFORMATION"></A><DT><CODE>JVMDI_ERROR_ABSENT_INFORMATION</CODE>
+  <DD>The requested information is not available.<P>
+<A NAME="JVMDI_ERROR_INVALID_EVENT_TYPE"></A><DT><CODE>JVMDI_ERROR_INVALID_EVENT_TYPE</CODE>
+  <DD>The specified event type id is not recognized.<P>
+<A NAME="JVMDI_ERROR_NOT_IMPLEMENTED"></A><DT><CODE>JVMDI_ERROR_NOT_IMPLEMENTED</CODE>
+  <DD>The functionality is not implemented in this virtual machine<P>
+
+<a name="JVMDI_ERROR_INVALID_THREAD_GROUP"></a><dt><code>JVMDI_ERROR_INVALID_THREAD_GROUP</code>
+  <dd>thread group invalid<P>
+<a name="JVMDI_ERROR_INVALID_PRIORITY"></a><dt><code>JVMDI_ERROR_INVALID_PRIORITY</code>
+  <dd>invalid priority<P>
+<a name="JVMDI_ERROR_NOT_FOUND"></a><dt><code>JVMDI_ERROR_NOT_FOUND</code>
+  <dd>Desired element (e.g. field or breakpoint) not found<P>
+<a name="JVMDI_ERROR_INVALID_MONITOR"></a><dt><code>JVMDI_ERROR_INVALID_MONITOR</code>
+  <dd>invalid monitor<P>
+<a name="JVMDI_ERROR_ILLEGAL_ARGUMENT"></a><dt><code>JVMDI_ERROR_ILLEGAL_ARGUMENT</code>
+  <dd>illegal argument<P>
+<a name="JVMDI_ERROR_NOT_MONITOR_OWNER"></a><dt><code>JVMDI_ERROR_NOT_MONITOR_OWNER</code>
+  <dd>This thread doesn't own the monitor.<P>
+<a name="JVMDI_ERROR_ABSENT_INFORMATION"></a><dt><code>JVMDI_ERROR_ABSENT_INFORMATION</code>
+  <dd>Desired information is not available.<P>
+<a name="JVMDI_ERROR_INTERRUPT"></a><dt><code>JVMDI_ERROR_INTERRUPT</code>
+  <dd>The call has been interrupted before completion.<P>
+<a name="JVMDI_ERROR_INVALID_TYPESTATE"></a><dt><code>JVMDI_ERROR_INVALID_TYPESTATE</code>
+  <dd>The state of the thread has been modified, and is now inconsistent.<P>
+<a name="JVMDI_ERROR_UNSUPPORTED_VERSION"></a><dt><code>JVMDI_ERROR_UNSUPPORTED_VERSION</code>
+  <dd>A new class file has a version number not supported by this VM.<P>
+<a name="JVMDI_ERROR_INVALID_CLASS_FORMAT"></a><dt><code>JVMDI_ERROR_INVALID_CLASS_FORMAT</code>
+  <dd>A new class file is malformed (The VM would return a ClassFormatError).<P>
+<a name="JVMDI_ERROR_CIRCULAR_CLASS_DEFINITION"></a><dt><code>JVMDI_ERROR_CIRCULAR_CLASS_DEFINITION</code>
+  <dd>The new class file definitions would lead to a circular definition (the VM would return a ClassCircularityError).<P>
+<a name="JVMDI_ERROR_ADD_METHOD_NOT_IMPLEMENTED"></a><dt><code>JVMDI_ERROR_ADD_METHOD_NOT_IMPLEMENTED</code>
+  <dd>A new class file would require adding a method, and can_add_method is false.<P>
+<a name="JVMDI_ERROR_SCHEMA_CHANGE_NOT_IMPLEMENTED"></a><dt><code>JVMDI_ERROR_SCHEMA_CHANGE_NOT_IMPLEMENTED</code>
+  <dd>A new class file would require a schema change, and can_unrestrictedly_redefine_classes is false.<P>
+<a name="JVMDI_ERROR_FAILS_VERIFICATION"></a><dt><code>JVMDI_ERROR_FAILS_VERIFICATION</code>
+  <dd>The class bytes fail verification.<P>
+<a name="JVMDI_ERROR_HIERARCHY_CHANGE_NOT_IMPLEMENTED"></a><dt><code>JVMDI_ERROR_HIERARCHY_CHANGE_NOT_IMPLEMENTED</code>
+  <dd>A direct superclass is different for the new class
+version, or the set of directly implemented
+interfaces is different
+and can_unrestrictedly_redefine_classes is false.<P>
+<a name="JVMDI_ERROR_DELETE_METHOD_NOT_IMPLEMENTED"></a><dt><code>JVMDI_ERROR_DELETE_METHOD_NOT_IMPLEMENTED</code>
+  <dd>The new class version does not declare a method
+   declared in the old class version 
+   and can_unrestrictedly_redefine_classes is false.<P>
+<a name="JVMDI_ERROR_NAMES_DONT_MATCH"></a><dt><code>JVMDI_ERROR_NAMES_DONT_MATCH</code>
+  <dd>The class name defined in the new class file is 
+   different from the name in the old class object.<P>
+<a name="JVMDI_ERROR_CLASS_MODIFIERS_CHANGE_NOT_IMPLEMENTED"></a><dt><code>JVMDI_ERROR_CLASS_MODIFIERS_CHANGE_NOT_IMPLEMENTED</code>
+  <dd>The new version of a class has different class modifiers
+  (public, abstract, final, ...) then the old version
+  (and can_unrestrictedly_redefine_classes is false).<P>
+<a name="JVMDI_ERROR_METHOD_MODIFIERS_CHANGE_NOT_IMPLEMENTED"></a><dt><code>JVMDI_ERROR_METHOD_MODIFIERS_CHANGE_NOT_IMPLEMENTED</code>
+  <dd>The new version of a class has a different method modifier
+  (public, abstract, synchronized, ...) then the old version
+  (and can_unrestrictedly_redefine_classes is false).<P>
+
+</dl>
+<a name="events"></a>
+<a name="handlingevents">
+<p><hr noshade size=3>
+<h2>Handling Events</h2></a>
+<ul>
+    <li><a href="#eventintro">Introduction</a>
+    <li><a href="#JVMDI_EVENT_SINGLE_STEP">Single Step Event</a>
+        <ul>
+        <li>JVMDI_EVENT_SINGLE_STEP
+        </ul>
+    <li><a href="#JVMDI_EVENT_BREAKPOINT">Breakpoint Event</a>
+        <ul>
+        <li>JVMDI_EVENT_BREAKPOINT
+        </ul>
+    <li><a href="#JVMDI_EVENT_FIELD_ACCESS">Field Events</a>
+        <ul>
+        <li>JVMDI_EVENT_FIELD_ACCESS
+        <li>JVMDI_EVENT_FIELD_MODIFICATION
+        </ul>
+    <li><a href="#JVMDI_EVENT_FRAME_POP">Frame Events</a>
+        <ul>
+        <li>JVMDI_EVENT_FRAME_POP
+        <li>JVMDI_EVENT_METHOD_ENTRY
+        <li>JVMDI_EVENT_METHOD_EXIT
+        </ul>
+    <li><a href="#JVMDI_EVENT_EXCEPTION">Exception Event</a>
+        <ul>
+        <li>JVMDI_EVENT_EXCEPTION
+        </ul>
+    <li><a href="#JVMDI_EVENT_EXCEPTION_CATCH">Exception Catch Event</a>
+        <ul>
+        <li>JVMDI_EVENT_EXCEPTION_CATCH
+        </ul>
+    <li><a href="#JVMDI_EVENT_USER_DEFINED">User Defined Event</a>
+        <ul>
+        <li>JVMDI_EVENT_USER_DEFINED
+        </ul>
+    <li><a href="#JVMDI_EVENT_THREAD_END">Thread Events</a>
+        <ul>
+        <li>JVMDI_EVENT_THREAD_END
+        <li>JVMDI_EVENT_THREAD_START
+        </ul>
+    <li><a href="#JVMDI_EVENT_CLASS_LOAD">Class Events</a>
+        <ul>
+        <li>JVMDI_EVENT_CLASS_LOAD
+        <li>JVMDI_EVENT_CLASS_UNLOAD
+        <li>JVMDI_EVENT_CLASS_PREPARE
+        </ul>
+    <li><a href="#JVMDI_EVENT_VM_INIT">VM Initialization Event</a>
+        <ul>
+        <li>JVMDI_EVENT_VM_INIT
+        </ul>
+    <li><a href="#JVMDI_EVENT_VM_DEATH">VM Death Event</a>
+        <ul>
+        <li>JVMDI_EVENT_VM_DEATH
+        </ul>
+</ul>
+<a name="eventintro"><p></a>
+JVMDI clients can be informed of many events that occur in application
+programs.
+<p>
+To handle Events, designate a hook function with
+<code><a href="#SetEventHook">SetEventHook</a></code>. For each event 
+the hook function will be called with a <code>JVMDI_Event</code> argument
+describing the event type and, depending on the event, additional
+information. The hook function is usually called from within application 
+threads and the JVMDI implementation does not queue events in any way. This means
+that event hook functions must be written carefully. Here are some 
+general guidelines. See the individual event descriptions for further
+suggestions.
+<ul>
+<li>Any exception thrown during the execution of an event hook can 
+overwrite any current pending exception in the current application thread.
+Care must be taken to preserve a pending exception
+when an event hook makes a JNI call that might generate an exception.
+<li>Event hook functions must be re-entrant. The JVMDI implementation does
+not queue events. If a JVMDI client needs to process events one at a time, it 
+can use a <a href=#debugger_monitor>raw monitor</a> inside the 
+event hook function to serialize event processing.
+</ul>
+<p>
+Some JVMDI events identify objects with JNI references. 
+All such references are passed to the event hook function via
+the <code>JVMDI_Event</code> argument. All references 
+in JVMDI events are JNI local references and will become invalid
+after the event hook returns.
+The <code>JVMDI_Event</code> data structure is allocated locally and deallocated
+when the event hook function returns.
+<p>
+Events can be enabled and disabled with the function
+<a href="#SetEventNotificationMode">SetEventNotificationMode</a>. 
+Some events are enabled at application startup; others are not. Refer
+to the documentation for this function for details.
+<p>
+A thread that generates an event does not change its execution status.
+If an event should cause a thread to be suspended, then the event hook function
+is responsible for explicitly suspending the thread with 
+<a href="#SuspendThread">SuspendThread</a>.
+<p>
+The <code>JVMDI_Event</code> contains the event kind and a union of 
+event-specific structures containing more information. 
+
+<blockquote><pre>
+typedef struct {
+    jint kind;		/* the discriminant */
+
+    union {
+	/* kind = JVMDI_EVENT_SINGLE_STEP */
+        JVMDI_single_step_event_data single_step;
+			
+        /* kind = JVMDI_EVENT_BREAKPOINT */
+        JVMDI_breakpoint_event_data breakpoint;
+
+        /* kind = JVMDI_EVENT_FRAME_POP */
+        /* kind = JVMDI_EVENT_METHOD_ENTRY */
+        /* kind = JVMDI_EVENT_METHOD_EXIT */
+        JVMDI_frame_event_data frame;
+
+        /* kind = JVMDI_EVENT_FIELD_ACCESS */
+        JVMDI_field_access_event_data field_access;
+
+        /* kind = JVMDI_EVENT_FIELD_MODIFICATION */
+        JVMDI_field_modification_event_data field_modification;
+
+        /* kind = JVMDI_EVENT_EXCEPTION */
+        JVMDI_exception_event_data exception;
+
+        /* kind = JVMDI_EVENT_EXCEPTION_CATCH */
+        JVMDI_exception_catch_event_data exception_catch;
+
+        /* kind = JVMDI_EVENT_USER_DEFINED */
+        JVMDI_user_event_data user;
+			
+        /* kind = JVMDI_EVENT_THREAD_END or */
+        /* JVMDI_EVENT_THREAD_START */
+        JVMDI_thread_change_event_data thread_change;
+			
+        /* kind = JVMDI_EVENT_CLASS_LOAD, */
+        /* JVMDI_EVENT_CLASS_UNLOAD, or */
+        /* JVMDI_EVENT_CLASS_PREPARE */
+        JVMDI_class_event_data class_event;
+			
+        /* kind = JVMDI_EVENT_VM_DEATH, JVMDI_EVENT_VM_INIT */
+        /* no additional fields */		
+    } u;
+} JVMDI_Event;
+</pre></blockquote>
+<p>
+More information on specific events is given in the sections below.
+<p>
+<a name="JVMDI_EVENT_SINGLE_STEP"><hr noshade width=75%></a>
+<h4>Single Step Events (JVMDI_EVENT_SINGLE_STEP)</h4>
+<blockquote><pre>
+    typedef struct { 
+        jthread thread;
+        jclass clazz;
+        jmethodID method;
+        jlocation location;
+    } JVMDI_single_step_event_data;
+</pre></blockquote>
+<p>
+Single step events allow the JVMDI client to trace thread execution
+at the finest granularity allowed by the VM. A single step event is
+generated whenever a thread reaches a new location. 
+Typically, single step events represent the completion of one VM 
+instruction as defined the VM Specification; however, some implementations 
+may define location differently. In any case the 
+<code>clazz</code>, <code>method</code>, and <code>location</code> fields
+of the event structure uniquely identify the current location and allow
+the mapping to source file and line number when that information is 
+available.
+<p>
+No single step events are generated from within native methods.
+<p>
+Single step events are disabled by default and can be enabled for a 
+thread by calling 
+<code><a href="#SetEventNotificationMode">SetEventNotificationMode</a></code>
+<p>
+<a name="JVMDI_EVENT_BREAKPOINT"><hr noshade width=75%></a>
+<h4>Breakpoint Events (JVMDI_EVENT_BREAKPOINT)</h4>
+<blockquote><pre>
+    typedef struct { 
+        jthread thread;
+        jclass clazz;
+        jmethodID method;
+        jlocation location;
+    } JVMDI_breakpoint_event_data;
+</pre></blockquote>
+<p>
+Breakpoint Events are generated whenever a thread reaches a location
+designated as a breakpoint with <a href="#SetBreakpoint">SetBreakpoint</a>.
+The 
+<code>clazz</code>, <code>method</code>, and <code>location</code> fields
+of the event structure uniquely identify the current location and allow
+the mapping to source file and line number when that information is 
+available.
+<p>
+Breakpoint reporting,  in general, can be enabled or disabled by calling 
+<code><a href="#SetEventNotificationMode">SetEventNotificationMode</a></code>
+and are enabled by default. If they are disabled, set breakpoints are 
+ignored.
+<p>
+<a name="JVMDI_EVENT_FIELD_ACCESS">
+<a name="JVMDI_EVENT_FIELD_MODIFICATION"><hr noshade width=75%></a></a>
+<h4>Field Events (JVMDI_EVENT_FIELD_ACCESS, JVMDI_EVENT_FIELD_MODIFICATION)</h4>
+<blockquote><pre>
+    /* kind = JVMDI_EVENT_FIELD_ACCESS */
+    typedef struct { 
+        jthread thread;
+        jclass clazz;
+        jmethodID method;
+        jlocation location;
+        jclass field_clazz;
+        jobject object;
+        jfieldID field;
+    } JVMDI_field_access_event_data;
+    
+    /* kind = JVMDI_EVENT_FIELD_MODIFICATION */
+    typedef struct { 
+        jthread thread;
+        jclass clazz;
+        jmethodID method;
+        jlocation location;
+        jclass field_clazz;
+        jobject object;
+        jfieldID field;
+        char signature_type;
+        jvalue new_value;
+    } JVMDI_field_modification_event_data;
+</pre></blockquote>
+<p>
+Field Events are generated whenever a thread accesses or modifies
+a field
+designated as a watchpoint 
+with <code><a href="#SetFieldAccessWatch">SetFieldAccessWatch</a></code> or
+with 
+<code><a href="#SetFieldModificationWatch">SetFieldModificationWatch</a></code>.
+The <code>clazz</code>, <code>method</code>, and <code>location</code> fields
+of the event structures uniquely identify the current location and allow
+the mapping to source file and line number when that information is 
+available. The <code>field_clazz</code> and <code>field</code> fields
+uniquely identify the field which is being accessed or modified. The
+<code>object</code> identifies the containing object if the field is 
+an instance field. It is NULL otherwise.
+<p>
+Field watchpoint reporting,  in general, can be enabled or disabled by calling 
+<code><a href="#SetEventNotificationMode">SetEventNotificationMode</a></code>
+and are enabled by default. If they are disabled, set watches are 
+ignored.
+<p>
+<a name="JVMDI_EVENT_FRAME_POP">
+<a name="JVMDI_EVENT_METHOD_ENTRY">
+<a name="JVMDI_EVENT_METHOD_EXIT"><hr noshade width=75%></a></a></a>
+<h4>Frame Events (JVMDI_EVENT_FRAME_POP, JVMDI_EVENT_METHOD_ENTRY, 
+                  JVMDI_EVENT_METHOD_EXIT)</h4>
+<blockquote><pre>
+    typedef struct { 
+        jthread thread;
+        jclass clazz;
+        jmethodID method;
+        jframeID frame;
+    } JVMDI_frame_event_data;
+</pre></blockquote>
+<p>
+Method entry events are generated upon entry of Java programming language or native methods.
+Method exit events are generated upon exit from a Java programming language or native methods.
+Frame pop events are generated upon exit from a single method 
+in a single frame as specified
+in a call to <code><a href="#NotifyFramePop">NotifyFramePop</a></code>.
+If a method terminates by throwing an exception to its caller, neither 
+a method exit event nor a frame pop event will be generated. JVMDI clients
+can check for this occurrence by monitoring 
+<a href="#JVMDI_EVENT_EXCEPTION_CATCH">exception catch events</a>
+<p>
+The <code>clazz</code> and <code>method</code> fields uniquely identify the
+method being entered or exited. The <code>frame</code> field provides 
+access to the stack frame for the method. On method entry, the location
+reported by 
+<code><a href="#GetFrameLocation">GetFrameLocation</a></code>
+identifies the initial executable location in
+the method. On method exit or frame pop, the location 
+reported by
+<code><a href="#GetFrameLocation">GetFrameLocation</a></code>
+identifies the 
+executable location in the returning method, immediately prior to the 
+return. 
+<p>
+Method entry and exit are disabled by default and can be enabled by calling
+<code><a href="#SetEventNotificationMode">SetEventNotificationMode</a></code>.
+Frame pop events are enabled by default and can be disabled similarly. 
+
+<p>
+<a name="JVMDI_EVENT_EXCEPTION"><hr noshade width=75%></a>
+<h4>Exception Events (JVMDI_EVENT_EXCEPTION)</h4>
+<blockquote><pre>
+    typedef struct { 
+        jthread thread;
+        jclass clazz;
+        jmethodID method;
+        jlocation location;
+        jobject exception;
+        jclass catch_clazz;
+        jmethodID catch_method;
+        jlocation catch_location;
+    } JVMDI_exception_event_data;
+</pre></blockquote>
+<p>
+Exception events are generated whenever an exception is first detected
+in a Java programming language method. The exception may have been thrown by a Java programming language or native
+method, but in the case of native methods, the event is not generated
+until the exception is first seen by a Java programming language method. If an exception is
+set and cleared in a native method (and thus is never visible to Java programming language code),
+no exception event is generated.
+<p>
+The 
+<code>clazz</code>, <code>method</code>, and <code>location</code> fields
+of the event structure uniquely identify the current location 
+(where the exception was detected) and allow
+the mapping to source file and line number when that information is 
+available. The <code>exception</code> field identifies the thrown
+exception object. The <code>catch_clazz</code>, <code>catch_method</code>,
+and <code>catch_location</code> identify the location of the catch clause,
+if any, that handles thrown exception. If there is no such catch clause,
+each field is set to 0. There is no guarantee that the thread will ever
+reach this catch clause. If there are native methods on the call stack
+between the throw location and the catch clause, the exception may 
+be reset by one of those native methods.
+JVMDI clients
+can check for this occurrence by monitoring 
+<a href="#JVMDI_EVENT_EXCEPTION_CATCH">exception catch events</a>
+<p>
+Exception events are enabled by default and can be disabled by calling
+<code><a href="#SetEventNotificationMode">SetEventNotificationMode</a></code>.
+
+<p>
+<a name="JVMDI_EVENT_EXCEPTION_CATCH"><hr noshade width=75%></a>
+<h4>Exception Catch Events (JVMDI_EVENT_EXCEPTION_CATCH)</h4></a>
+<blockquote><pre>
+    typedef struct { 
+        jthread thread;
+        jclass clazz;
+        jmethodID method;
+        jlocation location;
+        jobject exception;
+    } JVMDI_exception_catch_event_data;
+</pre></blockquote>
+<p>
+Exception catch events are generated whenever a thrown exception is caught.
+If the exception is caught in a Java programming language method, the event is generated
+when the catch clause is reached. If the exception is caught in a native
+method, the event is generated as soon as control is returned to a Java programming language 
+method. Exception catch events are generated for any exception for which
+a throw was detected in a Java programming language method.
+<p>
+The 
+<code>clazz</code>, <code>method</code>, and <code>location</code> fields
+of the event structure uniquely identify the current location 
+and allow the mapping to source file and line number when that information is 
+available. For exceptions caught in a Java programming language method, the 
+<code>exception</code> object identifies the exception object. Exceptions
+caught in native methods are not necessarily available by the time the 
+exception catch is reported, so the <code>exception</code> field is set
+to NULL.
+<p>
+Exception catch events are disabled by default and can be enabled by calling
+<code><a href="#SetEventNotificationMode">SetEventNotificationMode</a></code>.
+<p>
+<a name="JVMDI_EVENT_USER_DEFINED"><hr noshade width=75%></a>
+<h4>User Defined Events (JVMDI_EVENT_USER_DEFINED)</h4>
+<blockquote><pre>
+    typedef struct { 
+        jobject object;
+        jint key;
+    } JVMDI_user_event_data;
+</pre></blockquote>
+<p>
+The meaning of user defined events and the fields in the user event
+data structure are defined by particular JVMDI implementations.
+<p>
+<a name="JVMDI_EVENT_THREAD_END">
+<a name="JVMDI_EVENT_THREAD_START"><hr noshade width=75%></a></a>
+<h4>Thread Events (JVMDI_EVENT_THREAD_END, JVMDI_EVENT_THREAD_START)</h4>
+<blockquote><pre>
+    typedef struct { 
+        jthread thread;
+    } JVMDI_thread_change_event_data;
+</pre></blockquote>
+<p>
+Thread start events are generated by a new thread before its initial
+method executes. Thread end events are generated by a terminating thread
+after its initial method has finished execution. A thread may be 
+listed in the array returned by
+<code><a href="#GetAllThreads">GetAllThreads</a></code>
+before its thread start event is generated and after its thread end 
+event is generated. It is possible for other events to be generated
+for a thread before its thread start event, but no events are generated
+after its thread end event.
+<p>
+Thread events are enabled by default and can be disabled by calling
+<code><a href="#SetEventNotificationMode">SetEventNotificationMode</a></code>.
+
+<p>
+<a name="JVMDI_EVENT_CLASS_LOAD">
+<a name="JVMDI_EVENT_CLASS_UNLOAD">
+<a name="JVMDI_EVENT_CLASS_PREPARE"><hr noshade width=75%></a></a></a>
+<h4>Class Events (JVMDI_EVENT_CLASS_LOAD, JVMDI_EVENT_CLASS_UNLOAD, 
+                  JVMDI_EVENT_CLASS_PREPARE)</h4>
+<blockquote><pre>
+    typedef struct { 
+        jthread thread;
+        jclass clazz;
+    } JVMDI_class_event_data;
+</pre></blockquote>
+<p>
+Class events signal a change in status for a particular class. 
+<p>
+A class load event is generated when a class is first loaded. The order
+of class load events are generated by a particular thread are guaranteed
+to match the order of class loading within that thread. Arrays of 
+non-primitive types have class load events. Arrays of primitive types
+do not have class load events (they are considered loaded at the time
+of VM initialization). Primitive classes (for example, 
+java.lang.Integer.TYPE) do not have class load events.
+<p>
+A class prepare event is generated when class preparation is complete.
+At this point, class fields, methods, and implemented interfaces are 
+available, and no code from the class has been executed. Since array 
+classes never have fields or methods, class prepare events are not 
+generated for them. Class prepare events are not generated for 
+primitive classes (for example, java.lang.Integer.TYPE). 
+<p>
+A class unload event is generated when the class is about to be unloaded.
+Class unload events take place during garbage collection and must be 
+handled extremely carefully. The garbage collector holds many locks
+and has suspended all other threads, so the event handler cannot depend
+on the ability to acquire any locks. The class unload event handler should
+do as little as possible, perhaps by queueing information to be processed
+later.
+<p>
+Class events are enabled by default and can be disabled by calling
+<code><a href="#SetEventNotificationMode">SetEventNotificationMode</a></code>.
+<p>
+<a name="JVMDI_EVENT_VM_INIT"><hr noshade width=75%></a>
+<h4>VM Initialization Event (JVMDI_EVENT_VM_INIT)</h4>
+<p>
+The VM initialization event signals the completion of VM initialization. Once
+this event is generated, the JVMDI client is free to call any JNI or JVMDI
+function. The VM initialization event can be preceded by or can be concurrent
+with other events, but
+the preceding events should be handled carefully, if at all because the
+VM has not completed its initialization. The thread start event for the
+main application thread is guaranteed not to occur until after the 
+handler for the VM initialization event returns.
+<p>
+<a name="JVMDI_EVENT_VM_DEATH"><hr noshade width=75%></a>
+<h4>VM Death Event (JVMDI_EVENT_VM_DEATH)</h4>
+The VM death event notifies the JVMDI client of the termination of the 
+VM. 
+<a name="eventorder"><h4>Multiple Co-located Events</h4></a>
+In many situations it is possible for multiple events to occur 
+at the same location in one thread. When this happens, all of the events 
+are reported through the event hook in the order specified in the 
+following paragraphs.
+<p>
+If the current location is at the entry point of a method, the 
+<code>JVMDI_EVENT_METHOD_ENTRY</code> event is reported before
+any other event at the current location in the same thread.
+<p>
+If an exception catch has been detected at the current location,
+(either because it is the beginning of a catch clause or a native method
+which cleared a pending exception has returned), the
+<code>JVMDI_EVENT_EXCEPTION_CATCH</code> event is reported before
+any other event at the current location in the same thread.
+<p>
+If a <code>JVMDI_EVENT_SINGLE_STEP</code> event or 
+<code>JVMDI_EVENT_BREAKPOINT</code> event is triggered at the 
+current location, the event is defined to occur 
+immediately before the code at the current location is executed. 
+These events are reported before any events which are triggered 
+by the execution of code at the current location in the same 
+thread (specifically, 
+<code>JVMDI_EVENT_EXCEPTION</code>,
+<code>JVMDI_EVENT_FIELD_ACCESS</code>, and
+<code>JVMDI_EVENT_FIELD_MODIFICATION</code>).
+If both a step and breakpoint event are triggered for the same thread and 
+location, the step event is reported before the breakpoint event.
+<p>
+If the current location is the exit point of a method (that is, the last
+location before returning to the caller), the 
+<code>JVMDI_EVENT_METHOD_EXIT</code> event and 
+the <code>JVMDI_EVENT_FRAME_POP</code> event (if requested)
+are reported after all other events at the current location in the same
+thread. There is no specified ordering of these two events 
+with respect to each other.
+<p>
+Co-located events can be triggered during the processing of some other
+event by the JVMDI client at the same location in the same thread.
+If such an event, of type <i>y</i>, is triggered during the processing of 
+an event of type <i>x</i>, and if <i>x</i> 
+precedes <i>y</i> in the ordering specified above, then the co-located event 
+<i>y</i> is reported for the current thread and location. If <i>x</i> does not precede
+<i>y</i>, then <i>y</i> is not reported for the current thread and location.
+For example, if a breakpoint is set at the current location 
+during the processing of <code>JVMDI_EVENT_SINGLE_STEP</code>,
+that breakpoint will be reported before the thread moves off the current 
+location.
+<p>The following events are never considered to be co-located with 
+other events.
+<ul>
+<li><code>JVMDI_EVENT_USER_DEFINED</code>
+<li><code>JVMDI_EVENT_VM_INIT</code>
+<li><code>JVMDI_EVENT_VM_DEATH</code>
+<li><code>JVMDI_EVENT_THREAD_START</code>
+<li><code>JVMDI_EVENT_THREAD_END</code>
+<li><code>JVMDI_EVENT_CLASS_LOAD</code>
+<li><code>JVMDI_EVENT_CLASS_UNLOAD</code>
+<li><code>JVMDI_EVENT_CLASS_PREPARE</code>
+</ul>
+
+<p><hr noshade size=3>
+<a name="starting"><h2>Starting a VM with a JVMDI Client</h2></a>
+<p>
+The initial loading of a JVMDI client at VM startup can vary from VM
+to VM. The following description applies to the Sun J2SE SDK 1.2 classic VM for 
+Windows and Solaris.
+<p>
+The following command-line arguments are required on VM startup to 
+properly load and run JVMDI clients.
+<dl>
+<dt>-Xdebug
+<dd>Enables debugging
+<dt>-Xnoagent
+<dd>Prevents the default debug agent (used with jdb) from running.
+<dt>-Djava.compiler=NONE
+<dd>Disables the JIT. The classic VM does not support debugging with the 
+JIT enabled.
+<dt>-Xrun<jvmdi-lib-name>:<options>
+<dd>Identifies the library containing the JVMDI client as well as an options
+string to be passed in at startup. The library must export a 
+startup function with the following prototype.
+<blockquote><pre>
+JNIEXPORT jint JNICALL 
+JVM_OnLoad(JavaVM *vm, char *options, void *reserved) 
+</pre></blockquote>
+This function will be called at startup by the VM.
+For example, if the option 
+<code>-Xrunfoo:opt1,opt2</code> is specified, the VM will attempt to 
+load the shared library foo.dll under Windows or libfoo.so under Solaris.
+It will then attempt to find <code>JVM_OnLoad</code> and call it with
+"opt1,opt2" as the second argument. Since the VM is not initialized 
+at the time of this call, there is very little that can be done safely
+inside JVM_OnLoad. It can safely process the options and set an 
+event hook with <a href="#SetEventHook">SetEventHook</a>. Once that 
+event hook is called for the VM initialization event, the JVMDI client
+can complete its initialization.
+</dl>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+
+
+<TD>
+   <FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</a> &#169; 1996-2001
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.
+    </FONT>
+
+   <P>
+   <FONT SIZE="-1">
+   Send questions or comments to: <A HREF="mailto:java-debugger@sun.com">
+   java-debugger@sun.com</A>.
+   </FONT>
+</TD>
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+
+</TD>
+
+
+</TR>
+</TABLE>
+
+</body>
+</html>
+
+

@@ -1,0 +1,179 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Mon Jan 27 15:24:17 2003" />
+    <title>Exceptions In Object Serialization		</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="serialTOC.html" />
+    <link rel="Previous" href="security.html" />
+    <link rel="Next" href="examples.html" />
+    <link rel="Index" href="examples.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="security.html">Previous</a> | 
+        <a accesskey="n" href="examples.html">Next</a>
+       </td>
+	   <td align="right"><i>Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp3601"> </a><h2 class="pNewHTMLPage">
+Exceptions In Object Serialization		
+</h2>
+<hr class="pHr"/>
+<a name="wp3616"> </a><h2 class="pAppxNum">
+Appendix &#160; B
+</h2>
+<a name="wp3526"> </a><p class="pBody">
+	All exceptions thrown by serialization classes are subclasses of <code class="cCode">ObjectStreamException</code> which is a subclass of <code class="cCode">IOException</code>.
+</p>
+<a name="wp6331"> </a><div class="pTableCaption">
+</div><div align="left">
+<table border="0" cellpadding="7" id="wp4249">
+  <caption></caption>
+<thead>
+<tr  align="center">    <th><a name="wp4249"> </a><div style="text-align: left" class="pTableHead">
+Exception
+</div>
+
+</th>
+    <th><a name="wp4251"> </a><div style="text-align: left" class="pTableHead">
+Description
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4253"> </a><div class="pTableText">
+<code class="cCode">ObjectStreamException</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4255"> </a><div class="pTableText">
+Superclass of all serialization exceptions.
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4257"> </a><div class="pTableText">
+<code class="cCode">InvalidClassException</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4259"> </a><div class="pTableText">
+Thrown when a class cannot be used to restore objects for any of these reasons:
+</div>
+<ul class="pBullet1"><a name="wp4288"> </a><div class="pBullet1"><li>The class does not match the serial version of the class in the stream.</li></div>
+<a name="wp4293"> </a><div class="pBullet1"><li>The class contains fields with invalid primitive data types.</li></div>
+<a name="wp4296"> </a><div class="pBullet1"><li>The <code class="cCode">Externalizable</code> class does not have a public no-arg constructor.</li></div>
+<a name="wp4342"> </a><div class="pBullet1"><li>The <code class="cCode">Serializable</code> class can not access the no-arg constructor of its closest non-Serializable superclass.</li></div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4261"> </a><div class="pTableText">
+<code class="cCode">NotSerializableException</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4263"> </a><div class="pTableText">
+Thrown by a <code class="cCode">readObject</code> or <code class="cCode">writeObject</code> method to terminate serialization or deserialization.
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4265"> </a><div class="pTableText">
+<code class="cCode">StreamCorruptedException</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4267"> </a><div class="pTableText">
+Thrown:
+</div>
+<ul class="pBullet1"><a name="wp4335"> </a><div class="pBullet1"><li>If the stream header is invalid.</li></div>
+<a name="wp4327"> </a><div class="pBullet1"><li>If control information not found. </li></div>
+<a name="wp4333"> </a><div class="pBullet1"><li>If control information is invalid.</li></div>
+<a name="wp4334"> </a><div class="pBullet1"><li>JDK&#8482; 1.1.5 or less attempts to call <code class="cCode">readExternal</code> on a <code class="cCode">PROTOCOL_VERSION_2</code> stream.</li></div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4269"> </a><div class="pTableText">
+<code class="cCode">NotActiveException</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4271"> </a><div class="pTableText">
+Thrown if <code class="cCode">writeObject</code> state is invalid within the following <code class="cCode">ObjectOutputStream</code> methods:
+</div>
+<ul class="pBullet1"><a name="wp4363"> </a><div class="pBullet1"><li><code class="cCode">defaultWriteObject</code></li></div>
+<a name="wp4364"> </a><div class="pBullet1"><li><code class="cCode">putFields</code></li></div>
+<a name="wp4359"> </a><div class="pBullet1"><li><code class="cCode">writeFields</code></li></div>
+</ul>
+<a name="wp4370"> </a><div class="pTableText">
+&#160;
+</div>
+<a name="wp4365"> </a><div class="pTableText">
+Thrown if <code class="cCode">readObject</code> state is invalid within the following <code class="cCode">ObjectInputStream</code> methods:
+</div>
+<ul class="pBullet1"><a name="wp4369"> </a><div class="pBullet1"><li><code class="cCode">defaultReadObject</code></li></div>
+<a name="wp4367"> </a><div class="pBullet1"><li><code class="cCode">readFields</code></li></div>
+<a name="wp4368"> </a><div class="pBullet1"><li><code class="cCode">registerValidation</code></li></div>
+</ul>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4273"> </a><div class="pTableText">
+<code class="cCode">InvalidObjectException</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4275"> </a><div class="pTableText">
+Thrown when a restored object cannot be made valid.
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4277"> </a><div class="pTableText">
+<code class="cCode">OptionalDataException</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4279"> </a><div class="pTableText">
+Thrown by <code class="cCode">readObject</code> when there is primitive data in the stream and an object is expected. The length field of the exception indicates the number of bytes that are available in the current block.
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4281"> </a><div class="pTableText">
+<code class="cCode">WriteAbortedException</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4283"> </a><div class="pTableText">
+Thrown when reading a stream terminated by an exception that occurred while the stream was being written.
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="pTableCaption">
+
+</div>
+<a name="wp4242"> </a><p class="pBody">
+
+</p>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="security.html">Previous</a> | 
+        <a accesskey="n" href="examples.html">Next</a>
+       </td>
+        <td align="right">
+          <span class="copyright">Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification  </span>
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

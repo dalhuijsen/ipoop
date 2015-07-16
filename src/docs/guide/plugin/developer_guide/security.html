@@ -1,0 +1,35 @@
+<html>
+<head>
+<title>Overview -- Applet Security Basics</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Overview&#151;Applet Security Basics</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<h2><br>
+  Applet Security Basics</h2>
+<p>Below are the basic facts regarding applet security and Java Plug-in. More 
+  detail can be found in the next chapter, <a href="rsa_how.html">How RSA Signed 
+  Applet Verification Works in Java Plug-in</a>.</p>
+<ul>
+  <li>All <u>unsigned applets</u> are run under the standard applet security model.</li>
+  <li>If <code><a href="rsa_how.html#use">usePolicy</a></code> IS NOT DEFINED 
+    in the <code>java.policy</code> file, then a <u>signed applet</u> has the 
+    <code>AllPermission</code> permission if:<br>
+    Java Plug-in can verify the signers, and the user, when prompted, agrees to 
+    granting the <code>AllPermission</code> permission. </li>
+  <li>If <code>usePolicy</code> IS DEFINED, then a <u>signed applet</u> has only 
+    the permissions defined in <code>java.policy</code> and no prompting occurs.</li>
+</ul>
+<p>Moreover, note that Java Plug-in now handles certificate management; i.e., 
+  the certificate verification task is no longer passed off to the browser.</p>
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<HTML>
+<HEAD>
+  <TITLE>7 Scenarios</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="jndi.6.html">PREV</A>
+    | <A HREF="jndi.8.html">NEXT</A></TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<H2 CLASS="chapter"><A NAME="pgfId=998799"></A>7. Scenarios</H2>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998354"></A>This section outlines
+  a few application scenarios to help illustrate the capabilities
+  enabled by JNDI.</P>
+</BLOCKQUOTE>
+
+<UL>
+  <UL>
+    <LI CLASS="note"><A NAME="pgfId=998355"></A>The examples below
+    are not meant to be prescriptive. There are often several ways
+    to solve a problem, and JNDI is designed with flexibility in
+    mind.
+  </UL>
+</UL>
+
+<H3 CLASS="section"><A NAME="pgfId=998356"></A>7.1 User authentication</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998357"></A>In secure systems,
+  a user must authenticate himself to the computer, network, or
+  service that he wishes to access. For example, logging into Unix
+  requires the user to supply a password. Similarly, use of SSL
+  requires that the user supply his X.509 certificate. Such authentication
+  information can be stored as attributes associated with each
+  user in the directory. The system performing the authentication
+  would look up the attribute (for example, &quot;password&quot;)
+  of the user and verify the authenticity using the information
+  supplied by the user.</P>
+  <BLOCKQUOTE>
+    <PRE> 
+DirContext ctx = new InitialDirContext(); 	
+Attribute attr = ctx.getAttributes(userName).get(&quot;password&quot;);
+String password = (String)attr.get();</PRE>
+  </BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H3 CLASS="section"><A NAME="pgfId=998362"></A>7.2 Electronic
+Mail</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998363"></A>A useful feature of
+  an electronic mail system is a directory service that provides
+  a mapping between users and email addresses. This allows mail
+  users to search for the email address of a particular user. This
+  is analogous to searching for an individual's telephone number
+  in the phone book in order to dial his phone number. For example,
+  when I want to send mail to John Smith in my department, I search
+  for &quot;John Smith&quot; in the directory using a &quot;search&quot;
+  widget in the mail application. The widget returns to me five
+  entries of John Smith, from which I select the one that is in
+  a building on my site and use the email address attribute associated
+  with that entry.</P>
+  <BLOCKQUOTE>
+    <PRE>NamingEnumeration matches = deptCtx.search(&quot;user&quot;, new BasicAttributes(&quot;name&quot;, &quot;John Smith&quot;)); 
+// use matches to construct a selectable list for end-user
+while (matches.hasMore()) {
+    SearchResult item = (SearchResult) matches.next();
+    Attributes info = item.getAttributes(); 	
+    /* display attributes */
+    ...
+}</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998375"></A>The directory could
+  also be used by users to set up personalized address books. For
+  example, once I have located John Smith's email address, I might
+  not want to search the directory again each time I send him mail.
+  Instead, I can create a personal subtree in the directory in
+  which I maintain entries that I frequently use, possibly by creating
+  links to the existing entries.</P>
+</BLOCKQUOTE>
+
+<DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998376"></A>7.3 Databases</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998377"></A>Database applications
+  can use the directory to locate database servers. For example,
+  a financial application needs to get the stock quotes from a
+  stock quote server using JDBC. This application can enable the
+  user to select the stock quote server based on specification
+  of some attributes (such as coverage of which markets and frequency
+  of quote updates). The application searches the directory for
+  quote servers that meet these attributes, and then retrieves
+  the &quot;location&quot; attribute (a JDBC URL) of the selected
+  quote server and connects to it.</P>
+  <PRE>
+NamingEnumeration matches = 	ctx.search(&quot;service/stockQuotes&quot;,
+		                        &quot;(&amp;(market=NASDAQ)(updateFreqency&lt;=300))&quot;, searchctls); 	
+while (matches.hasMore()) {	
+	   SearchResult item = (SearchResult)matches.next(); 	
+	   Attribute location = item.getAttributes().get(&quot;location&quot;); 	
+   ...
+}</PRE>
+  </DIV><DIV>
+</BLOCKQUOTE>
+
+<H3 CLASS="section"><A NAME="pgfId=998386"></A>7.4 Browsing</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998387"></A>When using almost
+  any kind of interactive application that asks a user to input
+  names, the user's job is made easier if a namespace browser is
+  available to him. The browser can either be built into the application
+  and tailored to suit that application in particular, or it can
+  be more general-purpose such as a typical web browser.</P>
+  <P CLASS="body"><A NAME="pgfId=998388"></A>A very simple example
+  of a JNDI browser allows a user to &quot;walk&quot; through a
+  namespace, viewing the atomic names at each step along the way.
+  The browser prints a &quot;*&quot; to highlight the name of each
+  <CODE>Context</CODE> , thus telling the user where he can go
+  next.<A HREF="#pgfId=998391" CLASS="footnote"> 1</A></P>
+  <PRE>
+// Start at the top -- the initial context.
+Context ctx = new InitialContext();
+while (ctx != null) { 		// display one level
+    NamingEnumeration 	items = ctx.list();
+    while (items.hasMoreElements()) {
+        NameClassPair item = (NameClassPair)items.next();
+        if (isContext(item.getClassName())) {
+            System.out.print(&quot;*&quot;);
+        } else {
+            System.out.print(&quot; &quot;);
+        }
+        System.out.println(&quot; &quot; + item.getName());
+    }
+    // Take the next step down into the namespace.
+    String target = input.readLine();
+    try {
+        ctx = (Context)ctx.lookup(target);
+    } catch (NamingException e) {
+        // handle error
+    } catch (ClassCastException e) {
+        // not a context; cannot traverse
+    }
+}</PRE>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998418"></A>7.5 Network Printing</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998419"></A>An important function
+  of a printing service is to provide a means for its human users
+  to easily discover and select printers in the network. An application
+  that needs to print, or the machine on which it runs, should
+  not have to be configured each time a new printer is added to
+  the network. The scope of network access to printers may range
+  from a workgroup to global. The printing service can use the
+  directory to provide this capability.</P>
+  <P CLASS="body"><A NAME="pgfId=998420"></A>Assume that printers
+  are represented by a <CODE>Printer</CODE> interface. One of the
+  methods in it could be <CODE>print()</CODE> which, when given
+  an <CODE>InputStream</CODE> , will read data from <CODE>InputStream</CODE>
+  and print it on the printer represented by this instance of Printer.</P>
+  <BLOCKQUOTE>
+    <PRE>interface Printer {	
+	void print(InputStream data) throws PrinterException; 	
+	...
+}</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998425"></A>A user selects a printer
+  using a logical printer name, either explicitly or through default
+  settings. For example, the user might have specified a default
+  printer to use for all his applications, which is overridden
+  only when he explicitly specifies another printer to use. The
+  application that is accepting the print request takes the printer
+  name and looks it up in the directory service. The application
+  expects to receive as the result an object that implements the
+  <CODE>Printer</CODE> interface.</P>
+  <PRE>
+void myAppPrint(String printerName, String fileName) throws IOException {
+    try {
+        DirContext ctx = new InitialDirContext();
+        Printer prt = (Printer) ctx.lookup(printerName);
+        prt.print(new FileInputStream(fileName));
+    } catch (NamingException e){
+        System.err.println(&quot;Could not locate printer: &quot; + e);
+    } catch (ClassCastException e) {
+        System.err.println(printerName + &quot;does not name a printer&quot;);
+    }
+}</PRE>
+  <DIV>
+</BLOCKQUOTE>
+
+<H4 CLASS="subsection"><A NAME="pgfId=998438"></A>7.5.1 Browsing
+and searching for printers</H4>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998439"></A>Selecting a printer
+  by explicitly giving its name is but one way of identifying a
+  printer. The user can also use the directory to see the different
+  printers available (browsing), or to search for printers with
+  particular attributes. For example the user can ask the directory
+  to list all the printers on the second floor of building 5 in
+  the Mountain View campus, or search for all color laser printers
+  with 600dpi resolution. From the application's perspective, just
+  as <CODE>lookup()</CODE> returned a <CODE>Printer</CODE> object,
+  the list and search operations also provide the same capability
+  of returning <CODE>Printer</CODE> objects that the application
+  could use to submit print requests.</P>
+</BLOCKQUOTE>
+
+</DIV></DIV><HR ALIGN=LEFT><DIV CLASS="footnotes"><DIV CLASS="footnote">
+
+<P CLASS="Footnote"><SPAN CLASS="footnoteNumber"> 1.</SPAN> <A
+NAME="pgfId=998391"></A>The isContext() method used in the example
+is not part of JNDI. It is a method that must be provided by the
+application.</P>
+
+</DIV></DIV>
+
+<P><HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A> | <A 
+HREF="jndi.6.html">PREV</A> | <A HREF="jndi.8.html">NEXT</A><HR ALIGN=LEFT><I><FONT
+ SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

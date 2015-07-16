@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>JFileChooser</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>JFileChooser</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+  <h2>New JFileChooser isAcceptAllFileFilterUsed Property</h2>
+
+
+      This property allows control of the AcceptAll (*.*) file filter, which is 
+      added to the choosable file filters combo box by default.
+
+<P>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JFileChooser.html#ACCEPT_ALL_FILE_FILTER_USED_CHANGED_PROPERTY">public static final String ACCEPT_ALL_FILE_FILTER_USED_CHANGED_PROPERTY</a> 
+<li><a href="../../../api/javax/swing/JFileChooser.html#setAcceptAllFileFilterUsed(boolean)">public void setAcceptAllFileFilterUsed(boolean b)</a>
+<li><a href="../../../api/javax/swing/JFileChooser.html#isAcceptAllFileFilterUsed()">public boolean isAcceptAllFileFilterUsed()</a> 
+</tt>      
+</ul>
+
+    <h2>Support for removing the OK and Cancel Buttons</h2>
+
+
+      The normal way to bring a JFileChooser is with the dialog creation utilities. 
+      However, since a JFileChooser is a JComponent, it can just as easily be embedded 
+      in a container. When this is done, it will oftentimes be the case that the 
+      developer will want control of any control buttons (ok, cancel, other) and not 
+      want the default Accept and Cancel buttons to appear. The following property
+      will allow the developer to specify if the control buttons should be shown
+      or not by the file chooser.
+<P>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JFileChooser.html#getControlButtonsAreShown()">public boolean getControlButtonsAreShown()</a> 
+<li><a href="../../../api/javax/swing/JFileChooser.html#setControlButtonsAreShown(boolean)">public void setControlButtonsAreShown(boolean b) </a>
+</tt>
+</ul>
+
+
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

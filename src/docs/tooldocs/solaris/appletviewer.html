@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<HEAD>
+	<TITLE>appletviewer - The Java Applet Viewer</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>appletviewer - The Java Applet Viewer</H1>
+
+
+<BLOCKQUOTE>
+	<P>The <B>appletviewer</B> command allows you to run applets outside of the context of a World-Wide Web browser.
+
+</BLOCKQUOTE>
+
+<H2>SYNOPSIS</H2>
+
+
+<BLOCKQUOTE>
+	<P><B><CODE>appletviewer</CODE></B><CODE> [ </CODE><A
+	HREF="#Options"><CODE>options</CODE></A><CODE> ] <I>urls</I> ...</CODE>
+
+</BLOCKQUOTE>
+
+<H2>DESCRIPTION</H2>
+
+
+<BLOCKQUOTE>
+The <B>appletviewer</B> command connects to the documents or resources 
+designated by <I>urls</I> and displays each applet referenced by the 
+documents in its own window. Note: if the documents referred to by <I>urls</I>
+do not reference any applets with the <I>OBJECT</I>, <I>EMBED</I>, or <I>APPLET</I> tag, 
+then <B>appletviewer</B> does nothing. For details on the HTML tags that <B>appletviewer</B> 
+supports, see <a href="../appletviewertags.html">AppletViewer Tags</a>.
+</BLOCKQUOTE>
+
+<P><A NAME="Options"></A>
+<H2>OPTIONS</H2>
+
+
+<BLOCKQUOTE>
+
+	<DL>
+	<DT><B>-debug</B></DT>
+	<DD>Starts the applet viewer in the Java debugger, <A HREF="jdb.html"><B>jdb</B></A>, thus allowing you to debug
+	the applets in the document.
+	<P>
+	<DT><B>-encoding</B> <I>&nbsp; &nbsp;encoding name</I></DT>
+	<DD>Specify the input HTML file encoding name.
+	<P>
+	<DT><B>-J</B><I>javaoption</I></DT>
+	<DD>Passes through the string <I>javaoption</I> as a single argument to the Java interpreter which runs the appletviewer.
+	The argument should not contain spaces. Multiple argument words must all begin with the prefix <B>-J</B>, which
+	is stripped. This is useful for adjusting the compiler's execution environment or memory usage.
+	</DL>
+
+
+</BLOCKQUOTE>
+
+<P><!-- PENDING: put in a SEE ALSO link to hotjava after the ADR -->
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
+

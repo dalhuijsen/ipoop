@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>Versions Formats</title>
+
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Appendix 6: Sun-Supported <code>Specification-Version</code> and <code>Implemenation-Version</code> 
+  Formats</h1>
+<hr>
+<p><code>Specification-Version</code> and <code>Implementation-Version</code> 
+  follow these rules for Sun products, and third-party products must follow the 
+  same rules for Java Plug-in to make reliable decisions about whether an extension 
+  is up-to-date or not:</p>
+<p>The <code>Specification-Version</code> string will be of the form:</p>
+<blockquote> 
+  <p><code>n1.n2[.n3]</code></p>
+</blockquote>
+<p>where<code> n1</code>, <code>n2</code>, and <code>n3</code> are integers, <code>n1.n2</code> 
+  is the <i>major version number</i>, and optional <code>n3</code> is the <i>minor 
+  version number</i> (also referred to as the <i>maintenance version number</i>).</p>
+<p>The <code>Implementation-Version</code> will be of the same form initially 
+  but may:</p>
+<ul>
+  <li> append with a preceding underscore(&quot;<code>_</code>&quot;) <code>n4n5</code> 
+    to indicate a <i>patch version number</i> (also referred to as the <i>update 
+    version number</i>)</li>
+  <li>or append with a hyphen (&quot;<code>-</code>&quot;) a milestone name (<code>ea</code> 
+    , <code>alpha</code>, <code>beta</code>, <code>rc</code> ...), which may also 
+    include a trailing integer number (<code>ea1</code>, <code>beta2</code>, <code>rc1</code> 
+    ...).</li>
+</ul>
+<p>Both patch version number and milestone name may not be used together in the 
+  <code>Implemenation-Version</code> string.</p>
+<p>The general form is as follows:</p>
+<blockquote> 
+  <p><code>n1.n2[.n3][_&lt;patch_number&gt;|-&lt;milestone_name&gt;]</code></p>
+</blockquote>
+<p>Integers (<code>n1</code>,<code>n2</code>, <code>n3</code> ...), letters, dots, 
+  hyphens, and underscores , may be used in the version format as described above; 
+  no other characters (&quot;<code>*</code>&quot;, &quot;<code>+</code>&quot; 
+  ...) are allowed.</p>
+<p>Note that the <code>Specification-Version</code> and <code>Implementation-Version</code> 
+  numbers are in theory independent, though in practice they are often in sync 
+  with each other.</p>
+<p><b>Examples:</b> </p>
+<p><code>Specification-Version</code> examples: <code>1.3</code>, <code>1.4</code></p>
+<p><code>Implementation-Version</code> examples: <code>1.3.1</code>, <code>1.4.0_02</code>, 
+  <code>1.4.0-beta3</code></p>
+<p>While these are the rules, it is always a good idea when using a third-party 
+  extension <code>JAR</code> to examine its <code>MANIFEST.MF</code> file to see 
+  what actual values are in it. If it does not follow these rules, you may need 
+  to change your applet <code>JAR</code> <code>MANIFEST.MF</code> accordingly 
+  or alter the extension <code>JAR</code>.</p>
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,664 @@
+<html>
+<head>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Java-to-Javascript Communication</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<br>
+<p>This section includes the following topics:</p>
+<ul>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#jsobject"><code>JSObject</code></a> 
+    <ul>
+      <li><a href="java_js.html#how">How <code>JSObject</code> Works</a></li>
+      <li><a href="#degree">Degree of <code>JSObject</code> support in Java Plug-in</a></li>
+      <li><a href="#enabling">Enabling <code>JSObject</code> support in Java Plug-in</a></li>
+    </ul>
+  </li>
+  <li><a href="#common_dom">Common DOM API</a></li>
+</ul>
+<h2><a name="intro"></a>Introduction</h2>
+<p>Java Plug-in offers two way to access the DOM: Through <code>JSObject</code> 
+  and through the Common DOM API. Each method is described below, along with security 
+  considerations.<br>
+</p>
+<h2><a name="jsobject"></a><code>JSObject</code></h2>
+<p>Java<font size="-2"></font> applets may need to perform Java-to-JavaScript 
+  communication to access the Document Object Model (DOM) or to call JavaScript 
+  functions on an HTML page. Browsers allow communication between Java and JavaScript 
+  through the Java wrapper class <code>netscape.javascript.JSObject</code>. For 
+  more information, see <a href="http://developer.netscape.com/docs/manuals/communicator/jsref/pkg.htm">Java 
+  Packages for LiveConnect</a>. </p>
+<p>Because of differences in DOM implementations between browsers, Java Plug-in 
+  provides different degrees of support for <code>JSObject</code> in Internet 
+  Explorer and Navigator. This document specifies how <code>JSObject</code> support 
+  works in different browser environments. 
+<h3><a name="how"></a>How <code>JSObject</code> Works</h3>
+<p> <code>JSObjec</code>t provides an easy way to access the DOM of an HTML page. 
+  But because different browsers implement the DOM differently, using <code>JSObject</code> 
+  in a Java applet may yield different behaviors in Java Plug-in. For details 
+  about the DOM implementation in a particular browser, consult the developer 
+  guide for that browser. </p>
+<p>In general, applets access <code>JSObject</code> as follows:</p>
+<table summary="layout" cellpadding="5" align="center" width="95%">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <pre><font color="#000000">import netscape.javascript.*;
+import java.applet.*;
+import java.awt.*;
+class MyApplet extends Applet {
+     public void init() {
+         JSObject win = JSObject.getWindow(this);
+         JSObject doc = (JSObject) win.getMember(&quot;document&quot;);
+         JSObject loc = (JSObject) doc.getMember(&quot;location&quot;);
+
+         String s = (String) loc.getMember(&quot;href&quot;);  // document.location.href
+         win.call(&quot;f&quot;, null);                      // Call f() in HTML page
+     }
+}
+</font></pre>
+    </td>
+  </tr>
+</table>
+<p>The starting point is the <code>static</code> method </p>
+<blockquote>
+  <pre>
+public static JSObject getWindow(Applet a) 
+</pre>
+</blockquote>
+<p>which returns a <code>JSObject</code> representing the <code>Window</code> 
+  that contains the given applet. Since this method takes only <code>java.applet.Applet</code> 
+  as parameter, <code>JSObject</code> can be accessed from an applet, but not 
+  from a bean unless the bean is also an applet. </p>
+<p>Once the <code>Window</code> object is obtained, the applet can navigate the 
+  DOM of the HTML page using the following methods:</p>
+<ul>
+  <li><code>public Object call(String methodName, Object args[]) </code>
+  <li><code>public Object eval(String s) </code>
+  <li><code>public Object getMember(String name) </code>
+  <li><code>public Object getSlot(int index) </code>
+  <li><code>public void removeMember(String name) </code>
+  <li><code>public void setMember(String name, Object value) </code>
+  <li><code>public void setSlot(int index, Object value) </code>
+  <li><code>public String toString() </code> 
+</ul>
+<p>We recommend using only <code>getWindow()</code>, <code>call()</code>, <code>eval()</code>, 
+  <code>setMember()</code> and <code>getMember()</code> in Java Plug-in. The implementations 
+  of <code>getSlot()</code>, <code>setSlot()</code>, <code>removeMember()</code> 
+  and <code>toString()</code> are browser-dependent; i.e., the result of execution 
+  may vary depending on the version and platform of the browser in which Java 
+  Plug-in is running.</p>
+<p>For more information about using <code>JSObject</code>, please read the section 
+  called &quot;Java to JavaScript Communication&quot; on the <a href="http://developer.netscape.com/docs/manuals/communicator/jsguide4/livecon.htm">LiveConnect</a> 
+  page. </p>
+<p>To compile Java code to take advantage of <code>JSObject</code>, you must have 
+  the package <tt>netscape.javascript</tt> in the <code>CLASSPATH</code>. Currently, 
+  Java Plug-in 1.3 ships <tt>netscape.javascript</tt> in a JAR file called <code>JAWS.JAR</code>. 
+  To compile an applet which uses <code>JSObject</code>, add <code>JAWS.JAR</code> 
+  in the <code>CLASSPATH</code> before compilation.</p>
+<p>Note that although <code>JSObject</code> is supported in Java Plug-in, it is 
+  not supported in AppletViewer in the Java 2 platform. As a result, applets using 
+  <code>JSObject</code> may not run in AppletViewer or result in exceptions.</p>
+<h3><a name="degree"></a>Degree of <code>JSObject</code> support in Java Plug-in</h3>
+<h4><strong>Internet Explorer: </strong></h4>
+<p>By accessing the DOM through COM, Java Plug-in provides full support of <code>JSObject</code> 
+  in IE. </p>
+<h4><strong>Netscape Navigator:</strong> </h4>
+<p>By accessing the DOM through Netscape's Plug-in API, Java Plug-in provides 
+  limited support of <code>JSObject</code> in Navigator 4 . In Navigator 4 the 
+  following JavaScript objects can be accessed through <code>JSObject</code>:</p>
+<ul>
+  <li><code>Anchor </code> 
+  <li><code>Document </code> 
+  <li><code>Element </code> 
+  <li><code>Form </code> 
+  <li><code>Frame </code> 
+  <li><code>History </code> 
+  <li><code>Image</code>
+  <li><code>Layer</code> 
+  <li><code>Link </code> 
+  <li><code>Location </code> 
+  <li><code>Navigator </code> 
+  <li><code>Option </code> 
+  <li><code>URL </code> 
+  <li><code>Window</code> 
+</ul>
+<p>No other JavaScript objects are supported with Netscape 4, and attempting to 
+  access them through <code>JSObject</code> will result in Java exceptions. These 
+  restrictions do not apply to Netscape 6; it provides full support of <code>JSObject</code>.</p>
+<p><b><font size="4">Note:</font></b> Even though different browsers may support 
+  the same JavaScript object, support of an object's methods and properties may 
+  differ. Be sure to check the JavaScript developer guide for your browser.</p>
+<h3><a name="enabling"></a>Enabling <code>JSObject</code> Support in Java Plug-in</h3>
+<p>Due to security reasons, <code>JSObject</code> support is not enabled in Java 
+  Plug-in by default. To enable <code>JSObject</code> support in Java Plug-in, 
+  a new attribute called <code>MAYSCRIPT</code> needs to be present in the <code>EMBED/OBJECT</code> 
+  tag as follows:</p>
+<h4>Original <code>APPLET</code> tag:&nbsp; </h4>
+<table summary="layout" cellpadding="5" align="center" width="95%">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <pre><font color="#000000">&lt;APPLET code=&quot;XYZApp.class&quot; codebase=&quot;html/&quot; align=&quot;baseline&quot;
+     width=&quot;200&quot; height=&quot;200&quot; </font><font color="#FF0000">MAYSCRIPT</font><font color="#000000">&gt;
+&lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+     No JDK 1.3 support for APPLET!!
+&lt;/APPLET&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<h4>New <code>OBJECT</code> tag:&nbsp; </h4>
+<table summary="layout" cellpadding="5" align="center" width="95%">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <pre><font color="#000000">&lt;OBJECT classid=&quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;
+     width=&quot;200&quot; height=&quot;200&quot; align=&quot;baseline&quot;
+     codebase=&quot;http://java.sun.com/products/plugin/1.3/jinstall-13-win32.cab#Version=1,3,0,0&quot;&gt;
+     &lt;PARAM NAME=&quot;code&quot; VALUE=&quot;XYZApp.class&quot;&gt;
+     &lt;PARAM NAME=&quot;codebase&quot; VALUE=&quot;html/&quot;&gt;
+     &lt;PARAM NAME=&quot;type&quot; VALUE=&quot;application/x-java-applet;version=1.3&quot;&gt;</font><font color="#0000FF">
+</font><font color="#008000">    <font color="#FF0000"> &lt;PARAM NAME=&quot;MAYSCRIPT&quot; VALUE=&quot;true&quot;&gt;</font>
+</font><font color="#0000FF">     <font color="#000000">&lt;PARAM NAME=&quot;model&quot; VALUE=&quot;models/HyaluronicAcid.xyz&quot;&gt;
+        No JDK 1.3 support for APPLET!!</font></font><font color="#000000">
+&lt;/OBJECT&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<h4>New <code>EMBED</code> tag:</h4>
+<table summary="layout" cellpadding="5" align="center" width="95%">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <pre><font color="#000000">&lt;EMBED type=&quot;application/x-java-applet;version=1.3&quot; width=&quot;200&quot;
+   height=&quot;200&quot; align=&quot;baseline&quot; code=&quot;XYZApp.class&quot;
+   codebase=&quot;html/&quot; model=&quot;models/HyaluronicAcid.xyz&quot; </font><font color="#FF0000">MAYSCRIPT=true</font><font color="#800000">
+   <font color="#000000">pluginspage=&quot;http://java.sun.com/products/plugin/1.3/plugin-install.html&quot;&gt;
+&lt;NOEMBED&gt;
+   No JDK 1.3 support for APPLET!!
+&lt;/NOEMBED&gt;
+&lt;/EMBED&gt;</font>
+</font></pre>
+    </td>
+  </tr>
+</table>
+<p>If <code>MAYSCRIPT</code> is specified as false, or if <code>MAYSCRIPT</code> 
+  is absent, <code>JSObject</code> is disabled. For more information about the 
+  <code>MAYSCRIPT</code> attribute in the <code>EMBED/OBJECT</code> tag, see <a href="using_tags.html">Using 
+  <code>OBJECT</code>, <code>EMBED</code> and <code>APPLET</code> Tags in Java 
+  Plug-in</a>.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+<h2><a name="common_dom"></a>Common DOM API </h2>
+<h3>Overview</h3>
+<p>This section discusses the <a href="../dom/index.html">Common DOM API</a> in 
+  Java Plug-in for 1.4. It provides a standard API for accessing the DOM in the 
+  browser for browsers from different browser vendors running on various platforms.</p>
+<table summary="layout" width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr>
+    <td>
+      <h2><u>Note</u></h2>
+      <p>Full support is provided with Internet Explorer 6 and Netscape 6; support 
+        is limited with other browsers.</p>
+    </td>
+  </tr>
+</table>
+<p>This API is built upon the Document Object Model (DOM) Level 2 recommendation. 
+  (See <a href="http://www.w3.org/DOM/">http://www.w3.org/DOM/</a> for various 
+  w3c recommendations.) The Document Object Model (DOM) is a set of interfaces 
+  defined using Interface Definition Language (IDL) and including Java Language 
+  bindings.</p>
+<p>The Common DOM API includes the following w3c-defined interface packages:</p>
+<ul>
+  <li><code>org.w3c.dom.*</code></li>
+  <li><code>org.w3c.dom.css.*</code></li>
+  <li><code>org.w3c.dom.events.*</code></li>
+  <li><code>org.w3c.dom.html.*</code></li>
+  <li><code>org.w3c.dom.stylesheets.*</code></li>
+  <li><code>org.w3c.dom.views.* </code></li>
+</ul>
+<h3>DOMService</h3>
+<p>The Common DOM classes allow an application to access the underlying DOM of 
+  the browser through the APIs in the <code>org.w3c.dom</code><i> </i>and <code>org.w3c.dom.html</code><i> 
+  </i>packages.</p>
+<p>Each DOM represents the underlying representation of a single XML/HTML document 
+  within the browser, and each browser may display more than one XML/HTML document 
+  in multiple browser frames/windows. Thus, when an application requests to access 
+  the DOM through the Common DOM classes, it is important to return the DOM associated 
+  with the application. In order to obtain the proper DOM associated with the 
+  application, a Java object will be passed to <code>DOMService.getService()</code><i>. 
+  </i><code>DOMService</code> will return the proper <code>DOMService</code> implementations 
+  associated with the object, or an exception will be thrown. Ordinarily the Java 
+  object is an applet or JavaBeans component. However, this specification doesn't 
+  preclude other Java object types from being used, if the <code>DOMServiceProvider</code> 
+  can handle it.</p>
+<p>To perform an action on the DOM, an object that implements <code>DOMAction</code> 
+  will need to be passed to <code>DOMService.invokeAndWait()</code> or <code>DOMService.invokeLater()</code>. 
+  <code>DOMAction.run()</code> will then be executed on the DOM access dispatch 
+  thread.&nbsp;</p>
+<p>Here is a simple example of obtaining the title of the Document object: </p>
+<table summary="layout" width="90%" cellpadding="5" bgcolor="#CCCCCC" align="center">
+  <tr>
+    <td>
+      <blockquote>
+        <pre>DOMService service = null;
+
+try
+{
+    service = DOMService.getService(MyApplet);</pre>
+        <pre>    String title = (String) service.invokeAndWait(new DOMAction()
+                            {
+                                public Object run(DOMAccessor accessor)
+                                {
+                                     HTMLDocument doc = (HTMLDocument) accessor.getDocument(MyApplet);
+                                     return doc.getTitle();
+                                }
+                            });
+}
+catch (DOMUnsupportedException e1)
+{
+}
+catch (DOMAccessException e2)
+{
+}</pre>
+      </blockquote>
+      <p></p>
+</td>
+  </tr>
+</table>
+<p>
+<h3>DOMService Plugability</h3>
+<p>Since there may be more than one <code>DOMServiceProvider</code>, it is important 
+  to allow third parties to plug their <code>DOMServiceProvider</code> implementations 
+  into the Common DOM classes. To achieve that, a new Java property, <code>com.sun.browser.dom.DOMServiceProvider</code>, 
+  is defined.</p>
+<p>If this property is defined, it should contain a list of class names of the 
+  <code>DOMServiceProvider</code> implementations, each separated by a character 
+  &quot;|&quot;.</p>
+<p>When <code>DOMService.getService()</code> is called, <code>DOMServiceProvider</code> 
+  implementations specified by the <code>com.sun.browser.dom.DOMServiceProvider</code> 
+  will be called one-by-one to determine if the provide can determine the DOM 
+  association of the object, according to the order that is specified in the property. 
+  In case two <code>DOMServiceProvider</code> implementations may be able to handle 
+  the same object, the provider that is specified first in the property will be 
+  used.</p>
+<h3>Thread Safety</h3>
+<p>Because the DOM of each browser is implemented differently, DOM access is not 
+  expected to be thread safe. Accessing implementation of DOM objects in this 
+  specification must be restricted on the DOM access dispatch thread only, so 
+  thread safely can be ensured. To accomplish that, code accessing the DOM objects 
+  must be scoped within the <code>DOMAction.run()</code> block. To invoke the 
+  action, either <code>DOMService.invokeAndWait()</code> or <code>DOMService.invokeLater()</code> 
+  should be used, so that <code>DOMAction.run()</code> will be executed in the 
+  DOM access dispatch thread.<br>
+  <br>
+  Although implementations of DOM objects should not be called outside the<i> 
+  </i><code>DOMAction.run()</code> block, the application may cache these DOM 
+  objects around as instance member of a class, or pass these DOM objects between 
+  threads. However, caching the DOM objects as static members of any object is 
+  prohibited, since static members tend to stay around much longer than the lifecycle 
+  of the underlying DOM object.<br>
+  <br>
+  The only object in the Common DOM classes that can be called from any thread 
+  is <code>DOMService</code>. Access to other objects in the Common DOM classes 
+  is restricted within the <code>DOMAction.run()</code> block; otherwise, an exception 
+  will be thrown.</p>
+<h3>Security</h3>
+<p>The browser DOM provides access to every service in the browser, so it is important 
+  to ensure that security is checked properly during each call into the DOM. When 
+  <code>DOMService.invokeAndWait()</code> or <code>DOMService.invokeLater()</code> 
+  is called, the security context of the caller will be captured. Later, when 
+  the corresponding <code>DOMAction.run()</code> is executed on the DOM access 
+  dispatch thread, the caller's security context will be passed to the browser 
+  DOM when implementations of the DOM objects are called. <code>DOMAccessException</code> 
+  will be thrown if the original caller doesn't have the required privileges to 
+  access the DOM.</p>
+<p>Security policy of DOM access in each browser is different. As a result, even 
+  if a Java application is signed and fully trusted, accessing the DOM objects 
+  in the browser may still result in <code>DOMAccessException</code>.</p>
+<h3>DOM Object Lifetime</h3>
+<p>Implementation of the DOM objects represents the real underlying objects in 
+  the browser DOM. As the XML/HTML document is changed on-the-fly, DOM objects 
+  in Java may no longer be valid. Accessing an invalid DOM object will result 
+  in <code>org.w3c.dom.DOMException</code>, according to the W3C DOM Level 2 Specification. 
+  Developers who write code to access DOM objects in <code>DOMAction.run()</code> 
+  should not assume the validity of the DOM objects at any given moment.&nbsp;</p>
+<h3>Conformance Requirements</h3>
+<p>Third parties implementing this specification must provide implementations 
+  of the Common DOM classes in the<i> </i><code>com.sun.browser.dom</code> package. 
+  Implementations of the W3C DOM Level 2 APIs must also conformance to the W3C 
+  DOM Level 2 Specification. However, because each browser may implement a different 
+  subset of the W3C DOM APIs, third parties are not required to provide implementations 
+  of all <code>org.w3c.dom</code> and <code>org.w3c.dom.html</code> classes.</p>
+<h3>Package <code>com.sun.browser.dom</code></h3>
+<p>This section defines the API of the <code>com.sun.browser.dom</code> package.</p>
+<h4><code>public abstract class DOMService</code><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></h4>
+<p>The <code>DOMService</code> defines a service API that enables applications 
+  to access a <code>document</code> object representing the underlying DOM of 
+  the browser <code>window</code> that embeds the applications.<br>
+</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td>
+      <p><code>public abstract class DOMService&nbsp;<br>
+        {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns new instance 
+        of a <i>DOMService</i>. The implementation<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * of the <i>DOMService</i> 
+        returns depending on the setting of the<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * <i>javax.browser.dom.DOMServiceProvider</i> 
+        property or, if the<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * property is not set, 
+        a platform-specific default.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Throws DOMUnsupportedException 
+        if the DOMService is not&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * available to the obj.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param obj Object to 
+        leverage the <i>DOMService</i><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static DOMService getService(Object 
+        obj) throws DOMUnsupportedException;<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * An empty constructor 
+        is provided. Implementations of this<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * abstract class must 
+        provide a protected no-argument constructor<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * in order for the static 
+        <i>getService()</i> method to work correctly.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Application programmers 
+        should not be able to directly<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * construct implementation 
+        subclasses of this abstract subclass.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; protected DOMService();<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Causes <i>action.run()</i> 
+        to be executed synchronously on the&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * DOM action dispatching 
+        thread. This call will block until all&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * pending DOM actions 
+        have been processed and (then)&nbsp;<i><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * action.run()</i> returns. 
+        This method should be used when an&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * application thread 
+        needs to access the browser's DOM.&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * It should not be called 
+        from the <i>DOMActionDispatchThread</i>.&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Note that if the <i>DOMAction.run()</i> 
+        method throws an uncaught&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * exception (on the DOM 
+        action dispatching thread), it's caught&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * and re-thrown as an 
+        <i>DOMAccessException</i> on the caller's thread.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param action DOMAction.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public abstract Object invokeAndWait(DOMAction 
+        action) throws DOMAccessException;</code></p>
+      <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Causes <i>action.run()</i> 
+        to be executed asynchronously on the&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * DOM action dispatching 
+        thread. This method should be used&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * when an application 
+        thread needs to access the browser's&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * DOM. It should not 
+        be called from the <i>DOMActionDispatchThread</i>.&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Note that if the<i> 
+        DOMAction.run()</i> method throws an uncaught&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * exception (on the DOM 
+        action dispatching thread),&nbsp; it will not be<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * caught and re-thrown 
+        on the caller's thread.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param action DOMAction.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public abstract void invokeLater(DOMAction 
+        action);<br>
+        }</code></p>
+</td>
+  </tr>
+</table>
+<p>Note that <code>Object obj</code> in the <code>getService(Object obj)</code> 
+  method above is the applet or the bean.</p>
+<h4><code>public abstract class DOMServiceProvider</code></h4>
+<p> Implementation instances of the <code>public abstract class DOMServiceProvider</code> 
+  enable access to the underlying browser DOM for a given Java object. Instances 
+  of <code>DOMServiceProvider</code> should not be obtained by the application 
+  directly. </p>
+<table summary="layout" summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td><code>public abstract class DOMServiceProvider<br>
+      {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * An empty constructor 
+      is provided. Implementations should&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * provide a protected constructor 
+      so that the <i>DOMService</i><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * can instantiate instances 
+      of the implementation class.&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Application programmers 
+      should not be able to directly<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * construct implementation 
+      subclasses of this abstract subclass.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * The only way an application 
+      should be able to obtain a&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * reference to a <i>DOMServiceProvider</i> 
+      implementation<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * instance is by using 
+      the appropriate methods of the<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * <i>DOMService</i>.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; protected DOMServiceProvider();<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns true if the <i>DOMService</i> 
+      can determine the association<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * between the obj and the 
+      underlying DOM in the browser.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public abstract boolean canHandle(Object 
+      obj);<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns the Document 
+      object of the DOM.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public abstract org.w3c.dom.Document 
+      getDocument(Object obj) throws DOMUnsupportedException;<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns the <i>DOMImplemenation</i> 
+      object of the DOM.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public abstract org.w3c.dom.DOMImplementation 
+      getDOMImplementation();<br>
+      }</code></td>
+  </tr>
+</table>
+<p>Note that <code>Object obj</code> in the <code>canHandle(Object obj)</code> 
+  and <code>getDocument(Object obj)</code> methods above is the applet or the 
+  bean.</p>
+<p>
+<h4><code>public interface DOMAccessor</code></h4>
+<p><code>DOMAccessor</code> represents the interface that can be used within <code>DOMAction.run()</code> 
+  to access the entry point of the browser DOM. </p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td><code>public interface DOMAccessor<br>
+      {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns the Document 
+      object of the DOM.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public org.w3c.dom.Document getDocument(Object 
+      obj) throws org.w3c.dom.DOMException;<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns a <i>DOMImplementation</i> 
+      object.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public org.w3c.dom.DOMImplementation 
+      getDOMImplementation();<br>
+      }&nbsp;</code></td>
+  </tr>
+</table>
+<p>Note that <code>Object obj</code> in the <code>getDocument(Object obj)</code> 
+  method above is the applet or the bean.</p>
+<p>
+<h4><code>public interface DOMAction</code></h4>
+<p><code>DOMAction</code> encapsulates all the actions of the applications that 
+  will be performed on the browser's DOM.<br>
+</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td><code>public interface DOMAction<br>
+      {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * When an object implementing 
+      interface <i>DOMAction</i> is passed<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * to <i>DOMService.invokeAndWait()</i> 
+      or <i>DOMService.invokeLater()</i>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * the run method is called 
+      in the DOM access dispatch thread.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * accessor is used for 
+      the <i>DOMAction</i> to access the entry point of&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * the browser's DOM, if 
+      necessary.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param accessor <i>DOMAccessor</i><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public Object run(DOMAccessor 
+      accessor);<br>
+      }</code></td>
+  </tr>
+</table>
+<p>
+<h4><code>public class DOMUnsupportedException</code></h4>
+<p>This exception is thrown from <code>DOMService.getService()</code> and <code>DOMServiceProvider.getDocument()</code> 
+  if the association between the Java object and the DOM cannot be found.</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td><code>public class DOMUnsupportedException extends Exception<br>
+      {&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Constructs a new <i>DOMUnsupportedException</i> 
+      with no detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public DOMUnsupportedException();<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Constructs a new <i>DOMUnsupportedException</i> 
+      with the given detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param msg Detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public DOMUnsupportedException(String 
+      msg);<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Constructs a new <i>DOMUnsupportedException</i> 
+      with the given exception as a root clause.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param e Exception.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public DOMUnsupportedException(Exception 
+      e);<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Constructs a new <i>DOMUnsupportedException</i> 
+      with the given exception as a root clause and the given &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;detail 
+      message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param e Exception.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param msg Detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public DOMUnsupportedException(Exception 
+      e, String msg);<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns the detail message 
+      of the error or null if there is no detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public String getMessage();<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns the root cause 
+      of the error or null if there is none.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public Exception getException();&nbsp;&nbsp;&nbsp;<br>
+      }&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code></td>
+  </tr>
+</table>
+<p>
+<h4><code>public class DOMAccessException</code></h4>
+<p>This exception is thrown from <code>DOMService.accessAndWait()</code> if any 
+  DOM objects throws any exception when it is accessed within <code>DOMAction.run()</code>.</p>
+<table summary="layout" width="90%" cellpadding="5" align="center" bgcolor="#CCCCCC">
+  <tr>
+    <td><code>public class DOMAccessException&nbsp; extends Exception<br>
+      {&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Constructs a new <i>DOMAccessException</i> 
+      with no detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public DOMAccessException();<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Constructs a new <i>DOMAccessException</i> 
+      with the given detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param msg Detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public DOMAccessException(String 
+      msg);<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Constructs a new <i>DOMAccessException</i> 
+      with the given exception as a root clause.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param e Exception.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public DOMAccessException(Exception 
+      e);<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Constructs a new <i>DOMAccessException</i> 
+      with the given exception as a root clause and the given &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;detail 
+      message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param e Exception.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param msg Detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public DOMAccessException(Exception 
+      e, String msg);<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns the detail message 
+      of the error or null if there is no detail message.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public String getMessage();<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Returns the root cause 
+      of the error or null if there is none.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public Exception getException();&nbsp;&nbsp;&nbsp;<br>
+      }</code></td>
+  </tr>
+</table>
+<p>&nbsp; 
+<p>
+</body>
+</html>

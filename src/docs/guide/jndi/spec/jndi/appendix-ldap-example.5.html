@@ -1,0 +1,206 @@
+<HTML>
+<HEAD>
+  <TITLE>B.5 Modify Attributes</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="appendix-ldap-example.4.html">PREV</A>
+    | <A HREF="appendix-ldap-example.6.html">NEXT</A></TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<P CLASS="AppendixStart"><FONT COLOR="#707070">Appendix B:</FONT></P>
+
+<H2 CLASS="AppSection"><A NAME="pgfId=999369"></A>B.5 Modify Attributes</H2>
+
+<H2 CLASS="AppSection"><TABLE summary="layout" WIDTH="629" BORDER="0" CELLSPACING="2"
+CELLPADDING="0">
+  <TR>
+    <TD WIDTH="8%">
+    &nbsp;</TD> 
+    <TD WIDTH="54%">
+    &nbsp;B.5.1 <A HREF="#pgfId=999372">Modify Attributes Using LDAP
+    C API</A></TD> 
+    <TD WIDTH="38%">
+    &nbsp;B.5.2 <A HREF="#pgfId=999373">Modify Attributes Using JNDI</A></TD> 
+  </TR>
+</TABLE></H2>
+
+<H2 CLASS="AppSection">&nbsp;</H2>
+
+<H3 CLASS="AppSubsection"><A NAME="pgfId=999372"></A>B.5.1 Modify
+Attributes Using LDAP C API</H3>
+
+<BLOCKQUOTE>
+  <PRE>
+<CODE>/*</CODE>
+<CODE> * Copyright (c) 1996.  Netscape Communications Corporation.  All</CODE>
+<CODE> * rights reserved.</CODE>
+<CODE> * </CODE>
+<CODE> * Modify an entry:</CODE>
+<CODE> *  - replace any existing values in the &#147;mail&#148; attribute with &#147;babs@ace.com&#148;</CODE>
+<CODE> *  - add a new value to the &#147;description&#148; attribute</CODE>
+<CODE> */</CODE>
+<CODE>#include &#147;examples.h&#148;</CODE>
+<CODE>int</CODE>
+<CODE>main( int argc, char **argv )</CODE>
+<CODE>{</CODE>
+<CODE>    LDAP        *ld;</CODE>
+<CODE>    LDAPMod     mod0;</CODE>
+<CODE>    LDAPMod     mod1;</CODE>
+<CODE>    LDAPMod     *mods[ 3 ];</CODE>
+<CODE>    char        *vals0[ 2 ];</CODE>
+<CODE>    char        *vals1[ 2 ];</CODE>
+<CODE>    time_t      now;</CODE>
+<CODE>    char        buf[ 128 ];</CODE>
+<CODE>    /* get a handle to an LDAP connection */</CODE>
+<CODE>    if ( (ld = ldap_init( MY_HOST, MY_PORT )) == NULL ) {</CODE>
+<CODE>        perror( &#147;ldap_init&#148; );</CODE>
+<CODE>        return( 1 );</CODE>
+<CODE>    }</CODE>
+<CODE>    /* authenticate */</CODE>
+<CODE>    if ( ldap_simple_bind_s( ld, ENTRYDN, ENTRYPW ) != LDAP_SUCCESS ) {</CODE>
+<CODE>        ldap_perror( ld, &#147;ldap_simple_bind_s&#148; );</CODE>
+<CODE>        return( 1 );</CODE>
+<CODE>    }</CODE>
+<CODE>    /* construct the list of modifications to make */</CODE>
+<CODE>    mod0.mod_op = LDAP_MOD_REPLACE;</CODE>
+<CODE>    mod0.mod_type = &#147;mail&#148;;</CODE>
+<CODE>    vals0[0] = &#147;babs@ace.com&#148;;</CODE>
+<CODE>    vals0[1] = NULL;</CODE>
+<CODE>    mod0.mod_values = vals0;</CODE>
+<CODE>    mod1.mod_op = LDAP_MOD_ADD;</CODE>
+<CODE>    mod1.mod_type = &#147;description&#148;;</CODE>
+<CODE>    time( &amp;now );</CODE>
+<CODE>    sprintf( buf, &#147;This entry was modified with the modattrs program on %s&#148;,</CODE>
+<CODE>            ctime( &amp;now ));</CODE>
+<CODE>    /* Get rid of \n which ctime put on the end of the time string */</CODE>
+<CODE>    if ( buf[ strlen( buf ) - 1 ] == &#145;\n&#146; ) {</CODE>
+<CODE>        buf[ strlen( buf ) - 1 ] = &#145;\0&#146;;</CODE>
+<CODE>    }</CODE>
+<CODE>    vals1[ 0 ] = buf;</CODE>
+<CODE>    vals1[ 1 ] = NULL;</CODE>
+<CODE>    mod1.mod_values = vals1;</CODE>
+<CODE>    mods[ 0 ] = &amp;mod0;</CODE>
+<CODE>    mods[ 1 ] = &amp;mod1;</CODE>
+<CODE>    mods[ 2 ] = NULL;</CODE>
+<CODE>    /* make the change */</CODE>
+<CODE>    if ( ldap_modify_s( ld, ENTRYDN, mods )</CODE>
+<CODE>            != LDAP_SUCCESS ) {</CODE>
+<CODE>        ldap_perror( ld, &#147;ldap_modify_s&#148; );</CODE>
+<CODE>        return( 1 );</CODE>
+<CODE>    }</CODE>
+<CODE>    ldap_unbind( ld );</CODE>
+<CODE>    printf( &#147;modification was successful\n&#148; );</CODE>
+<CODE>    return( 0 );</CODE>
+<CODE>}</CODE></PRE>
+</BLOCKQUOTE>
+
+<H3 CLASS="AppSubsection"><A NAME="pgfId=999373"></A>Modify Attributes
+Using JNDI</H3>
+
+<BLOCKQUOTE>
+  <PRE><CODE>/*</CODE>
+<CODE> * @(#)Modattrs.java	1.2 99/07/26</CODE>
+<CODE> * </CODE>
+<CODE> * Copyright 1997, 1998, 1999 Sun Microsystems, Inc. All Rights</CODE>
+<CODE> * Reserved.</CODE>
+<CODE> * </CODE>
+<CODE> * Sun grants you (&quot;Licensee&quot;) a non-exclusive, royalty free,</CODE>
+<CODE> * license to use, modify and redistribute this software in source and</CODE>
+<CODE> * binary code form, provided that i) this copyright notice and license</CODE>
+<CODE> * appear on all copies of the software; and ii) Licensee does not utilize</CODE>
+<CODE> * the software in a manner which is disparaging to Sun.</CODE>
+<CODE> *</CODE>
+<CODE> * This software is provided &quot;AS IS,&quot; without a warranty of any</CODE>
+<CODE> * kind. ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND</CODE>
+<CODE> * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS</CODE>
+<CODE> * FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT, ARE HEREBY EXCLUDED. SUN</CODE>
+<CODE> * AND ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY</CODE>
+<CODE> * LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE</CODE>
+<CODE> * OR ITS DERIVATIVES. IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR</CODE>
+<CODE> * ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL,</CODE>
+<CODE> * CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER CAUSED AND</CODE>
+<CODE> * REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF THE USE OF</CODE>
+<CODE> * OR INABILITY TO USE SOFTWARE, EVEN IF SUN HAS BEEN ADVISED OF THE</CODE>
+<CODE> * POSSIBILITY OF SUCH DAMAGES.</CODE>
+<CODE> * </CODE>
+<CODE> * This software is not designed or intended for use in on-line</CODE>
+<CODE> * control of aircraft, air traffic, aircraft navigation or aircraft</CODE>
+<CODE> * communications; or in the design, construction, operation or</CODE>
+<CODE> * maintenance of any nuclear facility. Licensee represents and warrants</CODE>
+<CODE> * that it will not use or redistribute the Software for such purposes.  </CODE>
+<CODE> */</CODE>
+
+
+<CODE>import java.util.Hashtable;</CODE>
+<CODE>import java.util.Date;</CODE>
+<CODE> </CODE>
+<CODE>import javax.naming.*;</CODE>
+<CODE>import javax.naming.directory.*;</CODE>
+<CODE>/* </CODE>
+<CODE> * Modify an entry:</CODE>
+<CODE> *  - replace any existing values in the &quot;mail&quot; attribute with &quot;babs@ace.com&quot;</CODE>
+<CODE> *  - add a new value to the &quot;description&quot; attribute</CODE>
+<CODE> *</CODE>
+<CODE> * [equivalent to modattrs.c in Netscape SDK]</CODE>
+<CODE> */</CODE>
+<CODE>class Modattrs {</CODE>
+<CODE>public static void main(String[] args) {</CODE>
+<CODE>    Hashtable env = new Hashtable(5, 0.75f);</CODE>
+<CODE>    /*</CODE>
+<CODE>     * Specify the initial context implementation to use.</CODE>
+<CODE>     * This could also be set by using the -D option to the java program.</CODE>
+<CODE>     * For example,</CODE>
+<CODE>     *   java -Djava.naming.factory.initial=com.sun.jndi.ldap.LdapCtxFactory \</CODE>
+<CODE>     *       Modattrs</CODE>
+<CODE>     */</CODE>
+<CODE>    env.put(Context.INITIAL_CONTEXT_FACTORY, Env.INITCTX);</CODE>
+<CODE>    /* Specify host and port to use for directory service */</CODE>
+<CODE>    env.put(Context.PROVIDER_URL, Env.MY_SERVICE);</CODE>
+<CODE>    /* specify authentication information */</CODE>
+<CODE>    env.put(Context.SECURITY_AUTHENTICATION, &quot;simple&quot;);</CODE>
+<CODE>    env.put(Context.SECURITY_PRINCIPAL, Env.MGR_DN);</CODE>
+<CODE>    env.put(Context.SECURITY_CREDENTIALS, Env.MGR_PW);</CODE>
+<CODE>    try {</CODE>
+<CODE>        /* get a handle to an Initial DirContext */</CODE>
+<CODE>        DirContext ctx = new InitialDirContext(env);</CODE>
+<CODE>        /* construct the list of modifications to make */</CODE>
+<CODE>        ModificationItem[] mods = new ModificationItem[2];</CODE>
+<CODE>        Attribute mod0 = new BasicAttribute(&quot;mail&quot;, &quot;babs@eng&quot;);</CODE>
+<CODE>        // Update mail attribute</CODE>
+<CODE>        mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, mod0);</CODE>
+<CODE>        // Add another value to description attribute</CODE>
+<CODE>        Attribute mod1 = </CODE>
+<CODE>            new BasicAttribute(&quot;description&quot;, </CODE>
+<CODE>                          &quot;This entry was modified with the Modattrs program on &quot; +</CODE>
+<CODE>                          (new Date()).toString());</CODE>
+<CODE>        mods[1] = new ModificationItem(DirContext.ADD_ATTRIBUTE, mod1);</CODE>
+<CODE>         /* Delete the description attribute altogether */</CODE>
+<CODE>        /*</CODE>
+<CODE>        Attribute mod1 =  new BasicAttribute(&quot;description&quot;);</CODE>
+<CODE>        mods[2] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE, mod1);</CODE>
+<CODE>	*/</CODE>
+<CODE>        /* make the change */</CODE>
+<CODE>        ctx.modifyAttributes(Env.ENTRYDN, mods);</CODE>
+<CODE>        System.out.println( &quot;modification was successful.&quot; );</CODE>
+<CODE>    } catch (NamingException e) {</CODE>
+<CODE>        System.err.println(&quot;modification failed. &quot; + e);</CODE>
+<CODE>    }</CODE>
+<CODE>}</CODE>
+<CODE>}</CODE></PRE>
+</BLOCKQUOTE>
+
+<P CLASS="AppSubsection"><BR>
+<HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="appendix-ldap-example.4.html">PREV</A>
+| <A HREF="appendix-ldap-example.6.html">NEXT</A><HR ALIGN=LEFT><I><FONT
+ SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

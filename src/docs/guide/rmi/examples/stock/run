@@ -1,0 +1,176 @@
+#!/bin/sh -e
+
+#
+# Note to readers: This shell script is more complicated than simply
+# running the commands because it must handle many error conditions,
+# especially those that first time users are likely to encounter.
+# The meat of the script is down below the functions, where the first
+# "show" command is issued (that is, the first line that starts with
+# "show").  If you simply want to see what's done, read the
+# documentation.  The important commands are (assuming that ../.. is
+# in your CLASSPATH):
+#
+#	javac -d ../.. *.java
+#	rmic -d ../.. examples.stock.StockServer examples.stock.StockApplet
+#	java -Djava.security.policy=security.policy examples.stock.StockServer &
+#	appletviewer index.html
+#
+# So if you're looking for information on how to run things yourself,
+# just ignore the entire script and use the above commands.
+#
+
+#
+# the directories in the path
+#
+pathdirs=`echo $PATH | tr ':' ' '`
+
+#
+# find a binary somewhere in the path
+#
+findbin()
+{
+    prog=$1;
+    for dir in $pathdirs; do
+	if [ -x $dir/$prog ]; then
+	    echo $dir/$prog
+	    return;
+	fi
+    done
+    echo "Cannot find $prog in your path--please check your PATH variable" 1>&2
+    exit 1
+}
+
+#
+# run a command, showing it (if -v is given, only in verbose mode)
+#
+run()
+{
+    if [ x"$1" = "x-v" ]; then
+	show "$@"
+	shift
+    else
+	show % "$@"
+    fi
+    eval "$@" || (
+	echo Running "$@" 1>&2
+	exit 2
+    )
+}
+
+#
+# show some string (if -v, only in verbose)
+#
+show()
+{
+    if [ x"$1" = x"-v" ]; then
+	if [ "$verbose" != "" ]; then
+	    shift
+	    echo "..." "$@"
+	fi
+    elif [ x"$1" = x"-c" ]; then
+	shift
+	echo ""
+	echo "$@"
+    else
+	echo "$@"
+    fi
+}
+
+#
+# kill off all processes
+#
+killpids() {
+    kill 0
+}
+
+#
+# Process options
+#
+set +e
+while getopts vc opt; do
+    case $opt in
+      v) verbose="yes";;
+      c)
+	show -v cleaning out old stuff
+	rm -rf */. *.class core;;
+      \?)
+	echo "usage: run [-v] [-c]"
+	echo "   -c: clean before running"
+	echo "   -v: verbose"
+	exit 1
+	;;
+    esac
+done
+shift `expr $OPTIND - 1`
+set -e
+
+#
+# Ensure that these programs can be found
+#
+javac=`findbin javac`
+rmic=`findbin rmic`
+show -v "javac is $javac"
+show -v "rmic is $rmic"
+
+#
+# (There is no need to run rmiregistry for this example since
+# the StockServer class bundles its own registry.)
+#
+
+# The top of the package
+top=../..
+
+show -v origCLASSPATH=$CLASSPATH
+origCLASSPATH=$CLASSPATH
+export CLASSPATH
+
+case "$CLASSPATH" in
+    "")
+	CLASSPATH=$top
+	;;
+    $top:* | *:$top:* )
+	;;
+    *)
+	CLASSPATH="$top:$CLASSPATH"
+	;;
+esac
+
+show -v "CLASSPATH=$CLASSPATH"
+
+#
+# Compile the source
+#
+show -c "Compiling Java sources"
+run javac -d $top *.java
+
+#
+# Run rmic
+#
+server=examples.stock.StockServer
+applet=examples.stock.StockApplet
+show -c "Running rmic on the implementations"
+run rmic -d $top $server $applet
+
+#
+# Set up traps so that interrupt kills things off
+#
+trap killpids INT EXIT
+
+#
+# Running the server
+#
+show -c "Start server $server"
+run java -Djava.security.policy=security.policy $server &
+
+# sleep to give the server time to start up and print its message
+run -v sleep 6
+
+#
+# Run the appletviewer, after setting the class path back to the original
+# so that class loading is done via the codebase, not the class path.
+#
+show -v CLASSPATH=$origCLASSPATH
+CLASSPATH=$origCLASSPATH
+
+show -c "Starting the appletviewer"
+run appletviewer index.html

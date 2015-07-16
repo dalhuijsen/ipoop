@@ -1,0 +1,172 @@
+<html><head><title>Java AWT: Desktop Colors</title></head>
+<BODY BGCOLOR="#FFFFFF">
+<a name="920106">
+<h1><img src="images/pencil.sm.gif" alt="Duke logo holding a pencil">Java AWT: Desktop Colors</h1>
+</a>
+<hr><p><a name="920107">
+<address>Last Updated: February 3, 1997</address>
+
+<h2>Purpose</h2>
+</a>
+It is common for platform desktops (Windows95, Solaris/CDE, etc.) to provide a color scheme for objects on the desktop, and typically this scheme is configurable by the user. It is usually desirable to have applications running on that desktop use that color scheme in order to maintain visual consistency.
+<p>The AWT attempts to set appropriate default colors for its components, but there is currently no convenient way for a Java program to query and use those colors directly. This is particularly a problem when creating custom components where you'd like to ensure that the background, shadow, and font colors all match the rest of the desktop. As of version 1.1 of the Java<sup><font size=-2>TM</font></sup> platform, the AWT provides a simple API for accessing and using these desktop colors.<a name="920110">
+<p>
+<h2>Desktop Color API</h2>
+The API involves introducing a new type of "symbolic" color, which is represented by a subclass of java.awt.Color:
+<pre><code>
+        <a href="../../../../api/java/awt/SystemColor.html">java.awt.SystemColor</a>
+</code></pre>
+A SystemColor object can be used just like any other Color object, the only difference being that the actual value that represents its current color may change dynamically (on systems which support dynamic notification when the user changes the color scheme).
+<p>
+SystemColor objects are defined by the system and cannot be instantiated by Java programs. 
+</a><a name="920240">
+<p>
+<h3>Range of Colors</h3>
+</a>
+The SystemColor class provides a standard set of these symbolic colors that represent each distinct type of coloration on the desktop. These symbolic color objects are created automatically and stored statically in java.awt.SystemColor:
+<pre><code>	public final static SystemColor <b>desktop</b>; // Background color of desktop
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>activeCaption</b>; // Background color for captions
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>activeCaptionText</b>; // Text color for captions
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>activeCaptionBorder</b>; // Border color for caption text
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>inactiveCaption</b>; // Background color for inactive captions
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>inactiveCaptionText</b>; // Text color for inactive captions
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>inactiveCaptionBorder</b>; // Border color for inactive captions
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>window</b>; // Background for windows
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>windowBorder</b>; // Color of window border frame
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>windowText</b>; // Text color inside windows
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>menu</b>; // Background for menus
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>menuText</b>; // Text color for menus
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>text</b>; // background color for text
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>textText</b>; // text color for text
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>textHighlight</b>; // background color for highlighted text
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>textHighlightText</b>; // text color for highlighted text
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>control</b>; // Background color for controls
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>controlText</b>; // Text color for controls
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>controlLtHighlight</b>; // Light highlight color for controls
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>controlHighlight</b>; // Highlight color for controls
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>controlShadow</b>; // Shadow color for controls
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>controlDkShadow</b>; // Dark shadow color for controls
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>inactiveControlText</b>; // Text color for inactive controls
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>scrollbar</b>; // Background color for scrollbars
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>info</b>; // Background color for spot-help text
+</code></pre>
+
+<pre><code>	public final static SystemColor <b>infoText</b>; // Text color for spot-help text
+</code></pre>
+
+<p>If a Java program either sets the foreground or background of a component to be one of these symbolic colors, or uses one of these for rendering, the current value for that symbolic color will be used.
+<p>Not all platforms support distinct colors for each of these symbolic names. In the cases where a symbolic color is not supported by a platform, it is mapped to the most appropriate default.  These colors are guaranteed to be non-null.<p>The AWT base components will be modified to use these symbolic colors in order to provide more consistent default integration with the desktop.  Java programs written for 1.0 which make any assumptions about the default color of components (i.e. assume they will be "gray") may not render correctly under 1.1.  It is always important to query the component for its background/foreground colors within paint() methods for this reason.
+<a name="920253">
+<h3>One-time vs. Dynamic Updates</h3>
+</a>
+At a minimum, these colors are initialized dynamically when the toolkit is first loaded.  Some desktops provide dynamic update capabilities such that the AWT can detect when the user changes the color scheme and then update all these symbolic colors on the fly. However, this is platform-specific and is not a guaranteed feature of this interface. <a name="920139">
+<h2>Sample Code</h2>
+</a>
+Following is an example of a custom component (a separator) which uses this API:
+<pre><code>	
+import java.awt.*;
+
+//
+// Oversimplified separator class for creating 3D horizontal
+// line separators
+//
+public class Separator extends Component {
+
+    public Separator(int length, int thickness) {
+       super();
+       setSize(length, thickness);
+       <b>setBackground(SystemColor.control);</b>
+    }
+
+    public void paint(Graphics g) {
+       int x1, y1, x2, y2;
+       Rectangle bbox = getBounds();
+     
+       x1 = 0;
+       x2 = bbox.width - 1;
+       y1 = y2 = bbox.height/2 - 1;
+
+       <b>g.setColor(SystemColor.controlShadow);</b>
+       g.drawLine(x1, y2, x2, y2);
+       <b>g.setColor(SystemColor.controlHighlight);</b>
+       g.drawLine(x1, y2+1, x2, y2+1);
+    }
+
+    public static void main(String[] args) {
+        Frame f = new Frame("Separator Example");
+        f.setSize(200, 100);
+        f.setBackground(SystemColor.control);
+        Separator sep = new Separator(200, 4);
+        f.add("Center", sep);
+        f.show();
+    }
+}
+
+</code></pre>
+
+<hr><br>
+ 
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+ 
+<i>Copyright &#169; 1996, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+<!-- This file was created with Quadralay WebWorks Publisher 3.0.5 -->
+<!-- -->
+<!-- For more information on how this document, and how the rest of -->
+<!-- this server was created, email yourEmail@xyzcorp.com -->
+<!-- -->
+<!-- Last updated: 09/13/96 16:25:45 -->
+
+</body>
+</html>

@@ -1,0 +1,529 @@
+
+<HTML>
+<HEAD>
+<TITLE>Java IDL: Glossary</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- updated 4/2001 with POA/PI/new tools -->
+
+<H1 ALIGN=CENTER>Glossary of Java&nbsp;IDL Terms</H1>
+<HR><P>
+<DL>
+
+<DT><A NAME="adapter activator"><B>adapter activator</B></A>
+<DD>An adapter activator is an object that the application developer can associate with a <a href="#POA">POA</a>. The <a href="#ORB">ORB</a> will invoke an operation on an adapter activator when a request is received for a child POA that does not currently exist. The adapter activator can then create the required POA on demand.
+<BR><BR>
+
+
+<DT><A NAME="attribute,(IDL)"><B>attribute (IDL)</B></A>
+<DD>An identifiable association between an object and a value. An attribute <tt>A</tt> is made visible to clients as a pair of operations: <tt>get_A</tt> and <tt>set_A</tt>. Readonly attributes only generate a get operation. 
+
+<P>Also, that part of an
+<A HREF="#IDL">IDL interface</A> that is similar to a
+public class field or C++ data member. 
+The <A href="#idlj"><code>idlj</code> compiler</A>
+maps an OMG IDL attribute to accessor and modifier methods in the 
+Java programming language.
+For example, an interface <TT>ball</TT> might include the
+attribute <TT>color</TT>. The <TT>idlj</TT> compiler
+would generate a Java programming language method to get the color, and
+unless the attribute is <code>readonly</code>, a method
+to set the color.
+<BR><BR>
+
+<DT><A NAME="client"><B>client</B></A>
+<DD>Any code which invokes an operation on a distributed object. A client
+might itself be a CORBA object, or it might be a non-object-oriented 
+program,
+but while invoking a method on a CORBA object, it is said to be acting as 
+client.
+<BR><BR>
+
+<DT><A NAME="client stub"><B>client stub</B></A>
+<DD>A Java programming language class generated 
+by <A href="#idlj"><TT>idlj</TT></A>
+and used transparently
+by the client <A href="#ORB">ORB</A>
+during object <A href="#invocation">invocation</A>.
+The remote object reference
+held by the client points to the client stub.
+This stub is specific to the IDL interface from which it
+was generated, and it contains the information needed for
+the client to invoke a method on the CORBA object that was
+defined in the IDL interface.
+<BR><BR>
+
+<DT><A NAME="client tier"><B>client tier</B></A>
+<DD>The portion of a distributed application that requests services from 
+the server tier.  Typically, the client tier is characterized by a 
+small local footprint, a graphical user
+interface, and simplified development and maintenance efforts.
+<BR><BR>
+<P>
+
+<DT><A NAME="CORBA"><B>Common Object Request Broker Architecture (CORBA)</B></A>
+<DD>An <A HREF="#OMG">OMG</A>-specified architecture that is the
+basis for the CORBA object model. The CORBA specification includes an
+interface definition language (IDL), which is a language-independent way of
+creating contracts between objects for implementation as distributed
+applications.  <BR><BR>
+The Java 2 Platform, Standard Edition, v1.4, provides a CORBA 
+ Object Request Broker (ORB) and two CORBA programming 
+models that utilize the Java CORBA ORB and Internet InterORB Protocol 
+(IIOP).   The two programming models are the RMI 
+programming model, or <a href="#rmi-iiop"><EM>RMI-IIOP</EM></a>, and the IDL programming model, or <a href="#Java IDL"><EM>Java IDL</EM></a>. For more information on these programming models, read <a href="../corba/index.html"><em>CORBA Technology and the Java Platform</em></a>.<BR>
+<B>See also:</B>&nbsp;<A href="#client tier">client tier</A>, 
+<A href="#service tier">service tier</A>, <A href="#data store tier">data 
+store tier</A>
+<BR><BR>
+
+<DT><A NAME="CORBA object"><B>CORBA object</B></A>
+<DD>An entity which (1) is defined by an OMG IDL interface,
+and (2) for which an object reference is available.
+<code>Object</code> is also the implicit common base type for 
+object references of IDL interfaces.
+<BR><BR>
+
+
+<DT><A NAME="data store tier"><B>data store tier</B></A>
+<DD>The portion of a distributed application that manages access to persistent
+data and its storage mechanisms, such as relational databases.
+<BR><BR>
+
+<DT><A NAME="distributed application"><B>distributed application</B></A>
+<DD>A program designed to run on more than one computer, typically with 
+functionality separated into tiers such as <A href="#client tier">client</A>, 
+<A href="#service tier">service</A>, and 
+<A href="#data store tier">data store</A>.
+<BR><BR>
+
+<DT><A NAME="distributed environment"><B>distributed environment</B></A>
+<DD>A network of one or more computers that use 
+<A href="#CORBA object">CORBA objects</A>. 
+Objects are installed on the various machines and can communicate with each other.
+<BR><BR>
+ 
+<DT><A NAME="DII"><B>Dynamic Invocation Interface (DII)</B></A>
+<DD>An API that allows a client to make dynamic invocations on
+remote CORBA objects.
+It is used when at compile time a client does not have
+knowledge about an object it wants to invoke.
+Once an object is discovered, the client
+program can obtain a definition of it, issue a
+parameterized call to it, and receive a reply from it, all without having a
+type-specific <A href="#client stub">client stub</A>
+for the remote object.
+<BR><BR>
+
+<DT><A NAME="DSI"><B>Dynamic Skeleton Interface (DSI)</B></A>
+<DD>An API that provides a way to deliver requests from an ORB
+to an object implementation when the type of the object
+implementation is not known at compile time.  DSI, which is the
+server side analog to the client side <A href="#DII">DII</A>,
+makes it possible for the application programmer to inspect the parameters of
+an incoming request to determine a target object and method.
+<BR><BR>
+
+<DT><A NAME="exception,(IDL)"><B>exception (IDL)</B></A>
+<DD>An IDL construct that represents an exceptional condition that could
+be returned in response to an invocation.
+There are two categories of exceptions: (1) system exceptions,
+which inherit from <code>org.omg.CORBA.SystemException</code>
+(which is a <code>java.lang.RuntimeException</code>),
+and (2) user-defined exceptions, which inherit 
+from <code>org.omg.CORBA.UserException</code>
+(which is a <code>java.lang.Exception</code>).
+<BR><BR>
+ 
+<DT><A NAME="factory object"><B>factory object</B></A>
+<DD>A CORBA object that is used to create new CORBA objects. 
+Factory objects are themselves usually created at server installation time. 
+<BR><BR>
+
+<DT><A NAME="idlj"><B>idlj compiler</B></A>
+<DD>A tool that takes an interface written in OMG IDL and produces
+Java programming language interfaces and classes that represent the mapping from the 
+IDL interface to the Java programming language.  The resulting
+files are <code>.java</code> files.  Prior to J2SDK v1.3, the <TT>idlj</TT> compiler was known as the <TT>idltojava</TT> compiler. The <TT>idlj</TT> compiler supports new CORBA-standard features required for RMI-IIOP.  The <TT>idlj</TT> compiler is placed in the SDK's&nbsp<TT>.bin</TT>&nbsp;directory by the installer.
+<BR><BR>
+
+<DT><A NAME="idltojava"><B>idltojava compiler</B></A>
+<DD>A tool that takes an interface written in OMG IDL and produces
+Java programming language interfaces and classes that represent the mapping from the 
+IDL interface to the Java programming language.  The resulting
+files are <code>.java</code> files.  Beginning with J2SDK v1.3, the IDL-to-Java language mapping is handled by the <TT>idlj</TT> compiler, which  supports new CORBA-standard features required for RMI-IIOP.  The
+<code>idltojava</code> compiler can be downloaded from the
+Java Developer Connection (JDC) web site.
+<BR><BR>
+
+<DT><A NAME="implementation"><B>implementation</B></A>
+<DD>A concrete class that defines the behavior for all of 
+the operations and attributes of the IDL interface it supports. 
+A <A href-"#servant object">servant object</A> is an instance of an
+implementation. There may be many implementations of a single interface.
+<BR><BR>
+
+<DT><A name="initial naming context"><B>initial naming context</B></A>
+<DD>The <TT>NamingContext</TT> object returned by a call to the method
+<TT>orb.resolve_initial_references("NameService")</TT>. It is an
+<A href="#object reference">object reference</A> to the COS Naming Service 
+registered with the ORB and can be used to create other 
+<code>NamingContext</code> objects.
+<BR><B>See also:</B> <A href="#naming context">naming context</A>
+<BR><BR>
+
+<DT><A NAME="IDL"><B>Interface Definition Language (IDL)</B></A>
+<DD> The <A HREF="#OMG">OMG-standard</A>
+language for defining the interfaces for all CORBA objects.
+An IDL interface declares a set of
+<A HREF="#operation,(IDL)">operations</A>, 
+<A HREF="#exception,(IDL)">exceptions</A>, 
+and <A HREF="#attribute,(IDL)">attributes</A>. 
+Each operation has a signature, which defines its name,
+parameters, result and exceptions.  OMG IDL
+does not include implementations for operations;
+rather, as its name indicates, it is simply a language
+for defining interfaces.
+The complete syntax and semantics for IDL are
+available in the OMG specification at
+the <A href="http://www.omg.org/">OMG web site</A>.
+<BR><BR>
+
+<DT><A NAME="IFR"><B>Interface Repository (IFR)</B></A>
+<DD>A service that contains
+all the registered component interfaces, the methods they support, and
+the parameters they require.  The IFR stores, updates, and manages object
+interface definitions.  Programs may use the IFR APIs to access and
+update this information. An IFR is not necessary for normal client/server
+interactions.
+<BR><BR> 
+
+<DT><A NAME="IIOP"><B>Internet InterORB Protocol (IIOP)</B></A>
+<DD>The OMG-specified network protocol for communicating between ORBs.
+Java IDL in J2SE v.1.4. conforms to CORBA/IIOP specification 2.3.1.
+<BR><BR>
+
+<DT><A NAME="invocation"><B>invocation</B></A>
+<DD>The process of performing a method call on a CORBA object,
+which can be done without knowledge of the object's
+location on the network. Static invocation, which uses
+a client stub for the invocation and a server skeleton for the
+service being invoked, is used when the interface of the object is
+known at compile time. If the interface is not known at compile
+time, <A href="#DII">dynamic invocation</A> must be used.
+<BR><BR>
+
+<DT><A NAME="Java IDL"><B>Java&nbsp;IDL</B></A>
+<DD>The classes, libraries, and tools that make it possible
+to use CORBA objects from the Java programming
+language.  The main components of Java&nbsp;IDL are an ORB,
+a naming service, and the <code>idlj</code> compiler.
+All are part of J2SE, v.1.4.
+<BR><BR>
+
+<DT><A NAME="name binding"><B>name binding</B></A>
+<DD>The association of a name with an <A HREF="#object reference">
+object reference</A>.  Name bindings are stored in a 
+<A href="#naming context">naming context</A>.
+<BR><BR>
+
+<DT><A NAME="namespace"><B>namespace</B></A>
+<DD>A collection of <A href="#naming context">naming contexts</A> that are grouped together.
+<BR><BR>
+
+<DT><A NAME="naming context"><B>naming context</B></A>
+<DD>
+A <A href="#CORBA object">CORBA object</A> that supports the 
+<TT>NamingContext</TT> interface and
+functions as a sort of directory which contains
+(points to) other naming contexts and/or 
+simple names.  Similar to a directory structure, where the last
+item is a file and preceding items are directories, in a
+naming context, the last item is an object reference name, and the
+preceding items are naming contexts.
+<BR><BR>
+
+<DT><A NAME="Naming service"><B>naming service</B></A>
+<DD>
+A CORBA service that allows <A href="#CORBA object">CORBA objects</A>
+to be named by means of binding a name to an object reference.
+The <A HREF="#name binding">name binding</A> may be stored
+in the naming service, and a client may supply the name
+to obtain the desired object reference.  The two options for Naming Services shipped with J2SE v.1.4 are <tt><a href="#orbd">orbd</a></tt>, which is a daemon process containing a Bootstrap Service, a Transient Naming Service, a Persistent Naming Service, and a Server Manager, and <tt><a href="#tnameserv">tnameserv</a></tt>, a transient naming service.
+<BR><BR>
+
+<DT><A NAME="object"><B>object</B></A>
+<DD>
+A computational grouping of operations and data into a modular unit. An
+object is defined by the interface it presents to others, its behavior when 
+operations on its interface are invoked, and its state.
+<BR><BR>
+
+<DT><A NAME="object adapter"><B>object adapter</B></A>
+<DD>The ORB component which provides object reference, activation, and state related services to an object implementation. There may be different adapters provided for different kinds of implementations.  The <a href="#POA">POA</a> is a particular type of object adapter specified by OMG that can be used with multiple ORB implementations with a minimum of rewriting needed to deal with different vendors' implementations. 
+<BR><BR>
+
+<DT><A NAME="object id"><B>object id</B></A>
+<DD>An object id is a value that is used by the <a href="#POA">POA</a> and by the user-supplied <a href="#implementation">implementation</a> to identify a particular abstract CORBA object. Object Id values may be assigned and managed by the POA, or they may be assigned and managed by the implementation. Object Id values are hidden from clients, encapsulated by references. Object Ids have no standard form; they are managed by the POA as uninterpreted octet sequences.
+<BR><BR>
+
+<DT><A NAME="object implemementation"><B>object implementation</B></A>
+<DD>See <A HREF="#implementation">implementation</A>.
+<BR><BR>
+
+<DT><A NAME="OMG"><B>Object Management Group (OMG)</B></A>    
+<DD>
+An international organization with over 700 members 
+that establishes industry guidelines
+and object management specifications in order to provide a common
+framework for object-oriented application development.  Its members include
+platform vendors, object-oriented database vendors, software tool developers,
+corporate developers, and software application vendors.
+The OMG <A HREF="#CORBA">Common Object Request Broker Architecture</A>
+specifies the CORBA object model. See <a href="http://www.omg.org">
+www.omg.org</a> for more information.
+<BR><BR>
+
+<DT><A NAME="object reference"><B>object reference</B></A>
+<DD>A construct containing the information needed to specify an object
+within an ORB.  An object reference is used in method invocations to locate a 
+<a href="#CORBA object"> CORBA object</A>.
+Object references are the CORBA object
+equivalent to programming language-specific object pointers. 
+They may be obtained from a factory object or
+from the Naming Service. 
+An object reference, which is opaque (its internal structure
+is irrelevant to application developers), identifies the
+same CORBA object each time it is used.  It is possible, however,
+for multiple object references to
+refer to the same CORBA object.
+<BR><BR>
+
+<DT><A NAME="ORB"><B>Object Request Broker (ORB)</B></A>
+<DD>
+The libraries, processes, and other infrastructure 
+in a <A HREF="#distributed environment">distributed environment</A> that enable
+CORBA objects to communicate with each other. The
+ORB connects objects requesting services to the objects providing them. 
+<BR><BR>
+
+
+
+<DT><A NAME="operation,(IDL)"><B>operation (IDL)</B></A>
+<DD>The construct in an
+<A HREF="#IDL">IDL interface</A>
+that maps to a Java programming language method.
+For example, an interface <TT>ball</TT> might support the
+operation <TT>bounce</TT>. Operations may take parameters, return
+a result, or raise exceptions.  IDL operations can be
+<code>oneway</code>, in which case they cannot return results
+(return values or out arguments) or raise exceptions.
+<BR><BR>
+
+<DT><A NAME="operations interface"><B>operations interface</B></A>
+<DD>A non abstract IDL interface is mapped to two public Java interfaces: a <a href="#signature interface">signature interface</a> and an operations interface.  The operations interface has the same name as the IDL interface with the suffix <TT>Operations</TT> appended to the end and is used in the server-side mapping and as a mechanism for providing optimized calls for collocated clients and servers.  
+<BR><BR>
+
+<DT><A NAME="orbd"><B>ORBD (Object Request Broker Daemon)</B></A>
+<DD>The <B><a href="orbd.html">orbd</a></B> tool is a daemon process containing a Bootstrap Service, a Transient <a href="#Naming service">Naming Service</a>, a Persistent Naming Service, and a Server Manager.
+<BR><BR>
+
+<DT><A NAME="parameters"><B>parameter (IDL)</B></A>
+<DD>One or more objects the client passes to an IDL operation when it
+invokes the operation.
+Parameters may be declared as "in" (passed from client
+to server), "out" (passed from server to client), or "inout" (passed from 
+client to server and then back from server to client).
+<BR><BR>
+
+<DT><A NAME="persistent object"><B>persistent object</B></A>
+<DD>An object that can survive the process or thread that created it. A persistent object exists until it is explicitly deleted.
+<BR><BR>
+
+
+<DT><A NAME="PIDL"><B>PIDL (Pseudo-IDL)</B></A>
+<DD>The interface definition language for describing a CORBA 
+<a href="#pseudo-object">pseudo-object</a>.
+Each language mapping, including the mapping from IDL to the Java
+programming language, describes how pseudo objects
+are mapped to language-specific constructs. PIDL 
+mappings may or may not follow the rules that apply to 
+mapping regular CORBA objects. 
+<BR><BR>
+
+<DT><A NAME="POA"><B>POA (Portable Object Adapter)</B></A>
+<DD>An object adapter is the mechanism that connects a request using an <a href="#object reference">object reference</a> with the proper code to service that request.  The POA is a particular type of object adapter specified by OMG that can be used with multiple ORB implementations with a minimum of rewriting needed to deal with different vendors' implementations. 
+
+<P>The POA is also intended to allow persistent objects -- at least, from the client's perspective. That is, as far as the client is concerned,
+these objects are always alive, and maintain data values stored in them, even though physically, the server may have been restarted
+many times, or the implementation may be provided by many different <a href="#implementation">object implementations</a>. 
+<BR><BR>
+
+<DT><A NAME="POA Manager"><B>POA Manager</B></A>
+<DD>A POA manager is an object that encapsulates the processing state of one or more <a href="#POA">POAs</a>. Using operations on a POA manager, the developer can cause requests for the associated POAs to be queued or discarded. The developer can also use the POA manager to deactivate the POAs.
+<BR><BR>
+
+<DT><A NAME="policy"><B>policy</B></A>
+<DD>A policy is an object associated with a <a href="#POA">POA </a>by an application in order to specify a characteristic shared by the objects implemented in that POA. This specification defines policies controlling the POA's threading model as well as a variety of other options related to the management of objects. Other specifications may define other policies that affect how an <a href="#ORB">ORB</a> processes requests on objects implemented in the POA.
+<BR><BR>
+
+<DT><A NAME="PI"><B>Portable Interceptors</B></A>
+<DD>Portable Interceptors are hooks into the ORB through which ORB services can intercept the normal flow of execution of the ORB.  For more information, see <a href="../../api/org/omg/PortableInterceptor/package-summary.html"><tt>PortableInterceptor</tt> Package</a>.
+<BR><BR>
+
+
+
+<DT><A NAME="pragma"><B>pragma</B></A>
+<DD>
+In J2SE v.1.2, a directive to the <tt>idltojava</tt> compiler to perform certain 
+operations while compiling an IDL file. For example, the 
+pragma "javaPackage" directs the <tt>idltojava</tt> compiler 
+to put the Java programming language interfaces and classes it generates from the
+IDL interface into the Java programming language package specified. In J2SE
+v.1.3 and v.1.4, this functionality is supported via the <tt>-pkgPrefix</tt>
+command line option to <tt>idlj</tt>.
+<BR><BR>
+
+<DT><A NAME="pseudo-object"><B>pseudo-object</B></A> 
+<DD>An object similar to a CORBA object in that it is described
+in IDL, but unlike a CORBA object, it cannot be passed around using its
+object reference, nor can it be narrowed or stringified. 
+Examples of pseudo-objects include the Interface Repository and DII which, 
+although implemented as libraries, are more clearly described 
+in OMG specifications as pseudo-objects
+with IDL interfaces. The IDL for pseudo-objects is called "PIDL" to indicate
+that a pseudo-object is being defined.
+<BR><BR>
+
+
+<DT><A NAME="rmi-iiop"><B>RMI-IIOP</B></A> 
+<DD><a href="../rmi-iiop/index.html">Java RMI-IIOP</a> is an Object Request Broker and a compiler, <TT>rmic -iiop</TT>, that generates IIOP stub and tie classes.  With RMI-IIOP, developers can write remote interfaces in the Java programming language and implement them simply using Java technology and the Java RMI APIs. These interfaces can be implemented in any other
+language that is supported by an OMG mapping and a vendor supplied ORB for that language. Similarly, clients can be written in other languages using IDL derived from the remote Java technology-based interfaces. Using RMI-IIOP, objects can be passed both by reference and by value over IIOP. 
+<BR><BR>
+
+<DT><A NAME="servant"><B>servant</B></A>
+<DD>A servant is a programming language object or entity that implements requests on one or more objects. Servants generally exist within the context of a server process. Requests made on an object's references are mediated by the <a href="#ORB">ORB</a> and transformed into <a href="#invocation">invocations</a> on a particular servant. In the course of an object's lifetime it may be associated with (that is, requests on its references will be targeted at) multiple servants.
+<BR><BR>
+
+<DT><A NAME="servant manager"><B>servant manager</B></A>
+<DD>A servant manager is an object that the application developer can associate with a <a href="#POA">POA</a>. The <a href="#ORB">ORB</a> will invoke operations on servant managers to activate servants on demand, and to deactivate servants. Servant managers are responsible for managing the association of an object (as characterized by its Object Id value) with a particular servant, and for determining whether an object exists or not. There are two kinds of servant managers, called <tt>ServantActivator</tt> and </tt>ServantLocator</tt>; the type used in a particular situation depends on policies in the POA.
+<BR><BR>
+
+<DT><A NAME="servant object"><B>servant object</B></A>
+<DD>An instance of an <A href="#implementation">object implementation</A>
+for an <A href="#IDL">IDL interface</A>.  
+The servant object is registered
+with the ORB so that the ORB knows where to send invocations.
+It is the servant that performs the services requested when a CORBA 
+object's method is invoked.
+<BR><BR>
+
+<DT><A NAME="server"><B>server</B></A>
+<DD>A program that contains the implementations of one or more
+<A href="#IDL">IDL interfaces</A>.
+For example, a desktop publishing server
+might implement a <TT>Document</TT> object type, a <TT>ParagraphTag</TT> 
+object type, and other related object types.
+The server is required to
+register each implementation (<A href="#servant object">servant object</A>)
+with the ORB so that the ORB knows about the servant.
+Servers are sometimes referred to as object servers.
+<BR><BR>
+
+<DT><A NAME="server skeleton"><B>server skeleton</B></A>
+<DD>
+A public abstract class generated by the <tt>idlj</tt> compiler
+that provides the ORB with information it needs in dispatching
+method invocations to the <A href="#servant object">servant object</A>(s).
+A server skeleton, like a
+<A href="#client stub">client stub</A>,
+is specific to the IDL interface from which
+it is generated.  A server skeleton is the server side analog to a
+client stub, and these two classes are used by ORBs
+in static invocation.
+<BR><BR>
+
+<DT><A NAME="servertool"><B>servertool</B></A>
+<DD>The Java IDL Server Tool, <TT><a href="servertool.html">servertool</a></TT> provides the ease-of-use interface for the application programmers to register, unregister, startup, and shutdown a server.  
+
+
+
+<BR><BR>
+<DT><A NAME="service tier"><B>service tier</B></A>
+<DD>The portion of a <A href="#distributed application">distributed 
+application</A> that contains the business
+logic and performs most of the computation. 
+The service tier is typically located
+on a shared machine for optimum resource use. 
+<BR><BR>
+
+<DT><A NAME="signature interface"><B>signature interface</B></A>
+<DD>A non-abstract IDL interface is mapped to two public Java interfaces: a signature interface and an <a href="#operations interface">operations interface</a>.  The signature interface, which extends <TT>IDLEntity</TT>, has the same name as the IDL interface name and is used as the signature type in method declarations when interfaces of the specified type are used in other interfaces.
+<BR><BR>
+
+<DT><A NAME="skeleton"><B>skeleton</B></A>
+<DD>The object-interface-specific <a href="#ORB">ORB</a> component which assists an <a href="#object adapter">object adapter</a> in passing requests to particular methods.
+<BR><BR>
+
+<DT><A NAME="static invocation"><B>static invocation</B></A>
+<DD>See <A href="#invocation">invocation</A>.
+<BR><BR>
+
+<DT><A NAME="stringified object reference"><B>stringified object reference</B></A>
+<DD>An <A href="#object reference">object reference</A> that has been 
+converted to a string so that it may
+be stored on disk in a text file (or stored in some other manner).
+Such strings should be treated as opaque because they are ORB-implementation
+independent.  Standard <TT>object_to_string</TT>
+and <TT>string_to_object</TT> methods on <TT>org.omg.CORBA.Object</TT> make
+stringified references available to all CORBA Objects.
+<BR><BR>
+
+<DT><A NAME="stub"><B>stub</B></A>
+<DD>A local procedure corresponding to a single operation that invokes that operation when called.
+<BR><BR>
+
+<DT><A NAME="tnameserv"><B>tnameserv</B></A>
+<DD>The CORBA COS (Common Object Services) Naming
+Service</A> provides a tree-like directory for object references much like a
+filesystem provides a directory structure for files. 
+The Transient Naming Service provided with Java IDL, <tt><a href="tnameserv.html">tnameserv</a></tt>, is a simple implementation of the COS Naming Service specification.  <a href="#object reference">Object references</a> are stored in the namespace by name and each object reference-name pair
+is called a name binding. Name bindings may be organized under 
+naming contexts. Naming contexts are themselves name bindings and
+serve the same organizational function as a file system subdirectory. All
+bindings are stored under the initial naming context. The 
+initial naming context is the only persistent binding in the namespace; the rest of the namespace is lost if the transient naming service process halts and restarts.
+<BR><BR>
+
+<DT><A NAME="transient object"><B>transient object</B></A>
+<DD>An object whose existence is limited by the lifetime of the process or thread that created it.
+<BR><BR>
+
+</DL>
+
+ 
+<CENTER><P><HR>
+<A href="jidlDistApp.html">Distributed Application Concepts</A> |
+<A href="jidlUsingCORBA.html">Using CORBA</A>  |  
+Glossary
+ 
+ 
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html">
+Home</A></TD>
+</TD>
+</TR></TABLE>
+ 
+<HR><FONT
+SIZE="-2">
+<A HREF="http://www.sun.com/share/text/SMICopyright.html">Copyright
+&copy;</A></FONT><FONT SIZE="-2"> 1996-2001 Sun Microsystems, Inc.,
+2550 Garcia Ave., Mtn. View, CA. 94043-1100 USA., All rights
+reserved.</FONT></P>
+</CENTER>
+ 
+</BODY>
+</HTML>
+

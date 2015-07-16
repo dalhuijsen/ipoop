@@ -1,0 +1,93 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="connection.html">[Prev]</a> <a href="statement.html">[Next]</a> 
+<hr><br>
+ 
+<a name="999674"> </a>
+<h2> DriverManager</h2>
+<p><a name="1002965"> </a>
+NOTE: The material in this chapter is based on <em>JDBC</em>tm<em> API Tutorial and Reference, Second Edition: Universal Data Access for the Java</em>tm<em> 2 Platform</em>, published by Addison Wesley as part of the Java series, ISBN 0-201-43328-1.
+</p><a name="998348"> </a>
+<h3>3.1	 DriverManager Overview</h3>
+<p><a name="997394"> </a>
+The <code>DriverManager</a></code> class is the traditional management layer of JDBC, working between the user and the drivers. It keeps track of the drivers that are available and handles establishing a connection between a database and the appropriate driver. In addition, the <code>DriverManager</code> class attends to things like driver login time limits and the </a>printing of log and tracing messages.
+</p><p><a name="1002968"> </a>
+Note that the <code>javax.sql</code> package, otherwise known as the JDBC 2.0 Standard Extension API, provides the <code>DataSource</code> interface as an alternate and preferred means of connecting to a data source. However, the <code>DriverManager</code> facility can still be used with drivers that support <code>DataSource</code> implementations.
+</p><p><a name="998476"> </a>
+For simple applications, the only method in the <code>DriverManager</code> class that a general programmer needs to use directly is <code>DriverManager.getConnection</code>. As its name implies, this method establishes a connection to a database. An application may call the <code>DriverManager</code> methods <code>getDriver</code>, <code>getDrivers</code>, and <code>registerDriver</code> as well as the <code>Driver</code> method <code>connect</code>, but in most cases it is better to let the <code>DriverManager</code> class manage the details of establishing a connection.
+</p><a name="997322"> </a>
+<h4>3.1.1	 Keeping Track of Available Drivers</h4>
+<p><a name="999681"> </a>
+The <code>DriverManager</code> class maintains a list of <code>Driver</code> classes that have</a> </a>registered themselves by calling the method <code>DriverManager.registerDriver</code>. All <code>Driver</code> classes should be written with a static section (a static initializer) that creates an instance of the class and then registers it with the <code>DriverManager</code> class when it is loaded. Thus, a user would not normally call </a><code>DriverManager.registerDriver</code> directly; it should be called automatically by a <code>Driver</code> class when it is loaded. A <code>Driver</code> class is </a>loaded, and therefore automatically registered with the <code>DriverManager</code>, in one of two ways:
+</p><p><a name="1002784"> </a>
+
+</p><ol>
+<a name="997324"> </a>
+<li>by calling the </a>method </a><code>Class.forName</a></code>. This explicitly</a> loads</a> the driver class. Since it does not depend on any external setup, this way of loading a driver is the recommended one for using the <code>DriverManager</code> framework. The following code loads the class <code>acme.db.Driver</code>:
+<blockquote><pre>
+Class.forName("acme.db.Driver");
+</pre></blockquote><a name="997365"> </a>
+<p>
+If <code>acme.db.Driver</code> has been written so that loading it causes an instance to be created and also calls <code>DriverManager.registerDriver</code> with that instance as the parameter (as it should do), then it is in the <code>DriverManager</code>'s list of drivers and available for creating a connection.
+<a name="1002774"> </a>
+<blockquote></blockquote>
+<a name="1002777"> </a>
+<li>by </a>adding the </a><code>Driver</code> class to the <code>java.lang.System</code> property <code>jdbc.drivers</code>. This is a list of driver classnames, separated by colons, that the <code>DriverManager</code> class loads. When the <code>DriverManager</code> class is initialized, it looks for the system property "<code>jdbc.drivers</code>," and if the user has entered one or more drivers, the <code>DriverManager</code> class attempts to load them. The following code illustrates how a programmer might enter three driver classes in ~/.hotjava/properties (HotJava loads these into the system properties list on startup):
+</ol>
+<blockquote><pre>
+jdbc.drivers=foo.bah.Driver:wombat.sql.Driver:bad.test.ourDriver
+</pre></blockquote><a name="998646"> </a>
+<blockquote>The first call to a <code>DriverManager</code> method will automatically cause these driver classes to be loaded. </blockquote>
+<a name="1001916"> </a>
+<blockquote></blockquote>
+<p><a name="999830"> </a>
+Note that this second way of loading drivers requires a preset environment that is persistent. If there is any doubt about that being the case, it is safer to call the method <code>Class.forName</code> to explicitly load each driver. This is also the right method to use to bring in a particular driver since once the <code>DriverManager</code> class has been initialized, it will never recheck the <code>jdbc.drivers</code> property list.
+</p><p><a name="999831"> </a>
+In both of these cases, it is the </a>responsibility of the newly-loaded <code>Driver</code> class to register itself by calling <code>DriverManager.registerDriver</code>. As mentioned, this should be done automatically when the class is loaded.
+</p><p><a name="997331"> </a>
+For </a>security reasons, the JDBC management layer will keep track of which class loader provided which driver. Then when the </a><code>DriverManager</code> </a>class is opening a connection, it will use only drivers that come from the local file system or from the same class loader as the code issuing the request for a connection.
+</p><a name="997332"> </a>
+<h4>3.1.2	 Establishing a Connection</h4>
+<p><a name="1002712"> </a>
+Once the <code>Driver</code> classes have been loaded and registered with the <code>DriverManager</code> class, they are available for </a>establishing a connection with a database. When a request for a </a>connection</a> is made with a call to the </a><code>DriverManager.getConnection</code> method, the <code>DriverManager</code> tests each driver in turn to see if it can establish a connection.
+</p><p><a name="998421"> </a>
+It may sometimes be the case that more than one JDBC driver is capable of connecting to a given URL. For example, when connecting to a given remote database, it might be possible to use a JDBC-ODBC bridge driver, a JDBC-to-generic-network-protocol driver, or a driver supplied by the database vendor. In such cases, the </a>order in which the drivers are tested is significant because the <code>DriverManager</code> will use the first driver it finds that can successfully connect to the given URL.
+</p><p><a name="998900"> </a>
+First the</a> <code>DriverManager</code> tries to use each driver in the order it was registered. (The drivers listed in <code>jdbc.drivers</code> are always registered first.) It will skip any drivers that are untrusted code unless they have been loaded from the same source as the code that is trying to open the connection.
+</p><p><a name="998422"> </a>
+It tests the drivers by calling the method <code>Driver.connect</code> on each one in turn, passing them the URL that the user originally passed to the method <code>DriverManager.getConnection</code>. The first driver that recognizes the URL makes the connection.
+</p><p><a name="998441"> </a>
+At first glance this may seem inefficient, but it requires only a few procedure calls and string comparisons per connection since it is unlikely that dozens of drivers will be loaded concurrently.
+</p><p><a name="998390"> </a>
+The following code is an example of all that is normally needed to set up a connection with a driver such as a JDBC-ODBC bridge driver.
+</p><blockquote><pre>
+Class.forName("jdbc.odbc.JdbcOdbcDriver"); //loads the driver
+String url = "jdbc:odbc:fred";
+Connection con = DriverManager.getConnection(
+		url, "userID", "passwd");
+</pre></blockquote>
+<p><a name="999926"> </a>
+The variable con represents a connection to the data source "fred" that can be used to create and execute SQL statements.
+</p><p><a name="1001917"> </a>
+With the addition of the JDBC 2.0 Standard Extension API, a <code>DataSource</code> object can be used to establish a connection with a data source. The <code>DriverManager</code> can still be used, but a <code>DataSource</code> object offers several advantages over the <code>DriverManager</code> and is the preferred alternative. Developers who are writing Enterprise JavaBeans components, however, should always use a <code>DataSource</code> object instead of the <code>DriverManager</code>. Using a properly implemented <code>DataSource</code> object is the only way to get connections that are pooled and that can participate in distributed transactions. 
+</p></pre></blockquote><a name="999927"> </a>
+<h4>3.1.3	 DriverManager Methods Are Static</h4>
+<p><a name="999928"> </a>
+All </a><code>DriverManager</code> methods are declared <code>static</code>, which means that they operate on the class as a whole and not on particular instances. In fact, the constructor for <code>DriverManager</code> is declared <code>private</code> to prevent users from instantiating it. Logically, there is one instance of the <code>DriverManager</code> class. This means that methods are called by qualifying them with <code>DriverManager</code>, as in the following line of code.
+</p><blockquote><pre>
+DriverManager.setLogWriter(out);
+</pre></blockquote><blockquote><pre>
+</pre></blockquote>
+<hr><br>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="connection.html">[Prev]</a> <a href="statement.html">[Next]</a> 
+<hr><br>
+
+
+
+<i><a href="copyright.html">Copyright</a> &#169; 1999, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

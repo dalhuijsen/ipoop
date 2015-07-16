@@ -1,0 +1,318 @@
+<html>
+<head>
+<title>JNLP File Syntax</title>
+
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>JNLP File Syntax</h1>
+<hr>
+<form name="form1">
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This chapter covers the following topics:</p>
+<ul>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#example">Example</a></li>
+  <li><a href="#jnlp_elements">JNLP Elements</a> 
+    <ul>
+      <li><a href="#jnlp"><code>jnlp</code> Element</a></li>
+      <li><a href="#information"><code>information</code> Element</a></li>
+      <li><a href="#security"><code>security</code> Element</a></li>
+      <li><a href="#resources"><code>resources</code> Element</a></li>
+      <li><a href="#application_desc"><code>application-desc</code> Element</a></li>
+      <li><a href="#applet_desc"><code>applet-desc</code> Element</a></li>
+    </ul>
+  </li>
+</ul>
+<h2><a name="intro"></a>Introduction</h2>
+<p>The format used in this release is that specified in the <a href="http://java.sun.com/products/javawebstart/download-spec.html">Java 
+  Network Launching Protocol and API (JNLP) Specification v1.0.1</a>. This document 
+  describes the most commonly used elements of a JNLP file. For a complete description 
+  of the format, refer to the specification.</p>
+<p>The JNLP file is an XML document. The following shows a complete example of 
+  a JNLP file.</p>
+<h2><a name="example" id="example"></a>Example</h2>
+<p><tt><b>&lt;?xml version</b>="1.0" <b>encoding</b>="utf-8"?></tt> <br>
+  <b><tt><font color="#000000">&lt;!-- JNLP File for SwingSet2 Demo Application 
+  --></font></tt></b> <br>
+  <tt>&lt;<b>jnlp</b></tt> <br>
+  <tt>&nbsp; <b>spec=</b>"1.0+"</tt> <br>
+  <tt>&nbsp; <b>codebase=</b>"http://my_company.com/jaws/apps"</tt> <br>
+  <tt>&nbsp; <b>href=</b>"swingset2.jnlp"></tt> <br>
+  <tt>&nbsp; &lt;<b>information</b>></tt> <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>title</b>>SwingSet2 Demo Application&lt;/<b>title</b>></tt> 
+  <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>vendor</b>>Sun Microsystems, Inc.&lt;/<b>vendor</b>></tt> 
+  <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>homepage href</b>="docs/help.html"/></tt> <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>description</b>>SwingSet2 Demo Application<b>&lt;/description></b></tt> 
+  <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>description kind</b>="short">A demo of the capabilities 
+  of the Swing Graphical User Interface.&lt;/<b>description</b>></tt> <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>icon href</b>="images/swingset2.jpg"/></tt> <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>icon kind</b>="splash" <b>href</b>="images/splash.gif"/></tt> 
+  <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>offline-allowed</b>/></tt> <br>
+  <tt>&nbsp; &lt;/<b>information</b>></tt> <br>
+  <tt>&nbsp; &lt;<b>security</b>></tt> <br>
+  <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;<b>all-permissions</b>/></tt> <br>
+  <tt>&nbsp; &lt;/<b>security</b>></tt> <br>
+  <tt>&nbsp; &lt;<b>resources</b>></tt> <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>j2se version</b>="1.4.2"/></tt> <br>
+  <tt>&nbsp;&nbsp;&nbsp; &lt;<b>jar href</b>="lib/SwingSet2.jar"/></tt> <br>
+  <tt>&nbsp; &lt;/<b>resources</b>></tt> <br>
+  <tt>&nbsp; &lt;<b>application-desc main-class</b>="SwingSet2"/></tt> <br>
+  <tt>&lt;/<b>jnlp</b>></tt> </p>
+<p>The example shows the basic outline of the document. The root element is <tt>jnlp</tt>, 
+  which has four subelements: <tt>information</tt>, <tt>security</tt>, <tt>resources</tt>, 
+  and <tt>application-desc</tt>. In addition, Java Web Start also supports launching 
+  Applets by using the <tt>applet-desc</tt> element. The elements are described 
+  in more detail below. </p>
+<h2><a name="jnlp_elements"></a>JNLP Elements</h2>
+<h3> <a name="jnlp"></a><code>jnlp</code> Element</h3>
+<blockquote>
+  <p><b><code>spec</code> attribute</b>: This attribute must be 1.0 or higher 
+    to work with this release. The default value is "1.0+". Thus, it can typically 
+    be omited. </p>
+  <p><b><code>codebase</code> attribute</b>: All relative URLs specified in <tt>href</tt> 
+    attributes in the JNLP file are using this URL as a base. </p>
+  <p><b><code>href</code> attribute:</b> This is a URL pointing to the location 
+    of the JNLP file itself. Java Web Start requires this attribute to be set 
+    in order for the application to be included in the Application Manager. </p>
+</blockquote>
+<h3> <a name="information"></a><code>information</code> Element</h3>
+<blockquote>
+  <p><b><code>title</code> element:</b> The name of the application. </p>
+  <p><b><code>vendor</code> element:</b> The name of the vendor of the application. 
+  </p>
+  <p><b><code>homepage</code> element:</b> Contains a single attribute, <tt>href</tt>, 
+    which is a URL locating the home page for the Application. It is used by the 
+    Application Manager to point the user to a Web page where more information 
+    about the application can be found. </p>
+  <p><b><code>description</code> element:</b> A short statement about the application. 
+    Description elements are optional. The <tt>kind</tt> attribute defines how 
+    the description should be used. It can have one of the following values: </p>
+  <ul>
+    <li><i>one-line</i>: If a reference to the application is going to appear 
+      on one row in a list or a table, this description will be used.</li>
+    <li><i>short</i>: If a reference to the application is going to be displayed 
+      in a situation where there is room for a paragraph, this description is 
+      used.</li>
+    <li><i>tooltip</i>: If a reference to the application is going to appear in 
+      a tooltip, this description is used.</li>
+  </ul>
+  <p>Only one description element of each kind can be specified. A description 
+    element without a kind is used as a default value. Thus, if Java Web Start 
+    needs a description of kind <code>short</code>, and it is not specified in 
+    the JNLP file, then the text from the description without an attribute is 
+    used. </p>
+  <p>All descriptions contain plain text. No formatting, such as with HTML tags, 
+    is supported. </p>
+  <p><b><code>icon</code> element:</b> Contains an HTTP URL to an image file in 
+    either GIF or JPEG format. The icons are used to represents the application 
+  </p>
+  <ul>
+    <li>during launch when Java Web Start presents the application to the user;</li>
+    <li>in the Application Manager;</li>
+    <li>in desktop shortcuts. </li>
+  </ul>
+  <p>A 64x64 icon is shown during download; in the Application Manager and in 
+    desktop shortcuts a 32x32 icon is used. Java Web Start automatically resizes 
+    an icon to the appropriate size. </p>
+  <p>Optional <tt>width</tt> and <tt>height</tt> attributes can be used to indicate 
+    the size of the images. </p>
+  <p>The optional <tt>kind="splash"</tt> attribute may be used in an icon element 
+    to indicate that the image is to be used as a "splash" screen during the launch 
+    of an application. If the JNLP file does not contain an <tt>icon</tt> element 
+    with a <tt>kind="splash"</tt> attribute, but does contain another <tt>icon</tt> 
+    tag, Java Web Start will display a splash screen consisting of the image specified 
+    by the <tt>icon</tt> element on the left and the application's title and vendor 
+    on the right. </p>
+  <p> If the JNLP file does not contain any <tt>icon</tt> images, the splash image 
+    will consist of the application's title and vendor, as taken from the JNLP 
+    file. </p>
+  <p> A splash image will be surrounded by a border defined by Java Web Start. 
+  </p>
+  <p> The first time an application is launched following the addition or modification 
+    of the <tt>icon</tt> element in the JNLP file, the old splash image will still 
+    be displayed. The new splash image will appear on the second and subsequent 
+    launches of the application. </p>
+  <p><b><code>offline-allowed</code> element:</b> The optional <tt>offline-allowed</tt> 
+    element indicates if the application can be launched offline. </p>
+  <p>Applications not marked offline in the JNLP file will not be launched by 
+    the Application Manager. By default Application Manager only launches an application 
+    if the client system is online.</p>
+  <p> The <tt>offline-allowed</tt> element also controls how Java Web Start checks 
+    for an update to an application. <strong>If the element is not specified</strong>&#8212;i.e., 
+    the application is required to be online to run&#8212;Java Web Start will 
+    always check for an updated version before launching the application. And 
+    if an update is found, the new application will be downloaded and launched. 
+    Thus, it is guaranteed that the user always runs the latest version of the 
+    application. The application, however, must be run online.</p>
+  <p> <strong>If <tt>offline-allowed</tt> is specified</strong>, Java Web Start 
+    will also check to see if an update is available. However, if the application 
+    is already downloaded the check will timeout after a few seconds, in which 
+    case the cached application will be launched instead. Given a reasonable fast 
+    server connection, the lastest version of the application will usually be 
+    run, but it is not guaranteed. The application, however, can be run offline.</p>
+</blockquote>
+<h3> <a name="security"></a><code>security</code> Element</h3>
+<blockquote>
+  <p>Each application is, by default, run in a restricted execution environment, 
+    similar to the Applet sandbox.&nbsp; The security element can be used to request 
+    unrestricted access. </p>
+  <p>If the <tt>all-permissions</tt> element is specified, the application will 
+    have full access to the client machine and local network. If an application 
+    requests full access, then all JAR files must be signed. The user will be 
+    prompted to accept the certificate the first time the application is launched. 
+  </p>
+</blockquote>
+<h3> <a name="resources"></a><code>resources</code> Element</h3>
+<blockquote> 
+  <p>The <tt>resources</tt> element is used to specify all the resources, such 
+    as Java class files, native libraries, and system properties, that are part 
+    of the application.&nbsp; A resource definition can be restricted to a specific 
+    operating system, architecture, or locale using the <tt>os</tt>, <tt>arch</tt>, 
+    and <tt>locale</tt> attributes. </p>
+  <p>The resources element has six different possible subelements: <tt>jar</tt>, 
+    <tt>nativelib</tt>, <tt>j2se</tt>, <tt>property</tt>, <tt>package</tt>, and 
+    <tt>extension</tt>. The <tt>package</tt> and <tt>extension</tt> elements are 
+    not discussed in this developer's guide. See the <a href="http://java.sun.com/products/javawebstart/download-spec.html">Java 
+    Network Launching Protocol and API (JNLP) Specification v1.0.1</a> for details. 
+  </p>
+  <p>A <tt>jar</tt> element specifies a JAR file that is part of the application's 
+    classpath.&nbsp; For example: </p>
+  <p><tt>&nbsp; &lt;<b>jar href</b>="myjar.jar"/></tt> </p>
+  <p>The <tt>jar</tt> file will be loaded into the JVM using a <tt>ClassLoader</tt> 
+    object.&nbsp; The <tt>jar</tt> file will typically contain Java classes that 
+    contain the code for the particular application, but can also contain other 
+    resources, such as icons and configuration files, that are available through 
+    the <tt>getResource</tt> mechanism. </p>
+  <p>A <tt>nativelib</tt> element specifies a JAR file that contains native libraries.&nbsp; 
+    For example: </p>
+  <p>&nbsp;&nbsp;&nbsp; <tt>&lt;<b>nativelib href</b>="lib/windows/corelib.jar"/></tt> 
+  </p>
+  <p>The JNLP client must ensure that each file entry in the root directory of 
+    the JAR file (i.e., <code>/</code>) can be loaded into the running process 
+    using the <tt>System.loadLibrary</tt> method.&nbsp; Each entry must contain 
+    a platform-dependent shared library with the correct naming convention, e.g., 
+    <code>*.dll</code> on Windows or <code>lib*.so</code> on Solaris/Linux.&nbsp; 
+    The application is responsible for doing the actual call to <tt>System.loadLibrary</tt>. 
+  </p>
+  <p>Native libraries would typically be included in a <tt>resources</tt> element 
+    that is geared toward a particular operating system and architecture.&nbsp; 
+    For example: </p>
+  <p><tt>&nbsp;&nbsp;&nbsp; &lt;<b>resources os</b>="SunOS" <b>arch=</b>"sparc"></tt> 
+    <br>
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;<b>nativelib href</b>="lib/solaris/corelibs.jar"/></tt> 
+    <br>
+    <tt>&nbsp;&nbsp;&nbsp; &lt;/<b>resource</b>></tt> </p>
+  <p>By default, <tt>jar</tt> and <tt>nativelib</tt> resources will be downloaded 
+    eagerly, i.e., they are downloaded and available locally to the JVM running 
+    the application before the application is launched.&nbsp; The <tt>jar</tt> 
+    and <tt>nativelib</tt> elements also allow a resource to be specified as <tt>lazy</tt>.&nbsp; 
+    This means the resource does not have to be downloaded onto the client system 
+    before the application is launched. </p>
+  <p>The <tt>download</tt> attribute is used to control whether a resource is 
+    downloaded eagerly or lazily.&nbsp; For example: </p>
+  <p><tt>&nbsp;&nbsp;&nbsp; &lt;<b>jar</b> <b>href</b>="sound.jar" <b>download</b>="lazy"/></tt> 
+    <br>
+    <tt>&nbsp;&nbsp;&nbsp; &lt;<b>nativelib</b> <b>href</b>="native-sound.jar" 
+    <b>download</b>="eager"/></tt> </p>
+  <p>The <tt>j2se</tt> element specifies what Java 2 SE Runtime Environment (JRE) 
+    versions an application is supported on, as well as standard parameters to 
+    the Java Virtual Machine.&nbsp; If several JREs can are specified, this indicates 
+    a prioritized list of the supported JREs, with the most preferred version 
+    first.&nbsp; For example: </p>
+  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>&lt;<b>j2se version</b>="1.3" <b>initial-heap-size</b>="64m"/></tt> 
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>&lt;<b>j2se version</b>="1.4+"/></tt> 
+  </p>
+  <p>The <code>version</code> attribute refers, by default, to a platform (specification) 
+    version of the Java 2 platform. Currently defined platform version are 1.2, 
+    1.3, and 1.4. (A platform version may optionally contain a micro version number; 
+    e.g., 1.4.2.)</p>
+  <p>Exact product versions (implementation versions) may also be specified&#8212;e.g., 
+    1.3.1_01 or 1.4.2-beta by Sun Microsystems, Inc.&#8212;by including the <code>href</code> 
+    attribute. E.g., </p>
+  <blockquote> 
+    <p>&lt;<tt><b>j2se version</b>="1.3.1_01" <b>href</b>="http://java.sun.com/products/autodl/j2se"/</tt></p>
+    <p>or</p>
+    <p>&lt;<tt><b>j2se version</b>="1.4.2-beta" <b>href</b>="http://java.sun.com/products/autodl/j2se"/></tt> 
+    </p>
+  </blockquote>
+  <p>If a platform version is specified (i.e., no <code>href</code> attribute 
+    is provided), Java Web Start will not consider an installed non-FCS (i.e., 
+    milestone) JRE as a match. E.g., a request of the form </p>
+  <blockquote> 
+    <p><tt>&lt;j2se version="1.4+"&gt;</tt> </p>
+  </blockquote>
+  <p>would not consider an installed 1.4.1-ea or 1.4.2-beta JRE as a match for 
+    the request. Starting with 1.3.0, a JRE from Sun Microsystems, Inc., is by 
+    convention a non-FCS (milestone) JRE if there is a dash (<code>-</code>) in 
+    the version string. </p>
+  <p>The <tt>property</tt> element defines a system property that will be available 
+    through the <tt>System.getProperty</tt> and <tt>System.getProperties </tt>methods. 
+    It has two required attributes:&nbsp; <tt>name</tt> and <tt>value</tt>.&nbsp; 
+    For example: </p>
+  <blockquote>
+    <p><tt> &lt;<b>property name</b>="key" <b>value</b>="overwritten"/></tt> </p>
+  </blockquote>
+</blockquote>
+<h3> <a name="application_desc"></a><code>application-desc</code> Element</h3>
+<blockquote>
+  <p>The <tt>application</tt> element indicates that the JNLP file is launching 
+    an application (as opposed to an applet). The application element has an optional 
+    attribute, <tt>main-class</tt>, which can be used to specify the name of the 
+    application's main class, i.e., the class that contains the <tt>public static 
+    void main(String argv[])</tt> method where execution must begin. </p>
+  <p>The <code>main-class</code> attribute can be omitted if the first JAR file 
+    specified in the JNLP file contains a manifest file containing the <code>main</code> 
+    class. </p>
+  <p>Arguments can be specified to the application by including one or more nested 
+    <tt>argument</tt> elements. For example: </p>
+  <p><tt>&nbsp; &lt;<b>application-desc main-class</b>="Main"></tt> <br>
+    <tt>&nbsp;&nbsp;&nbsp; &lt;<b>argument</b>>arg1&lt;/<b>argument</b>></tt> 
+    <br>
+    <tt>&nbsp;&nbsp;&nbsp; &lt;<b>argument</b>>arg2&lt;/<b>argument</b>></tt> 
+    <br>
+    <tt>&nbsp; &lt;/<b>application-desc</b>></tt> </p>
+</blockquote>
+<h3> <a name="applet_desc"></a><code>applet-desc</code> Element</h3>
+<blockquote> 
+  <p>Java Web Start has support for launching Java applets. This support provides 
+    easy migration of existing code to Java Web Start. </p>
+  <p>An applet is launched using the <tt>applet-desc</tt> element instead of the 
+    <tt>application-desc</tt> element. For example: </p>
+  <p><tt>&nbsp; &lt;<b>applet-desc</b></tt> <br>
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>documentBase</b>="http://..."</tt> <br>
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>name</b>="TimePilot"</tt> <br>
+    <tt><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; main-class</b>="TimePilot.TimePilotApp"</tt> 
+    <br>
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>width</b>="527"</tt> <br>
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>height</b>="428"></tt> <br>
+    <tt>&nbsp;&nbsp;&nbsp; &lt;<b>param name=</b>"key1" <b>value=</b>"value1"/></tt> 
+    <br>
+    <tt>&nbsp;&nbsp;&nbsp; &lt;<b>param name=</b>"key2" <b>value=</b>"value2"/></tt> 
+    <br>
+    <tt>&nbsp; &lt;<b>/applet-desc</b>></tt> </p>
+  <p>The JAR files that make up the applet are described using the <tt>resources</tt> 
+    element as for applications. The <tt>documentBase</tt> must be provided explicitly 
+    since a JNLP file is not embedded in an HTML page. The rest of the attributes 
+    correspond to the respective HTML applet tag elements. </p>
+  <p>The <tt>main-class</tt> attribute is used instead of the <tt>code</tt> attribute.&nbsp; 
+    The <tt>main-class</tt> attribute is assigned the name of the <tt>Applet</tt> 
+    class (without the <tt>.class</tt> extension).&nbsp; This attribute can be 
+    omitted if the <tt>Applet</tt> class can be found from the <tt>Main-Class</tt> 
+    manifest entry in the main JAR file. </p>
+  <p>Note: Applets must be packaged in JAR files in order to work with Java Web 
+    Start. </p>
+</blockquote>
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<HTML>
+<HEAD>
+<!-- updated 5/2001 dcarson1 -->
+   <TITLE>servertool - The Java(TM) IDL Server Tool</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>
+servertool - The Java(TM) IDL Server Tool</H1>
+
+<BLOCKQUOTE><B>servertool</B> provides a command-line interface for application 
+programmers to register, unregister, startup, and shutdown a persistent 
+server.</BLOCKQUOTE>
+
+<H2>
+SYNOPSIS</H2>
+
+<BLOCKQUOTE>
+<PRE>servertool -ORBInitialPort <em>nameserverport</em> <a 
+href="#Options">options</a> [ <a href="#Commands">commands</a> ]</PRE>
+
+<P>If you did not enter a command when starting <tt>servertool</tt>, the command-line 
+tool displays with a <tt>servertool ></tt> prompt.  Enter <a 
+href="#Commands">commands</a> at the <TT>servertool &gt;</TT> prompt.
+
+<P>If you enter a command when starting <tt>servertool</tt>, the Java IDL Server Tool 
+starts, runs the command, and exits. 
+
+<P>The <code>-ORBInitialPort</code> <em>nameserverport</em> option is 
+<strong>required</strong>.  The value for  <em>nameserverport</em> must specify the 
+port on which <tt>orbd</tt> is running and listening for incoming requests. When 
+using Solaris software, you must become root to start a process on a port under 1024. 
+ For this reason, we recommend that you use a port number greater than or equal to 
+1024 for the <em>nameserverport</em>.  
+</BLOCKQUOTE>
+
+<H2>
+DESCRIPTION</H2>
+
+
+<BLOCKQUOTE>
+<P>The <TT>servertool</TT> provides the command-line interface for the application 
+programmers to register, unregister, startup, and shutdown a persistent server.  
+Other commands are provided to obtain various statistical information about the 
+server.
+</BLOCKQUOTE>
+
+
+<A NAME="Options"></A>
+<H2>
+OPTIONS</H2>
+
+<BLOCKQUOTE>
+<DL>
+<DT>
+<B>-ORBInitialHost <em>nameserverhost</em></B></DT>
+<DD>Specifies the host machine on which the name server is running and listening for 
+incoming requests. The <em>nameserverhost</em> defaults to <em>localhost</em> if this 
+option is not specified.  If <tt>orbd</tt> and <tt>servertool</tt> are running on 
+different machines, you must specify the name or IP address of the host on which 
+<tt>orbd</tt> is running.
+</DD>
+<p>
+
+    <dt><b>-J</b><i>option</i>
+        <dd>Pass <i>option</i> to the Java virtual machine, where 
+        <i>option</i> is one of the options described on the 
+        reference page for the <a href="../../tooldocs/solaris/java.html">java a
+pplication 
+        launcher</a>.  For example, <b>-J-Xms48m</b> sets the startup
+        memory to 48 megabytes.  It is a common convention for <b>-J</b> 
+        to pass options to the underlying virtual machine.
+
+
+</DL>
+</BLOCKQUOTE>
+
+
+<A NAME="Commands"></A>
+<H2>
+COMMANDS</H2>
+
+<BLOCKQUOTE>
+<DL>
+<DT>
+<B>register -server&nbsp;&lt;server&nbsp;class&nbsp;name&gt;
+ &nbsp;-classpath&nbsp;&lt;classpath&nbsp;to&nbsp;server&gt;
+ [&nbsp;-applicationName&nbsp;&lt;application&nbsp;name&gt;  
+-args&nbsp;&lt;args&nbsp;to&nbsp;server&gt; 
+-vmargs&nbsp;&lt;flags&nbsp;to&nbsp;be&nbsp;passed&nbsp;to&nbsp;Java&nbsp;VM&gt;
+ &nbsp;]</B></DT>
+<DD>
+Register a new persistent server with the Object Request Broker Daemon (ORBD).  If 
+the server is not already registered, it is registered and activated.  This command 
+causes an install method to be invoked in the main class of the server identified by 
+the <tt>-server</tt> option.   The install method must be <tt>public static void 
+install(org.omg.CORBA.ORB)</tt>.  The install method is optional and enables the 
+developer to provide their own server installation behavior (for example, creating 
+database schema). </DD>
+<p>
+
+<DT>
+<B>unregister -serverid&nbsp;&lt;server&nbsp;id&nbsp;&gt;&nbsp;| 
+-applicationName&nbsp;&lt;application&nbsp;name&gt;</B></DT>
+<DD>Unregister a server from the ORBD by using either its server id or its 
+application name.  This command causes an uninstall method to be invoked in the main 
+class of the server identified by the <tt>-server</tt> option.   The uninstall method 
+must be <tt>public static void uninstall(org.omg.CORBA.ORB)</tt>.  The uninstall 
+method is optional and enables the developer to provide their own server uninstall 
+behavior (for example, undoing the behavior of the install method).
+</DD>
+<p>
+
+<DT>
+<B>getserverid -applicationName&nbsp;&lt;application&nbsp;name&gt;</B></DT>
+<DD>Return the server id that corresponds with an application.
+</DD>
+<p>
+
+<DT>
+<B>list</B></DT>
+<DD>List information about all persistent servers registered with the ORBD. </DD>
+<p>
+
+<DT>
+<B>listappnames</B></DT>
+<DD>List the application names for all servers currently registered with the ORBD.
+</DD>
+<p>
+
+<DT>
+<B>listactive</B></DT>
+<DD>List information about all persistent servers that have been launched by the ORBD 
+and are currently running. 
+</DD>
+<p>
+
+<DT>
+<B>locate -serverid&nbsp;&lt;server&nbsp;id&nbsp;&gt;&nbsp;| 
+-applicationName&nbsp;&lt;application&nbsp;name&gt;   
+[-endpointType&nbsp;&lt;endpointType&gt;&nbsp;]</B></DT>
+<DD>Locate the endpoints (ports) of a specific type for all ORBs created by a 
+registered server.  If a server is not already running, it is activated.  If an 
+endpoint type is not specified, then the plain/non-protected endpoint associated with 
+each ORB in a server is returned.
+</DD>
+<p>
+
+<DT>
+<B>locateperorb -serverid&nbsp;&lt;server&nbsp;id&nbsp;&gt;&nbsp;| 
+-applicationName&nbsp;&lt;application&nbsp;name&gt;  
+[-orbid&nbsp;&lt;ORB&nbsp;name&gt;&nbsp;]</B></DT>
+<DD>Locate all the endpoints (ports) registered by a specific ORB of registered 
+server.  If a server is not already running, then it is activated.  If an 
+<em>orbid</em> is not specified, the default value of "" is assigned to the 
+<em>orbid</em>.  If any ORBs are created with an <em>orbid</em> of empty string, all 
+ports registered by it are returned.
+</DD>
+<p>
+
+<DT>
+<B>orblist -serverid&nbsp;&lt;server&nbsp;id&nbsp;&gt;&nbsp;| 
+-applicationName&nbsp;&lt;application&nbsp;name&gt;</B></DT>
+<DD>Lists the ORBId of the ORBs defined on a server.  An ORBId is the string name for 
+the ORB created by the server. If the server is not already running, it is activated.
+</DD>
+<p>
+
+<DT>
+<B>shutdown -serverid&nbsp;&lt;server&nbsp;id&nbsp;&gt;&nbsp;| 
+-applicationName&nbsp;&lt;application&nbsp;name&gt; </B></DT>
+<DD>Shutdown an active server that is registered with ORBD.  During execution of this 
+command, the <TT>shutdown()</TT> method defined in the class specified by either the 
+<tt>-serverid</tt> or <tt>-applicationName</tt> parameter is also invoked to shutdown 
+the server process appropriately. 
+</DD>
+<p>
+
+<DT>
+<B>startup -serverid&nbsp;&lt;server&nbsp;id&nbsp;&gt;&nbsp;| 
+-applicationName&nbsp;&lt;application&nbsp;name&gt; </B></DT>
+<DD>Startup or activate a server that is registered with ORBD.  If the server is not 
+running, this command launches the server.  If the server is already running, an 
+error message is returned to the user.
+</DD>
+<p>
+
+<DT>
+<B>help</B></DT>
+<DD>List all the commands available to the server through the server tool.
+</DD>
+<p>
+
+<DT>
+<B>quit</B></DT>
+<DD>Exit the server tool.
+</DD>
+<p>
+
+</BLOCKQUOTE>
+</DL>
+
+<p>
+
+
+<H2>
+SEE ALSO</H2>
+
+ 
+
+<BLOCKQUOTE>
+<A HREF="orbd.html">orbd</A></BLOCKQUOTE>
+<P>
+<P>
+
+
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2001
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+</BODY>
+</HTML>
+
+

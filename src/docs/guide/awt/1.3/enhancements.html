@@ -1,0 +1,391 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>AWT Enhancements</title>
+  </head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>AWT Enhancements in the Java<sup><font size=-2>TM</font></sup> 2 SDK, v1.3</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+<blockquote>
+Version 1.3 of the Java 2 SDK includes the following AWT enhancements:
+<blockquote>
+<a href=#multiscreen>Multiple Monitor Support</a><br>
+<a href=#robot>New Class <tt>java.awt.Robot</tt></a><br>
+<a href=#masks>New Event Masks for PaintEvents and InvocationEvents</a><br>
+<a href=#coalescing>Paint Coalescing</a><br>
+<a href=#printing>Printing API Enhancements</a><br>
+<a href=#hierarchies>New Event Type for Tracking Changes to Component Hierarchies</a><br>
+<a href=#native>AWT Native Interface</a>
+</blockquote>
+<hr>
+
+<a name=multiscreen>
+<b>Multiple Monitor Support</b>
+<blockquote>
+<p>
+	You can now render on
+	multiple screens by creating <tt>Frame</tt>, <tt>JFrame</tt>, 
+	<tt>Window</tt>, or <tt>JWindow</tt> objects with the 
+	<tt>GraphicsConfiguration</tt> of the target
+	<tt>GraphicsDevice</tt>.
+	<p>
+    	The new <tt>Frame</tt> constructor, 
+	<a href=
+	"../../../api/java/awt/Frame.html#Frame(java.awt.GraphicsConfiguration)">
+	<tt>Frame(GraphicsConfiguration)</tt></a>, 
+	enables creation of a <tt>Frame</tt> object on a different 
+	screen device.
+	<p>
+	The new <tt>Window</tt> constructor, 
+	<tt><a href=
+"../../../api/java/awt/Window.html#Window(java.awt.Window, java.awt.GraphicsConfiguration)">
+	Window(Window, GraphicsConfiguration)</a></tt>, 
+	constructs a new invisible window with the specified window as its
+	owner and the <tt>GraphicsConfiguration</tt> of a screen device.
+	<p>
+        The new <tt>GraphicsConfiguration</tt> 
+	<a href=
+	"../../../api/java/awt/GraphicsConfiguration.html#getBounds()">
+	<tt>getBounds</tt></a> method
+	returns the bounds of the <tt>GraphicsConfiguration</tt> 
+	in device coordinates.  If you have a virtual device, then the
+	device coordinates returned from <tt>getBounds</tt> are 
+	virtual device coordinates.
+	<p>
+	Finally, the new <tt>Component</tt> <a href=
+	"../../../api/java/awt/Component.html#getGraphicsConfiguration()">
+	<tt>getGraphicsConfiguration</tt></a> method 
+	returns the <tt>GraphicsConfiguration</tt> with which the 
+	<tt>Component</tt> was created.
+	<p>
+	In a virtual device configuration consisting of more than
+	one physical screen device, the <tt>GraphicsConfiguration</tt>
+	objects' coordinates are relative to the virtual coordinate
+	system.  For this reason, virtual coordinates must be used when
+	calling the <tt>setLocation</tt> method of a <tt>Frame</tt> or
+	<tt>Window</tt>.  Similarly, calling <tt>getBounds</tt>
+	of a <tt>GraphicsConfiguration</tt> in a virtual device 
+	environment returns virtual device coordinates.
+<p>
+	The following code sample creates a 
+	<tt>JFrame</tt> object for each <tt>GraphicsConfiguration</tt>
+	on each screen device in the <tt>GraphicsEnvironment</tt>.
+	It offsets the coordinates of the intended location of
+	the <tt>JFrame</tt> with the bounds of 
+	the <tt>GraphicsConfiguration</tt> to ensure that the 
+	<tt>JFrame</tt> appears on the screen of the specified
+	<tt>GraphicsConfiguration</tt>.
+	<pre>
+        GraphicsEnvironment ge = GraphicsEnvironment.
+                                 getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();
+        for (int j = 0; j < gs.length; j++) { 
+            GraphicsDevice gd = gs[j];
+            GraphicsConfiguration[] gc = gd.getConfigurations();
+            for (int i=0; i < gc.length; i++) {
+                    JFrame f = new JFrame(gs[j].getDefaultConfiguration());
+                    Canvas c = new Canvas(gc[i]);
+                    Rectangle gcBounds = gc[i].getBounds();
+                    int xoffs = gcBounds.x;
+                    int yoffs = gcBounds.y;
+                    f.getContentPane().add(c);
+                    f.setSize(300, 150);
+                    f.setLocation((i*50)+xoffs, (i*60)+yoffs);
+                    f.show();
+	    }
+	}
+	</pre>
+	If the bounds of a <tt>GraphicsConfiguration</tt> is not
+	taken into account in this sample, a <tt>JFrame</tt> 
+	would appear at location (i*50, i*60) on the primary screen, 
+	which might be different than the screen of the specified 
+	<tt>GraphicsConfiguration</tt>.
+	<p>
+	For more information on how the Java 2D API supports
+	multi-screen environments, see <a href="../../2d/spec/j2d-awt.html">
+	Rendering in a Multi-Screen Environment</a> in the 
+	<a href="../../2d/spec/j2d-bookTOC.html">Programmer's Guide to the 
+	Java 2D API</a>.
+</blockquote>
+	
+
+<a name=robot>
+<b>New Class <tt>java.awt.Robot</tt></b></a> 
+<blockquote>
+New class <tt><a href="../../../api/java/awt/Robot.html">java.awt.Robot</a></tt> 
+has been added to the Java<sup><font size=-2>TM</font></sup> 2 Platform.
+The Robot API is designed to make automated AWT and Swing testing possible.
+The Robot API allows code written in the Java programming language 
+to generate low-level native mouse and
+keyboard input events. Because the events are generated at the operating
+system level (as opposed to the 
+Java event queue or component level), they are indistinguishable from
+real user input to the rest of the AWT (both the native and Java-language
+portions). 
+<p>
+Though designed to improve testability, the Robot API also provides other
+benefits:
+<ul>
+   <li>Accessibility enabled applications will be able to give more
+feedback. For example, if the user acts on a screen object using voice
+commands, the mouse pointer can be moved to indicated the object being
+manipulated.
+   <li>Enables the creation of computer-based training (CBT) and other
+demo type Java applications. 
+</ul>
+</blockquote>
+<p>
+<a name=masks>
+<b>New Event Masks for PaintEvents and InvocationEvents</b></a> 
+<blockquote> 
+The new final static fields <tt><a href=../../../api/java/awt/AWTEvent.html#PAINT_EVENT_MASK>PAINT_EVENT_MASK</a></tt> and <tt><a href=../../../api/java/awt/AWTEvent.html#INVOCATION_EVENT_MASK>INVOCATION_EVENT_MASK</a></tt> have been added to class 
+<tt>AWTEvent</tt>. These fields are now available for use by 
+<tt><a href="../../../api/java/awt/Toolkit.html#addAWTEventListener(java.awt.event.AWTEventListener, long)">addAWTEventListener()</a></tt> to allow client applications 
+to listen for paint events and invocation events.
+</blockquote>
+<p>
+<a name=coalescing>
+<b>Paint Coalescing</b></a> 
+<blockquote>
+Painting performance has been 
+enhanced through the implementation of paint coalescing. Areas 
+that require repainting are now coalesced into a single, 
+non-rectangular repaint area as they are posted to the 
+event queue. This has the effect of batching repaints, 
+executing multiple repaints simultaneously.  Previously, 
+paint events were queued up and executed in succession, 
+even when the repaint areas overlapped.
+</blockquote>
+<p>
+<a name=printing>
+<b>Printing API Enhancements</b></a>
+<blockquote>
+Two new classes have been added to package <tt>java.awt.print</tt>:
+<ul>
+<li><tt><a href=../../../api/java/awt/JobAttributes.html>JobAttributes</a></tt>
+<li><tt><a href=../../../api/java/awt/PageAttributes.html>PageAttributes</a></tt>
+</ul>
+Class <tt>JobAttributes</tt> controls properties of a print job such 
+as destination, number of copies, page ranges, etc. Class 
+<tt>PageAttributes</tt> controls attributes of a printed page such 
+as paper size, orientation, print quality, etc. 
+<p>
+These classes are used by a new method in class <tt>java.awt.Toolkit</tt>:
+<blockquote><tt>
+<a href="../../../api/java/awt/Toolkit.html#getPrintJob(java.awt.Frame, java.lang.String, java.awt.JobAttributes, java.awt.PageAttributes)">
+getPrintJob(Frame,&nbsp;String,&nbsp;JobAttributes,&nbsp;PageAttributes)</a></tt>
+</blockquote>
+See <a href="designspec/printing.html">Java AWT: Printing</a> for 
+more information on the printing API.
+<p>
+Support for using attributes will be 
+added to the printing API in a future release of 
+the Java platform.
+
+</blockquote>
+<p>
+<a name=hierarchies>
+<b>New Event Type for Tracking Changes to Component Hierarchies</b></a>
+<blockquote> 
+Several new classes have been added to the Java 2 Platform to provide 
+a standardized way for components to track changes to their component 
+hierarchy. The new API is a preferred alternative to that provided 
+by <tt><a href="../../../api/javax/swing/event/AncestorEvent.html">javax.swing.event.AncestorEvent</a></tt>
+<ul>
+<li>displayability - whether a component has a peer
+<li>show state - whether a component is showing on the screen
+<li>ancestors additions to and deletions from the hieracrhy
+<li>ancestor resizes
+<li>ancestor moves
+</ul>
+The new classes and interfaces implementing the new event types are:
+<ul>
+<li><tt><a href=../../../api/java/awt/event/HierarchyEvent.html>java.awt.event.HierarchyEvent</a></tt>
+<li><tt><a href=../../../api/java/awt/event/HierarchyListener.html>java.awt.event.HierarchyListener</a></tt>
+<li><tt><a href=../../../api/java/awt/event/HierarchyBoundsListener.html>java.awt.event.HierarchyBoundsListener</a></tt>
+<li><tt><a href=../../../api/java/awt/event/HierarchyBoundsAdapter.html>java.awt.event.HierarchyBoundsAdapter</a></tt>
+</ul>
+The following methods have been added to <tt>java.awt.Component</tt>:
+<ul>
+<li><tt><a href=../../../api/java/awt/Component.html#addHierarchyListener(java.awt.event.HierarchyListener)>addHierarchyListener</a></tt>
+<li><tt><a href=../../../api/java/awt/Component.html#removeHierarchyListener(java.awt.event.HierarchyListener)>removeHierarchyListener</a></tt>
+<li><tt><a href=../../../api/java/awt/Component.html#addHierarchyBoundsListener(java.awt.event.HierarchyBoundsListener)>addHierarchyBoundsListener</a></tt>
+<li><tt><a href=../../../api/java/awt/Component.html#removeHierarchyBoundsListener(java.awt.event.HierarchyBoundsListener)>removeHierarchyBoundsListener</a></tt>
+<li><tt><a href=../../../api/java/awt/Component.html#processHierarchyEvent(java.awt.event.HierarchyEvent)>processHierarchyEvent</a></tt>
+<li><tt><a href=../../../api/java/awt/Component.html#processHierarchyBoundsEvent(java.awt.event.HierarchyEvent)>processHierarchyBoundsEvent</a></tt>
+</ul>
+The following fields have been added to <tt>java.awt.AWTEvent</tt>:
+<ul>
+<li><tt><a href=../../../api/java/awt/AWTEvent.html#HIERARCHY_EVENT_MASK>HIERARCHY_EVENT_MASK</a></tt>
+<li><tt><a href=../../../api/java/awt/AWTEvent.html#HIERARCHY_BOUNDS_EVENT_MASK>HIERARCHY_BOUNDS_EVENT_MASK</a></tt>
+</ul>
+Class <tt>java.awt.AWTEventMulticaster</tt> now implements interfaces 
+<tt>HierarchyListener</tt> and <tt>HierarchyBoundsListener</tt>. In 
+addition, it has the following new methods:
+<ul>
+<li><tt><a href=../../../api/java/awt/AWTEventMulticaster.html#hierarchyChanged(java.awt.event.HierarchyEvent)>hierarchyChanged</a></tt>
+<li><tt><a href=../../../api/java/awt/AWTEventMulticaster.html#ancestorMoved(java.awt.event.HierarchyEvent)>ancestorMoved</a></tt>
+<li><tt><a href=../../../api/java/awt/AWTEventMulticaster.html#ancestorResized(java.awt.event.HierarchyEvent)>ancestorResized</a></tt>
+<li><tt><a href="../../../api/java/awt/AWTEventMulticaster.html#add(java.awt.event.HierarchyListener, java.awt.event.HierarchyListener)">add(HierarchyListener, HierarchyListener)</a></tt>
+<li><tt><a href="../../../api/java/awt/AWTEventMulticaster.html#add(java.awt.event.HierarchyBoundsListener, java.awt.event.HierarchyBoundsListener)">add(HierarchyBoundsListener, HierarchyBoundsListener)</a></tt>
+<li><tt><a href="../../../api/java/awt/AWTEventMulticaster.html#remove(java.awt.event.HierarchyListener, java.awt.event.HierarchyListener)">remove(HierarchyListener, HierarchyListener)</a></tt>
+<li><tt><a href="../../../api/java/awt/AWTEventMulticaster.html#remove(java.awt.event.HierarchyBoundsListener, java.awt.event.HierarchyBoundsListener)">remove(HierarchyBoundsListener, HierarchyBoundsListener)</a></tt>
+</ul>
+</blockquote>
+<p>
+
+<a name=native>
+<b>AWT Native Interface</b></a>
+<blockquote>
+The AWT Native Interface is a new interface for integrating native 
+rendering engines with the Java 2 platform. The AWT Native Interface 
+lets you design UIs with natively rendered components for best 
+rendering performance. <p>
+In the most common usage, four steps are involved:
+<ol>
+<li>Define a class that extends a <a href="../../../api/java/awt/Canvas.html">Canvas
+</a>.
+<li>Declare the <tt>paint</tt> method as native and load its shared library 
+in the static block.
+<li>Use javah to generate a C/C++ header file for the native paint 
+method. (See javah documentation for <a href=../../../tooldocs/windows/javah.html>Windows</a> and <a href=../../../tooldocs/solaris/javah.html>Solaris</a> platforms.)
+<li>Write the native paint method and build it as a shared library.
+</ol>
+Header files associated with the AWT Native Interface are 
+in the SDK's <tt>include</tt> directory.  They are
+   <ul> 
+   <li><tt>include/jawt.h</tt> on both Windows and Solaris<sup><font size=-2>TM</font></sup> platforms
+   <li><tt>include/windows/jawt_md.h</tt> in the Windows SDK only
+   <li><tt>include/solaris/jawt_md.h</tt> on Solaris SDK only
+   </ul>
+These headers are not part of the official specification of the 
+   Java 2 Platform. The headers are provided as a convenience to 
+   developers who want a standardized way to access native drawing 
+   functionality.
+<p>
+For further information and 
+sample code, see 
+<a href=AWT_Native_Interface.html>The AWT Native Interface</a>.
+</blockquote>
+
+
+</blockquote>
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <br>
+
+
+
+<FONT SIZE="-1">
+Please send comments to:
+<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </body>
+</html>

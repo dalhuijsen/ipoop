@@ -1,0 +1,442 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<!--NewPage-->
+<html>
+<head>
+<title>
+Privileged Block API
+</title>
+</head>
+<body bgcolor="white">
+<center>
+<h1>API for Privileged Blocks</h1>
+
+
+<b>Last Modified:  <em>30 April, 2001</em></b>
+
+</center>
+<br>
+<hr>
+
+<h2>
+Overview
+</h2>
+
+<blockquote>
+
+This document provides background information about what
+"privileged" code is and what it is used for, followed by 
+illustrations of the use of the API, with special attention 
+to issues of:
+<ul>
+  <li>returning values</li>
+  <li>type safety</li>
+  <li>exception handling</li>
+  <li>reflection</li>
+</ul>
+
+</blockquote>
+
+
+<H2>Background: What It Means to Have "Privileged" Code</H2>
+
+<blockquote>
+
+<p>The policy for an SDK installation specifies what permissions -- which types 
+of system resource accesses -- are allowed for code from specified code sources.
+A "code source" (of type CodeSource) essentially consists of the code location 
+(URL) and a reference to the certificate(s) containing the public key(s) 
+corresponding to the private key(s) used to sign the code (if it was signed).
+
+<p>The policy is represented 
+by a Policy object. More specifically, it is represented by a
+<code>Policy</code> subclass providing an implementation
+of the abstract methods in the <code>Policy</code> class (which is 
+in the <code>java.security</code> package).
+
+<p>The source location for the policy information utilized by the
+Policy object is up to the Policy implementation.
+The Policy reference implementation obtains its
+information from policy configuration files.
+See <a href = "PolicyFiles.html">Default Policy Implementation
+and Policy File Syntax</a>
+for information about the Policy reference
+implementation and the syntax that must be used
+in policy files it reads.
+For information about using the <b>Policy Tool</b> to create
+a policy file (without needing to know the required syntax),
+see the Policy Tool documentation
+(<a href="../../tooldocs/solaris/policytool.html">for Solaris</a>) (<a href="../../tooldocs/windows/policytool.html">for Windows</a>).
+
+<p>A "protection domain" encompasses a CodeSource and the permissions granted to code 
+from that CodeSource, as determined by the security policy currently in effect.
+Thus, classes signed by the same keys and from the same URL are placed in the same 
+domain, and a class belongs to one and only one protection domain. 
+Classes that have the same permissions but are from different code sources belong 
+to different domains.
+
+<p>Today all code shipped as part of the SDK is considered system code and run 
+inside the unique system domain. System code automatically has all permissions.
+
+<p>Each applet or application runs in its 
+appropriate domain, determined by its code source.
+In order for an applet (or an application running under a security
+manager) to be allowed to perform a secured action (such as reading or 
+writing a file), the applet or application must be
+granted permission for that particular action.
+
+<p>More specifically, whenever a resource access is attempted, <i>all</i> code 
+traversed by the execution thread up to that point must have permission 
+for that resource access, <i>unless some code on the thread has been marked 
+as "privileged"</i>. That is, suppose access control checking occurs in a thread 
+of execution that has a chain of multiple callers. (Think of this as 
+multiple method calls that potentially cross the protection domain boundaries.) 
+When the <code>AccessController</code> <code>checkPermission</code> method is 
+invoked by the most recent caller, the basic algorithm for deciding whether to 
+allow or deny the requested access is as follows:
+
+<blockquote>
+
+<p>If the code for any caller in the call chain does not have the requested 
+permission, AccessControlException is thrown, <i>unless</i> 
+the following is true - 
+a caller whose code is granted the said permission has been marked as 
+"privileged" (see below) and all parties subsequently called by this caller 
+(directly or indirectly) all have the said permission.
+
+</blockquote>
+
+<p>Marking code as "privileged" enables a piece of trusted code to
+temporarily enable access to more resources than are available directly to
+the code that called it. This is necessary in some situations. For
+example, an application may not be allowed direct access to files that
+contain fonts, but the system utility to display a document must obtain
+those fonts, on behalf of the user. In order to do this, the system utility 
+becomes privileged while obtaining the fonts.
+
+</blockquote>
+
+
+<h2>Using the doPrivileged API</h2>
+
+<blockquote>
+
+The use of the "privileged" feature is described in the following sections.
+
+<h3>No return value, no exception thrown</h3> 
+
+<blockquote>
+<p>If you don't need to return a value from within the "privileged" block, 
+your call to <code>doPrivileged</code> can look like the following:
+
+ <pre>
+   somemethod() {
+        ...normal code here...
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                // privileged code goes here, for example:
+                System.loadLibrary("awt");
+                return null; // nothing to return
+            }
+        });
+       ...normal code here...
+  }
+ </pre>
+
+<p>The <CODE>AccessController.doPrivileged</CODE> method takes an object
+of type <CODE>java.security.PrivilegedAction</CODE> and invokes its
+<CODE>run</CODE> method in
+privileged mode. The implementation guarantees that privileges will be 
+revoked after the <CODE>run</CODE> method is executed, even if execution 
+of <CODE>doPrivileged</CODE> is interrupted by an asynchronous exception.
+
+<p>
+<code>PrivilegedAction</code> is an interface with a single method, named
+<code>run</code>, that returns an Object.
+The above example shows creation of an implementation
+of that interface using an anonymous inner class; 
+a concrete implementation of the
+<code>run</code> method is supplied.
+When the call to <code>doPrivileged</code> is made, an 
+instance of the PrivilegedAction implementation is passed
+to it. The <code>doPrivileged</code> method calls the
+<code>run</code> method from the PrivilegedAction 
+implementation after enabling privileges, and returns the 
+<code>run</code> method's return value as the 
+<code>doPrivileged</code> return value (which is
+ignored in this example).
+
+<p>Note that depending on what "privileged code" actually consisted of,
+you might have to make some changes due to the way inner classes
+work. For example, if "privileged code" throws an exception or attempts
+to access local variables then you will have to make some changes, as
+shown in subsequent sections of this document.
+
+<p>You can also call <code>doPrivileged</code> without using
+an anonymous inner class, as in:
+
+<pre>
+    somemethod() {
+        ...normal code here...
+        MyAction mya = new MyAction();
+        // become privileged:
+        AccessController.doPrivileged(mya);
+       ...normal code here...
+    }
+
+    class MyAction implements PrivilegedAction {
+        public MyAction() {};
+        public Object run() {
+            // privileged code goes here, for example:
+            System.loadLibrary("awt");
+            return null; // nothing to return
+        }
+    }
+</pre>
+
+<p> Be <i>very</i> careful in your use of the "privileged" construct, and 
+always remember to make the privileged code section as small as possible,
+that is, try and limit the code within the <code>run</code> method to only the 
+code that needs to be run with privileges, and do more general things outside
+the <code>run</code> method. Also note that the call to <code>doPrivileged</code> 
+should be made in the code that wants to enable its privileges. Do not 
+be tempted to write a utility class that itself calls
+<code>doPrivileged</code> as that could lead to security holes.
+You can write utility classes for <code>PrivilegedAction</code> classes though,
+as shown in the example above.
+
+</blockquote>
+
+
+<h3>Returning values</h3> 
+
+<blockquote>
+
+<p> If you need to return a value, you can do something like the following:
+
+ <pre>
+   somemethod() {
+        ...normal code here...
+        String user = (String) AccessController.doPrivileged(
+          new PrivilegedAction() {
+            public Object run() {
+                return System.getProperty("user.name");
+            }
+          }
+        );
+        ...normal code here...
+  }
+ </pre>
+
+<p> Note that this usage requires a dynamic cast on the value returned
+by <code>doPrivileged</code>. An alternative is to use a 
+<code>final</code> local variable:
+
+
+ <pre>
+   somemethod() {
+        ...normal code here...
+        final String user[] = {null};
+        AccessController.doPrivileged(
+          new PrivilegedAction() {
+            public Object run() {
+                user[0] = System.getProperty("user.name");
+                return null; // still need this
+            }
+          }
+        );
+        ...normal code here...
+  }
+ </pre>
+
+Yet another alternative would be to write a non-anonymous class
+that safely handles types for you:
+
+ <pre>
+   somemethod() {
+        ...normal code here...
+        GetPropertyAction gpa = new GetPropertyAction("user.name");
+        AccessController.doPrivileged(gpa);
+        String user = gpa.getValue();
+        ...normal code here...
+   }
+
+   class GetPropertyAction implements PrivilegedAction {
+      private String property;
+      private String value;
+      public GetPropertyAction(String prop) { property = prop;}
+      public Object run() { 
+               value = System.getProperty(property);
+               return value;
+      } 
+      public String getValue() {return value;}
+
+   }
+</pre>
+
+<p> Note there are now no type-casts involved, although the <code>run</code>
+method still returns a value, so you could still have a "one-liner" if you 
+wanted to:
+
+<pre>
+   somemethod() {
+        ...normal code here...
+        String user = (String) AccessController.doPrivileged(
+                                   new GetPropertyAction("user.name"));
+        ...normal code here...
+   }
+</pre>
+
+</blockquote>
+
+
+<h3>Accessing local variables</h3>
+
+<blockquote>
+
+<p> If you are using an anonymous inner class, any local variables you 
+access must be <code>final</code>. For example:
+
+ <pre>
+   somemethod() {
+        ...normal code here...
+        final String lib = "awt";
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                // privileged code goes here, for example:
+                System.loadLibrary(lib);
+                return null; // nothing to return
+            }
+        });
+       ...normal code here...
+  }
+ </pre>
+<p>The variable <code>lib</code> must be declared <code>final</code> if you intend
+to use it within the privileged block. See the 
+
+<a href="http://java.sun.com/products/archive/jdk/1.1/index.html">"Inner Classes"</a> spec for more information on this topic.
+
+<p>If there are cases where you can't make an existing variable <code>final</code>
+(because it gets set multiple times), then you can create a new <code>final</code>
+variable right before invoking <code>doPrivileged</code>, and set that
+variable equal to the other variable. For example:
+
+ <pre>
+   somemethod() {
+        ...normal code here...
+        String lib;
+        ...
+        // lib gets set multiple times so we can't make it final
+        ...
+        // create a final String that we can use inside of the run method
+        final String fLib = lib;
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                // privileged code goes here, for example:
+                System.loadLibrary(fLib);
+                return null; // nothing to return
+            }
+        });
+       ...normal code here...
+  }
+ </pre>
+
+</blockquote>
+
+
+<h3>Handling Exceptions</h3>
+
+<blockquote>
+
+ <p>If the action performed in your <code>run</code> method could
+ throw a "checked" exception (one that must be listed in the 
+<code>throws</code> clause  of a method), then you need to use the 
+ <code>PrivilegedExceptionAction</code> interface instead of the
+ <code>PrivilegedAction</code> interface:
+ 
+ <pre>
+   somemethod() throws FileNotFoundException {
+        ...normal code here...
+      try {
+        FileInputStream fis = (FileInputStream) AccessController.doPrivileged(
+          new PrivilegedExceptionAction() {
+            public Object run() throws FileNotFoundException {
+                return new FileInputStream("someFile");
+            }
+          }
+        );
+      } catch (PrivilegedActionException e) {
+        // e.getException() should be an instance of FileNotFoundException,
+        // as only "checked" exceptions will be "wrapped" in a
+        // <code>PrivilegedActionException</code>.
+        throw (FileNotFoundException) e.getException();
+      }
+        ...normal code here...
+  }
+ </pre>
+
+<p>If a checked exception is thrown during execution of the <code>run</code>
+method, it is placed in a PrivilegedActionException 
+"wrapper" exception that is then thrown and should be caught by your code,
+as illustrated in the above example..
+
+</blockquote>
+
+
+<H2>Reflection</H2>
+
+<blockquote>
+
+One subtlety that must be considered is the interaction of this API with
+reflection. The <code>doPrivileged()</code> method can be invoked reflectively
+using <code>java.lang.reflect.Method.invoke()</code>. In this case, the privileges
+granted in privileged mode are not those of <code>Method.invoke()</code> but
+of the non-reflective code that invoked it. Otherwise, system privileges
+could erroneously (or maliciously) be conferred on user code. Note that
+similar requirements exist when using the existing
+API via reflection.
+
+</blockquote>
+
+</blockquote>
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+<TD>
+
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1997-2001
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+Please send comments to: <a href="mailto:java-security@sun.com">
+java-security@sun.com</a>
+   </FONT>
+
+</TD>
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+</body>
+</html>
+

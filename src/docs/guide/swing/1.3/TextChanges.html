@@ -1,0 +1,454 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Text</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Text</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+
+
+
+
+
+ <h2>Default HTML Font Is Now Serif</h2>
+      HTML text -- including HTML text used in labels, buttons,
+      and so on -- used to be in SansSerif font by default.
+      As of v 1.3, the default font is Serif.
+
+
+
+ <h2>HTMLEditorKit insertAtBoundry => insertAtBoundary</h2>
+
+
+      A method in HTMLEditorKit.InsertHTMLTextAction,
+      insertAtBoundry, was misspelled.
+      It's been deprecated and insertAtBoundary has been added.
+
+
+
+    <h2>Automatic Handling of DocumentEvents</h2>
+
+    <p>
+      The default functionality of managing the DocumentEvent has been
+      moved (from CompositeView) and raised from package private to
+      public.  Subclassing has been made much easier as the management
+      of the DocumentEvent is now distributed to the protected methods:
+
+    <ul>
+     <tt>
+      <li>updateChildren
+      <li>forwardUpdate
+      <li>forwardUpdateToView
+      <li>updateLayout
+</tt> 
+   </ul>
+
+    <p>
+      To accomplish its behavior, the methods managing the children of the
+      view also needed to be moved from CompositeView to View.
+
+    <ul>
+   <tt>
+      <li>removeAll
+      <li>remove
+      <li>append
+      <li>replace
+</tt>
+    </ul>
+
+
+    <p>
+      The following methods were added to the javax.swing.text.View:
+<tt>
+<ul>
+    <li><a href="../../../api/javax/swing/text/View.html#updateChildren(javax.swing.event.DocumentEvent.ElementChange, javax.swing.event.DocumentEvent, javax.swing.text.ViewFactory)">protected boolean updateChildren(DocumentEvent.ElementChange ec,
+      DocumentEvent e, ViewFactory f)</a>
+
+    <li><a href="../../../api/javax/swing/text/View.html#forwardUpdate(javax.swing.event.DocumentEvent.ElementChange, javax.swing.event.DocumentEvent, java.awt.Shape, javax.swing.text.ViewFactory)">protected void forwardUpdate(DocumentEvent.ElementChange ec,
+          DocumentEvent e, Shape a, ViewFactory f)</a>
+
+    <li><a href="../../../api/javax/swing/text/View.html#forwardUpdateToView(javax.swing.text.View, javax.swing.event.DocumentEvent, java.awt.Shape, javax.swing.text.ViewFactory)">protected void forwardUpdateToView(View v, DocumentEvent e, Shape a, ViewFactory f)</a>
+
+
+    <li><a href="../../../api/javax/swing/text/View.html#updateLayout(javax.swing.event.DocumentEvent.ElementChange, javax.swing.event.DocumentEvent, java.awt.Shape)">protected void updateLayout(DocumentEvent.ElementChange ec, DocumentEvent e, Shape a)</a>
+
+
+    <li><a href="../../../api/javax/swing/text/View.html#removeAll()">public void removeAll()</a>
+
+
+    <li><a href="../../../api/javax/swing/text/View.html#remove(int)">public void remove(int i)</a>
+
+
+    <li><a href="../../../api/javax/swing/text/View.html#insert(int, javax.swing.text.View)">public void insert(int offs, View v)</a>
+
+
+    <li><a href="../../../api/javax/swing/text/View.html#append(javax.swing.text.View)">public void append(View v)</a>
+
+
+    <li><a href="../../../api/javax/swing/text/View.html#replace(int, int, javax.swing.text.View[])">public void replace(int offset, int length, View[] views)</a>
+
+  </tt>    
+</ul>
+
+    <h2>BoxView: Add axis property, layoutChanged Method</h2>
+
+
+      BoxView has an axis argument which subclasses previously could not get at.  A
+      subclass that sets it's axis based upon i18n considerations needs this
+      as a property.  The layout of the box should also be treated seperate
+      from the requested size as in some cases (such as a table) the layout
+      may become invalid independant of the children's preferences.
+
+    <p>
+      The following methods have been added to javax.swing.text.BoxView:
+<ul>
+<tt>
+ <li><a href="../../../api/javax/swing/text/BoxView.html#getAxis()">public int getAxis()</a>
+ <li><a href="../../../api/javax/swing/text/BoxView.html#setAxis(int)">public void setAxis(int axis)</a>
+ <li><a href="../../../api/javax/swing/text/BoxView.html#layoutChanged(int)">public void layoutChanged(int axis)</a>
+</tt>
+   </ul>
+
+
+    <h2>ParagraphView now extends FlowView</h2>
+
+
+      The View protocol supports building flows, but the only previous implementation
+      had been ParagraphView which creates relatively simple
+      paragraph flows.  The functionality can be generalized substantially
+      to do things like shaped flows, page breaking, etc.  Generalizing the
+      functionality will make the creation of alternative flows much easier.
+
+    <p>
+      A new class called FlowView takes a strategy to translate
+      the logical structure to a physical structure.  The strategy is
+      defined by a nested static class called FlowStrategy.  ParagraphView
+      extends FlowView adding just that behavior which is paragraph-specific
+      (i.e line spacing, first line indent, alignment, etc).  This change
+      adds the following method to the 
+      javax.swing.text.View class:
+
+    <ul>
+        <tt>
+    <li><a href="../../../api/javax/swing/text/View.html#getViewIndex(int, javax.swing.text.Position.Bias)">public int getViewIndex(int pos, Position.Bias b)</a>
+      </tt>
+    </ul>
+
+
+    <h2>FormView Localization; SUBMIT, RESET deprecated</h2>
+
+   Class
+    <code>javax.swing.text.html.FormView</code> was not previously localizable. There are two
+    public static final Strings, SUBMIT and RESET, that are used to
+    determine the text for &lt;form> elements in an HTML document. As they
+    are public static final they can not be localized.
+    SUBMIT and RESET have been deprecated, the values are now obtained 
+    from the UIManager properties: <code>FormView.submitButtonText</code> and
+    <code>FormView.resetButtonText</code>.
+
+    <h2>Serialization</h2>
+
+    Here's a summary of the serialization related changes in the swing.text package: 
+    <ul>
+      <li>
+      <code><a href="../../../api/javax/swing/text/html/parser/ParserDelegator.html">javax.swing.text.html.parser.ParserDelegator</a></code> now implements
+      <a href="../../../api/java/io/Serializable.html">Serializable</a>.
+
+      <li>
+      Added a nullary constructor to the public static innner class <code><a href="../../../api/javax/swing/text/html/HTML.Tag.html">HTML.Tag</a></code> 
+      to allow serialization of subclasses to work.
+    </ul>
+
+
+  <h2>HTML Package: Expose More of AbstractWriter</h2>
+
+    AbstractWriter is used as a base class for developers wishing
+      to provide custom writing out of a text Document. For example, HTMLWriter
+      extends AbstractWriter, and is used in the html package to
+      output html. The problem with AbstractWriter was that most of the 
+      methods and ivars it provided were private. Subclasses had to
+      resort to copying numerous methods and ivars to be
+      useful. HTMLWriter extends AbstractWriter, but ended up copying
+      all the ivars, and overriding almost all the methods. The
+      following changes open up the API in AbstractWriter, making 
+      it more useful by itself. This makes HTMLWriter much
+      simpler, and it won't have to copy as much from AbstractWriter.
+<P>
+See:
+
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#getStartOffset()">public int getStartOffset()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#getEndOffset()">public int getEndOffset()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#getWriter()">protected Writer getWriter()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#getLineLength()">protected int getLineLength()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#setCurrentLineLength(int)">protected void setCurrentLineLength(int length)</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#getCurrentLineLength()">protected int getCurrentLineLength()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#isLineEmpty()">protected boolean isLineEmpty()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#setCanWrapLines(boolean)">protected void setCanWrapLines(boolean newValue)</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#getCanWrapLines()">protected boolean getCanWrapLines()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#setLineSeparator(java.lang.String)">public void setLineSeparator(String value)</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#getLineSeparator()">public String getLineSeparator()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#getIndentLevel()">protected int getIndentLevel()</a>
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#writeLineSeparator()">protected void writeLineSeparator() throws IOException</a> 
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#write(char[], int, int)">protected void write(char[] chars, int startIndex, int length)</a>
+                         throws IOException
+<li><a href="../../../api/javax/swing/text/AbstractWriter.html#output(char[], int, int)">protected void output(char[] content, int start, int length)
+                         throws IOException</a>
+</tt>
+</ul>  
+
+
+
+
+    <h2>HTML Package: Expose More CSS1 Support</h2>
+
+    <p>The html package supports CSS 1. One
+      of the abilities of CSS is to support cascading of style sheets
+      (as the name implies), 
+      that is more than one style sheet can influence the presentation 
+      simultaneously. For example a browser usually has a style sheet
+      that defines the default styles, a particular page might also
+      have a style sheet that overrides those provided by the
+      browser. The following methods expose this to developers,
+      allowing them to link style sheets:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/text/html/StyleSheet.html#addStyleSheet(javax.swing.text.html.StyleSheet)">public synchronized void addStyleSheet(StyleSheet ss)</a>
+<li><a href="../../../api/javax/swing/text/html/StyleSheet.html#removeStyleSheet(javax.swing.text.html.StyleSheet)">public synchronized void removeStyleSheet(StyleSheet ss)</a>
+<li><a href="../../../api/javax/swing/text/html/StyleSheet.html#getStyleSheets()">public StyleSheet[] getStyleSheets()</a> 
+</tt>
+</ul>
+
+    <h2>Simplify HTML Insertions</h2>
+
+    Previously it was not very easy for developers to insert
+      arbitrary html into an existing html document. To accomplish
+      this, the developer needed to have an intimate knowledge of the swing
+      text package, as well as the html package. Many developers
+      have used dynamic html, which provides a handful of methods that 
+      make it trivial to insert html into an existing page. To
+      accomodate these users we now expose methods that
+      closely mirror those provided by dynamic html:
+
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/text/html/HTMLDocument.html#setInnerHTML(javax.swing.text.Element, java.lang.String)"> public void setInnerHTML(Element elem, String htmlText) throws
+                                   BadLocationException, IOException</a>
+<li><a href="../../../api/javax/swing/text/html/HTMLDocument.html#setOuterHTML(javax.swing.text.Element, java.lang.String)">public void setOuterHTML(Element elem, String htmlText) throws
+                                  BadLocationException, IOException</a>
+<li><a href="../../../api/javax/swing/text/html/HTMLDocument.html#insertAfterStart(javax.swing.text.Element, java.lang.String)"> public void insertAfterStart(Element elem, String htmlText) throws
+                                       BadLocationException, IOException</a>
+<li><a href="../../../api/javax/swing/text/html/HTMLDocument.html#insertBeforeEnd(javax.swing.text.Element, java.lang.String)"> public void insertBeforeEnd(Element elem, String htmlText) throws
+                                      BadLocationException, IOException</a>
+<li><a href="../../../api/javax/swing/text/html/HTMLDocument.html#insertBeforeStart(javax.swing.text.Element, java.lang.String)"> public void insertBeforeStart(Element elem, String htmlText) throws
+                                        BadLocationException, IOException</a>
+<li> <a href="../../../api/javax/swing/text/html/HTMLDocument.html#insertAfterEnd(javax.swing.text.Element, java.lang.String)">public void insertAfterEnd(Element elem, String htmlText) throws
+                                     BadLocationException, IOException </a>
+<li><a href="../../../api/javax/swing/text/html/HTMLDocument.html#getElement(java.lang.String)">public Element getElement(String id)</a>
+<li>
+<a href="../../../api/javax/swing/text/html/HTMLDocument.html#getElement(javax.swing.text.Element, java.lang.Object, java.lang.Object)">  public Element getElement(Element e, Object attribute, Object value)</a>
+
+</tt>
+</ul>
+
+
+
+        <p>
+        And this is constant has been added to class HTMLEditorKit.ParserCallback:
+
+        <ul>
+<tt>
+        <li><a href="../../../api/javax/swing/text/html/HTMLEditorKit.ParserCallback.html#IMPLIED">public static final Object IMPLIED</a>
+</tt>
+        </ul>
+
+
+        <h2>New text Package ZoneView class</h2>
+
+<b>Problem:</b><br>
+The swing text package uses View objects to represent a presentation of the document
+model for the sake of layout and rendering.  If the model is large, the number of
+view objects that get created is large, in spite of only being able to view a small
+number of them.  A View implementation is needed that defers creation of the
+objects until they are actually needed for display.  This can be done by 
+building zones with an estimated size that get replaced with the actual View
+objects when they are needed.  This can substantially reduce the amount of
+memory used for large documents.
+<p>
+<b>Solution:</b><br>
+The following class called ZoneView supports zones that don't consume
+much memory until actively viewed or edited.  WrappedPlainView which
+will become more heavyweight with its support of bidi for i18n will
+benefit substantially from this class by changing it's superclass from 
+BoxView to ZoneView (which is a BoxView).
+<p>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/text/ZoneView.html">javax.swing.text.ZoneView</a>
+</tt>
+</ul>
+
+        <h2>New text Package AsyncBoxView class</h2>
+<b>Problem:</b><br>
+The swing text package uses View objects to represent a view of the document
+model to handle layout and rendering.  Layout is done on the event handling
+thread like most other things.  Layout is sometimes quite expensive in terms
+of cpu time, and causes the user interface to freeze while performing layout.
+The text package has some support of concurrency however, so this should be
+extended to include performing layout asynchronous to the gui event handling
+thread.  A View implementation is needed that performs layout asynchronously.
+
+        <p>
+<b>Solution:</b><br>
+To address this need, the following classes are being added to the text
+package.  For more information visit <a href="http://java.sun.com/products/jfc/tsc/">The 
+Swing Connection</a>.
+
+
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/text/AsyncBoxView.html">javax.swing.text.AsyncBoxView</a> 
+<li><a href="../../../api/javax/swing/text/LayoutQueue.html">javax.swing.text.LayoutQueue</a>
+</tt>
+</ul>
+        <h2>Add getGraphics Method to text View Class</h2>
+
+A method is included on the javax.swing.text.View class to fetch the Graphics
+object that will be used to render.  
+<P>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/text/View.html#getGraphics()">public Graphics getGraphics()</a>
+</tt>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

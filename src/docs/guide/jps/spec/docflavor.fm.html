@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide: 3 - Specifying Document Types
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="attributes.fm6.html">PREV</a>
+ | <a href="docflavor.fm1.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+<a name="996957"><!-- --></a>
+<hr size="8" width="35%" align="left" noshade>
+
+<table summary="layout" border=0>
+<tr valign=bottom>
+<td valign=bottom>
+<br>
+<U><B><FONT FACE="ARIAL,HELVETICA,TIMES ROMAN">CHAPTER</FONT> 
+3 
+</B></U>
+</td>
+</tr>
+</table>
+
+<a name="996958"><!-- --></a>
+<h1>
+Specifying Document Types
+</h1>
+<!--
+<hr size="1" width="100%" align="left" noshade>
+-->
+<br>
+<br>
+<br><blockquote>
+<a name="996973"><!-- --></a>
+From the user&#39;s perspective, a document can take many different forms, including: a PDF file, an image from a digital camera, an email, a word processor document, or a web page. Before printing a document of a particular format, the client needs to ensure that the printer can understand the format. Sometimes a printer can directly print documents of a given format: photo printers can directly print images of various formats, and PostScript<sup><font size="-2">TM</font></sup> printers can directly print a PostScript<sup><font size="-2">TM</font></sup> document. However, there are few printers that can directly print a wide range of formats; most printers require some higher-level software support to translate the source document into a format they can print.  <p>
+<a name="996984"><!-- --></a>
+A printing API needs to provide a way to describe document types so that:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="997428"><!-- --></a>
+The printer can report what formats it can print.
+</li>
+<li>
+<a name="997434"><!-- --></a>
+The client can describe the format of the data it wants to print.
+</li>
+<li>
+<a name="997314"><!-- --></a>
+The client can describe the encoding of text data.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="996990"><!-- --></a>
+The Java<sup><font size="-2">TM</font></sup> Print Service API describes document types using the DocFlavor class. A DocFlavor is comprised of:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="997457"><!-- --></a>
+A MIME type that tells the printer how to interpret the data.
+</li>
+<li>
+<a name="997459"><!-- --></a>
+A representation class name indicating the Java class that describes how the data is sent to the printer.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="997456"><!-- --></a>
+To describe an HTML page to a print service, a client might choose to use a DocFlavor with a MIME type string of &#34;text/html; charset=utf-16&#34; and a representation class name of &#34;java.io.InputStream&#34;. The client can obtain this DocFlavor in one of two ways:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="997480"><!-- --></a>
+Construct a DocFlavor:DocFlavor htmlStreamFlavor = new DocFlavor("text/html; charset=utf-16",	"java.io.InputStream");
+</li>
+<li>
+<a name="997468"><!-- --></a>
+Use the pre-defined instance that represents this type of DocFlavor:DocFlavor.INPUT_STREAM TEXT_HTML_UTF_16 . The Java Print Service API provides a set of pre-defined instances for common doc flavors as a convenience.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="998696"><!-- --></a>
+Because the HTML page contains text data, the MIME type String includes the text encoding, which is charset=utf-16 in this example. The client is responsible for accurately describing the print data to the print service. The section, <a href="docflavor.fm1.html#997577"><em>Client-Formatted Print Data</em></a>, explains how to properly construct a DocFlavor to accomplish this. If the text encoding is not included in the MIME type, unexpected results can occur, as explained in the section, <a href="docflavor.fm2.html#1000346"><em>Importance of Character Encoding</em></a>. The client can allow the service to determine the format of data that the client supplies as a Java object. The <a href="docflavor.fm3.html#997144"><em>Service-Formatted Print Data</em></a> section describes using a DocFlavor to represent service-formatted print data.<p>
+
+Keep in mand that, just because the <tt>DocFlavor</tt> API has a pre-declared
+doc flavor, this doesn't mean that an implementation of the particular flavor
+is available.  For example, even if you use the pre-defined <tt>DocFlavor</tt>
+representing HTML text in UTF-16, you won't be able to print the HTML unless
+you have a print service that supports printing HTML.  Again, it is the
+user's responsibility to ensure that a printer supports a particular format.
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="attributes.fm6.html">PREV</a>
+ | <a href="docflavor.fm1.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

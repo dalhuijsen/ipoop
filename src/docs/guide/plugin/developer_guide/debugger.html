@@ -1,0 +1,229 @@
+<html>
+<head>
+<title>Java Debugger Support</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Debugging Support</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>This section covers the following topics:</p>
+<ul>
+  <li><a href="#how">How to Debug Applets in Java Plug-in</a></li>
+  <li><a href="#jpic">Java Plug-in Console</a></li>
+  <li><a href="#jpitf">Java Plug-in Trace File</a></li>
+  <li><a href="#jpitp">javaplugin.trace property</a></li>
+  <li><a href="#jsdp">java.security.debug property</a></li>
+  <li><a href="#online">Documentation</a></li>
+  <li><a href="#isolating">Isolating Bugs</a></li>
+  <li><a href="#submitting-br">Submitting Bug Reports</a></li>
+  <li><a href="#submitting-fr">Submitting Feature Requests</a></li>
+  <li><a href="#jpifa">Java Plug-in Feedback Alias</a></li>
+</ul>
+<p>Debugging Java applets in Java Plug-in has not been simple in the past, partly 
+  because the applets use many services and facilities from the Java 2 Runtime 
+  Environment, Java Plug-in, and the browser itself. If the applet does not work, 
+  the developer needs to spend time diagnosing the problem. </p>
+<p> The purpose of this document is to simplify the debugging process. It provides 
+  techniques and suggestions for developing applets in Java Plug-in and describes 
+  some common mistakes in applet development. 
+<h2><a name="how"></a>How to Debug Applets in Java Plug-in</h2>
+<p> In order to debug applets, you must have the appropriate version of the Java 
+  2 SDK, Standard Edition, installed on your machine. Also make sure to compile 
+  your <code>.java</code> files with <code>-g</code> option with <code>javac</code>. 
+  To begin debugging your applet: </p>
+<ol>
+  <li>Start the Java Plug-in Control Panel. On the Advanced<i> </i>tab, specify 
+    the following parameters in the Java Runtime Parameters: 
+    <pre>
+-Djava.compiler=NONE
+-Xnoagent
+-Xdebug 
+-Xrunjdwp:transport=dt_shmem,address=
+	&lt;connection-address&gt;,server=y,suspend=n
+</pre>
+    <p> The <i>&lt;connection-address></i> could be any string which is used by 
+      the java debugger later to connect to the JVM. For example, 
+    <pre>
+-Djava.compiler=NONE
+-Xnoagent
+-Xdebug
+-Xrunjdwp:transport=dt_shmem,address=2502,server=y,suspend=n</pre>
+    <p> See <a href="http://java.sun.com/j2se/1.4.2/docs/guide/jpda/conninv.html">JPDA 
+      Connection and Invocation</a> for the details on the possible runtime parameters 
+      for debugging. 
+  </li>
+  <p> 
+  <li>On the <i>Advanced</i> tab in the Java Plug-in Control Panel, select &quot;<code>JDK 
+    &lt;<i>version</i>> in &lt;<i>jdk-path</i>&gt;</code>&quot; for the Java Runtime 
+    Environment, where <code>&lt;<i>version</i>></code> is the Java Plug-in version 
+    and <code>&lt;<i>jdk-path</i>&gt;</code> is the path to the Java 2 SDK installation. 
+    For example, &quot;<code>JDK1.4 in C:\jdk1.4</code>&quot; . </li>
+  <p> 
+  <li>Start Internet Explorer or Netscape Navigator and load the page which contains 
+    the applet to be debugged. Make sure the applet code has been compiled with 
+    <code>-g</code> option with <code>javac</code>. </li>
+  <p> 
+  <li>Run the command <code>jdb -attach &lt;<i>connection address</i>></code> 
+    in a DOS command prompt. <code>&lt;<i>connection address</i>></code> is the 
+    name mentioned in the step 1. For example, if <code>&lt;<i>connection address</i>></code> 
+    is <code>2502</code>, you will run the command as 
+    <pre>
+		  jdb -attach 2502
+</pre>
+    To learn more about the Java Debugger (jdb), see <a href="../../../tooldocs/windows/jdb.html">The 
+    Java Debugger</a>. </li>
+  <p> 
+  <li>Once the jdb has attached to the VM, you can set up breakpoints in the applet. 
+  </li>
+  <p>
+  <li>When the applet in the browser reaches the breakpoint, it will stop executing, 
+    and you will see the debugger waiting for your input to continue debugging. 
+  </li>
+</ol>
+<p> When debugging applets in Java Plug-in, make sure that only one instance of 
+  the browser is being used for debugging using the same connection address at 
+  the same time. Otherwise, it will result in a conflict, since the Java Runtime 
+  for each instance of the browser will try to gain exclusive access to the connection 
+  address. To debug applets in both Internet Explorer and Netscape Navigator, 
+  run either Internet Explorer or Netscape Navigator with Java Plug-in&#151;but 
+  not both at the same time.</p>
+<p> Debugging applets in Java Plug-in with Active Desktop is discouraged because 
+  an instance of Internet Explorer will always be running in the desktop process 
+  during the lifetime of the user session.</p>
+<p> You can use other Java 2 debuggers, like Inprise's JBuilder or Symantac's 
+  VisualCafe, instead of jdb. To use these debuggers, you will need to change 
+  the project option in these IDEs to <i>attach</i> Java Plug-in in the browser 
+  process on the same machine or remote machine. Different Java Runtime Parameters 
+  may also be required in the Java Plug-in Control Panel. For more information, 
+  consult your Java 2 debugger or IDE manuals.</p>
+<h2><a name="jpic"></a>Java Plug-in Console</h2>
+<p> One of the most powerful tools in Java Plug-in is the <a href="console.html">Java 
+  Plug-in Console</a>. It is a simple console window for redirecting all the <code>System.out</code><i> 
+  </i>and <code>System.err</code> messages. The console window is disabled by 
+  default; it can be enabled from the Java Plug-in Control Panel or the task bar. 
+  If the console is enabled, you will see the console window appear when Java 
+  Plug-in is used in the browser. 
+<h2><a name="jpitf"></a>Java Plug-in Trace File</h2>
+<p> Similar to the Java Plug-in Console, this is a file that records all the <code>System.out</code> 
+  and <code>System.err</code> messages. The trace file is disabled by default 
+  but is automatically enabled when the Java Plug-in Console is enabled. The trace 
+  file is normally located in <code>user.dir</code>, and the file is called <code>.plugin&lt;<i>version</i>&gt;.trace</code><i>.</i> 
+  For example, in Windows NT this file is located in <tt>C:\WINNT\Profiles\&lt;<i>username</i>&gt;\.plugin&lt;<i>version</i>&gt;.trace.</tt> 
+</p>
+<h2><a name="jpitp"></a><code>javaplugin.trace</code> property</h2>
+<p> This property controls whether Java Plug-in prints its trace messages during 
+  execution. This is useful to applet developers to determine what is occuring 
+  within Java Plug-in. The possible values are <code>true</code> or <code>false</code>. 
+  By default this property is <code>false</code>. To enable this property, set 
+  <code>-Djavaplugin.trace=true</code> in the Java Runtime Parameters field in 
+  the Advance Panel of the Java Plug-in Control Panel. </p>
+<h2><a name="jsdp"></a><code>java.security.debug</code> property</h2>
+<p>This property controls whether the security system of the Java 2 Runtime Environment 
+  prints its trace messages during execution. This is usful when a security exception 
+  is thrown in an applet or when a signed applet is not working. The following 
+  options are supported: 
+<ul>
+  <li><code>access</code> &nbsp;&nbsp;&#151; print all <code>checkPermission</code> 
+    results</li>
+  <li><code>jar</code><i> </i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#151; 
+    print jar verification information</li>
+  <li><code>policy</code><i> </i>&nbsp;&nbsp;&#151; print policy information</li>
+  <li><code>scl</code><i> </i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#151; 
+    print permissions <code>SecureClassLoader</code> assigns</li>
+</ul>
+<p> The following options can be used with <i><code>access</code></i>:</p>
+<ul>
+  <li><code>stack</code> &nbsp;&nbsp;&nbsp;&nbsp;&#151; include stack trace</li>
+  <li><code>domain</code> &nbsp;&nbsp;&#151; dumps all domains in context</li>
+  <li><code>failure</code> &#151; before throwing exception, dump the stack and 
+    domain that didn't have permission</li>
+</ul>
+<p> For example, to print all <code>checkPermission</code> results and dump all 
+  domains in context, set <code>-Djava.security.debug=access:stack </code>in the 
+  Java Runtime Parameters field in the Advanced Panel of the Java Plug-in Control 
+  Panel. </p>
+<h2><a name="online"></a>Documentation</h2>
+<p> Java Plug-in provides a rich set of documentation to help developers use the 
+  various features of Java Plug-in. The documentation includes a <a href="faq/index.html">FAQ</a>, 
+  which includes some of the most frequently asked questions by developers. Make 
+  sure you read and understand these documents before applet development, as it 
+  may save you hundreds of hours in debugging. </p>
+<h2><a name="isolating"></a>Isolating Bugs</h2>
+<p> Although Java Plug-in provides the Java 2 Runtime Environment within Internet 
+  Explorer and Netscape Navigator, most of the facilities are provided by the 
+  Java 2 Runtime itself, rather than by Java Plug-in. Therefore, if a problem 
+  occurs in Java Plug-in, it may be either a problem in Java Plug-in, the Java 
+  2 Runtime itself or a user error. It is extremely important to determine where 
+  bugs originate, as it will affect the speed of bug evaluation and fixing. Here 
+  are some suggestions for isolating bugs: 
+<ol>
+  <li>Run the applets in both Internet Explorer and Netscape Navigator through 
+    Java Plug-in.&nbsp;</li>
+  <li>Run the applets in <code>appletviewer</code>. Java Plug-in is mainly derived 
+    from <code>appletviewer</code> and has inherited problems from <code>appletviewer</code> 
+    as well. This step should be performed only if the applet doesn't require 
+    specific browser facilities that Java Plug-in provides, like HTTPS or RSA 
+    signing.</li>
+  <li>If the applet fails in <code>appletviewer</code>, it is likely the problem 
+    is in the Java 2 Runtime Environment&#151;and not in Java Plug-in.&nbsp;</li>
+  <li>If the applet fails in only one of the browsers, IE or Netscape, it is likely 
+    a Java Plug-in problem.</li>
+  <li>If the applet fails in both browsers but not <code>appletviewer</code>, 
+    it could be either a Java Plug-in problem or user error. Please examine the 
+    applet code to see if it makes any assumptions about the execution environment. 
+    For example, in <code>appletviewer</code> the current directory is set to 
+    the current directory in the shell when <code>appletviewer</code> is launched, 
+    whereas the current directory in Java Plug-in may be set to the browser's 
+    directory. Therefore, loading resources from the current directory may work 
+    in <code>appletviewer</code> but not in Java Plug-in.</li>
+  <li>Try to reproduce the problem on other machines or platforms. In some cases, 
+    the root of the problem may be in the machine configuration, e.g., an improper 
+    DNS setup.</li>
+  <li>If you have identified the problems in the Java 2 Runtime Environment or 
+    Java Plug-in, please follow the instructions in the next section to submit 
+    a bug report to the appropriate product categories.</li>
+</ol>
+<h2><a name="submitting-br"></a>Submitting Bug Reports</h2>
+<p> To submit a bug report, go to the Java Development Connection's <a href="http://developer.java.sun.com/developer/bugParade/index.jshtml">BugParade</a>. 
+  Before submitting a bug, search the BugParade to determine if the bug has already 
+  been reported. In some cases, a workaround may also have been suggested. If 
+  the bug is not already reported, submit a new bug report to the Java Plug-in 
+  team. In the bug report, include the following information: 
+<ul>
+  <li>Complete description of the problem and step-by-step instructions for reproducing 
+    it;</li>
+  <li>Error messages captured by Java Plug-in Console or trace file; 
+  <li>Proxy configuration information, e.g., auto proxy configuration with proxy 
+    configuration file attached;</li>
+  <li>Browser and platform information, e.g., Navigator 4.7 on Win 2000;</li>
+  <li>A test case demonstrating the problem;</li>
+  <li>Specify whether the problem occurs in other browsers and <code>appletviewer</code>;</li>
+  <li>Specify any workaround available;</li>
+  <li>Specify personal information&#151;your name and email address&#151;so you 
+    may be contacted if additional information is required.</li>
+</ul>
+<p></p>
+<h2><a name="submitting-fr"></a>Submitting Feature Requests</h2>
+<p> To submit a feature request, do so through the <a href="http://java.sun.com/cgi-bin/bugreport.cgi">Report 
+  A Bug or Request a Feature</a> page.In the feature request, please make sure 
+  the following information is included: 
+<ul>
+  <li>Complete description of the requested feature;</li>
+  <li>How this feature will improve the quality of your product or Java Plug-in 
+    in general.</li>
+</ul>
+<h2><a name="jpifa"></a>Java Plug-in Feedback Alias</h2>
+<p> The purpose of the Java Plug-in Feedback alias, <a href="mailto:java-plugin-feedback@sun.com">java-plugin-feedback@sun.com</a>, 
+  is for customers to provide feedback on product features and the product in 
+  general. This alias is not intended for bug report submission. To submit a bug 
+  report, please follow the instructions given above. 
+<p>&nbsp;
+</body>
+</html>

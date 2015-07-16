@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide: 2 - Attributes
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="attributes.fm.html">PREV</a>
+ | <a href="attributes.fm2.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="999353"><i></i> Attribute Categories and Values
+</a></h2>
+
+<blockquote>
+<a name="998660"><!-- --></a>
+Every printer has a set of capabilities, such as the ability to print on different paper sizes or the ability to print more than one copy. Each of the capabilities has a range of values. For example, a printer's orientation capability might have this range of values: [landscape, portrait]. For each print request, the capability is set to one of these possible values. The Java Print Service API uses the term attribute category to refer to a printer capability, such as orientation, and the term attribute value to refer to the value of the capability, such as landscape.<p>
+<a name="998628"><!-- --></a>
+In the Java Print Service API, an attribute category is represented by a Java class implementing the Attribute interface, and attribute values are instances of such a class or one of its subclasses. For example, to print 5 copies of a job, an application constructs an instance of the Copies class with the value of 5 and uses the Copies instance to specify the print job. The Copies class represents the attribute category, and the Copies instance represents the attribute value. Because the attribute value is encapsulated as a Java object, the attribute value implies its attribute category, and so an attribute value is usually referred to simply as an attribute. The category and value constitute a key-value pair, which you can add to a set along with other attributes. See <a href="attributes.fm3.html#998783"><em>Attribute Sets</em></a> for more information<p>
+<a name="998583"><!-- --></a>
+The Attribute interface defines just two methods: getName and getCategory. The getName method returns a String name for the attribute category. The getCategory method returns the class that first implements that category. To ensure that all implementations of a particular category report the same name and class, subclasses should not override the getName or getCategory methods.<p>
+<a name="1001105"><!-- --></a>
+To determine what attribute categories and values are supported by a printer, use the query methods defined in the PrintService interface. A print request does not need to specify attribute values for all of the target printer&#39;s supported attribute categories: each supported attribute category has a default value. For example, a printer might support printing up to 999 copies of a job, but if a print request does not specify the number of copies, the printer almost always prints a default of just 1 copy.<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="attributes.fm.html">PREV</a>
+ | <a href="attributes.fm2.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

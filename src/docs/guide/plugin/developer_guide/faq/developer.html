@@ -1,0 +1,201 @@
+<html>
+<head>
+<title>Developer Information</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Developer Information</h1>
+<hr>
+<p>This section includes the following topics:</p>
+<ul>
+  <li><a href="#authors">Information for Web-Page Authors</a></li>
+  <li><a href="#developers">Information for Applet Developers</a></li>
+  <li><a href="#administrators">Information for System Administrators</a></li>
+</ul>
+<h2><b><font size=+1><a name="authors"></a></font>Information for Web Page Authors</b>&nbsp; 
+</h2>
+<p><b>Q: As a web page author, how do I use Java Plug-in Software?</b> 
+<p><b>A: </b>To utilize all of the features and capabilities of Java 2 SDK, Standard 
+  Edition, web page authors must modify the page's HTML to specify the use of 
+  Sun's JRE via Java Plug-in. Sun is provides a specification&#151;<a href="../using_tags.html">Using 
+  <code>OBJECT</code>, <code>EMBED</code> and <code>APPLET</code> Tags in Java 
+  Plug-in</a>&#151;to guide web page authors on how to make these changes. In 
+  addition, Sun provides the Java Plug-in HTML Converter, free of charge; it will 
+  automatically make the changes to the HTML of a selected web page or set of 
+  web pages.
+<p><b>Q: For Windows, the above specification mentions JRE releases that can be 
+  autodownloaded via <code>.cab</code> files. Where do I find a complete list 
+  of such JRE releases?</b> 
+<p><b>A:</b> See <a href="../../../deployment/autodl/autodl-files.html">Autodownload 
+  Files (Windows Only)</a>.
+<p><b>Q: How can I get the the Java Plug-in Software HTML Converter?</b> 
+<p><b>A: </b>The Java Plug-in HTML Converter is bundled with the J2SE SDK. It 
+  is free.
+<p><b>Q: How do I run the HTML Converter?</b> 
+<p><b>A: </b>See <a href="../html_converter_more.html">More About the HTML Converter</a>.
+<p><b>Q: What capabilities do the supplementary templates provide with the Java 
+  Plug-in HTML Converter?&nbsp; </b> 
+<p><b>A: </b>The HTML Converter provides both a default template (<code>default.tpl</code>) 
+  and three supplementary templates. The supplementary templates allow web-page 
+  authors to more explicitly target browsers and platforms in their environment 
+  when modifying pages with the HTML Converter: 
+<ol>
+  <li><b><code>default.tpl</code>:&nbsp;</b> The default template used by the 
+    Java Plug-in HTML Converter. The converted page can be used in <a href="../overview.html#supported">supported 
+    versions of Internet Explorer and Navigator on supported operating systems</a> 
+    to invoke the Java Plug-in.</li>
+  <li><b><code>extend.tpl</code>:&nbsp;</b> The converted page can be used with 
+    any supported browser or platform. Java Plug-in will be invoked on all <a href="../overview.html#supported">supported 
+    operating systems and browsers</a>. If operating system or browser is not 
+    supported by Java Plug-in, then the browser's default Java runtime will be 
+    used.</li>
+  <li><b><code>ieonly.tpl</code>:&nbsp;</b> The converted page can be used to 
+    invoke Java Plug-in in <a href="../overview.html#supported">supported versions 
+    of Internet Explorer on supported operating systems</a>.</li>
+  <li><code><b>nsonly.tpl</b></code><b>:&nbsp;</b> The converted page can be used 
+    to invoke Java Plug-in in <a href="../overview.html#supported">supported versions 
+    of Navigator on supported operating systems</a>.&nbsp;</li>
+</ol>
+<p><b>Q: How do I specify a JAR file as part of an <tt>OBJECT</tt> or <tt>EMBED</tt> 
+  tag?&nbsp;</b> 
+<p><b>A: </b>You can specify one or more JAR files by defining an <tt>archive</tt>, 
+  <tt>cache_archive</tt>, or <tt>cache_archive_ex </tt> parameter in the <tt>OBJECT</tt> 
+  or <tt>EMBED</tt> tag. 
+<p>The <code>archive</code> parameter with the <tt>OBJECT</tt> tag this looks 
+  like: 
+<blockquote> 
+  <p><code>&lt;PARAM NAME=&quot;archive&quot; VALUE=&quot;demo.jar,fred.jar&quot;></code> 
+  </p>
+</blockquote>
+<p>For more information on the <code>cache_archive</code> and <code>cache_archive_ex</code> 
+  parameters, see <a href="../applet_caching.html">Applet Caching</a>.</p>
+<p>With the <tt>EMBED</tt> tag this looks like:
+<blockquote> <code>&lt;EMBED ... archive=&quot;demo.jar,fred.jar&quot; ... &gt; 
+  </code> </blockquote>
+<p><b>Q: Does Java Plug-in Software support multiple JAR files in the <tt>archive</tt> 
+  attribute in the <tt>APPLET</tt> tag? If so, why can't I get this to work? </b> 
+<p><b>A: </b>The <tt>archive</tt> attribute is supported in both the <tt>EMBED 
+  </tt>and <tt>OBJECT</tt> tags. The most common mistake is to put the JAR files 
+  in the wrong order. For example, if you use the Swing set with Java Plug-in 
+  and specify <tt>archive="Myjar.jar,swing.jar,..."</tt>, Java Plug-in will fail 
+  to load the applet because when <tt>Myjar.jar</tt> is loaded and Java Plug-in 
+  tries to initialize the applet, <tt>swing.jar</tt> is not yet loaded. The JAR 
+  files in the <tt>archive</tt> should be in the order of dependency; since <tt>Myjar.jar</tt> 
+  depends on other JARs, it should be put at the end of the list. The other common 
+  mistake is to put spaces or paths with the JAR file lists. 
+<p> 
+<h2><b><font size=+1><a name="developers"></a></font>Information for Applet Developers</b>&nbsp; 
+</h2>
+<p><b>Q: Do developers need to modify their applets in order to support Java Plug-in?</b> 
+<p><b>A: </b>No. Any Java 2 SDK, Standard Edition, 100% Pure Java applets should 
+  run unmodified using the Java Plug-in. 
+<p><b>Q: What is the applet lifecycle in Java Plug-in Software?</b>
+<p><b>A: </b>When an applet is encountered on an HTML page, the applet will be 
+  initialized and started. When the HTML page is closed, or the back button is 
+  pushed, the applet with be stopped and destroyed immediately. 
+<p> When the same HTML page is encountered again, the applet will be initialized 
+  and started again. 
+<p><b>Q: Does Java Plug-in Software support Drag and Drop between applets and 
+  the native environment? If so, why can't I get it to work?</b> 
+<p><b>A: </b>Yes, Java Plug-in Software does support Drag and Drop. You must make 
+  sure to grant the applet the correct socket permissions using <a href="../../../../tooldocs/windows/policytool.html">policytool</a> 
+  to use this feature. Please see the <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/net/SocketPermission.html">SocketPermission 
+  class</a> documentation for more information. 
+<p><b>Q: How can I speed up applet download time?</b> 
+<p><b>A: </b>There are several ways: 
+<ul>
+  <li>JAR files&#151;bundle your applets as JAR files. 
+  <li>JAR indexing&#151;optimize the class loading process. See the <a href="http://java.sun.com/j2se/1.4.2/docs/guide/jar/jar.html">JAR 
+    File Specification</a> for details. 
+  <li>Applet caching&#151;cache your applets in a permanent cache (see <a href="../applet_caching.html">Applet 
+    Caching</a>).
+</ul>
+<p><b><a name="banner"></a>Q: How do I prevent the warning banner from covering 
+  my GUI state?&nbsp; </b> 
+<p><b>A: </b>You should use the <tt>getInsets()</tt> method to find the size of 
+  your frame's decorative border. This includes the warning banner. For example, 
+  if you create a <tt>Frame</tt> with size 100x100, you might find it has <tt>insets 
+  [top=42,left=5,bottom=5,right=6]</tt> giving you a drawable area of 89x53. You 
+  need to position your work within the drawable area. 
+<p>If you need to create a drawable area of a particular size:
+<ol>
+  <li>create and show the <tt>Frame</tt>;</li>
+  <li>use <tt>getInsets</tt> to find the insets' sizes;</li>
+  <li>figure out the desired frame size by adding your desired size to the insets;</li>
+  <li>then use <tt>frame.setSize()</tt> to set your frame to that size. </li>
+</ol>
+<p><b><a name="localhost"></a>Q: Why does <code>InetAddress.getLocalHost().getHostName()</code> 
+  return <code>localhost</code>? </b> 
+<p><b>A: </b> This is a deliberate security feature in the Java 2 platform. Untrusted 
+  applets will not be given the real host name. Trusted applets (such as signed 
+  applets) will be given the real host name. 
+<p> 
+<h2><b><font size=+1><a name="administrators"></a></font></b>Information for System 
+  Administrators </h2>
+<p><b>Q: I would like to change the Java Plug-in setting in thousands of machines 
+  through system management tools. What should I do?</b> 
+<p><b>A: </b>Java Plug-in stores user specific settings under <code>&lt;user.home&gt;/.java/properties&lt;version&gt;</code>. 
+  Therefore, if administrators would like to change the Java Plug-in settting 
+  globally, they may use system managment tools to update the file in all machines. 
+<p><b>Q: Does Java Plug-in Software replace Microsoft's or Netscape's Java runtime 
+  with Sun's JRE?</b> 
+<p><b>A: </b>No. Java Plug-in Software does not replace the browser's underlying 
+  virtual machine if it has one. (Netscape 6 and later versions of Internet Explorere 
+  6 do not have a Java virtual machine.) Rather, Java Plug-in Software simply 
+  enables web-page authors to specify that Sun's JRE be used instead of the default 
+  Java runtime. 
+<p><b>Q: What happens on browsers other than IE or Navigator, or on non-supported 
+  platforms?</b> 
+<p><b>A: </b>The default conversion template provided with the Java Plug-in HTML 
+  Converter is designed so that an applet will not be rendered in browsers other 
+  than Internet Explorer and Netscape Navigator on unsupported platforms. However, 
+  the Java Plug-in HTML Converter provides additional templates allowing web-page 
+  authors to specify that on non-supported platforms applets will be rendered 
+  using the original <tt>&lt;APPLET></tt> tag with the browser's default Java 
+  runtime. 
+<p><b>Q: We are trying to deploy Java Plug-in Software within our intranet environment. 
+  The chapter called <a href="../using_tags.html">Using <code>OBJECT</code>, <code>EMBED</code> 
+  and <code>APPLET</code> Tags in Java Plug-in</a> and other documents say we 
+  should set up an installation page within our intranet for Netscape users to 
+  install Java Plug-in. What does this page do and how should we set it up?</b> 
+<p><b>A: </b>The purpose of this installation page is to act as an entry point 
+  for Netscape users to install Java Plug-in Software. If a user encounters an 
+  HTML page that requires Java Plug-in, the user will get redirected to this installation 
+  page according to the <tt>pluginspage</tt> attribute in the <tt>EMBED</tt> tag. 
+  At that point, the users should be able to download and install the correct 
+  version of Java Plug-in Software for their platform. Thus, the installation 
+  page should have links to download the Java Plug-in binary. 
+<p> An simple example page would look like: 
+<pre>
+&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;TITLE&gt;Java Plug-in Software Download Page&lt;/TITLE&gt;
+&lt;/HEAD&gt;
+&lt;BODY&gt;
+&lt;P&gt;&lt;A HREF="ftp://myhost.com/public/jre14-win32.exe"&gt;
+    Java Plug-in Software for Microsoft Windows&lt;/A&gt;
+&lt/P&gt;
+&lt;P&gt;&lt;A HREF="ftp://myhost.com/public/plugin-14-solaris.bin"&gt;
+        Java Plug-in Software for Solaris&lt;/A&gt;
+&lt;/P&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre>
+Depending on how your webserver is configured, you may want to consider using 
+CGI scripting instead of FTP for the download. Contact your webmaster for more 
+information. 
+<p><b>Q: Why is the experience of downloading and installing Netscape Navigator 
+  different from Internet Explorer?</b> 
+<p><b>A: </b>The releases of Netscape Navigator supported by Java Plug-in Software 
+  do not provide mechanisms that allow for the automatic download and installation 
+  of Java Plug-in, as in Internet Explorer. The first time Netscape Navigator 
+  comes across a web page that is enabled for Java Plug-in (the <i>activated page</i>), 
+  it redirects the user to another web page to download and install Java Plug-in 
+  Software on the user's system. The user must then return to the activated page 
+  to render the applet using Java Plug-in Software. From that point on, the browser 
+  automatically invokes Java Plug-in whenever it encounters an activated page. 
+<p>&nbsp;</p>
+</body>
+</html>

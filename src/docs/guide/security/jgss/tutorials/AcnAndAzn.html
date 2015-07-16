@@ -1,0 +1,789 @@
+<html>
+
+<head>
+    <title>JAAS Authorization</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#000077" alink="#FF0000">
+
+
+<table summary="layout" width="550">v
+<tr>
+<td align="left" valign="center">
+<a href="AcnOnly.html" target="_top"><img src="images/PreviousArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Previous Tutorial"></a>
+<a href="index.html" target="_top"><img src="images/TOCIcon.gif" width="26" 
+height="26" align="center" border="0" alt="Tutorials Introduction and TOC"></a>
+<a href="LoginSample.html" target="_top"><img src="images/NextArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Next Tutorial"></a></td>
+
+
+<td align="right" valign="center">
+<font size="-1">
+<a href="Feedback.html">Feedback</a>
+</font>
+</td>
+
+</tr>
+</table>
+
+<hr>
+
+
+<center>
+<H1>JAAS Authorization</H1>
+</center>
+
+<br>
+<br>
+
+<p>This tutorial expands the program and policy file developed in the
+<a href="AcnOnly.html">JAAS Authentication</a> tutorial 
+to demonstrate the JAAS authorization component,
+which ensures the authenticated caller has the access control rights 
+(permissions) required to do subsequent security-sensitive operations.
+Since the authorization component requires that the user
+authentication first be completed, please read the
+<a href="AcnOnly.html">JAAS Authentication</a>
+tutorial first if you have not already done so.
+
+<p>The rest of this tutorial consists of the following sections:
+
+<ul>
+
+<li><a href="#WhatIsAzn">What is JAAS Authorization?</a> <p>
+
+<li><a href="#InvokingAzn">How is JAAS Authorization
+Performed?</a> <p>
+
+<ul>
+<li><a href="#UserPFStmts">How Do You Make Principal-Based 
+Policy File Statements?</a> <p>
+
+<li><a href="#AssocSubject">How Do You Associate a Subject with an 
+Access Control Context?</a>
+</ul>
+
+<p>
+
+<li><a href="#AznCode">The Authorization Tutorial Code</a> <p>
+
+<li><a href="#AznLCF">The Login Configuration File</a> <p>
+
+<li><a href="#AznPF">The Policy File</a> <p>
+
+<li><a href="#RunAzn">Running the Authorization Tutorial Code</a> 
+
+</ul>
+
+<p>If you want to first see the tutorial code in action, you can skip 
+directly to <a href="#RunAzn">Running the Authorization Tutorial Code</a>
+and then go back to the other sections to learn more.
+
+
+<a name="WhatIsAzn">
+<H2>What is JAAS Authorization? </H2></a>
+
+<blockquote>
+
+<p>JAAS authorization extends the existing Java security
+architecture that uses a security <a href = "../../PolicyFiles.html">
+policy</a> to specify what access
+rights are granted to executing code. That architecture, introduced
+in the Java 2 platform, is <i>code-centric</i>. That is, the permissions are
+granted based on code characteristics: where the code is coming
+from and whether it is digitally signed and if so by whom. We saw
+an example of this in the <code>jaasacn.policy</code> file used in the
+<a href="AcnOnly.html">JAAS Authentication</a> tutorial.
+That file contains the following:
+
+<blockquote>
+<pre>
+grant codebase "file:./JaasAcn.jar" {
+   permission javax.security.auth.AuthPermission 
+                    "createLoginContext.JaasSample";
+};</pre>
+</blockquote>
+
+<p>This grants the code in the <code>JaasAcn.jar</code> file, located in the
+current directory, the specified permission. (No signer is specified, so
+it doesn't matter whether the code is signed or not.)
+
+<p>JAAS authorization augments the existing code-centric access controls
+with new <i>user-centric</i> access controls. Permissions can be
+granted based not just on what code is running but also on <i>who</i> 
+is running it. 
+
+<p>When an application uses JAAS authentication
+to authenticate the user (or other entity such as a service), a
+<a href="../../../../api/javax/security/auth/Subject.html">
+Subject</a> is created as a result. The purpose of the Subject 
+is to represent the authenticated user.
+A Subject is comprised of a set of
+<a href="../../../../api/java/security/Principal.html">
+Principals</a>, where each Principal represents an identity for
+that user. For example, a Subject could have a name Principal 
+("Susan Smith") and a Social Security Number Principal ("987-65-4321"),
+thereby distinguishing this Subject from other Subjects.
+
+<p>Permissions can be granted in the policy to specific 
+Principals. After the user has been authenticated, the application can 
+associate the Subject with the current access control context. 
+For each subsequent security-checked operation,
+(a local file access, for example), the Java runtime will
+automatically determine whether the policy grants the 
+required permission only to a specific Principal and if so, 
+the operation will be allowed only if the Subject associated with
+the access control context contains the designated Principal.
+
+</blockquote>
+
+
+<a name="InvokingAzn">
+<H2>How is JAAS Authorization Performed?</H2></a>
+
+<blockquote>
+
+<p>To make JAAS authorization take place, 
+the following is required:
+
+<ul>
+
+<li>The user must be authenticated, as described in the
+<a href="AcnOnly.html">JAAS Authentication</a> tutorial. <p>
+
+<li><a href="#UserPFStmts">Principal-based entries</a> must be configured 
+in the security policy. <p>
+
+<li>The Subject that is the result of authentication must be
+<a href="#AssocSubject">associated with the current access control context</a>. 
+
+</ul>
+
+
+<a name="UserPFStmts">
+<H3>How Do You Make Principal-Based Policy File Statements?</H3></a>
+
+<blockquote>
+
+<p><a href = "../../PolicyFiles.html">
+Policy file</a> <code>grant</code> statements can now optionally include
+one or more Principal fields. Inclusion of a Principal field
+indicates that the user or other entity represented by
+the specified Principal, executing the specified code,
+has the designated permissions.
+
+<p>Thus, the basic format of a <code>grant</code> statement is now
+
+<blockquote>
+<pre>
+grant &lt;<i>signer(s) field</i>&gt;, &lt;<i>codeBase URL</i>&gt; 
+  &lt;<i>Principal field(s)</i>&gt; {
+    permission <i>perm_class_name</i> "<i>target_name</i>", "<i>action</i>";
+    ....
+    permission <i>perm_class_name</i> "<i>target_name</i>", "<i>action</i>";
+  };
+</pre>
+</blockquote>
+
+where each of the signer, codeBase and Principal fields is
+optional and the order between the fields doesn't matter.
+
+<p>A Principal field looks like the following:
+
+<blockquote>
+<pre>
+Principal <i>Principal_class</i> "<i>principal_name</i>"
+</pre>
+</blockquote>
+
+<p>That is, it is the word "Principal" (where case doesn't matter)
+followed by the (fully qualified) name of a Principal class and 
+a principal name.
+
+<p>A Principal class is a class that implements the 
+<a href="../../../../api/java/security/Principal.html">
+java.security.Principal</a> interface. 
+All Principal objects have an associated name that can be
+obtained by calling their <code>getName</code> method.
+The format used for the name is dependent on each
+Principal implementation.
+
+<p>The type of Principal placed in the Subject created by the Kerberos 
+authentication mechanism used by this tutorial is 
+<code>javax.security.auth.kerberos.KerberosPrincipal</code>,
+so that is what should be used as the <code><i>Principal_class</i></code> 
+part of our <code>grant</code> statement's Principal designation.
+User names for <code>KerberosPrincipal</code>s are of the form 
+"name@realm". Thus, if the user name is "mjones" and the realm is
+"KRBNT-OPS.ABC.COM", the full <code><i>principal_name</i></code> designation 
+to use in the <code>grant</code> statement is "mjones@KRBNT-OPS.ABC.COM".
+
+<p>It is possible to include more than one Principal field in a 
+<code>grant</code> statement.
+If multiple Principal fields are specified, then the permissions in that
+<code>grant</code> statement are granted only if the Subject associated with the
+current access control context contains <i>all</i> of those Principals.
+
+<p>To grant the same set of permissions to different Principals,
+create multiple <code>grant</code> statements where each lists 
+the permissions and contains a single Principal field designating one of the 
+Principals.
+
+<p>The policy file for this tutorial includes one <code>grant</code>
+statement with a Principal field:
+
+<blockquote>
+<pre>
+grant codebase "file:./SampleAction.jar",
+    Principal javax.security.auth.kerberos.KerberosPrincipal 
+        "your_user_name@your_realm"  {
+
+   permission java.util.PropertyPermission "java.home", "read";
+   permission java.util.PropertyPermission "user.home", "read";
+   permission java.io.FilePermission "foo.txt", "read";
+};
+</pre>
+</blockquote>
+
+where you substitute your Kerberos user name (complete with "@" and realm)
+for "<code>your_user_name@your_realm</code>".
+
+<p>This specifies that the indicated permissions are granted
+to the specified principal executing the code in
+<code>SampleAction.jar</code>.
+
+</blockquote>
+
+
+<a name="AssocSubject">
+<H3>How Do You Associate a Subject with an Access Control 
+Context?</H3></a>
+
+<blockquote>
+
+<p>To create and associate a Subject with an 
+access control context, you need the following:
+
+<ul>
+
+<li>The user must first be authenticated, as described in
+<a href="AcnOnly.html">JAAS Authentication</a>. <p>
+
+<li>The static <code>doAs</code> method from the
+Subject class must be called, passing it an authenticated
+Subject and a 
+<a href="../../../../api/java/security/PrivilegedAction.html">
+java.security.PrivilegedAction</a> or
+<a href="../../../../api/java/security/PrivilegedExceptionAction.html">
+java.security.PrivilegedExceptionAction</a>. (See 
+<a href="../../doprivileged.html">API for 
+Privileged Blocks</a> for a comparison of PrivilegedAction and 
+PrivilegedExceptionAction.) The <code>doAs</code> method 
+associates the provided Subject with the current access control context
+and then invokes the <code>run</code> method from the action.
+The <code>run</code> method implementation contains all the code
+to be executed as the specified Subject.
+The action thus executes as the specified Subject.
+
+<p>The static <code>doAsPrivileged</code> method from the Subject class may be 
+called instead of the <code>doAs</code> method.  In addition to the parameters
+passed to <code>doAs</code>, <code>doAsPrivileged</code> requires a third 
+parameter: an AccessControlContext.  Unlike <code>doAs</code>, which associates
+the provided Subject with the current access control context,
+<code>doAsPrivileged</code> associates the Subject with the provided
+access control context. See <a href="../../jaas/JAASRefGuide.html#doAsComp">
+doAs vs. doAsPrivileged</a> in the JAAS Reference Guide for a comparison of 
+those methods.
+
+</ul>
+
+
+</blockquote>
+
+</blockquote>
+
+
+<a name="AznCode">
+<H2>The Authorization Tutorial Code</H2></a>
+
+<blockquote>
+
+<p>The code for this tutorial consists of two files:
+
+<ul>
+
+<li><a href = "JaasAzn.java">JaasAzn.java</a> is exactly the same 
+as the <code>JaasAcn.java</code> from the
+<a href="AcnOnly.html">JAAS Authentication</a> tutorial
+except for the additional code needed to call
+<code>Subject.doAsPrivileged</code>. <p>
+
+<li><a href = "SampleAction.java">SampleAction.java</a>
+contains the SampleAction class. This class implements 
+PrivilegedAction and has a <code>run</code> method that contains all the
+code we want to be executed with Principal-based authorization checks.
+
+</ul>
+
+<H3>JaasAzn.java</H3>
+
+<blockquote>
+
+<p><a href = "JaasAzn.java">JaasAzn.java</a> is exactly the same as the
+<code>JaasAcn.java</code> code used in the previous tutorial except with
+three statements added at the end of the <code>main</code> method, after the
+authentication is done. These statements result in (1) association of a Subject 
+representing the authenticated user with the current access control context and 
+(2) execution of the code in the <code>run</code> method of SampleAction. 
+Associating the Subject with the access control context enables 
+security-sensitive operations in the SampleAction <code>run</code> method 
+(and any code it invokes directly or indirectly) to be executed if 
+a Principal representing the authenticated user 
+is granted the required permissions in the current policy.
+
+<p>Like <code>JaasAcn.java</code>, <code>JaasAzn.java</code> instantiates a 
+LoginContext <code>lc</code> and calls its <code>login</code> method to 
+perform the authentication. If successful, the authenticated Subject 
+(which includes a Principal representing the user) is 
+obtained by calling the LoginContext's <code>getSubject</code> method:
+
+<blockquote>
+<pre>
+Subject mySubject = lc.getSubject();
+</pre>
+</blockquote>
+
+<p>The <code>main</code> method then calls <code>Subject.doAsPrivileged</code>,
+passing it the authenticated Subject <code>mySubject</code>, 
+a PrivilegedAction (SampleAction) and a <code>null</code>
+AccessControlContext, as described in the following.
+
+<p>The SampleAction class is instantiated via the following:
+
+<blockquote>
+<pre>
+PrivilegedAction action = new SampleAction();
+</pre>
+</blockquote>
+
+<p>The call to <code>Subject.doAsPrivileged</code> is performed via:
+
+<blockquote>
+<pre>
+Subject.doAsPrivileged(mySubject, action, null);
+</pre>
+</blockquote>
+
+<p>The <code>doAsPrivileged</code> method invokes execution 
+of the <code>run</code> method in the PrivilegedAction <code>action</code> 
+(SampleAction) to initiate execution of the rest of the code, which 
+is considered to be executed on behalf of the Subject <code>mySubject</code>.
+
+<p>Passing <code>null</code> as the AccessControlContext (third)
+argument to <code>doAsPrivileged</code> indicates
+that <code>mySubject</code> should be associated with a new empty
+AccessControlContext.  The result is that security checks
+occurring during execution of SampleAction will only require
+permissions for the SampleAction code itself (or other code it invokes),
+running as <code>mySubject</code>.  
+Note that the caller of <code>doAsPrivileged</code>
+(and the callers on the execution stack at the time
+<code>doAsPrivileged</code> was called) do not require any permissions
+while the action executes.
+
+
+
+</blockquote>
+
+
+<a name="SACode">
+<H3>SampleAction.java</H3></a>
+
+<blockquote>
+
+<p><a href = "SampleAction.java">SampleAction.java</a> contains the 
+SampleAction class. This class implements 
+<code>java.security.PrivilegedAction</code>
+and has a <code>run</code> method that contains all the
+code we want to be executed as the Subject <code>mySubject</code>.
+For this tutorial, we will perform three operations, each of which cannot
+be done unless code has been granted required permissions. We will:
+
+<ul>
+
+<li>Read and print the value of the <code>java.home</code> system property, <p>
+
+<li>Read and print the value of the <code>user.home</code> system property, 
+and <p>
+
+<li>Determine whether or not a file named <code>foo.txt</code> exists in
+the current directory.
+
+</ul>
+
+<p>Here is the code:
+
+<blockquote>
+<pre>
+import java.io.File;
+import java.security.PrivilegedAction;
+
+public class <b>SampleAction</b> implements PrivilegedAction {
+
+  public Object <b>run</b>() {
+
+    System.out.println("\nYour java.home property value is: "
+                + System.getProperty("java.home"));
+
+    System.out.println("\nYour user.home property value is: "
+                + System.getProperty("user.home"));
+
+    File f = new File("foo.txt");
+    System.out.print("\nfoo.txt does ");
+    if (!f.exists())
+        System.out.print("not ");
+    System.out.println("exist in the current working directory.");
+    return null;
+  }
+}
+</pre>
+</blockquote>
+
+
+</blockquote>
+
+</blockquote>
+
+
+<a name="AznLCF">
+<H2>The Login Configuration File</H2></a>
+
+<blockquote>
+
+<p>The login configuration file used for this tutorial can be
+exactly the same as that used by the 
+<a href="AcnOnly.html">JAAS Authentication</a> tutorial.
+Thus we can use 
+<a href = "jaas.conf">jaas.conf</a>, which contains just one
+entry:
+
+<blockquote>
+<pre>
+<b>JaasSample {
+  com.sun.security.auth.module.Krb5LoginModule required;
+};</b>
+</pre>
+</blockquote>
+
+<p>This entry is named "JaasSample" and that is the name that both our
+tutorial applications <code>JaasAcn</code> and <code>JaasAzn</code>
+use to refer to it.
+The entry specifies that the LoginModule to be used to do the
+user authentication is the Krb5LoginModule in the 
+<code>com.sun.security.auth.module</code> package and that
+this Krb5LoginModule is required to "succeed" in order for
+authentication to be considered successful.
+The Krb5LoginModule succeeds only if the name and password supplied
+by the user are successfully used to log the user into the Kerberos KDC.
+
+
+</blockquote>
+
+
+
+<a name="AznPF">
+<H2>The Policy File</H2></a>
+
+<blockquote>
+
+<p>This authorization tutorial contains two classes,
+<code>JaasAzn</code> and <code>SampleAction</code>. The code in 
+each class contains some security-sensitive operations and thus 
+relevant permissions are required in a policy file in order for
+the operations to be executed.
+
+
+<H3>Permissions Required by JaasAzn</H3>
+
+<blockquote>
+
+<p>The main method of the <code>JaasAzn</code> class does two operations for
+which permissions are required. It
+
+<ul>
+
+<li>creates a LoginContext, and <p>
+
+<li>calls the <code>doAsPrivileged</code> static method of the Subject class.
+
+</ul>
+
+<p>The LoginContext creation is exactly the same as was done in the
+authentication tutorial, and it thus needs the same 
+<code>javax.security.auth.AuthPermission</code> permission with target
+"<code>createLoginContext.JaasSample</code>".
+
+<p>In order to call the <code>doAsPrivileged</code> method of the Subject class,
+you need to have a <code>javax.security.auth.AuthPermission</code> with
+target "<code>doAsPrivileged</code>".
+
+<p>Assuming the <code>JaasAzn</code> class is placed in a JAR file named
+<code>JaasAzn.jar</code>, these permissions can be granted to the 
+<code>JaasAzn</code> code via the following <code>grant</code> statement 
+in the policy file:
+
+<blockquote>
+<pre>
+grant codebase "file:./JaasAzn.jar" {
+   permission javax.security.auth.AuthPermission 
+                    "createLoginContext.JaasSample";
+   permission javax.security.auth.AuthPermission "doAsPrivileged";
+};
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+<a name="SampleActionPerms"></a>
+<H3>Permissions Required by SampleAction</H3>
+
+<blockquote>
+
+<p><p>The <code>SampleAction</code> code does three operations for
+which permissions are required. It
+
+<ul>
+
+<li>reads the value of the "java.home" system property. <p>
+
+<li>reads the value of the "user.home" system property. <p>
+
+<li>checks to see whether or not a file named <code>foo.txt</code> exists
+in the current directory.
+
+</ul>
+
+<p>The permissions required for these operations are the following:
+
+<blockquote>
+<pre>
+permission java.util.PropertyPermission "java.home", "read";
+permission java.util.PropertyPermission "user.home", "read";
+permission java.io.FilePermission "foo.txt", "read";
+</pre>
+</blockquote>
+
+<p>We need to grant these permissions to the code in 
+<code>SampleAction.class</code>, which we will place in a 
+JAR file named <code>SampleAction.jar</code>. 
+However, for this particular <code>grant</code> statement we want to
+grant the permissions not just to the <i>code</i> but to a specific
+user executing the code, to demonstrate how to restrict access to
+a particular user. 
+
+<p>Thus, as explained in <a href="#UserPFStmts">How Do You Make Principal-Based 
+Policy File Statements?</a>,
+our <code>grant</code> statement looks like the following:
+
+<blockquote>
+<pre>
+grant codebase "file:./SampleAction.jar",
+    Principal javax.security.auth.kerberos.KerberosPrincipal 
+        "your_user_name@your_realm"  {
+
+   permission java.util.PropertyPermission "java.home", "read";
+   permission java.util.PropertyPermission "user.home", "read";
+   permission java.io.FilePermission "foo.txt", "read";
+};
+</pre>
+</blockquote>
+
+You substitute your Kerberos user name (complete with "@" and realm)
+for "<code>your_user_name@your_realm</code>". For example, if your 
+user name is "mjones" and your realm is "KRBNT-OPERATIONS.ABC.COM",
+you would use "mjones@KRBNT-OPERATIONS.ABC.COM" (complete with the quotes).
+
+
+
+<H3>The Full Policy File </H3>
+
+<blockquote>
+
+<p>The full policy file is <a href = "jaasazn.policy">jaasazn.policy</a>.
+</blockquote>
+
+
+</blockquote>
+
+
+</blockquote>
+
+
+
+<a name="RunAzn">
+<H2>Running the Authorization Tutorial Code</H2></a>
+
+<blockquote>
+
+<p>To execute our JAAS authorization tutorial code, all you
+have to do is 
+
+<ol>
+
+<li>Place the following files into a directory: <p>
+
+<ul>
+<li>The <a href = "JaasAzn.java">JaasAzn.java</a> source file.
+<li>The <a href = "SampleAction.java">SampleAction.java</a> source file.
+<li>The <a href = "jaas.conf">jaas.conf</a> login configuration file.
+<li>The <a href = "jaasazn.policy">jaasazn.policy</a> policy file.
+</ul>
+
+<p>
+
+<li>Replace "your_user_name@your_realm" in <code>jaasazn.policy</code> 
+with your user name and realm. <p>
+
+<li>Compile <code>SampleAction.java</code> and <code>JaasAzn.java</code>:
+
+<blockquote>
+<pre>
+javac SampleAction.java JaasAzn.java
+</pre>
+</blockquote>
+
+<li>Create a JAR file named <code>JaasAzn.jar</code> containing 
+<code>JaasAzn.class</code>:
+
+<blockquote>
+<pre>
+jar -cvf JaasAzn.jar JaasAzn.class
+</pre>
+</blockquote>
+
+<li>Create a JAR file named <code>SampleAction.jar</code> containing 
+<code>SampleAction.class</code>:
+
+<blockquote>
+<pre>
+jar -cvf SampleAction.jar SampleAction.class
+</pre>
+</blockquote>
+
+
+<li>Execute the <code>JaasAzn</code> application, specifying <p>
+
+<ol>
+
+<li>by an appropriate <code>-classpath</code> clause that classes should be 
+searched for in the <code>JaasAzn.jar</code> and <code>SampleAction.jar</code>
+JAR files, <p>
+
+<li>by <code>-Djava.security.manager</code> that a
+security manager should be installed, <p>
+
+<li>by <code>-Djava.security.krb5.realm=&lt;your_realm&gt;</code> that 
+your Kerberos realm is the one specified.<p>
+
+<li>by <code>-Djava.security.krb5.kdc=&lt;your_kdc&gt;</code> that 
+your Kerberos KDC is the one specified.<p>
+
+<li>by <code>-Djava.security.policy=jaasazn.policy</code> that
+the policy file to be used is <code>jaasazn.policy</code>, and <p>
+
+<li>by <code>-Djava.security.auth.login.config=jaas.conf</code> that the
+login configuration file to be used is <code>jaas.conf</code>.
+
+</ol>
+
+<p>Below are the full commands to use for both Microsoft Windows and Unix systems.
+The only difference is that on Windows systems you use semicolons to
+separate classpath items, while you use colons for that purpose on
+Unix systems.  <b>Be sure to replace 
+<code>&lt;your_realm&gt;</code> with your Kerberos realm,
+and <code>&lt;your_kdc&gt;</code> with your Kerberos KDC.</b>
+
+<p>Here is the full command for Windows systems:
+
+<blockquote>
+<pre>
+java -classpath JaasAzn.jar;SampleAction.jar 
+ -Djava.security.manager 
+ -Djava.security.krb5.realm=&lt;your_realm&gt; 
+ -Djava.security.krb5.kdc=&lt;your_kdc&gt; 
+ -Djava.security.policy=jaasazn.policy 
+ -Djava.security.auth.login.config=jaas.conf JaasAzn
+</pre>
+</blockquote>
+
+<p>Here is the full command for UNIX systems:
+
+<blockquote>
+<pre>
+java -classpath JaasAzn.jar:SampleAction.jar 
+ -Djava.security.manager 
+ -Djava.security.krb5.realm=&lt;your_realm&gt; 
+ -Djava.security.krb5.kdc=&lt;your_kdc&gt; 
+ -Djava.security.policy=jaasazn.policy 
+ -Djava.security.auth.login.config=jaas.conf JaasAzn
+</pre>
+</blockquote>
+
+<p>Type the full command on one line. Multiple lines are used here 
+for legibility. If the command is too long for your system, you may
+need to place it in a .bat file (for Windows) or a .sh file
+(for UNIX) and then run that file to execute the command.
+
+<p>You will be prompted for your Kerberos user name and password,
+and the underlying Kerberos authentication mechanism 
+specified in the login configuration file will log you into
+Kerberos. If your login is successful, you will see the 
+message "Authentication succeeded!" and if not, you will see
+"Authentication Failed." 
+
+<p>For login troubleshooting suggestions, see 
+<a href = "Troubleshooting.html">Troubleshooting</a>.
+
+<p>Once authentication is successfully completed,
+the rest of the program (in <code>SampleAction</code>) will be executed
+on behalf of you, the user, requiring you to have been granted
+appropriate permissions. The <code>jaasazn.policy</code> policy file
+grants you the required permissions, so you will see a display of
+the values of your <code>java.home</code> and <code>user.home</code>
+system properties and a statement as to whether or not you have a file named
+<code>foo.txt</code> in the current directory.
+
+</blockquote>
+
+
+<br>
+
+<hr>
+
+<table summary="layout" width="550">
+<tr>
+<td align="left" valign="center">
+<a href="AcnOnly.html" target="_top"><img src="images/PreviousArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Previous Tutorial"></a>
+<a href="index.html" target="_top"><img src="images/TOCIcon.gif" width="26" 
+height="26" align="center" border="0" alt="Tutorials Introduction and TOC"></a>
+<a href="LoginSample.html" target="_top"><img src="images/NextArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Next Tutorial"></a></td>
+
+
+<td align="right" valign="center">
+<font size="-1">
+<a href="Feedback.html">Feedback</a>
+</font>
+</td>
+
+</tr>
+</table>
+
+
+</body>
+
+</html>
+

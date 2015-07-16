@@ -1,0 +1,172 @@
+<html>
+<head>
+<title>JavaScript to Java</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>JavaScript to Java Communication (Scripting)</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This section includes the following topics:</p>
+<ul>
+  <li><a href="#how">How to Script Applets</a></li>
+  <li><a href="#method">Using Scripts to Invoke a Method</a> </li>
+</ul>
+<h2><a name="how"></a>How to Script Applets</h2>
+Scripting for applets is supported in Internet Explorer and Netscape 6; it is 
+not supported in Netscape 4. It is assumed in this chapter that you understand 
+the special HTML tags required for Java Plug-in. For information about these special 
+tags, refer to <a href="using_tags.html">Using <code>OBJECT</code>, <code>EMBED</code>, 
+and <code>APPLET</code> Tags in Java Plug-in</a>. You also should be familiar 
+with JavaScript. 
+<p> With scripting you have the capability to call applet methods from within 
+  an HTML page. In addition to invoking methods, you can use scripts to: 
+<ul>
+  <li>Get and set properties in applets </li>
+  <li>Run Java objects that have been built for scripting</li>
+</ul>
+<h2><a name="method"></a>Using Scripts to Invoke a Method</h2>
+You often want to use scripts to invoke methods on an applet. For example, you 
+might have an HTML button that, when clicked, starts an animation sequence. You 
+do this through a combination of HTML tags and scripting in the HTML file, plus 
+the actual code in the applet itself. 
+<p>You need to include the following in your applet's HTML page: <!-- table #29 start; table #25 still open -->
+<ul>
+  <li>Within the <tt>OBJECT</tt> tag, an ID parameter that specifies the name 
+    of the applet</li>
+  <li>Tags specifying a scripting language and scripting method associated with 
+    a particular action</li>
+  <li>A SCRIPT tag for the scripting method that the action will invoke</li>
+</ul>
+<p> These tags are explained in the following sections. 
+<h4>Specify the Applet</h4>
+You must designate an <tt>ID</tt> parameter within the <tt>OBJECT</tt> tag for 
+your HTML page. Recall that the <tt>OBJECT</tt> tag includes such parameters as 
+<tt>classid</tt>, <tt>width</tt>, <tt>height</tt>, and so on. 
+<p> The <tt>ID</tt> parameter is the symbolic name of the applet. Once you establish 
+  a symbolic name for an applet through the <tt>ID</tt> parameter, you can reuse 
+  this name later in the scripts to refer to this applet. 
+<p> For example, suppose you have an applet called Fractal. You add the <tt>ID</tt> 
+  parameter to the <tt>OBJECT</tt> tag and set <tt>ID</tt> to the symbolic name 
+  of the applet. You might set the tag as follows: 
+<blockquote>
+  <pre>
+ID="Fractal"
+</pre>
+</blockquote>
+Now, you can use the name <tt>Fractal</tt> within scripts to refer to the Fractal 
+applet. 
+<p> Using the same Fractal applet example, your HTML page would begin with a <tt>FORM</tt> 
+  tag, followed by an <tt>OBJECT</tt> tag, that together might look as follows: 
+<blockquote> 
+  <table summary="layout" cellpadding="5">
+    <tr bgcolor="#CCCCCC"> 
+      <td> 
+        <pre>
+&lt;form name="Form1"&gt;
+&lt;OBJECT ID="Fractal" WIDTH=500 HEIGHT=120
+CLASSID="CLSID:8AD9C840-044E-11d1-B3E9-00805F499D93"
+&lt;PARAM NAME="code" value="CLSFractal.class"&gt;
+&lt;PARAM NAME="codebase" value="1.0.2"&gt;
+&lt;PARAM NAME="level" value="5"&gt;
+...
+&lt;/OBJECT&gt;</pre>
+      </td>
+    </tr>
+  </table>
+  
+</blockquote>
+<p>
+<h4>Associate the Action to the Script</h4>
+<p>The HTML page defines components that are intended to invoke actions triggered 
+  by the user. You use the <tt>INPUT</tt> tag to define these components. You 
+  specify the <tt>TYPE</tt> of the component, such as <tt>button</tt>, its <tt>NAME</tt>, 
+  and <tt>VALUE</tt>. To have the button or other component actually invoke the 
+  intended action, you need to add tags that specify: </p>
+<ul>
+  <li>What the user does to trigger the action, such as <tt>onClick</tt> for when 
+    the user clicks on the button </li>
+  <li>The name of the script method that the HTML page will invoke when the specified 
+    trigger action occurs</li>
+  <li>The language in which the script method is written</li>
+</ul>
+<p> For example, suppose your HTML page creates a button that, when clicked, starts 
+  a particular animation sequence. Your HTML tag creates the button and gives 
+  that button a name and a value (label). 
+<p> To do this you want to add two tags. One tag indicates that on a certain action, 
+  such as <code>onclick</code>, a corresponding script method should be called. 
+  You might have the tag <tt>onClick="method name"</tt>. The method name is a 
+  script method within the same HTML page. 
+<p> Thus, you might have the following in your HTML page: 
+<blockquote> 
+  <table summary="layout" cellpadding="5">
+    <tr bgcolor="#CCCCCC"> 
+      <td> 
+        <pre>
+&lt;input type="button" name="Button1" value="Start"
+onClick="startJSFractal" language="JavaScript"&gt;</pre>
+      </td>
+    </tr>
+  </table>
+  
+</blockquote>
+<p>
+<p> This <tt>INPUT</tt> tag creates a button, names the button "Button1", and 
+  gives it the value "Start" (the label that appears on the button). It also specifies 
+  the scripting method that will be called when a user clicks the button, and 
+  the scripting method's language. In this example, the scripting method is <tt>startJSFractal</tt>, 
+  and the scripting language is JavaScript. When the user clicks this button, 
+  the HTML page branches to the script method <tt>startJSFractal</tt>, which is 
+  written in JavaScriptscript. 
+<h4>The Script Tag and Method</h4>
+You must include a <tt>SCRIPT</tt> tag for the method (function) that the <tt>onClick</tt> 
+tag specifies. The <tt>SCRIPT</tt> tag must have the same name as the name used 
+in the <tt>onClick</tt> tag. It also has a parameter that specifies the script 
+language. More importantly, the script method calls the Java applet method. It 
+identifies the method by using the name of the applet as specified by the <tt>ID</tt> 
+tag, followed by the actual method name as implemented in the applet code. 
+<p> For example, the same HTML page might have the following <tt>SCRIPT</tt> tag:
+<blockquote> 
+  <table summary="layout" cellpadding="5">
+    <tr bgcolor="#CCCCCC"> 
+      <td> 
+        <pre>
+&lt;SCRIPT language="JavaScript"&gt;
+function startJSFractal() {
+        document.Form1.Fractal.startFractal()
+}
+&lt;/SCRIPT&gt;</pre>
+      </td>
+    </tr>
+  </table>
+  
+</blockquote>
+<p>
+<p>
+<p> In this example, the <tt>SCRIPT</tt> tag begins by specifying that the scripting 
+  language is JavaScript. This is followed by the JavaScript <code>function</code> 
+  statement, which starts the definition of a scripting method. The <code>function</code> 
+  statement supplies a label or name for the scripting method, calling it <tt>startJSFractal</tt>. 
+  This name must match the method name given for the input component's action 
+  parameter. 
+<p> For this example, both the <tt>onClick</tt> parameter and the <tt>function</tt> 
+  statement specify the identical scripting method. The scripting method <tt>startJSFractal</tt> 
+  merely calls the actual method, <tt>startFractal()</tt>, implemented in the 
+  applet code. It qualifies the method name by using the document form name , 
+  then the applet name (<code>OBJECT</code> <code>ID</code>), then the method 
+  name itself, as follows: 
+<blockquote>
+  <pre>
+document.Form1.Fractal.startFractal()
+</pre>
+</blockquote>
+<p>&nbsp;</p>
+</body>
+</html>

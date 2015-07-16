@@ -1,0 +1,109 @@
+<html><head><title>Java AWT: ScrollPane Container</title></head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<a name="919682">
+<h1><img alt="Duke logo in box" align=middle src="images/box.sm.gif"> Java AWT: ScrollPane Container</h1>
+
+</a>
+<hr><p><a name="919687">
+<address>
+Last Updated: February 3, 1997
+</address>
+<h2>The Problem</h2>
+</a>
+In the AWT1.0, the task of implementing all scrolling behavior is left to the developer.  Only a basic Scrollbar class is provided which must be managed by the Java program, meaning the Java program must catch the scrollbar events and then take appropriate action to update the contents being scrolled.
+<p>Not only is this a general burden to developers who are accustomed to better support for this in toolkits, but it is also a serious performance problem, since there is a round trip (native-&gt;java-&gt;native) for each individual scroll event that occurs, and the application must respond to the event and move its contents using slower java draw/move operations.  This is particularly noticeable during the event-intensive scroll-drag operations.<a name="919690">
+<h2>ScrollPane API</h2>
+</a>
+To resolve this problem, a ScrollPane class was added to the AWT in version 1.1. ScrollPane provides a container that implements automatic scrolling for a single component child:
+<pre><code>	<a href="../../../../api/java/awt/ScrollPane.html">java.awt.ScrollPane</a>
+</code></pre>
+The ScrollPane supports three modes for its scrollbars:
+<ol>
+<li> Scrollbars "when needed": Scrollbars are displayed only when the size of the child exceeds the size of the scrollpane.
+<li> Scrollbars "always": Scrollbars are always displayed regardless of the relative sizes of the child and parent.
+<li> Scrollbars "never": Scrollbars are never displayed and the program is in total control of when scrolling occurs. This mode is useful when a program wishes to implement its own scrollbar controls.
+</ol>
+The state of the vertical and horizontal scrollbars in cases 1 & 2 are represented by separate internal objects to the ScrollPane which implement the following interface:
+<pre><code>       <a href="../../../../api/java/awt/Adjustable.html">java.awt.Adjustable</a>
+</code></pre>
+Therefore, if a program wishes to set properties such as the unitIncrement,value, etc. on the scrollpane, it would first get the appropriate Adjustable and set the property there.
+
+<h2>Sample Code</h2>
+</a>
+Following is sample code showing the use of this API in a simple case:
+<pre><code>	
+import java.awt.*;
+
+public class Scroller extends Frame {
+
+    public Scroller() {
+        super("Scroller Example");
+    
+        <b>ScrollPane scroller = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
+        scroller.add(new DrawCanvas());
+
+        Adjustable vadjust = scroller.getVAdjustable();
+        Adjustable hadjust = scroller.getHAdjustable();
+        hadjust.setUnitIncrement(10);
+        vadjust.setUnitIncrement(10);
+
+        scroller.setSize(200, 200);</b>
+
+        add("Center", scroller);
+        pack();
+
+    }
+   // No more handleEvent method needed to implement scrolling!
+
+    public static void main(String args[]) {
+        Scroller test = new Scroller();
+        test.show();
+    }
+}
+
+class DrawCanvas extends Component {
+
+    public Dimension getPreferredSize() {
+        return new Dimension(300, 300);
+    }
+  
+    public void paint(Graphics g) {
+        // Note: For most efficient repainting, we should check the
+        // clip rectangle in the Graphics object to determine the
+        // damaged region and only paint that;  we don't do that here
+        // for simplicity in this example
+        //
+        Rectangle r = getBounds();
+
+        g.setColor(Color.black);
+        g.fillRect(0, 0, r.width, r.height);
+
+        g.setColor(Color.yellow);
+        g.drawLine(0, 0, r.width, r.height);
+
+        g.setColor(Color.white);
+        g.drawLine(0, r.height, r.width, 0);
+    }
+}
+</code></pre>
+
+<hr><br>
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+
+
+<i>Copyright &#169; 1996, 1997 Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+<!-- This file was created with Quadralay WebWorks Publisher 3.0.5 -->
+<!-- -->
+<!-- For more information on how this document, and how the rest of -->
+<!-- this server was created, email yourEmail@xyzcorp.com -->
+<!-- -->
+<!-- Last updated: 09/13/96 16:16:05 -->
+
+</body>
+</html>

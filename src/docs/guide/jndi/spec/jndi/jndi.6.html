@@ -1,0 +1,327 @@
+<HTML>
+<HEAD>
+  <TITLE>6 Configuration</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="jndi.5.html">PREV</A>
+    | <A HREF="jndi.7.html">NEXT</A></TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<H2 CLASS="chapter"><A NAME="pgfId=999222"></A>6. <A NAME="30460"></A>Configuration</H2>
+
+<DIV>
+
+<BLOCKQUOTE>
+  <H3 CLASS="section"><A NAME="pgfId=1000620"></A>6.1 Environment
+  Properties</H3>
+  <P CLASS="body"><A NAME="pgfId=1000615"></A>Some JNDI applications
+  need a way to communicate various preferences and information
+  that define the environment in which naming and directory services
+  are accessed. For example, an application might need to specify
+  the level of security for accessing a directory service. Or,
+  when directory and naming services are distributed, the source
+  of information is in more than one place--replicas, master, caches,
+  <EM>etc.</EM> An application might want to access information
+  from the authoritative source and needs to indicate this information
+  to the JNDI system.</P>
+  <P CLASS="body"><A NAME="pgfId=1000636"></A>To address these
+  requirements, JNDI defines a number of properties that developers
+  and users can use to provide configuration information to the
+  JNDI system. These are called <EM>environment properties</EM>
+  .</P>
+  <P CLASS="body"><A NAME="pgfId=1000784"></A>There are different
+  types of environment properties:</P>
+</BLOCKQUOTE>
+
+<UL>
+  <UL>
+    <LI CLASS="bullet"><A NAME="pgfId=1000776"></A>Standard JNDI
+    environment properties. These properties are defined by JNDI
+    and are common across all service providers. They are defined
+    in relatively generic terms. For example, the property &quot;java.naming.security.principal&quot;
+    is used to specify the security principal for authentication
+    to the naming service. Individual service providers map these
+    environment properties to an interpretation appropriate for their
+    service. These properties have the prefix &quot;java.naming.&quot;.
+    contains a list of standard JNDI environment properties. The
+    <CODE>Context</CODE> interface defines constants for most of
+    these environment property names.
+    <LI CLASS="bullet"><A NAME="pgfId=1000777"></A>Service-specific
+    environment properties. These properties are common across all
+    service providers that implement a particular service or protocol.
+    They have the prefix &quot;java.naming.<EM> service.</EM> &quot;,
+    where <EM>service</EM> is the name of the service. For example,
+    the prefix &quot;java.naming.ldap.&quot; is used for LDAP-specific
+    environment properties.
+    <LI CLASS="bullet"><A NAME="pgfId=1000728"></A>Feature-specific
+    environment properties. These properties are common across all
+    service providers that support a particular feature. They have
+    the prefix &quot;java.naming.<EM> feature</EM> .&quot;, where
+    <EM>feature</EM> is the name of the feature. For example, the
+    prefix &quot;java.naming.security.sasl.&quot; is used for SASL-specific
+    environment properties.
+    <LI CLASS="bullet"><A NAME="pgfId=1000656"></A>Provider-specific
+    environment properties. These properties only apply to a particular
+    service provider. They should have a prefix that reflects this
+    uniqueness. A common practice is to use the package name of the
+    service provider as the prefix. For example, since Sun's LDAP
+    provider is primarily contained in the package <CODE>com.sun.jndi.ldap</CODE>
+    , properties specific to Sun's LDAP provider have the prefix
+    &quot;com.sun.jndi.ldap.&quot;.
+  </UL>
+</UL>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1000971"></A>See <A HREF="jndi.8.html#31601"
+  CLASS="XRef">Context Environment</A> for security-related
+  considerations when using environment properties.</P>
+  <P CLASS="body"><A NAME="pgfId=1000787"></A>Although the support
+  for environment properties is rather extensive, it is important
+  to note that an application typically does not need to deal with
+  them, or only needs to set one or two properties. Most properties
+  have reasonable defaults and only need to be adjusted when the
+  application has special requirements.</P>
+  </DIV><DIV>
+</BLOCKQUOTE>
+
+<H3 CLASS="section"><A NAME="pgfId=1000954"></A>6.2 Context Environment</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1000922"></A>A context's environment
+  is represented as a <CODE>java.util.Hashtable</CODE> or any of
+  its subclasses (e.g., <CODE>java.util.Properties<A HREF="#pgfId=1000925"
+  CLASS="footnote"> 1</A> </CODE>). It is typically specified using
+  an argument to the <CODE>InitialContext</CODE> , <CODE>InitialDirContext</CODE>
+  , or <CODE>InitialLdapContext</CODE> constructors, and augmented
+  with data from other sources (as discussed in the rest of this
+  section). They are inherited from the parent context as context
+  methods proceed from one context to the next. For example, the
+  following code creates an environment consisting of two security-related
+  properties and creates an initial context using that environment.</P>
+  <BLOCKQUOTE>
+    <PRE>Hashtable env = new Hashtable();
+env.put(Context.SECURITY_PRINCIPAL, &quot;jsmith&quot;);
+env.put(Context.SECURITY_CREDENTIALS, &quot;xxxxxxx&quot;);
+Context ctx = new InitialContext(env);</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1001069"></A>Contexts that are
+  looked up or otherwise derived from this initial context will
+  have these two properties in their environment.</P>
+  <P CLASS="body"><A NAME="pgfId=1001723"></A>A context's environment
+  can be examined using <CODE>Context.getEnvironment()</CODE> .</P>
+  <P CLASS="body"><A NAME="pgfId=1001213"></A>Not all environment
+  properties are meaningful to all contexts. Those that are not
+  meaningful are ignored by the context but inherited by derived
+  contexts (because they might be meaningful, for instance, to
+  federated contexts).</P>
+  </DIV><DIV>
+</BLOCKQUOTE>
+
+<H3 CLASS="section"><A NAME="pgfId=1000880"></A>6.3 Resource Files</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1000881"></A>A JNDI resource file
+  is a file in the properties file format (see <CODE>java.util.Properties</CODE>
+  ). The file contains a list of key/value pairs. The key is the
+  name of the property (e.g., &quot;java.naming.factory.object&quot;)
+  and the value is a string in the format defined for that property.
+  Here is an example of a JNDI resource file:</P>
+  <BLOCKQUOTE>
+    <PRE>java.naming.factory.object=com.wiz.jndi.AttrsToCorba:com.wiz.jndi.ToPerson
+java.naming.factory.state=com.wiz.jndi.CorbaToAttrs:com.wiz.jndi.FromPerson
+java.naming.factory.control=com.wiz.jndi.MyResponseControlFactory</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1000376"></A>There are two kinds
+  of JNDI resource files: application and provider.</P>
+  <DIV>
+  <H4 CLASS="subsection"><A NAME="pgfId=1000408"></A>Application
+  Resource Files</H4>
+  <P CLASS="body"><A NAME="pgfId=1000410"></A>When an application
+  is deployed, it will generally have several codebase directories
+  and JARs in its classpath. Similarly, when an applet is deployed,
+  it will have a codebase and archives specifying where to find
+  the applet's classes. JNDI locates all application resource files
+  named <CODE>jndi.properties</CODE> in the classpath. In addition,
+  if the file <CODE>$JAVA_HOME/lib/jndi.properties</CODE> exists
+  and is readable, JNDI treats it as an additional application
+  resource file. (<CODE> $JAVA_HOME</CODE> is the directory named
+  by the <CODE>java.home</CODE> system property.) All of the properties
+  contained in these files are placed into the environment of the
+  initial context. This environment is then inherited by other
+  contexts.</P>
+  <P CLASS="body"><A NAME="pgfId=1000418"></A>For each property
+  found in more than one application resource file, JNDI uses the
+  first value found or, in a few cases where it makes sense to
+  do so, it concatenates all of the values. For example, if the
+  <CODE>java.naming.factory.object</CODE> property is found in
+  three <CODE>jndi.properties</CODE> resource files, the list of
+  object factories is a concatenation of the property values from
+  all three files. Using this scheme, each deployable component
+  is responsible for listing the factories that it exports. JNDI
+  automatically collects and uses all of these export lists when
+  searching for factory classes.</P>
+  <P CLASS="body"><A NAME="pgfId=1000425"></A>Application resource
+  files are available beginning with the Java 2 Platform, except
+  that the file in <CODE>$JAVA_HOME/lib</CODE> can be used on all
+  Java platforms.</P>
+  </DIV><DIV>
+  <H4 CLASS="subsection"><A NAME="pgfId=1001731"></A><A NAME="20836"></A>Provider
+  Resource Files</H4>
+  <P CLASS="body"><A NAME="pgfId=1001732"></A>Each service provider
+  has an optional resource file that contains properties specific
+  to that provider. The name of this resource is:</P>
+  <BLOCKQUOTE>
+    <PRE>[<EM>prefix/</EM>]<CODE>jndiprovider.properties</CODE></PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1001734"></A>where <EM>prefix</EM>
+  is the package name of the provider's context implementation(s),
+  with each period (&quot;.&quot;) converted to a slash (&quot;/&quot;).</P>
+  <P CLASS="body"><A NAME="pgfId=1002071"></A>The JNDI library
+  will consult the provider resource file when determining the
+  values of certain properties. Properties other than these can
+  be set in the provider resource file at the discretion of the
+  service provider. The service provider's documentation should
+  clearly state which properties are allowed.</P>
+  </DIV></DIV><DIV>
+</BLOCKQUOTE>
+
+<H3 CLASS="section"><A NAME="pgfId=1001754"></A>6.4 <A NAME="21515"></A>Application/Applet-scope
+Standard JNDI Properties</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1001757"></A>Certain standard
+  JNDI properties can alternately be set in the Java runtime's
+  system properties, or in an applet's parameter list. These properties
+  are:</P>
+  <BLOCKQUOTE>
+    <PRE>java.naming.factory.initial
+java.naming.factory.object
+java.naming.factory.state
+java.naming.factory.control
+java.naming.factory.url.pkgs
+java.naming.provider.url
+java.naming.dns.url</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1001765"></A>For JNDI to access
+  an applet's parameters, the applet code must set the <CODE>java.naming.applet</CODE>
+  environment property to an instance of the applet (<CODE> java.applet.Applet</CODE>
+  ).</P>
+  <P CLASS="body"><A NAME="pgfId=1001776"></A>When these properties
+  are set as system properties or applet parameters, they affect
+  all of the application's/applet's contexts.</P>
+  </DIV><DIV>
+</BLOCKQUOTE>
+
+<H3 CLASS="section"><A NAME="pgfId=1001801"></A>6.5 How the Environment
+Properties are Set</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1000432"></A>When JNDI constructs
+  an initial context, the context's environment is initialized
+  with properties defined in the environment parameter passed to
+  the constructor and all application resource files. For the application/applet-scope
+  properties, their values from the system properties and the applet
+  parameters are also used.</P>
+  <P CLASS="body"><A NAME="pgfId=1001815"></A>JNDI passes the resulting
+  environment to the initial context implementation. The environment
+  is then inherited by contexts that are derived from the initial
+  context. Since JNDI performs any necessary merging of the properties
+  and their values, there is no need for the application or context
+  implementation to directly consult the system properties or applet
+  parameters.</P>
+  </DIV><DIV>
+</BLOCKQUOTE>
+
+<H3 CLASS="section"><A NAME="pgfId=1001027"></A>6.6 Modifications
+to the Environment</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1001029"></A>A context's environment
+  can be changed using the <CODE>addToEnvironment()</CODE> and
+  <CODE>removeFromEnvironment()</CODE> methods:</P>
+  <BLOCKQUOTE>
+    <PRE>public interface Context {
+	public Object addToEnvironment(String propName, Object val)
+		throws NamingException;
+	public Object removeFromEnvironment(String propName)
+		throws NamingException;
+	...
+}</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=1001202"></A>Not all environment
+  properties are meaningful to all contexts. Changes to those that
+  are not meaningful are still recorded and passed onto derived
+  contexts.</P>
+  <DIV>
+  <H4 CLASS="subsection"><A NAME="pgfId=1001032"></A>Scope</H4>
+  <P CLASS="body"><A NAME="pgfId=1001034"></A>Changing a property
+  using the <CODE>addToEnvironment()</CODE> or <CODE>removeFromEnvironment()</CODE>
+  methods affects the context instance on which the method is invoked.
+  For example, if you specify new credentials for a context to
+  use, subsequent methods invoked on that context that require
+  communication with the server will use those new credentials
+  (perhaps internally by first creating a new connection to the
+  server). These updated environment properties are inherited by
+  context instances that are subsequently derived from the affected
+  context instance, but do not otherwise affect other context instances
+  that were in existence prior to the update.</P>
+  </DIV><DIV>
+  <H4 CLASS="subsection"><A NAME="pgfId=1001043"></A>Timeliness</H4>
+  <P CLASS="body"><A NAME="pgfId=1001045"></A>When a change is
+  made to the environment properties, there is no requirement that
+  the change be verified and acted upon at the time <CODE>addToEnvironment()</CODE>
+  or <CODE>removeFromEnvironment() </CODE>is invoked. The only
+  requirement is that the change (or changes) be effective the
+  next time an operation that uses that property is invoked.</P>
+  </DIV><DIV>
+  <H4 CLASS="subsection"><A NAME="pgfId=1001050"></A>Defaults</H4>
+  <P CLASS="body"><A NAME="pgfId=1001052"></A>For some environment
+  properties, JNDI defines defaults (see Appendix A). For others,
+  the default might be determined by the service provider or a
+  group of service providers. If a context's environment does not
+  have a particular property, the context behaves as if its environment
+  has that property with its default value.</P>
+  <P CLASS="body"><A NAME="pgfId=1001056"></A>When a property is
+  removed from a context's environment, the context assumes the
+  default behavior specified for that property. This does not necessarily
+  mean that the default value must be recorded as the property's
+  value. The removal may also be indicated by the absence of the
+  property from the context's environment.</P>
+  </DIV><DIV>
+  <H4 CLASS="subsection"><A NAME="pgfId=1001061"></A>Acceptable
+  Values</H4>
+  <P CLASS="body"><A NAME="pgfId=1001063"></A>Some environment
+  properties have a fixed set of acceptable values while others
+  have values that must follow a particular syntax. If an unacceptable
+  value is presented, a property-specific exception will be thrown
+  (for example, <CODE>ConfigurationException</CODE> , <CODE>IllegalArgumentException</CODE>
+  , or <CODE>AuthenticationNotSupportedException</CODE> ). In some
+  cases, it might be reasonable for the service provider to accept
+  additional values than those specified, in which case, those
+  values should be documented.</P>
+</BLOCKQUOTE>
+
+</DIV></DIV><HR ALIGN=LEFT><DIV CLASS="footnotes"><DIV CLASS="footnote">
+
+<P CLASS="Footnote"><SPAN CLASS="footnoteNumber"> 1.</SPAN> <A
+NAME="pgfId=1000925"></A>Note that if you use Properties, only
+the top-level properties are consulted--its defaults are not consulted--because
+<CODE>Hashtable.get()</CODE> is used when retrieving entries from
+the environment. See <CODE>java.util.Properties</CODE> for details.</P>
+
+</DIV></DIV>
+
+<P><HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A> | <A 
+HREF="jndi.5.html">PREV</A> | <A HREF="jndi.7.html">NEXT</A><HR ALIGN=LEFT><I><FONT
+ SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

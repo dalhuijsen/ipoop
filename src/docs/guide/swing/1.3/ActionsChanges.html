@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Actions</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Actions</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+  <h2>API for Adding Actions to ActionEvent Sources</h2> 
+
+<h3>Background</h3>
+Swing provides an implementation of the <i>Command</i> pattern 
+which helps application developer centralize functionality which
+can be accessed from multiple places in the GUI.  The <code>Action</code>
+interface is used to provide a stateful <code>ActionListener</code> which
+can provide the implementation of functionality accessed for example
+from the toolbar, a menu item, and a keyboard binding. As the state of
+the <code>Action</code> changes, for instance when it becomes disabled, 
+the associated controls change their state accordingly (they also become 
+disabled).
+
+<h3>The Problem</h3>
+For <code>Action</code>s to work as intended, the following connections 
+need to be made (assume the <code>Action</code> has already been created):
+<ol>
+<li>The control needs to be created
+<li>The <code>Action</code> is added as an <code>ActionListener</code>
+    on the control
+<li>A <code>PropertyChangeListener</code> is created which describes how
+    the control should be updated in response to 
+    <code>PropertyChangeEvents</code> on the <code>Action</code>
+<li>The <code>PropertyChangeListener</code> is added as a listener on
+    the <code>Action</code>.
+<li>Information about the linkage may need to be retained so it can be 
+    undone to allow garbage collection (in 1.2 this can be automatically
+    handled with WeakRefs).
+</ol>
+
+Since a typical application may have between 5 and 25 <code>Action</code>s,
+and 2-3 controls per <code>Action</code>, the steps above need to be done 
+up to 75 times!  
+<p>In order to relieve the developer of much of this burden, we have provided
+a way to have this done automatically, through helper methods on potential 
+<code>Container</code>s of <code>Action</code>s.  
+The three places where this is surfaced in Swing at present are:
+<p>
+<center>
+<table summary="layout" border=3>
+<tr>
+<td>JToolBar.java</td>
+<td><code>public JButton add(Action a)</code></td>
+</tr>
+<tr>
+<td>JMenu.java</td>
+<td><code>public JMenuItem add(Action a)</code></td>
+</tr>
+<tr>
+<td width=200>JPopupMenu.java</td>
+<td><code>public JMenuItem add(Action a)</code></td>
+</tr>
+</table>
+</center>
+<p>
+The problems with this approach are several:
+<ol>
+<li>It is highly problematic for Builders, since it overloads 
+<code>Container.add()</code> to allow a non-<code>Component</code> parameter which
+      is not itself the thing that ends up being added.
+<li>Developers cannot participate in the configuration of the controls created
+without subclassing the container classes
+<li>Even if they do subclass, the granularity of the configuration ends up being per-<code>Container</code> instead of per-control added.
+<li>It limits developers to the expected control for each <code>Container</code>
+    rather than allowing the full range of <code>ActionEvent</code> sources 
+    which <code>Action</code> permits. 
+</ol>
+<h3>Solution</h3>
+Many developers have commented that they would prefer to create their own
+controls which are <code>ActionEvent</code> sources and then have a method
+which connects them to a particular <code>Action</code>.  The 
+solution is along these lines, and addresses the deficiencies listed above.
+<p>
+The added API is initially added to <b>AbstractButton</b>, which defines
+the abstract superclass of <code>JButton, JMenuItem, JMenu, JCheckBox</code>, 
+etc. 
+<p>The new public methods are as follows:
+<tt>
+<ul>
+    <li><a href="../../../api/javax/swing/AbstractButton.html#setAction(javax.swing.Action)">public void setAction(Action a)</a>
+    <li><a href="../../../api/javax/swing/AbstractButton.html#getAction()">public Action getAction()</a>
+    <li><a href="../../../api/javax/swing/AbstractButton.html#configurePropertiesFromAction(javax.swing.Action)">protected void configurePropertiesFromAction(Action a)</a>
+    <li><a href="../../../api/javax/swing/AbstractButton.html#createActionPropertyChangeListener(javax.swing.Action)">protected PropertyChangeListener createActionPropertyChangeListener()</a>
+</ul>
+</tt>
+
+In addition, constructors have been added to the ActionEvent sources which
+will allow for creating a control directly with the supplied Action.<p>
+In <b>JButton</b>:
+<ul>
+<code>
+<li><a href="../../../api/javax/swing/JButton.html#JButton(javax.swing.Action)">public JButton(Action a)</a>
+</code>
+</ul>
+Equivalent constructors have been added to: 
+<ul>
+<tt>
+<li> <a href="../../../api/javax/swing/JCheckBox.html#JCheckBox(javax.swing.Action)">JCheckBox</a>
+<li> <a href="../../../api/javax/swing/JRadioButton.html#JRadioButton(javax.swing.Action)">JRadioButton</a>
+<li> <a href="../../../api/javax/swing/JToggleButton.html#JToggleButton(javax.swing.Action)">JToggleButton</a>
+<li> <a href="../../../api/javax/swing/JMenuItem.html#JMenuItem(javax.swing.Action)">JMenuItem</a>
+<li> <a href="../../../api/javax/swing/JMenu.html#JMenu(javax.swing.Action)">JMenu</a>
+<li> <a href="../../../api/javax/swing/JCheckBoxMenuItem.html#JCheckBoxMenuItem(javax.swing.Action)">JCheckBoxMenuItem</a>
+<li> <a href="../../../api/javax/swing/JRadioButtonMenuItem.html#JRadioButtonMenuItem(javax.swing.Action)">JRadioButtonMenuItem</a>
+</tt>
+</ul>
+Notes:
+<ul>
+<li><code>setAction</code> is merely a helper method which performs the linkage steps
+described above as a convenience to the developer.
+<li>It is not expected that developers will often switch the 
+    <code>Action</code> for a control on the fly.  However, it is possible 
+    for them to do so, using <code>setAction</code> since it replaces the previously 
+    set action and fires a <code>PropertyChangeEvent</code>.
+<li>This does <b>not</b> replace the standard method of adding
+ <code>ActionListener</code>s, note that it uses 
+ <code>addActionListener()</code> as stated above
+<li>The current <code>Container</code> apis listed above will be reimplemented
+in terms of setAction, so that they give the same behavior as they did 
+previously.  This solution will make that code much easier to maintain!
+<li> The methods <code>configurePropertiesFromAction</code> and 
+      <code>createActionPropertyChangeListener</code> will be overridden in 
+      subclasses to provide the expected default behavior.
+</ul>
+
+
+        <h2>createAction Factory Methods for JToolBar, JPopupMenu, JMenu</h2>
+
+        New factory methods allow one to control what toolbars
+and menus create when an action is added directly, i.e. with the add
+method.
+
+        <p>
+        Addition to JToolBar: 
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JToolBar.html#createActionComponent(javax.swing.Action)">protected JButton createActionComponent(Action a)</a>
+</tt>
+</ul>
+
+      
+          Addition to JPopupMenu: 
+<ul>
+<tt>    
+
+    <li>      <a href="../../../api/javax/swing/JPopupMenu.html#createActionComponent(javax.swing.Action)">protected JMenuItem createActionComponent(Action a)</a>
+    </tt>
+</ul>
+
+
+        Addition to JMenu:
+
+<ul>
+<tt> 
+  
+        <li><a href="../../../api/javax/swing/JMenu.html#createActionComponent(javax.swing.Action)">protected JMenuItem createActionComponent(Action a)</a>
+        </tt>
+</ul>
+
+
+        <h2>New Action Constants</h2>
+See:
+<ul>
+<tt>
+        <li><a href="../../../api/javax/swing/Action.html#ACCELERATOR_KEY">public static final String ACCELERATOR_KEY</a>
+        <li><a href="../../../api/javax/swing/Action.html#MNEMONIC_KEY"> public static final String MNEMONIC_KEY</a>
+       
+</tt>
+</ul>
+        
+
+        <h2> Add AbstractAction getKeys Method</h2>
+
+       
+        This new method is needed for serialization of Abstract Actions, and gives the
+        developer a way to find out which keys have been set for the AbstractAction.
+ 
+<P>
+See:
+<ul>
+<tt>
+<li>
+    <a href="../../../api/javax/swing/AbstractAction.html#getKeys()">public Object[] getKeys()</a>
+</tt>
+</ul>
+
+
+
+
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

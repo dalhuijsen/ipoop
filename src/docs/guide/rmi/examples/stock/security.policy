@@ -1,0 +1,11 @@
+
+/** 
+ * A minimal set of permissions needed for the stock server to run.
+ */
+
+grant {
+  
+    // Allow the server to connect to the applet's callback object
+    //
+    permission java.net.SocketPermission "*:1024-", "connect";
+};

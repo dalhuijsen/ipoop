@@ -1,0 +1,338 @@
+<HTML>
+<HEAD>
+  <TITLE>9 Design Choices</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="jndi.8.html">PREV</A>
+    | <A HREF="properties.html">NEXT</A></TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<H2 CLASS="chapter"><A NAME="pgfId=998522"></A>9. Design Choices</H2>
+
+<DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998524"></A>9.1 Separation
+of Interfaces into Context and DirContext</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998525"></A>There are two core
+  interfaces in JNDI: <CODE>Context</CODE> , and <CODE>DirContext</CODE>
+  , with <CODE>DirContext</CODE> extending the base naming operations
+  in <CODE>Context</CODE> with directory service operations. They
+  have been separated into separate interfaces both for modularity
+  and also in keeping with the &quot;pay for what you use&quot;
+  goal of JNDI.</P>
+  <P CLASS="body"><A NAME="pgfId=998526"></A>Naming is a basic
+  component found in many computing services such as file systems,
+  spreadsheets, calendar services, and directory services. By having
+  a base <CODE>Context</CODE> interface for the naming operations,
+  we enable its use by all these other services, not just for directory
+  services.</P>
+  <P CLASS="body"><A NAME="pgfId=998527"></A><CODE>DirContext</CODE>
+  extends <CODE>Context</CODE> to provide basic directory service
+  operations, which include manipulation of attributes associated
+  with named objects, attribute-based searches, and schema-related
+  operations of those attributes and named objects.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998528"></A>9.2 Separation
+of JNDI into Different Functional Packages</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998529"></A>JNDI is separated
+  into four client packages (<CODE> javax.naming</CODE> , <CODE>javax.naming.directory</CODE>
+  , <CODE>javax.naming.event</CODE> , <CODE>javax.naming.ldap</CODE>
+  ) and a service provider package (<CODE> javax.naming.spi</CODE>
+  ). The idea is that each package contains the interfaces and
+  classes required for a particular category of applications, again
+  in keeping with the &quot;pay for what you use&quot; goal. For
+  example, an application that just wants to perform name-lookups
+  only needs to use the <CODE>javax.naming</CODE> package. An application
+  that wants to examine/modify attributes associated with an object
+  uses the <CODE>javax.naming</CODE> and <CODE>javax.naming.directory</CODE>
+  packages. An application that needs to use LDAP-specific controls
+  or extended operations uses the <CODE>javax.naming.ldap</CODE>
+  package. There is a step-by-step progression of what classes
+  and interfaces each category of application writer needs to learn
+  and use.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998530"></A>9.3 Separation
+of Client APIs and Service Provider Interfaces</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998531"></A>JNDI separates interfaces
+  and classes that a client application needs to use from those
+  that are only of interest to service providers into different
+  packages. For example, a client would use interfaces and classes
+  from <CODE>javax.naming</CODE> , while a service provider that
+  is hooking up a naming service would use both <CODE>javax.naming</CODE>
+  and <CODE>javax.naming.spi</CODE> . The package delineation minimizes
+  confusion for the application developer and makes clear which
+  packages he needs to examine when writing his program.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998532"></A>9.4 Multiple methods
+for listing Context</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998533"></A>There are two common
+  types of applications that list contexts: browser-style applications,
+  and applications that need to perform operations on the objects
+  in a context en-masse. Browser-style applications typically want
+  to display the names of the contents of a context. In addition
+  to the names, many browsers often require type information of
+  the objects bound to the names, so that it can display appropriate
+  pictorial representations of the objects. The browser is usually
+  interactive. Once a user has used a browser to display the contents
+  of a context, he would then select one or a few of the entries
+  displayed and request more information on it.</P>
+  <P CLASS="body"><A NAME="pgfId=998534"></A>Some applications
+  need to perform operations on objects within a context en-masse.
+  For example, a backup program might want to perform &quot;file
+  stats&quot; operations on all the objects in a file directory.
+  A printer administration program might want to restart all the
+  printers in a building. To perform such operations, these programs
+  need to obtain all the objects bound in a context.</P>
+  <P CLASS="body"><A NAME="pgfId=998535"></A>With these two common
+  styles of usage in mind, the <CODE>Context</CODE> interface has
+  two types of list methods: <CODE>list()</CODE> and <CODE>listBindings()</CODE>
+  . <CODE>list()</CODE> returns a list of name/class-name pairs
+  while <CODE>listBindings()</CODE> returns a list of name/class-name/object
+  tuples. <CODE>list()</CODE> is designed for browser-style applications
+  that want mostly just the names and types of objects bound in
+  a context. <CODE>listBindings()</CODE> is for applications that
+  want to potentially get all the objects in the context, as well
+  as their names and types. <CODE>listBindings()</CODE> returns
+  an enumeration of <CODE>Binding</CODE> . Both the <CODE>listBindings()</CODE>
+  operation itself and invocation of methods in the <CODE>Binding</CODE>
+  class (e.g. <CODE>getObject()</CODE> ) could be implemented lazily
+  or eagerly. Using <CODE>listBindings() </CODE>simply indicates
+  the potential that the caller might want all or many of the objects
+  in the context so that implementations that are able can optimize
+  for it. Using <CODE>list()</CODE> indicates that the caller is
+  unlikely to want all, if any, objects in the context so implementations
+  can optimize for that if possible.</P>
+  <P CLASS="body"><A NAME="pgfId=998536"></A>An alternative is
+  to have a single list operation and have the lazy or eager behavior
+  as part of the implementation of <CODE>Binding</CODE> . The advantage
+  of this is that there is a single list operation to learn. The
+  disadvantage is that the caller has no way of indicating which
+  piece of information he wants back from list, and subsequently,
+  implementations cannot optimize for the eventual behavior of
+  the program.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998537"></A>9.5 Support for
+Federation</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998538"></A>Federation is a first-class
+  concept in JNDI. In the client interfaces, it is supported by
+  the use of the <CODE>Name</CODE> interface for specifying names
+  that can span one or more namespaces. The caller of the methods
+  in the client interface need not know anything else regarding
+  federation. Resolution of names across multiple systems is handled
+  by the SPI and does not involve any intervention on the part
+  of the caller.</P>
+  <P CLASS="body"><A NAME="pgfId=998539"></A>Although federation
+  is a first-class concept, that does not mean that all callers
+  and service providers must make use of it. If an application
+  or service does not want to take advantage of federation, there
+  is no requirement that <CODE>Name</CODE> always span multiple
+  namespaces. <CODE>Name</CODE> can just name objects within a
+  single namespace, and the SPI can handle name resolution within
+  a single namespace as well (as a degenerate case of multiple
+  namespace support).</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998540"></A>9.6 DirContext
+versus DirObject</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998541"></A>Instead of having
+  <CODE>DirContext</CODE> extend <CODE>Context</CODE> , an alternative
+  would be to not extend <CODE>Context</CODE> at all but to have
+  a separate interface called <CODE>DirObject</CODE> that encapsulates
+  all the directory-related methods. In that case, an object can
+  implement both <CODE>Context</CODE> and <CODE>DirObject</CODE>
+  if it supports both the naming and directory operations; another
+  object might implement just <CODE>DirObject</CODE> .</P>
+  <P CLASS="body"><A NAME="pgfId=998542"></A>The problem with eliminating
+  <CODE>DirContext</CODE> is that <CODE>DirContext</CODE> contains
+  some hybrid operations that involve both naming and directories
+  (<CODE> bind()</CODE> , <CODE>createSubcontext() </CODE>methods
+  that accept attributes as arguments). To keep these operations
+  <EM>and</EM> have <CODE>DirObject</CODE> at the same time would
+  produce the need for a third interface (perhaps called <CODE>DirContext</CODE>
+  ) to contain just these hybrids.</P>
+  <P CLASS="body"><A NAME="pgfId=998543"></A>Furthermore, having
+  <CODE>DirContext</CODE> instead of <CODE>DirObject</CODE> is
+  somewhat more convenient in that you can perform some operations
+  in one step instead of two. For example <CODE>DirContext.getAttributes()</CODE>
+  could be used to get the attributes associated with a named object,
+  whereas with <CODE>DirObject</CODE> , you would need first to
+  resolve to the object (<CODE> Context.lookup()</CODE> ) and then
+  use <CODE>DirObject.getAttributes()</CODE> to get the attributes
+  from it.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998544"></A>9.7 Support for
+Schemas</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998545"></A>The <CODE>DirContext</CODE>
+  interface contains support for schemas. For example, from a <CODE>DirContext</CODE>
+  object you can obtain its schema object, which points to the
+  directory space where the schema for this particular <CODE>DirContext</CODE>
+  instance is defined. From a <CODE>DirContext</CODE> object, you
+  can also obtain its schema class definition (i.e. information
+  about what type of object this represents in the directory).
+  There is further support for schemas in the <CODE>Attribute</CODE>
+  class, which contains methods for obtaining an attribute's syntax
+  information (i.e. what is the type of the attribute's value)
+  and the attribute's definition (e.g. is it multivalued, syntax,
+  constraints on its syntax). There is no requirement that any
+  of this schema information be dynamically accessible (i.e. points
+  to live directory spaces). Support for such schema information
+  could be generated statically by the service provider. For example,
+  a particular directory service might only support string attribute
+  values, so it can hard-wire the syntax of the attributes that
+  it returns. Another directory might support only static schemas
+  (where information in the schema are not modifiable). Yet another
+  directory might support fully dynamic schemas. The interfaces
+  and classes in <CODE>DirContext</CODE> are flexible enough that
+  these different levels of support for schemas can be accommodated.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998546"></A>9.8 Overloaded
+Methods in Context and DirContext</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998547"></A>For each method in
+  the <CODE>Context</CODE> and <CODE>DirContext</CODE> interfaces
+  that accepts a <CODE>Name</CODE> argument, there is a corresponding
+  overloaded form that accepts a <CODE>String</CODE> argument for
+  specifying a name.</P>
+  <P CLASS="body"><A NAME="pgfId=998548"></A>The motivation for
+  having the <CODE>String</CODE> -based methods is that there are
+  many applications that simply accept a string name from the end-user
+  and perform context methods on the object named by that string
+  name. For those applications, it is useful to have the context
+  methods accept a string for the name directly, instead of requiring
+  the applications to first construct a <CODE>Name</CODE> object
+  using the string name.</P>
+  <P CLASS="body"><A NAME="pgfId=998549"></A>The motivation for
+  having the <CODE>Name</CODE> -based methods is that there are
+  also many applications that manipulate names and do not want
+  to worry about syntactic details of the names' string forms when
+  composing and modifying names. These applications deal with the
+  parsed form of names and hence would prefer to deal with <CODE>Name</CODE>
+  objects rather than string names. For these applications, we
+  provide the <CODE>Name</CODE> -based methods in the context interfaces.
+  Not providing these methods would probably cause proliferation
+  of <CODE>Name</CODE> -like interfaces/classes to support manipulation
+  of names in their structural form in applications developed on
+  top of JNDI.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998550"></A>9.9 Reference and
+Referenceable</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998551"></A>There are different
+  ways in which applications and services can use the directory
+  to locate objects. JNDI is general enough that it accommodates
+  several different models. For some applications, the object bound
+  in the directory is the object itself. An application may build
+  up a dynamic directory while the application is active, and delete
+  the directory when the application exits. Another application
+  might store URLs as attributes for locating objects in its namespace.
+  Other systems might bind some reference information in the directory,
+  which can subsequently be used to locate or access the actual
+  object. This last case is quite common, especially for making
+  Java applications take advantage of services in the installed
+  base. The reference in the directory acts as a &quot;pointer&quot;
+  to the real object.</P>
+  <P CLASS="body"><A NAME="pgfId=998552"></A>JNDI defines a <CODE>Reference</CODE>
+  class to provide a uniform way of representing reference information.
+  A <CODE>Reference</CODE> contains information on how to access
+  an object. It consists of a list of addresses and class information
+  about the object to which this reference refers. When binding
+  a name to an object that is to be represented in the directory
+  as a reference, the desired effect is that the object's reference
+  be extracted and bound. To allow for this behavior, the object's
+  class must implement the <CODE>Referenceable</CODE> interface,
+  which contains the method <CODE>getReference()</CODE> .</P>
+  <P CLASS="body"><A NAME="pgfId=998553"></A>There is some similarity
+  between the interfaces <CODE>Serializable</CODE> and <CODE>Referenceable</CODE>
+  and a natural question is &quot;why not just use <CODE>Serializable</CODE>
+  instead?&quot; The answer is that a serialized object is really
+  a frozen version of the object, whereas the reference contains
+  just the information needed to construct it. The serialized version
+  may have a lot more state which may not be appropriate for storage
+  in the directory.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998554"></A>9.10 Automatically
+Turning References into Objects</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998555"></A>For an object that
+  is bound as a <CODE>Reference</CODE> in the directory, JNDI SPI
+  framework automatically creates and instantiates the object identified
+  by the reference. In this way, the program can simply narrow
+  the result of <CODE>lookup()</CODE> to the expected class, instead
+  of calling a separate operation to transform the result of <CODE>lookup()</CODE>
+  into an object of the expected class.</P>
+  <P CLASS="body"><A NAME="pgfId=998556"></A>For example, if you
+  are looking up a printer object, a successful lookup would return
+  to you a printer object that you can directly use.</P>
+  <BLOCKQUOTE>
+    <PRE>Printer prt = (Printer) ctx.lookup(somePrinterName);
+prt.print(someFileName);</PRE>
+  </BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998559"></A>JNDI does this automatically,
+  instead of requiring an explicit conversion step, because this
+  is expected to be the common usage pattern. By having the <CODE>Reference</CODE>
+  class, and a common mechanism for converting a <CODE>Reference</CODE>
+  into the object identified by the <CODE>Reference</CODE> , JNDI
+  encourages different applications and system providers to utilize
+  this mechanism, rather than inventing separate mechanisms on
+  their own.</P>
+</BLOCKQUOTE>
+
+<P>&nbsp;</P>
+
+<P><HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A> | <A 
+HREF="jndi.8.html">PREV</A> | <A HREF="properties.html">NEXT</A><HR ALIGN=LEFT><I><FONT
+ SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide: 4 - Printing and Streaming Documents
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="printing.fm6.html">PREV</a>
+ | <a href="printing2d.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="999569"><i></i> Print Service Providers
+</a></h2>
+
+<blockquote>
+<a name="1000839"><!-- --></a>
+Print Service Providers are third parties that write an implementation of the abstract class PrintServiceLookup and install it according to the SPI JAR file specification. <p>
+<a name="1000840"><!-- --></a>
+This class provides a standardized API for looking up instances of print services. For example an IPP print service provider, a JINI lookup service, or a JNDI-based directory service may each be implementations of this class which can return PrintServices. <p>
+<a name="999576"><!-- --></a>
+The API is reasonably simple and generally requires implementation of the PrintServiceLookup class, and the PrintService interface, and DocPrintJob. The PrintService should also support the events defined by the Java Print Service API.<p>
+<a name="999577"><!-- --></a>
+How much more code there is depends on the document types that are supported. If a printer wants to be able to print a JPEG image and the printer already has such capability in hardware, its little more than a case of properly spooling the data. However, to print 2D graphics, a class that can turn the graphics calls into a printer-formatted raster is a significant body of work.<p>
+<a name="998231"><!-- --></a>
+<pre>
+</pre>
+
+
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="printing.fm6.html">PREV</a>
+ | <a href="printing2d.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

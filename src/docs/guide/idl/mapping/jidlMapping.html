@@ -1,0 +1,434 @@
+<HTML>
+
+<HEAD>
+
+   <TITLE>Java IDL: Mapping IDL to Java</TITLE>
+
+<!-- Changed by: dcarson, 4/2001 -->
+
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+
+</HEAD>
+
+<BODY BGCOLOR="#EEEEFF">
+
+
+
+<H1 ALIGN=CENTER>Java IDL: IDL to Java Language Mapping</H1>
+
+<HR>
+
+
+
+<P>This release of the Java<sup><font size=-2>TM</sup></font> 2 Platform, Standard Edition, v.1.4, includes <TT>idlj</TT>, a compiler that reads an Object Management Group (OMG) Interface Definition Language (IDL) file and translates it,
+or maps it, to a Java interface.  Depending on the command-line options used, the <TT>idlj</TT> compiler
+ creates stub, skeleton, helper, holder, and other files as necessary. 
+These <TT>.java</TT> files are generated from the IDL file
+according to the mapping specified in the OMG document (pdf format) 
+<A HREF="http://www.omg.org/cgi-bin/doc?ptc/00-01-08"><I>OMG IDL to Java Language Mapping Specification, ptc</I>, 00-01-08</A>, with the revisions indicated in <a href="http://www.omg.org/cgi-bin/doc?ptc/00-11-03">ptc/00-11-03, <I>The new IDL to Java Mapping Chapter</I></a>.   Version 00-01-08 of the IDL to Java language mapping is aligned with CORBA version 2.3.2. 
+ For a basic summary of the IDL to Java mapping, see <A href="#overview">IDL to Java Language Mapping Overview</A> below.  
+ 
+<UL>
+<LI>The CORBA technology shipped in J2SE v.1.4 conforms to the mappings specified by the following document: <a href="../../../api/org/omg/CORBA/doc-files/compliance.html">Official Specifications for CORBA support in J2SE 1.4</a>.
+</UL>
+
+
+<P>Some topics from the OMG <I>IDL to Java Language Mapping</I> specification that are not easily summarized are: 
+
+
+
+<UL>
+
+	<LI>Section 1.13, Mapping for Value Type
+	
+	<LI>Section 1.14, Value Box Types
+
+	<LI>Section 1.20, Server-Side Mapping
+
+	<LI>Section 1.21, Java ORB Portability Interfaces
+
+</UL>
+
+
+
+<P><HR>
+ 
+
+
+
+<A name="overview">
+
+<H2>IDL to Java Language Mapping Overview</H2></A>
+
+<P>
+CORBA objects are defined in OMG IDL (Object Management Group Interface
+Definition Language).  The syntax and semantics of OMG IDL are defined in Chapter 3 of the <a 
+href="http://www.omg.org/cgi-bin/doc?formal/99-10-07"><em>CORBA/IIOP 2.3.1 Specification</em></a>.   The IDL-to-Java compiler, <TT>idlj</TT>, maps the IDL-defined interfaces to Java classes and interfaces as defined in <A HREF="http://www.omg.org/cgi-bin/doc?ptc/00-01-08"><I>OMG IDL to Java Language Mapping Specification</I>, ptc, 00-01-08</A>, and as supported in this version of the Java platform, as described in <a href="../../../api/org/omg/CORBA/doc-files/compliance.html"><em>Official Specifications for CORBA support in J2SE 1.4</em></a>. 
+</P>
+
+<P>
+This overview shows the correspondence between OMG IDL types and Java types.  Note that OMG IDL, as its name implies, defines interfaces.   Like Java interfaces, IDL interfaces contain no implementations for their operations (methods in Java). In other words, IDL interfaces define only the signature for an operation (the name of the operation, the data type of its return value, the data types of the parameters that it takes, and any exceptions that it raises). The implementations for these operations need to be supplied in Java classes written by a Java programmer.
+
+</P>
+
+
+
+<P>The following table lists the main constructs of IDL and the corresponding constructs in Java.</P>
+
+
+
+<P><TABLE summary="main constructs of IDL and Java" BORDER=1 CELLSPACING=0 CELLPADDING=5 WIDTH="100%">
+
+   <Thead>
+
+      <TH VALIGN=top>
+
+         <P ALIGN=LEFT>IDL Type
+
+      </TH><TH VALIGN=top>
+
+         <P ALIGN=LEFT>Java Type
+
+      </TH></Thead>
+
+   <TR>
+
+      <TD>
+
+         <P>module
+
+      </TD><TD>
+
+         <P>package
+
+      </TD></TR>
+
+  
+   <TR>
+
+      <TD>
+
+         <P>boolean
+
+      </TD><TD>
+
+         <P>boolean
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>char, wchar
+
+      </TD><TD>
+
+         <P>char
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>octet
+
+      </TD><TD>
+
+         <P>byte
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>string, wstring
+
+      </TD><TD>
+
+         <P>java.lang.String
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>short, unsigned short
+
+      </TD><TD>
+
+         <P>short
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>long, unsigned long
+
+      </TD><TD>
+
+         <P>int
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>long long, unsigned long long
+
+      </TD><TD>
+
+         <P>long
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>float
+
+      </TD><TD>
+
+         <P>float
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>double
+
+      </TD><TD>
+
+         <P>double
+
+      </TD></TR>
+ <TR>
+
+      <TD>
+
+         <P>fixed
+
+      </TD><TD>
+
+         <P>java.math.BigDecimal
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>enum, struct, union
+
+      </TD><TD>
+
+         <P>class
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>sequence, array
+
+      </TD><TD>
+
+         <P>array
+
+      </TD></TR>
+
+ <TR>
+
+      <TD>
+
+         <P>interface (non-abstract)
+
+      </TD><TD>
+
+         <P>signature interface and an operations interface, helper class, holder class
+
+      </TD></TR>
+ <TR>
+
+      <TD>
+
+         <P>interface (abstract)
+
+      </TD><TD>
+
+         <P>signature interface, helper class, holder class
+
+      </TD></TR>
+   <TR>
+
+      <TD>
+
+         <P>constant (not within an interface)
+
+      </TD><TD>
+
+         <P>public interface
+
+      </TD></TR>
+
+ <TR>
+
+      <TD>
+
+         <P>constant (within an interface)
+
+      </TD><TD>
+
+         <P>fields in the Java signature interface for non-abstract, or the sole
+         Java interface for abstract
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>exception
+
+      </TD><TD>
+
+         <P>class
+
+      </TD></TR>
+      
+  <TR>
+
+      <TD>
+
+         <P>Any
+         
+      </TD><TD>
+
+         <P>org.omg.CORBA.Any
+
+      </TD></TR>
+ 
+  <TR>
+
+      <TD>
+
+         <P>type declarations nested within interfaces
+         
+      </TD><TD>
+
+         <P>"scoped" package
+
+      </TD></TR> 
+ 
+ 
+   <TR>
+
+      <TD>
+
+         <P>typedef
+         
+      </TD><TD>
+
+         <P>helper classes
+
+      </TD></TR>
+   
+   <TR>
+
+      <TD>
+
+         <P>pseudo objects
+         
+      </TD><TD>
+
+         <P>pseudo interface
+
+      </TD></TR>
+      
+ 
+   <TR>
+
+      <TD>
+
+         <P>readonly attribute
+
+      </TD><TD>
+
+         <P>accessor method
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>readwrite attribute
+
+      </TD><TD>
+
+         <P>accessor and modifer methods
+
+      </TD></TR>
+
+   <TR>
+
+      <TD>
+
+         <P>operation
+
+      </TD><TD>
+
+         <P>method
+
+      </TD></TR>
+
+</TABLE></P>
+
+
+
+<P><HR>
+
+<P>
+
+
+
+
+
+<CENTER><P>
+
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+
+<TR>
+
+  <TD ALIGN=CENTER><A href="../index.html">Java IDL Home</A></TD>
+
+</TR></TABLE>
+
+
+
+<!-- server side include for page footer -->
+
+  <!--#include virtual="/share/include/normal.footer.v4.0.html"-->
+
+<!-- end server side include for footer -->
+
+</CENTER>
+
+
+
+
+
+</BODY>
+
+</HTML>

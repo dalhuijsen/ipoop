@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Image I/O API Guide: 2 - Goals
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="goals.fm1.html">PREV</a>
+ | <a href="apps.fm1.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Image I/O API Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="997090"><i>2.2	</i> Non-Goals
+</a></h2>
+
+
+
+<blockquote>
+<a name="997091"><!-- --></a>
+<i><b> Thread Safety
+</b></i>
+</blockquote>
+<blockquote>
+<a name="997092"><!-- --></a>
+A particular instance of an <code>ImageReader</code> or <code>ImageWriter</code> is not required to support re-entrant (simultaneous) calls to its methods (with the exception of the <code>abort</code> method that requests current read or writes to halt). However, it must be possible for multiple instances of the same plug-in class to operate simultaneously. For the sake of brevity, we will only discuss reader plug-ins below.<p>
+<a name="997115"><!-- --></a>
+Supporting full re-entrancy would require that the reader bundle all of its state information (e.g., the current input source) into a separate state object, which would allow methods in progress to continue to work with the settings that were in effect at the time they began, while allowing a separate thread to modify the state to be used by the next operation.<p>
+<a name="997112"><!-- --></a>
+Rather than forcing each <code>ImageReader</code> to keep track of its state in this way, it is simpler to require the application to instantiate multiple instances of the same <code>ImageReader</code> class if it wishes to perform multithreaded processing. This means that the state of an <code>ImageReader</code> must be maintained using non-static instance variables only, which should not be a burden for plug-in developers.<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="goals.fm1.html">PREV</a>
+ | <a href="apps.fm1.html">NEXT</a> <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="copyright.fm.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Suzette Pelouch -->
+<!-- Last updated: Fri Apr 27 11:11:16 2001 -->
+ 
+
+
+</body>
+</html>

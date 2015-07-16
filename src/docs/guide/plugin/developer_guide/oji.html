@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>Netscape 6</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Netscape 6</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p align="left"><br>
+  This section describes the primary features of the Java runtime in Netscape 
+  6, which is enabled by Java Plug-in. It includes the following topics:</p>
+<ul>
+  <li><code><a href="#applet">APPLET</a></code><a href="#applet">, <code>EMBED</code> 
+    AND <code>OBJECT</code> Tag Support </a> </li>
+  <li><a href="#java-javascript">Java-JavaScript Bi-directional Communication</a></li>
+  <li><a href="#rsa">RSA Signed Applet Verification</a></li>
+  <li><a href="#display">Display of Java Console</a></li>
+  <li><a href="#enable-disable">Enable/Disable Java</a></li>
+  <li><a href="#lifecycle">Applet Lifecycle Change</a></li>
+  <li><a href="#proxy">Proxy and Cookie Support</a></li>
+  <li><a href="#https">HTTPS</a></li>
+  <li><a href="#automatic">Automatic Download</a></li>
+  <li><a href="#backward">Backward Compatibility Issue</a><br>
+  </li>
+</ul>
+<h3><code><a name="applet"></a>APPLET</code> Tag Support </h3>
+<p>Applets are loaded by Java Plug-in if the conventional <code>APPLET</code> 
+  tag is used. </p>
+<table summary="layout" width="90%" align="center" bgcolor="#FFFFCC" cellpadding="5" border="1" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u>Note:</u></h2>
+      <p>Currently the <code>OBJECT</code> and element does not work with Netscape 
+        6 with Java Plug-in. You must use the <code>APPLET</code> or <code>EMBED</code> 
+        element with Netscape 6.</p>
+    </td>
+  </tr>
+</table>
+<h3><a name="java-javascript"></a>Java-JavaScript Bi-directional Communication</h3>
+<p>JavaScript can access the methods of applets, and applets can access the Document 
+  Object Model (DOM) through JavaScript. </p>
+<p>See <a href="java_js.html">Java-to-JavaScript Communication</a> and <a href="js_java.html">JavaScript-to-Java 
+  Communication</a>. Be sure to read the sections on security.</p>
+<h3><a name="rsa"></a>RSA Signed Applet Verification</h3>
+<p>RSA signed applet verification is supported.</p>
+<h3><a name="display"></a>Display of Java Console</h3>
+<p>You may display the Java Console through the Netscape 6 browser menu: Tasks&gt;Tools&gt;Java 
+  Console.</p>
+<h3><a name="enable-disable"></a>Enable/Disable Java</h3>
+<p>You may enable/disable Java through the Netscape 6 browser menu: Edit&gt;Preferences&gt;Advanced. 
+  Note that to take effect, the browser must be restarted.</p>
+<h3><a name="lifecycle"></a>Applet Lifecycle Change</h3>
+<p>Whenever a page is visited, the <code>init()</code> and <code>start()</code> 
+  methods of the applet are called; and whenever the page is left, the <code>stop()</code> 
+  and <code>destroy()</code> methods may be called.</p>
+<h3><a name="proxy"></a>Proxy and Cookie Support</h3>
+<p>Java Plug-in previously handled proxy and cookie support alone. In Netscape 
+  6 this support is moved to the browser.</p>
+<h3><a name="https"></a>HTTPS</h3>
+<p>HTTPS is supported through Java Secure Socket Extension (JSSE) in J2SE.<br>
+</p>
+<h3><a name="automatic"></a>Automatic Download</h3>
+<p>Via its XPInstall mechanism, Netscape 6 will support automatic download of 
+  Java Plug-in (JRE) if it is not present. </p>
+<h3><a name="backward"></a>Backward Compatibility Issue</h3>
+<p>Although Sun has tried to ensure backward compatibility as much as possible 
+  between Java 2 and the Netscape VM, it may not be 100%. Some applets may run 
+  as is; other may only need recompilation; others, however, may need to be ported 
+  to Java 2.</p>
+<p>&nbsp;</p>
+</body>
+</html>

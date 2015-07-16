@@ -1,0 +1,168 @@
+<HTML>
+<HEAD>
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.02 [en] (X11; U; SunOS 5.6 sun4u) [Netscape]">
+   <TITLE> </TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<CENTER>
+<H1><B>Applying the Factory Pattern to RMI</B></H1></CENTER>
+
+<p>What is a "factory" and why would you want to use one? A factory, in
+this context, is a piece of software that implements one of the
+"factory" design patterns introduced in the book, <A
+HREF="http://www.awprofessional.com/catalog/product.asp?product_id={E1CD5BE7-E008-481B-8D0C-8E80CE9978F9}">
+Design Patterns, Elements of Reusable Object-Oriented Software.</A> In
+general, a factory implementation is useful when you need one object to
+control the creation of and/or access to other objects.By using a
+factory in RMI, you can reduce the number of objects that you need to
+register with the RMI registry.
+
+<H2>Examples of Factories in the Real World:</H2>
+
+<blockquote>
+<H3>The Bank</H3>
+
+<p>When you go to the bank to make a deposit to your account, 
+you <I>don't</I> walk up to a vault, pull out a drawer with your
+name on it, drop in your money, shut the drawer and leave. Think about
+how you originally established, or <I>opened</I>, the account. You probably
+went to the bank, spoke with an Account Manager, and signed some papers.
+In return, they gave you some checks, a passbook, or a bank card so 
+you could access your account in the future.
+
+<P>The Account Manager is an example of a factory. The person or
+Automated Teller Machine (ATM) that acts as account manager controls
+the creation of and/or access to individual accounts.  <H3> The
+Library</H3> Let's think about how a book, compact disk, or video tape
+gets from the library shelf into your home.  Before you can check out
+any material, you must first get a library card from the librarian. In
+this case, the librarian could be viewed as a <i>library card</i>
+factory because the librarian controls the creation of new library card
+instances.
+
+<P>Once you have a library card, you can go into the library, and
+without any further fuss, just walk out with all your materials, right?
+Of course not. Before you can walk out of the library without setting
+off the alarm system, you must <I>check out</I> the book, CD, or video
+tape you wish to take home. So you present your library card to, you
+guessed it, the librarian, who will use your card to access the library
+database to see if you owe any late fees, and to register these new
+materials as having been leased to you. In this case, the librarian
+could be seen as a <i>book</i> factory because the librarian controls
+your access to the books.
+
+</blockquote>
+
+<H2>How Does a Factory Work in RMI?</H2>
+
+<p>Just like any other RMI program, there are a few basic players: a
+server that produces one or more remote objects, each of which
+implements a remote interface; a client that accesses a name server
+(the <code>rmiregistry</code>) to get a reference to one of the remote
+objects; and the <code>rmiregistry</code>, which facilitates the
+client's initial contact with the server.
+
+<P>For the picture below and the steps that follow, you may make the
+following assumptions:
+<UL>
+	<LI>There are two remote interfaces that the client understands, 
+	<code>Factory</code> and <code>Product</code>
+
+	<LI>The <code>FactoryImpl</code> implements the <code>Factory</code> 
+	interface andthe <code>ProductImpl</code> implements the 
+	<code>Product</code> interface
+
+</UL>
+
+<CENTER><IMG SRC="images/Factory-1.gif" ALT="Illustrates the 6 actions listed below."></CENTER>
+
+<blockquote>
+<OL>
+<BR>
+
+	<LI>The <code>FactoryImpl</code> registers, or is registered,
+	with the <code>rmiregistry</code>
+
+	<LI>The client requests a reference to a <code>Factory</code>
+
+	<LI>The <code>rmiregistry</code> returns a remote reference to
+	a <code>FactoryImpl</code>
+
+	<LI>The client invokes a remote method on the
+	<code>FactoryImpl</code> to obtain a remote reference to a
+	<code>ProductImpl</code>
+
+	<LI>The <code>FactoryImpl</code> returns a remote reference to
+	an existing <code>ProductImpl</code> or to one that it just
+	created, based on the client request
+
+	<LI>The client invokes a remote method on the <code>ProductImpl</code>
+
+
+
+</OL>
+</blockquote>
+
+<BR>&nbsp;
+
+<H2>How Could the Bank and Library be Implemented in RMI?</H2>
+
+<blockquote>
+
+<H3>The Bank</H3>
+
+<p>In code, <code>AccountManager</code> would be a remote interface
+with one or more remote methods. These methods would return objects
+that implement the <code>Account</code> interface. In a similar
+fashion, <code>Account</code> would be an interface that declared all
+of the operations a person could perform on an account instance, such
+as depositing or withdrawing money, getting an account balance, or
+listing the most recent account transactions.
+
+<P>In RMI, only the instance of the <code>AccountManager</code>
+implementation would be registered with the RMI registry. The
+<code>AccountManager</code> implementation would be the factory, 
+returning remote references to (or serialized instances of)
+<code>Account</code> implementations, like your savings account.
+
+<H3>The Library</H3>
+
+<p>In the library example, the <code>Librarian</code> would be a remote
+interface with one or more methods that would return objects that
+implement the <code>LibraryCard</code> interface. In addition, the
+<code>Librarian</code> interface would have methods to allow you access
+to books, CDs, or videotapes that implemented the <code>Loanable</code>
+interface.
+
+<P>In RMI, only the instance of the <code>Librarian</code>
+implementation would be registered with the RMI registry. The
+<code>Librarian</code> implementation would be the factory, 
+returning remote references to (or serialized instances of)
+<code>LibraryCard</code> implementations and <code>Loanable
+</code>object implementations.
+
+</blockquote>
+
+<FONT SIZE=-1>While the bank and library examples presented here may
+not be entirely complete they are not designed to be complete, but
+rather instructionally useful in describing the factory pattern in
+RMI.</FONT>
+
+<BR>
+
+<!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../relnotes/SMICopyright.html">Copyright &copy;</A>
+2003 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:rmi-comments@java.sun.com">rmi-comments@java.sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+</BODY>
+</HTML>

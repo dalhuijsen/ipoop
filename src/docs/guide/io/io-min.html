@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Minor changes to java.io in the Java 2 Platform v1.2</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Minor changes to <code>java.io</code> in the Java<sup><font size=-2>TM</font></sup>&nbsp;2 Platform v1.2</h1>
+
+</center>
+
+</TD>
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+
+   <font size="-1"><a href="../../index.html">Java<sup><font size=-2>TM</font></sup> 2 SDK Contents</a></font>
+
+
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+<!-- Body text begins here -->
+
+<blockquote>
+The following changes to package <tt>java.io</tt> were introduced in 
+version 1.2 of the Java<sup><font size=-2>TM</font></sup> 2 Platform. 
+Minor changes to this package were:
+<ul>
+<li> 
+ The <tt>
+<a href="../../api/java/io/PrintWriter.html#out">out</a></tt>
+    field of the <tt><a href="../../api/java/io/PrintWriter.html">PrintWriter</a></tt>
+    class is now protected rather than private, so that subclasses may access it
+    <li> The <tt>
+<a href="../../api/java/io/RandomAccessFile.html">RandomAccessFile</a></tt>
+class supports a new <tt>
+<a href="../../api/java/io/RandomAccessFile.html#setLength(long)">setLength</a></tt>
+method;&nbsp;and
+<li> The <tt>
+<a href="../../api/java/io/StringWriter.html#StringWriter(int)">StringWriter(int)</a>
+</tt>
+ constructor is now public.
+
+</ul>
+
+<P>
+In the Java 2 Platform, the following constructors check for 
+<tt>null</tt> input parameters: 
+
+<p><ul>
+
+        <li> The constructors <tt>
+<a href="../../api/java/io/PrintStream.html#PrintStream(java.io.OutputStream)">PrintStream(OutputStream&nbsp;out)</a></tt>
+and
+<tt><a href="../../api/java/io/PrintStream.html#PrintStream(java.io.OutputStream, boolean)">PrintStream(OutputStream&nbsp;out,&nbsp;boolean&nbsp;autoFlush)</a></tt>
+        will throw a <tt>NullPointerException</tt> if the parameter
+        <tt>out</tt> is <tt>null</tt>.
+
+        <p><li> The constructors <tt>
+<a href="../../api/java/io/InputStreamReader.html#InputStreamReader(java.io.InputStream)">InputStreamReader(InputStream&nbsp;in)</a></tt>
+and
+        <tt>
+<a href="../../api/java/io/InputStreamReader.html#InputStreamReader(java.io.InputStream, java.lang.String)">InputStreamReader(InputStream
+in,&nbsp;String enc)</a></tt> will throw a
+        <tt>NullPointerException</tt> if the <tt>in</tt> parameter is
+        <tt>null</tt>.
+
+        <p><li> The constructors <tt>
+<a href="../../api/java/io/OutputStreamWriter.html#OutputStreamWriter(java.io.OutputStream)">OutputStreamWriter(OutputStream&nbsp;out)</a></tt>
+        and <tt>
+<a href="../../api/java/io/OutputStreamWriter.html#OutputStreamWriter(java.io.OutputStream, java.lang.String)">OutputStreamWriter(OutputStream&nbsp;out,&nbsp;String&nbsp;enc)</a></tt> will
+        throw a <tt>NullPointerException</tt> if the <tt>out</tt> parameter is
+        <tt>null</tt>.
+
+        <p><li> The protected constructors <tt>
+<a href="../../api/java/io/Reader.html#Reader(java.lang.Object)">Reader(Object&nbsp;lock)</a></tt>
+and
+        <tt>
+<a href="../../api/java/io/Writer.html#Writer(java.lang.Object)">Writer(Object&nbsp;lock)</a></tt>
+now throw <tt>NullPointerException</tt> if
+        the <tt>lock</tt> parameter is <tt>null</tt>.
+    </ul>
+
+
+
+</blockquote>
+
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+</BODY>
+
+</HTML>

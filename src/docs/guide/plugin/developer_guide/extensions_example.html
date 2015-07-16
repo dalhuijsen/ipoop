@@ -1,0 +1,251 @@
+<html>
+<head>
+<title>Complete Example: Java Media Framework as Java Extension</title>
+
+<script language="JavaScript">
+<!--
+function MM_openBrWindow(theURL,winName,features) { //v2.0
+  window.open(theURL,winName,features);
+}
+//-->
+</script>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Appendix 5: Complete Example&#151;Deploying Java Media Framework as Java Extension</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <script src="menu_script.js" language="JavaScript"></script>
+  </select>
+</form>
+<p>This section covers the following topics:</p>
+<ul>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#creating_jar">Creating the jar File to Be Installed</a><br>
+  </li>
+  <li><a href="#creating_applet_jar">Creating the Applet jar File</a></li>
+  <li><a href="#creating_html">Creating the HTML for the Applet</a></li>
+  <li><a href="#testing">Testing the Example</a></li>
+</ul>
+<h3><a name="intro"></a>Introduction</h3>
+<p>This is a complete, working example showing how to deploy a single jar file 
+  from Java Media Framework (JMF) as a Java Extension. The example uses <code>SimplePlayerApplet.java</code> 
+  and <code>jmf.jar</code> to play an <code>.avi</code> media file. It uses the 
+  raw installation method for installating a repackaged and signed version of 
+  <code>jmf.jar</code> called <code>s_my_jmf.jar</code>. Normally there are other 
+  jar files that are installed with JMF, but for <code>SimplePlayerApplet.java</code> 
+  only the functionality in <code>jmf.jar</code> is required. </p>
+<p>For simplicity sake, this example makes the following assumptions:</p>
+<ul>
+  <li>You are working on a Microsoft Windows system. </li>
+  <li>You have intalled the 1.4 SDK in the following location on your computer: 
+    <code>C:\j2sdk1.4.0</code></li>
+  <li>For signing purposes you have set up a keystore in the following directory: 
+    <code>C:\plugin\keystores</code></li>
+  <li>The <code>keystore</code> name is <code>thawte.p12</code></li>
+  <li>The <code>storepass</code> and the <code>keypass</code> are the same: <code>mypass</code></li>
+  <li>The keystore alias is <code>&quot;Sun Microsystems Inc.'s Thawte Consulting 
+    cc ID&quot;</code> <br>
+  </li>
+</ul>
+<h3><a name="creating_jar"></a>Creating the jar File to Be Installed</h3>
+<p>In this case there is no installer. All you need to do is obtain the required 
+  jar file, <code>jmf.jar</code>, that needs to be downloaded and copied into 
+  <code>&lt;jre_location&gt;/lib/ext</code>. Plug-in, in conjunction with the 
+  extension mechanism in the JRE, handles the installation (downloading and copying 
+  of the file) for you. </p>
+<p>You can get <code>jmf.jar</code> by downloading the cross-platform installation 
+  zip file <code>jmf-2_1_1a-alljava.zip</code> from <code><a href="http://java.sun.com/products/java-media/jmf/2.1.1/download.html">http://java.sun.com/products/java-media/jmf/2.1.1/download.html</a></code>. 
+  Along with other jar files, the zip file contains <code>jmf.jar</code>, which 
+  you can extract from the zip.</p>
+<p>Once you have obtained <code>jmf.jar</code>, you will want to extract <code>jmf.jar</code> 
+  itself into some directory, say <code>C:\plugin\extensions\workspace1</code>. 
+  Here you will want to delete the <code>META-INF</code> directory, as the <code>manifest.mf</code> 
+  file contains signing information that you do not want.</p>
+<p>Next you need to create your own manifest file for the new jar file to be based 
+  on <code>jmf.jar</code>. The manifest file that we create we call jmf_manifest. 
+  It will be provided as input to the <code>jar</code> tool. Here is what is used 
+  in this example:</p>
+<blockquote> 
+  <p><code>Extension-Name: javax.media.s_my_jmf<br>
+    Specification-Vendor: Sun Microsystems, Inc<br>
+    Specification-Version: 2.1<br>
+    Implementation-Vendor-Id: com.sun<br>
+    Implementation-Vendor: Sun Microsystems, Inc<br>
+    Implementation-Version: 2.1.1</code></p>
+</blockquote>
+<p>First we will jar the files in <code>jmf.jar</code> and rename the result <code>my_jmf.jar</code>. 
+  Then we will sign the result and call it <code>s_my_jmf.jar</code>. </p>
+<p>In order to jar the files in <code>workspace1</code> with our new manifest 
+  file <code>jmf_manifest</code>, we <code>cd</code> to the locations of <code>workspace1</code>, 
+  then we use the <code>jar</code> tool in the SDK as follows:</p>
+<blockquote> 
+  <p><code>C:\plugin\extensions\workspace1&gt;C:\j2sdk1.4.0\bin\jar cmf jmf_manifest 
+    my_jmf.jar *.class codecLib com javax jmapps</code></p>
+</blockquote>
+<p>Note that <code>codecLib</code>, <code>com</code>, <code>javax</code>, and 
+  <code>jmapps</code> are subdirectories that must be jar'd as well<code> *.class</code>.</p>
+<p>In this example we use the <code>jarsigner</code> tool to sign the new jar 
+  file.</p>
+<p>Assuming that we have a Thawte keystore called <code>thawte.p12</code> located 
+  in <code>C:\plugin\keystores</code> with the same password, <code>mypass</code>, 
+  for both <code>storepass</code> and <code>keypass</code>, and <code>storetype</code> 
+  is <code>&quot;pkcs12&quot;</code> and the keystore alias is <code>&quot;Sun 
+  Microsystems Inc.'s Thawte Consulting cc ID&quot;</code>, then we can sign <code>my_jmf.jar</code> 
+  as follows, creating a signed jar file called <code>s_my_jmf.jar</code>:</p>
+<blockquote>
+  <p><code>C:\plugin\extensions\workspace1&gt;C:\j2sdk1.4.0\bin\jarsigner -keystore 
+    C:\plugin\keystores\thawte.p12 -storepass mypass -keypass mypass -storetype 
+    &quot;pkcs12&quot; -signedjar s_my_jmf.jar my_jmf.jar &quot;Sun Microsystems 
+    Inc.'s Thawte Consulting cc ID&quot;</code></p>
+</blockquote>
+<p>We can verify the new signed jar file as follows:</p>
+<blockquote> 
+  <p><code>C:\plugin\extensions\workspace1&gt;C:\j2sdk1.4.0\bin\jarsigner -verify 
+    s_my_jmf.jar</code></p>
+</blockquote>
+<p>We now have a signed jar file with the proper <code>manifest.mf</code> file 
+  for raw installation.</p>
+<p>Next we need to create the applet jar file.</p>
+<h3><br>
+  <a name="creating_applet_jar"></a>Creating the Applet jar file</h3>
+<p>The applet consists of a single file, <code>SimplePlayerApplet.class</code>, 
+  that can be used to playback a media file. The source code for the applet can 
+  be viewed <a href="SimplePlayerApplet.java.html">here</a>. What we need to do 
+  is create a manifest file called for the the applet, which we will call <code>applet_manifest</code>, 
+  jar the applet with the manifest, then sign the result..</p>
+<p>The applet <code>applet_manifest</code> is as follows:</p>
+<blockquote> 
+  <pre>Extension-List: s_my_jmf <br>s_my_jmf-Extension-Name: javax.media.s_my_jmf <br>s_my_jmf-Specification-Version: 2.1 <br>s_my_jmf-Implementation-Version: 2.1.1<br>s_my_jmf-Implementation-Vendor-Id: com.sun <br>s_my_jmf-Implementation-URL: http://java.sun.com/products/plugin/extensions/examples/jmf/s_my_jmf.jar
+</pre>
+</blockquote>
+<p>Note that the above manifest says that the extension jar, <code>s_my_jmf.jar</code>, 
+  can be downloaded from the <code> java.sun.com </code>web server at <code>http://java.sun.com/products/plugin/extensions/examples/jmf</code></p>
+<p>If the <code>SimplePlayerApplet.class</code> and <code>applet_manifest</code> 
+  are located in <code>C:\plugin\workspace2</code>, we can jar the applet with 
+  the manifest with the following command:</p>
+<blockquote> 
+  <p><code>C:\plugin\extensions\workspace2&gt;C:\j2sdk1.4.0\bin\jar cmf applet_manifest 
+    my_SimplePlayerApplet.jar *.class</code></p>
+</blockquote>
+<p>Again, we use <code>jarsigner</code> to sign the jar file:</p>
+<blockquote> 
+  <p><code>C:\plugin\extensions\workspace2&gt;C:\j2sdk1.4.0\bin\jarsigner -keystore 
+    C:\plugin\keystores\thawte.p12 -storepass mypass -keypass mypass -storetype 
+    &quot;pkcs12&quot; -signedjar s_my_SimplePlayerApplet.jar my_SimplePlayerApplet.jar 
+    &quot;Sun Microsystems Inc.'s Thawte Consulting cc ID&quot;</code></p>
+</blockquote>
+<p>and we verify it as follows:</p>
+<blockquote> 
+  <p><code>C:\plugin\extensions\workspace2&gt;C:\j2sdk1.4.0\bin\jarsigner -verify 
+    s_my_SimplePlayerApplet.jar</code></p>
+</blockquote>
+<p>We now have our signed applet jar file called <code>s_my_SimplePlayerApplet.jar</code>, 
+  whose manifest contains the correct information to trigger the installation 
+  of the required extension jar file, <code>s_my_jmf.jar</code> if no such file 
+  or an older version is found in <code>&lt;jre_location&gt;/lib/ext</code>.</p>
+<p> Next we need to create the HTML for the applet.</p>
+<h3><a name="creating_html"></a>Creating the HTML for the Applet</h3>
+<p>We have several choices. We can use the conventional <code>APPLET</code> tag 
+  and assume those who visit the page have Java Plug-in version 1.3.1_01 or later 
+  installed on their systems. (To use Java Plug-in to launch an applet with the 
+  conventional applet tag requires 1.3.1_01 or later.) We can also use the HTML 
+  Converter, located in the SDK in the <code>bin</code> directory (<code>&lt;sdk_location&gt;/bin/HtmlConverter.exe</code>) 
+  to convert the applet to various forms. Here we have chosen to do both: <code>SimplePlayerApplet-1.html</code> 
+  uses the conventional applet form; <code>SimplePlayerApplet-2.html</code> is 
+  a converted format for both the <code>OBJECT</code> and <code>EMBED</code> tags 
+  that assumes dynamic versioning (<code>clasdid=&quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;</code>) 
+  for the <code>OBJECT</code> tag and <code>type=&quot;application/x-java-applet;jpi-version=1.4&quot;</code> 
+  for the <code>EMBED</code> tag for Plug-in 1.4.2).</p>
+<p>The two forms are shown below:</p>
+<h4><code>SimplePlayerApplet-1.html</code></h4>
+<blockquote>
+  <pre>&lt;html&gt;<br>&lt;head&gt;<br>&lt;title&gt;SimplePlayerApplet&lt;/title&gt;<br>&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=iso-8859-1&quot;&gt;<br>&lt;/head&gt;<br>&lt;body bgcolor=&quot;#FFFFFF&quot; text=&quot;#000000&quot;&gt;<br>&lt;applet code=&quot;SimplePlayerApplet.class&quot; archive=&quot;s_my_SimplePlayerApplet.jar&quot; width=320 height=300&gt;<br>&lt;param name=&quot;file&quot; value=&quot;0720crt1.avi&quot;&gt;<br>&lt;/applet&gt;<br>&lt;/body&gt;<br>&lt;/html&gt;
+</pre>
+</blockquote>
+<h4><code>SimplePlayerApplet-2.html</code></h4>
+<blockquote> 
+  <p><code>&lt;html&gt;<br>
+    &lt;head&gt;<br>
+    &lt;title&gt;SimplePlayerApplet&lt;/title&gt;<br>
+    &lt;/head&gt;<br>
+    &lt;body bgcolor=&quot;#FFFFFF&quot; text=&quot;#000000&quot;&gt;<br>
+    &lt;!--&quot;CONVERTED_APPLET&quot;--&gt;<br>
+    &lt;!-- HTML CONVERTER --&gt;<br>
+    &lt;OBJECT <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;classid = &quot;clsid:8AD9C840-044E-11D1-B3E9-00805F499D93&quot;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;codebase = &quot;http://java.sun.com/products/plugin/autodl/jinstall-1_4-windows-i586.cab#Version=1,4,0,0&quot;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WIDTH = 320 HEIGHT = 300 &gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PARAM NAME = CODE VALUE = &quot;SimplePlayerApplet.class&quot; 
+    &gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PARAM NAME = ARCHIVE VALUE = &quot;s_my_SimplePlayerApplet.jar&quot; 
+    &gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PARAM NAME = &quot;type&quot; VALUE = &quot;application/x-java-applet;version=1.4&quot;&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PARAM NAME = &quot;scriptable&quot; VALUE 
+    = &quot;false&quot;&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;PARAM NAME = &quot;file&quot; VALUE=&quot;0720crt1.avi&quot;&gt;</code></p>
+  <p> <code>&lt;COMMENT&gt;<br>
+    &lt;EMBED <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type = &quot;application/x-java-applet;version=1.4&quot; 
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CODE = &quot;SimplePlayerApplet.class&quot; 
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ARCHIVE = &quot;s_my_SimplePlayerApplet.jar&quot; 
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WIDTH = 320 <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HEIGHT = 300 <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;file =&quot;0720crt1.avi&quot; <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scriptable = false <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pluginspage = &quot;http://java.sun.com/products/plugin/index.html#download&quot;&gt;<br>
+    &lt;NOEMBED&gt;<br>
+    <br>
+    &lt;/NOEMBED&gt;<br>
+    &lt;/EMBED&gt;<br>
+    &lt;/COMMENT&gt;<br>
+    &lt;/OBJECT&gt;</code></p>
+  <p><code>&lt;!--<br>
+    &lt;APPLET CODE = &quot;SimplePlayerApplet.class&quot; ARCHIVE = &quot;s_my_SimplePlayerApplet.jar&quot; 
+    WIDTH = 320 HEIGHT = 300&gt;<br>
+    &lt;PARAM NAME = &quot;file&quot; VALUE=&quot;0720crt1.avi&quot;&gt;</code></p>
+  <p><code>&lt;/APPLET&gt;<br>
+    --&gt;</code></p>
+  <p><code>&lt;!--&quot;END_CONVERTED_APPLET&quot;--&gt;</code></p>
+  <p><code>&lt;/body&gt;<br>
+    &lt;/html&gt;</code></p>
+</blockquote>
+<p><br>
+  Note that the media file is <code>0720crt1.avi</code>.</p>
+<p>For this example the following files have been placed on the <code>java.sun.com</code> 
+  web server at<code> http://java.sun.com/products/plugin/extensions/examples/jmf</code>:</p>
+<ul>
+  <li><code>0720crt1.avi</code></li>
+  <li><code>s_my_jmf.jar</code></li>
+  <li><code>s_mySiplePlayerApplet.jar</code></li>
+  <li><code>SimplePlayerApplet-1.html</code></li>
+  <li><code>SimplePlayerApplet-2.htm</code><br>
+  </li>
+</ul>
+<h3>
+  <a name="testing"></a>Testing the Example </h3>
+<p>You can test the setup by pushing either of the buttons below:</p>
+<blockquote> 
+  <form name="form2" method="post" action="">
+    <input type="button" name="Button" value="SimplePlayerApplet-1.html" onClick="MM_openBrWindow('../../../../../../products/plugin/extensions/examples/jmf/1.4.0/SimplePlayerApplet-1.html','SimplePlayerApplet','status=yes,menubar=yes,resizable=yes,width=500,height=250')">
+  </form>
+  <form name="form3" method="post" action="">
+    <input type="button" name="Button2" value="SimplePlayerApplet-2.html" onClick="MM_openBrWindow('../../../../../../products/plugin/extensions/examples/jmf/1.4.0/SimplePlayerApplet-2.html','SimplePlayerApplet','status=yes,menubar=yes,resizable=yes,width=500,height=325')">
+  </form>
+</blockquote>
+<p>When you point your browser at the URL, the applet jar will first be downloaded 
+  and cached; and, if the extension has not already been installed, you will see 
+  a Java Security Warming dialog that says: 'The applet requires the installation 
+  of optional package <code>&quot;javax.media.s_my_jmf&quot;</code> from <code>http://java.sun.com/products/plugin/extensions/examples/jmf/s_my_jmf.jar</code>'. 
+  You will have the options to <b>Grant this session</b>, <b>Deny</b>, or <b>Grant 
+  Always</b>. If you grant permission for installation, the extension will be 
+  installed in <code>&lt;jre_location&gt;/lib/ext</code> and the applet will run. 
+</p>
+<p>&nbsp;</p>
+</body>
+</html>

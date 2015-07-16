@@ -1,0 +1,259 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>JTable</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>JTable</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+As a result of JTable changes,
+code written for v&nbsp;1.2 or for JFC/Swing 1.1
+might have the following problems when run in v&nbsp;1.3:
+
+<ul> 
+<li> Since the 
+     <code>TableColumn</code> <code>getHeaderRenderer</code> method
+     now returns null by default,
+     you can't use that method to get the default header renderer.
+     Instead, change your code to use the 
+     <code>JTableHeader</code> <code>getDefaultRenderer</code> method.
+     See <a
+     href="http://java.sun.com/docs/books/tutorial/uiswing/components/table.html#13defaultheaderrenderer">How to Use Tables</a> in <em>The Java Tutorial</em>
+     for an example.
+<li> Because JTable's default text editor is now smarter about data types,
+     it now gives <code>setValueAt</code> objects of the appropriate type,
+     instead of always specifying strings.
+     For example, if <code>setValueAt</code> is invoked for an Integer cell,
+     then the value is specified as an Integer instead of a String.
+     If you implemented a table model,
+     then you might have to change its 
+     <code>setValueAt</code> method
+     to take the new data type into account.
+     If you implemented a class used as a data type for cells,
+     make sure that your class has a constructor
+     that takes a single String argument.
+</ul>
+
+
+
+<h2>Column and Row Layout Improvements</h2>
+
+    <p>
+    We made the following changes: 
+
+    <ul>
+      <li><b>Improved performance in tables with large numbers of columns</b> 
+      
+      <br>
+      Moving the header renderers from the columns themselves 
+      to the table header represents the most significant change to 
+      performance and footprint by sharing similar header renderers 
+      on a per-table basis. 
+
+      <li><b>Dynamic changing of individual row height</b> 
+      <br>
+     
+      The rendering machinery in the JTable has been substantially overhauled in 
+      this release to enable this much sought after feature in the JTable. 
+
+      <li><b>Simplified creation of non-standard editor components</b>
+     
+      <br>
+      The <code>AbstractCellEditor</code> class has been included
+      in response to continued feedback on the difficulty of 
+      creating non-standard editor components.
+
+      <li><b>Better handling of inter-cell spacing</b>
+      <br>
+      Previously JTable did not correctly implement its
+      specification for inter-cell spacing. Changes in the 
+      inter-cell spacing affected a number of other properties 
+      including the overall height of the table. In v&nbsp;1.3, the 
+      inter-cell spacing has only one effect: to 
+      provide an inset for the cells, where the inset
+      is the amount that renderers 
+      and editors are shrunk to accommodate the spacing between 
+      the cells. 
+
+   </ul>
+<P>
+For more information, see the API documentation for 
+the following methods and fields.
+Note that "obsolete" means that you should avoid using the obsolete API,
+but that using the API isn't dangerous enough
+to warrant a compile-time warning.
+"Deprecated" API, on the other hand, 
+is not only obsolete but also results in a compile-time warning.
+
+
+<h4>In JTable</h4>
+<ul>
+<li><a href="../../../api/javax/swing/JTable.html#removeNotify()"><code>public void removeNotify()</code></a> 
+<li><a href="../../../api/javax/swing/JTable.html#unconfigureEnclosingScrollPane()"><code>protected void unconfigureEnclosingScrollPane()</code></a> 
+<li><a href="../../../api/javax/swing/JTable.html#changeSelection(int, int, boolean, boolean)"><code>public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend)</code></a>
+<li><a href="../../../api/javax/swing/JTable.html#cellSelectionEnabled"><code>protected boolean cellSelectionEnabled</code></a> // obsolete
+<li><a href="../../../api/javax/swing/JTable.html#setRowHeight(int)"><code>public void setRowHeight(int row, int height)</code></a> 
+<li><a href="../../../api/javax/swing/JTable.html#getRowHeight(int)"><code>public int getRowHeight(int row)</code></a> 
+</ul>
+
+<h4>In JTableHeader</h4>
+<ul>
+<li><a href="../../../api/javax/swing/table/JTableHeader.html#updateTableInRealTime"><code>protected boolean updateTableInRealTime</code></a> // obsolete
+<li><a href="../../../api/javax/swing/table/JTableHeader.html#getUpdateTableInRealTime()"><code>public boolean getUpdateTableInRealTime()</code></a> // obsolete
+<li><a href="../../../api/javax/swing/table/JTableHeader.html#setUpdateTableInRealTime(boolean)"><code>public void setUpdateTableInRealTime(boolean flag)</code></a> // obsolete
+<li><a href="../../../api/javax/swing/table/JTableHeader.html#setDefaultRenderer(javax.swing.table.TableCellRenderer)"><code>public void setDefaultRenderer(TableCellRenderer defaultRenderer)</code></a> 
+<li><a href="../../../api/javax/swing/table/JTableHeader.html#getDefaultRenderer()"><code>public TableCellRenderer getDefaultRenderer()</code></a> 
+<li><a href="../../../api/javax/swing/table/JTableHeader.html#createDefaultRenderer()"><code>protected TableCellRenderer createDefaultRenderer()</code></a> 
+</ul>
+
+<h4>In TableColumn</h4>
+<ul>
+<li><a href="../../../api/javax/swing/table/TableColumn.html#COLUMN_WIDTH_PROPERTY"><code>public final static String COLUMN_WIDTH_PROPERTY;</code></a> // obsolete
+<li><a href="../../../api/javax/swing/table/TableColumn.html#HEADER_VALUE_PROPERTY"><code>public final static String HEADER_VALUE_PROPERTY;</code></a> // obsolete
+<li><a href="../../../api/javax/swing/table/TableColumn.html#HEADER_RENDERER_PROPERTY"><code>public final static String HEADER_RENDERER_PROPERTY</code></a> // obsolete
+<li><a href="../../../api/javax/swing/table/TableColumn.html#CELL_RENDERER_PROPERTY"><code>public final static String CELL_RENDERER_PROPERTY</code></a> // obsolete
+<li><a href="../../../api/javax/swing/table/TableColumn.html#createDefaultHeaderRenderer()"><code>protected TableCellRenderer createDefaultHeaderRenderer()</code></a>
+<li><a href="../../../api/javax/swing/table/TableColumn.html#resizedPostingDisableCount"><code>transient protected int resizedPostingDisableCount</code></a> // deprecated 
+<li><a href="../../../api/javax/swing/table/TableColumn.html#disableResizedPosting()"><code>public void disableResizedPosting()</code></a> // deprecated
+<li><a href="../../../api/javax/swing/table/TableColumn.html#enableResizedPosting()"><code>public void enableResizedPosting()</code></a> //deprecated
+</ul>
+
+<h4>New Class:  <a href="../../../api/javax/swing/AbstractCellEditor.html"><code>javax.swing.AbstractCellEditor</code></a></h4>
+
+<h4>Existing Class <a href="../../../api/javax/swing/DefaultCellEditor.html"><code>DefaultCellEditor</code></a> now extends  <a href="../../../api/javax/swing/AbstractCellEditor.html"><code>AbstractCellEditor</code></a></h4>
+
+</tt>
+</ul>
+
+
+        <h2>New SizeSequence Utility Class</h2>
+
+
+        <p>
+        Before this release the height of rows in a JTable was always 
+        fixed. Introducing variable height rows whilst retaining the 
+        scalability requirements of the JTable (no O(N) behavior on rows) 
+        has required this new class and we have made it public as we 
+        think it may be generally useful. Indeed, table columns and 
+        the variable height rows of a JList might both use this class 
+        in the future to improve performance.
+
+<P>
+See: <a href="../../../api/javax/swing/SizeSequence.html"><code>javax.swing.SizeSequence</code></a>
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-98
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

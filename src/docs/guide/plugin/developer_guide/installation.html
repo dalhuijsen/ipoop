@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>Installation for Conventional Applets</title>
+
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Installation for Conventional Applets (Microsoft Window Only)</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <script src="menu_script.js" language="JavaScript"></script>
+  </select>
+</form>
+<p>This section covers the following topics:</p>
+<ul>
+  <li><b><a href="#enabling">Enabling <tt>APPLET</tt> Tag Support</a></b></li>
+  <li><b><a href="#silent">Silent Installation Options</a> </b> </li>
+</ul>
+<h2><a name="enabling">Enabling <tt>APPLET</tt> Tag Support</a></h2>
+<p> Developers should be aware that end users of Java Plug-in can choose to enable 
+  or disable <tt>APPLET</tt> tag support during installation or at any time after 
+  installation. </p>
+<p> As part of the installation process, the user will see the following panel: 
+</p>
+<blockquote>
+  <p align="center"> <img src="images/browsers.gif"alt="Sample Select Browser window"> </p>
+</blockquote>
+<p> This panel allows the user to select JRE/Java Plug-in to be the default runtime 
+  environment for handling <tt>APPLET</tt> tags in Microsoft Internet Explorer 
+  browsers and/or Netscape 6 browsers. The installer will use the Windows registry 
+  to determine whether the user's machine has these browsers installed and will 
+  check by default the box corresponding to any installed browser(s). </p>
+<p> The user can enable or disable <tt>APPLET</tt> tag support after installation 
+  through the <a href="control_panel.html#browser">Browser panel</a> of the<a href="control_panel.html"> 
+  Java Plug-in Control Panel</a>.</p>
+<p>On Microsoft Internet Explorer browsers, users also can use the Advanced tab 
+  in the Internet Options window to enable/disable Java Plug-in's <tt>APPLET</tt> 
+  tag support. (Tool&gt;Internet Options ... and select Advanced tab.)</p>
+<blockquote> 
+  <p align="center"> <img src="images/ie_advanced_options.gif" alt="sample Advanced tab" width="406" height="452"></p>
+</blockquote>
+<h2><a name="silent">Silent Installation Options</a></h2>
+<p> Java Plug-in supports silent installation as an alternative to the standard 
+  installation wizard. Silent installation might be used, for example, for large-scale 
+  deployment. For general information on silent installation of Java Plug-in, 
+  see <a href="silent.html">Silent Installation</a>. </p>
+<p> Unlike the installation using the wizard, silent installation will <em>not</em> 
+  enable <tt>APPLET</tt> tag support by default for any browsers on the end user's 
+  machine. To enable <tt>APPLET</tt> tag support during silent installation, you 
+  must use one or both of the following command-line options: </p>
+<dl> 
+  <dl> 
+    <dt><b><code>-iexplorer</code></b> </dt>
+  </dl>
+</dl>
+<blockquote> 
+  <dl> 
+    <dd>If this flag is passed to the installer, <tt>APPLET</tt> tag support will 
+      be enabled for Microsoft Internet Explorer browsers.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b><code>-netscape6</code></b> 
+      <blockquote>
+        <p>If this flag is passed to the installer, <tt>APPLET</tt> tag support 
+          will be enabled for Netscape 6 browsers. </p>
+      </blockquote>
+    </dt>
+  </dl>
+</blockquote>
+<pre>
+
+</pre>
+</body>
+</html>

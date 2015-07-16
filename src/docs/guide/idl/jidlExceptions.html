@@ -1,0 +1,313 @@
+
+<HTML>
+<HEAD>
+   <TITLE>Java IDL: Exceptions</TITLE>
+   <META NAME=GENERATOR CONTENT="Claris Home Page 2.0">
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1 ALIGN=CENTER>Exceptions</H1>
+
+<HR>
+
+<P>CORBA has two types of exceptions: standard system exceptions which are
+fully specified by the OMG and user exceptions which are defined
+by the individual application programmer. CORBA exceptions are a little
+different from Java exception objects, but those differences are largely
+handled in the mapping from IDL to Java. 
+
+<P>Topics in this section include:
+
+<UL>
+<LI><A href="#differences">Differences Between CORBA and Java Exceptions</A>
+<LI><A href="#systemexceptions">System Exceptions</A>
+  <UL>
+  <LI><A href="#structure">System Exception Structure</A>
+  <LI><A href="#minorcodes">Minor Codes</A>
+  <LI><A href="#compstatus">Completion Status</A>
+  </UL>
+<LI><A href="#userexceptions">User Exceptions</A>
+<LI><A href="#minorcodemeanings">Minor Code Meanings</A>
+</UL>
+
+
+<!--*********************DIFFERENCES****************-->
+
+<A name="differences">
+<H2>Differences Between CORBA and Java Exceptions</H2></A>
+
+
+<P>To specify an exception in IDL, the interface designer 
+uses the <EM>raises</EM> keyword.
+This is similar to the <EM>throws</EM> specification in Java. 
+When you use the exception
+keyword in IDL you create a user-defined exception. The standard
+system exceptions need not (and cannot) be specified this way.
+
+
+<!--****************SYSTEM EXCEPTIONS***************-->
+
+<A name="systemexceptions">
+<H2>System Exceptions</H2></A>
+
+CORBA defines a set of standard system exceptions, which
+are generally raised by the ORB libraries to signal systemic 
+error conditions like:</P>
+
+<UL>
+   <LI>Server-side system exceptions, such as resource exhaustion 
+   or activation failure.
+   
+   <LI>Communication system exceptions, for example, losing contact with the
+   object, host down, or cannot talk to ORB daemon (orbd).
+   
+   <LI>Client-side system exceptions, such as invalid operand type or
+   anything that occurs before a request is sent or
+   after the result comes back.
+</UL>
+
+<P>All IDL operations can throw system exceptions when invoked. 
+The interface designer need not specify anything to enable operations
+in the interface to throw system exceptions -- the capability is automatic.
+</P>
+
+<P>This makes sense because no matter how trivial an operation's
+implementation is, the potential of an operation invocation coming
+from a client that is in another process, and perhaps (likely) on
+another machine, means that a whole range of errors is possible.</P>
+
+<P>Therefore, a CORBA client should always catch CORBA system
+exceptions. Moreover, developers cannot rely on the Java compiler to
+notify them of a system exception they should catch, because CORBA
+system exceptions are descendants of <TT>java.lang.RuntimeException</TT>. 
+
+
+<A name="structure">
+<H3>System Exception Structure</H3></A>
+
+<P>All CORBA system exceptions have the same structure:
+
+<PRE>
+exception &lt;SystemExceptionName&gt; { // descriptive of error
+    unsigned long <A href="#minorcodes">minor</A>;          // more detail about error
+    CompletionStatus <A href="#compstatus">completed</A>;   // yes, no, maybe
+}
+&nbsp;
+</PRE>
+
+<P>System exceptions are subtypes of <TT>java.lang.RuntimeException</TT>
+through <TT>org.omg.CORBA.SystemException</TT>:
+
+<PRE>
+java.lang.Exception
+ |
+ +--java.lang.RuntimeException
+     |
+     +--org.omg.CORBA.SystemException
+         |
+         +--BAD_PARAM
+         |
+         +--//etc. 
+&nbsp;
+</PRE>
+
+<A name="minorcodes">
+<H3>Minor Codes</H3></A>
+
+<P>All CORBA system exceptions have a minor code field, a number that 
+provides additional information about the nature of the failure that caused
+the exception. Minor code meanings are not specified by the OMG; 
+each ORB vendor
+specifies appropriate minor codes for that implementation. 
+For the meaning of minor codes thrown by the Java&nbsp; ORB, see 
+<A href="#minorcodemeanings">Minor code meanings</A> .
+
+
+<A name="compstatus">
+<H3>Completion Status</H3></A>
+
+<P>All CORBA system exceptions have a completion status field, 
+indicating the status of the operation that threw the exception.
+The completion codes are:
+
+<DL>
+<DT>COMPLETED_YES
+<DD>The object implementation has completed processing prior to the
+exception being raised.
+<DT>COMPLETED_NO
+<DD>The object implementation was not invoked prior to the 
+exception being raised.
+<DT>COMPLETED_MAYBE
+<DD>The status of the invocation is unknown.
+</DL>
+
+
+<!--****************USER EXCEPTIONS***************-->
+
+<A name="userexceptions">
+<H2>User Exceptions</H2></A>
+
+<P>CORBA user exceptions are subtypes of <TT>java.lang.Exception</TT>
+through <TT>org.omg.CORBA.UserException</TT>:
+
+<PRE>
+java.lang.Exception
+ |
+ +--org.omg.CORBA.UserException
+      |
+      +-- Stocks.BadSymbol
+      |
+      +--//etc. 
+</PRE>
+
+<P>Each user-defined exception
+specified in IDL results in a generated Java exception class. These
+exceptions are entirely defined and implemented by the programmer
+
+
+<!--*****************MINOR CODE MEANINGS********************-->
+
+
+<A name="minorcodemeanings">
+<H2>Minor Code Meanings</H2></A>
+
+<P>System exceptions all have a field <I>minor</I> that allows CORBA vendors
+to provide additional information about the cause of the exception. For a 
+list of standard OMG minor code exceptions (OMGVMCID), refer to the OMG document at <a href=
+"http://www.omg.org/docs/omg/03-01-04.txt">
+http://www.omg.org/docs/omg/03-01-04.txt</a>.
+
+  <P>Some of the most common Sun minor code exceptions are the following:
+	<p><UL>
+	<LI><strong>COMM_FAILURE/201</strong>.  <em>vmcid: SUN  minor code: 201</em> 
+	literally means "CONNECT_FAILURE".
+	This may be caused by a <code>java.net.SocketException</code>, usually one of 
+	<code>BindException</code>, <code>ConnectException</code>, or
+	<code>NoRouteToHostException</code>.
+	
+	<P>Some things to verify are:
+	<P>
+		<UL>
+		<LI>Is a naming service running?  If not, start the ORBD naming service as described
+		in the document  
+		<a href="orbd.html#starting">
+		Starting and Stopping ORBD</a>.
+		<LI>Are the <code>-ORBInitialHost</code> and <code>-ORBInitialPort</code> values being  
+		set correctly for the naming service?  If you are uncertain about what 
+		the settings should be, read the
+		document  
+		<a href="orbd.html#starting">
+		Starting and Stopping ORBD</a>.
+		<LI>Are the client and server applications aware of the port number
+		 (and machine name, if applicable) where the Naming Service is running?  Read
+		  <a href="orbd.html#starting">
+		Starting and Stopping ORBD</a> for more
+		information on how to do this.
+		</UL>
+		<P>
+
+
+	<LI><strong>COMM_FAILURE/208</strong>. <em>vmcid: SUN  minor code: 208</em> literally
+	means "CONNECTION ABORT", which generally means the connection has been dropped.  <P>
+	
+	<LI><strong>COMM_FAILURE/209</strong>. <em>vmcid: SUN  minor code: 209</em> literally
+	means "CREATE_LISTENER_FAILED": <code>Unable to create the listener thread on the 
+	specific port. Either the post is taken or there was an error creating the daemon
+	 thread</code>. This generally indicates
+	that the port on which you are trying to run the naming service is in use by another process.
+	If you are running on Solaris, you could discover whether or not something is running 
+	on this port using the following terminal prompt command:<P>
+	<PRE>netstat | grep <em>port_number</em></PRE>
+
+	
+	 <P>
+	 <LI><strong>OBJECT_NOT_EXIST/204</strong>. <em>vmcid: SUN  minor code: 204</em>
+	 literally  means "SERVANT_NOT_FOUND".
+	 It is only thrown in one place: <code>corba.INSSubcontract.getINSReference</code>.
+	 <P>
+	 <LI><strong>MARSHAL/217</strong>.  <em>vmcid: SUN  minor code: 217</em> means that
+	 your client tried to send either a <code>wchar</code> or <code>wstring</code>
+	 in GIOP 1.0, which is not legal in the spec. 
+	 <P>
+	 <LI><strong>MARSHAL/202</strong>. <em>vmcid: SUN  minor code: 202</em> means that the
+	 code is attempting to marshal an object that derives from 
+	 <code>org.omg.CORBA.Object</code>, but that particular instance has never
+	 been connected to an ORB.  When using the POA, you need to register the 
+	 object with the POA first.  If you need more information on how to register
+	 an object with the POA, refer to the   
+	 <a href="POA.html">
+	 POA</a> document or the 
+	 <a href="GShome.html">
+	 tutorial</a>.
+	 <P>
+	 <LI><strong>BAD_PARAM/201</strong>.  <em>vmcid: SUN  minor code: 201</em> 
+	literally means "NULL_PARAM". This exception often occurs because a Java 
+	<code>null</code> was given to a <code>write</code> method such as <code>write_string</code>, 
+	<code>write_octet_array</code>, etc.   You cannot return a
+	 Java <code>null</code>  as the result of a Java method.
+	 
+	 <P>
+	 <LI><strong>org.omg.CORBA.INTERNAL</strong>.  <em>vmcid: SUN  minor code: 208</em> 
+	 means <code>Unable to determine local hostname using 
+	 InetAddress.getLocalHost().getHostName()</code>.
+	 
+	 <P>The ORB 
+	 uses <code>InetAddress.getLocalHost().getHostName()</code> to create a 
+	 reference to the name service for looking for and/or binding references.  
+	 It also uses <code>InetAddress.getLocalHost().getHostName()</code> on the 
+	 server side to create remote object references (i.e., IORs) that contain
+	 the name/port of the server (rather than a dotted-decimal/port pair).
+	 
+	 <P>To avoid the call to <code>getHostName</code>, you can set the following
+	 properties (refer to <a href="orbd.html#starting">
+		Starting and Stopping ORBD</a> if you are not sure how to do this):
+	 
+	 <P><UL>
+	 <LI>Set <code>com.sun.CORBA.ORBServerHost</code> to the DNS name or dotted-decimal
+	 address of the server if the ORB is acting as a server.
+	 <LI>Set <code>com.sun.CORBA.ORBInitialHost</code> to the DNS name or dotted-decimal
+	 address of the name server.
+	 </UL>
+	 <P>
+	 <STRONG>NOTE: These properties are proprietary and are subject to deletion or 
+	 change.</STRONG>
+
+
+
+	</UL>
+
+<P>If none of these suggestions work for you, or if you encounter a different Sun minor
+code exception, email us for more information at 
+ <a href="mailto:corba-tutorial@sun.com">corba-tutorial@sun.com</a>. When requesting the meaning of a minor code please include the following information:
+<P>
+<UL>
+<LI>The platform on which 
+the client and server are running  (e.g., Solaris, Linux, Win32)
+<LI>The version of the
+JDK you are using (e.g., 1.4.0_01)
+<LI>A  complete stack trace
+<LI>If you are using a naming service or an ORB from a different vendor, please provide the information on the vendor and version of the product.
+</UL> 
+
+
+<P><HR>
+<CENTER><P>
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html">Home</A></TD>
+</TR></TABLE>
+
+<HR><FONT
+SIZE="-2">
+<A HREF="http://www.sun.com/share/text/SMICopyright.html">Copyright
+&copy;</A></FONT><FONT SIZE="-2"> 1996-98 Sun Microsystems, Inc.,
+2550 Garcia Ave., Mtn. View, CA. 94043-1100 USA., All rights
+reserved.</FONT></P>
+</CENTER>
+
+</BODY>
+</HTML>
+
+

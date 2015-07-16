@@ -1,0 +1,145 @@
+<HTML>
+<HEAD>
+  <title>ktab - Kerberos tool</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<H1>ktab - <FONT SIZE="+1">Kerberos key table manager</FONT></H1>
+
+<BLOCKQUOTE>
+  <P><CODE>ktab</CODE> allows the user to manage the principal
+  names and service keys stored in a local key table. Principal
+  and key pairs listed in the keytab allow services running on
+  a host to authenticate themselves to the Key Distribution Center
+  (KDC). Before a server can be setup to use Kerberos, the user
+  must setup a keytab on the host running the server.  Note that
+  any updates made to the keytab using <CODE>ktab</CODE> do not
+  affect the Kerberos database. If you change the keys in the keytab,
+  you must also make the corresponding changes to the Kerberos
+  database.</P>
+</BLOCKQUOTE>
+
+<H2>SYNOPSIS</H2>
+
+<BLOCKQUOTE>
+  <P><B><CODE>ktab [ <A HREF="#commands">commands</A> ] </CODE></B></P>
+</BLOCKQUOTE>
+
+<H2>DESCRIPTION</H2>
+
+<BLOCKQUOTE>
+  <P><CODE>ktab</CODE> manages principal name and key pairs in
+  the key table. ktab allows the user to list, add, update or delete
+  principal names and key pairs in the key table. None of these
+  operations affect the Kerberos database. </P>
+  <UL>
+    <DL>
+      <DT><B>Keytab</B>
+      <DD>A keytab is a host's copy of its own keylist, which is analogous
+      to a user's password. An application server that needs to authenticate
+      itself to the Key Distribution Center (KDC) must have a keytab
+      which contains its own principal and key. Just as it is important
+      for users to protect their passwords, it is equally important
+      for hosts to protect their keytabs. You should always store keytab
+      files on the local disk and make them readable only by root.
+      You should never send a keytab file over a network in the clear.
+    </DL>
+  </UL>
+</BLOCKQUOTE>
+
+<H2><A NAME="commands"></A>COMMANDS</H2>
+
+<BLOCKQUOTE>
+  <P><B>Usage:</B> The command line options are <I>not</I> case-sensitive.
+</P>
+<BLOCKQUOTE>
+  <B><CODE>ktab -help</CODE></B></P>
+
+  <P><B><CODE>ktab -l [-k &lt;<I><em>keytab_name</EM></I>&gt;]</CODE></B></P>
+
+  <P><B><CODE>ktab [-a &lt;<I><em>principal_name</em></I>&gt;
+  &lt;<I><em>password</em></I>&gt;]
+  [-k &lt;<I><em>keytab_name</EM></I>&gt;]</CODE></B></P>
+
+  <P><B><CODE>ktab
+  [-d &lt;<I><em>principal_name</em></I>&gt;]
+  [-k &lt;<I><em>keytab_name</EM></I>&gt;]</CODE></B></P>     
+
+    <P><TABLE WIDTH="550" BORDER="1" CELLSPACING="2" CELLPADDING="2"
+summary="List of ktab Command Options and Descriptions">
+<tr>
+<th>
+Command Option
+</th>
+<th>
+Description
+</th>
+</tr>
+      <TR>
+        <TD WIDTH="119">
+        <CODE>-l </CODE></TD>
+        <TD WIDTH="431">
+        List the keytab name and entries.</TD>
+      </TR>
+      <TR>
+        <TD WIDTH="119">
+        <CODE>-a &lt;<I><em>principal_name</em></I>&gt; &lt;<I><em>password</em></I>&gt;</CODE></TD> 
+        <TD WIDTH="431">
+        Add an entry to the
+        keytab. No changes are made to the Kerberos database. 
+	  (DO NOT SPECIFY YOUR PASSWORD ON COMMAND LINE OR IN A SCRIPT.) 
+      </TD>
+      </TR>
+      <TR>
+        <TD WIDTH="119">
+        <CODE>-d &lt;<I><em>principal_name</em></I>&gt;</CODE></TD>
+        <TD WIDTH="431">
+        Delete an entry from the keytab. No changes
+        are made to the Kerberos database.</TD>
+      </TR>
+      <TR>
+        <TD WIDTH="119">
+        <CODE>-k &lt;<I><em>keytab_name</EM></I>&gt; </TD> 
+        <TD WIDTH="431">
+        Specify keytab name and path with the prefix
+        <code>FILE:</code></TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="119">
+        <CODE>-help</CODE></TD> 
+        <TD WIDTH="431">
+        Displays instructions.</TD> 
+      </TR>
+    </TABLE></P>
+  </BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H2>EXAMPLES</H2>
+
+<BLOCKQUOTE>
+  <DL>
+    <DT>To list all the entries in the default keytable: 
+    <DD><CODE>ktab -l </CODE>
+  </DL>
+
+  <DL>
+    <DT>To add a new principal to the key table (note that you will
+    be prompted for your password): 
+    <DD><CODE>ktab -a duke@java.sun.com </CODE>
+  </DL>
+
+  <DL>
+    <DT>To delete a principal from the key table: 
+    <DD><CODE>ktab -d duke@java.sun.com</CODE>
+  </DL>
+</BLOCKQUOTE>
+
+<H2>SECURITY ALERT</H2>
+
+<BLOCKQUOTE>
+  <P>Do not specify your password on the command line. Doing so
+  is a security hole. For example, an attacker could discover your password
+  while running the Unix <CODE>ps</CODE> command.</BLOCKQUOTE>
+
+</BODY>
+</HTML>

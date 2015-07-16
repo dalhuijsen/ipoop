@@ -1,0 +1,188 @@
+<html>
+<head>
+<title>AWT memory image dynamic update API</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<h1>AWT memory image dynamic update API</h1>
+<hr>
+<address>last updated: November 14, 1996</address>
+<h2>The Issue</h2>
+Currently the AWT provides a standard utility class to make an image out
+of an array of pixel values.  This class isolates developers from the
+complex ImageProducer/ImageConsumer mechanisms if they simply want to
+calculate an image using a Java algorithm and then display the resulting
+image on the screen.
+<p>
+The <a href="../../../../../api/java/awt/image/MemoryImageSource.html">MemoryImageSource</a>
+class provides this facility but it only implements a static image
+capability.  The first time an image is prepared for a screen by
+drawing the image, using the prepareImage method, or by using a
+MediaTracker to build the image, a snapshot of the pixels in the
+array will be converted into a screen representation.  Then every
+time the image is drawn again at that same scale, the same buffered
+screen representation will be used, ignoring any changes the developer
+may have made to the original array of pixels in the meantime.
+<p>
+The implementation specifically does not reread the original array
+of pixel information for each rendering operation since image conversion
+is a slow process when compared to simply moving converted pixels to the
+screen.  For drawImage to be fast, it works better if it can use a copy
+of the image that is already in the format that the display hardware uses
+to represent pixels.  And thus we have a tradeoff between showing the
+image fast when it is not changing and dynamically incorporating changes
+to the original image data.
+<p>
+This implementation worked fine for images that were computed once and
+then the results were final.  It was even workable for images that
+changed rarely since a new MemoryImageSource image could be constructed
+after each infrequent change or the original image could be flushed
+using the <a href="../../../../../api/java/awt/Image.html#flush()">Image.flush()</a>
+method to decache any existing screen representations.  These workarounds
+were inefficient or unwieldy for more frequent updates such as those
+involved in animations since the entire image had to be reconverted
+even for minor modifications to the data, or even worse requiring
+more garbage collection than strictly necessary to reclaim space
+used by old discarded versions of the image.
+
+<h2>The new memory image animation API</h2>
+To simplify this capability, new methods are being added to
+MemoryImageSource so that developers can notify the image
+that new data is available from the original array.  Since the
+image conversion process only occurs when the data in the original
+array actually changes, drawImage can still execute very fast.
+The new methods are:
+<pre>	<a href="../../../../../api/java/awt/image/MemoryImageSource.html#setAnimated(boolean)">setAnimated</a>(boolean animated)
+	<a href="../../../../../api/java/awt/image/MemoryImageSource.html#setFullBufferUpdates(boolean)">setFullBufferUpdates</a>(boolean animated)
+	<a href="../../../../../api/java/awt/image/MemoryImageSource.html#newPixels()">newPixels</a>()
+	<a href="../../../../../api/java/awt/image/MemoryImageSource.html#newPixels(int, int, int, int)">newPixels</a>(int x, int y, int w, int h)
+	<a href="../../../../../api/java/awt/image/MemoryImageSource.html#newPixels(int, int, int, int, boolean)">newPixels</a>(int x, int y, int w, int h,
+		  boolean framenotify)
+	<a href="../../../../../api/java/awt/image/MemoryImageSource.html#newPixels(byte[], java.awt.image.ColorModel, int, int)">newPixels</a>(byte[] newpix, ColorModel newmodel,
+		  int offset, int scansize)
+	<a href="../../../../../api/java/awt/image/MemoryImageSource.html#newPixels(int[], java.awt.image.ColorModel, int, int)">newPixels</a>(int[] newpix, ColorModel newmodel,
+		  int offset, int scansize)
+</pre>
+These new methods give the developer control over when the screen
+representations are updated, which region of the pixels is updated,
+when ImageObserver.FRAMEBITS notifications (which indicate when a
+single "frame" of animation is complete) are sent to the image
+observers, and the ability to switch to a new set of pixels and
+ColorModel.
+
+<h2>Sample Code</h2>
+<p>Following is sample code showing the use of the old API to perform
+memory image buffer animation:
+<pre>
+
+    import java.awt.*;
+    import java.awt.image.*;
+    import java.applet.*;
+
+    public class AnimationExample extends Applet implements Runnable {
+    	Thread anim;
+	MemoryImageSource imgsrc;
+	Image memimg;
+	int[] pixels;
+
+	public void init() {
+	    pixels = new int[100 * 100];
+	    imgsrc = new MemoryImageSource(100, 100, pixels, 0, 100);
+	    memimg = createImage(imgsrc);
+	}
+
+    	public void start() {
+	    anim = new Thread(this);
+	    anim.start();
+	}
+
+	public synchronized void stop() {
+	    anim = null;
+	    notify();
+	}
+
+	public synchronized void run() {
+	    while (Thread.currentThread() == anim) {
+	    	int x = (int) (Math.random() * 100);
+	    	int y = (int) (Math.random() * 100);
+		int r = (int) (Math.random() * 255);
+		int g = (int) (Math.random() * 255);
+		int b = (int) (Math.random() * 255);
+		pixels[y * 100 + x] =
+		    ((int) (Math.random() * 0xffffff)) | (0xff<<24);
+		<b>memimg.flush();</b>
+		repaint();
+		try {wait(100);} catch (InterruptedException e) {return;}
+	    }
+	}
+
+	public void paint(Graphics g) {
+	    // Draw the animated image
+	    g.drawImage(memimg, 0, 0, this);
+	}
+    }
+</pre>
+<p>Following is sample code showing the use of the new API to perform
+memory image buffer animation:
+<pre>
+
+    import java.awt.*;
+    import java.awt.image.*;
+    import java.applet.*;
+
+    public class AnimationExample extends Applet implements Runnable {
+    	Thread anim;
+	MemoryImageSource imgsrc;
+	Image memimg;
+	int[] pixels;
+
+	public void init() {
+	    pixels = new int[100 * 100];
+	    imgsrc = new MemoryImageSource(100, 100, pixels, 0, 100);
+	    <b>imgsrc.setAnimated(true);</b>
+	    memimg = createImage(imgsrc);
+	}
+
+    	public void start() {
+	    anim = new Thread(this);
+	    anim.start();
+	}
+
+	public synchronized void stop() {
+	    anim = null;
+	    notify();
+	}
+
+	public synchronized void run() {
+	    while (Thread.currentThread() == anim) {
+	    	int x = (int) (Math.random() * 100);
+	    	int y = (int) (Math.random() * 100);
+		int r = (int) (Math.random() * 255);
+		int g = (int) (Math.random() * 255);
+		int b = (int) (Math.random() * 255);
+		pixels[y * 100 + x] =
+		    ((int) (Math.random() * 0xffffff)) | (0xff<<24);
+		<b>imgsrc.newPixels(x, y, 1, 1);</b>
+		repaint();
+		try {wait(100);} catch (InterruptedException e) {return;}
+	    }
+	}
+
+	public void paint(Graphics g) {
+	    // Draw the animated image
+	    g.drawImage(memimg, 0, 0, this);
+	}
+    }
+</pre>
+
+<hr><br>
+
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1996, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

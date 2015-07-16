@@ -1,0 +1,421 @@
+<html><head><title>Java AWT: Data Transfer</title></head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+ 
+<a name="919682">
+<h1><img align=middle alt="Juggling Duke logo" src="images/juggler.sm.gif">  Java AWT: Data Transfer</h1>
+</a>
+<hr><p><a name="919687">
+<address>
+Last updated: August 13, 1997
+</address>
+
+<h2>Purpose</h2>
+</a>
+Typical GUI users today expect to be able to transfer data between
+applications using operations like cut/copy/paste and drag-and-drop.
+The only mechanism for this in the current Java environment is through
+whatever facilities the AWT native widgets (TextField, TextArea) provide by
+default. There are many cases however, where an application needs to enable
+these operations outside of these native widgets, and therefore the Java
+platform needs to provide an API to enable basic data transfer capabilities.
+This document defines a baseline data transfer capability for Java objects on
+top of which various transfer-protocols can be built. This document also
+describes APIs for two of those higher-level transfer-protocols,
+<a href="#clipboard">Clipboard</a> and
+<a href="#dnd">Drag-and-Drop</a>.<a name="919689">
+<p>
+Note:  The Clipboard API will be included in JDK1.1, however the Drag-and-Drop API will be in the following release (due to time constraints on 1.1).  We are including the document on Drag-and-Drop here so that the Java Beans document can refer to it and we can get as much early feedback as possible.
+<p>
+<h2>Java Data Transfer</h2>
+</a><a name="919690">
+<h3>Design Goals for Transfer API</h3>
+</a>
+The design goals for the data transfer API are the following:<ul>
+<li>Keep simple tasks simple (as always with Java APIs).
+
+<li>Ensure API is general enough to enable existing and future transfer models.
+
+<li>Allow dynamic data types to be created, registered, and transferred.
+
+<li>Enable data transfer both within and across process space boundaries.
+
+<li>Enable data transfer between Java and non-Java applications.
+
+<li>Support the transfer of Java Beans
+</ul><a name="transfer">
+<p>
+<h2>Transfer API Overview</h2>
+</a>
+<h3>Transferable Objects</h3>
+
+The API centers on an interface which is implemented by objects which are to be transferred.:
+<pre><code>	<a href="../../../../api/java/awt/datatransfer/Transferable.html">java.awt.datatransfer.Transferable</a>
+</code></pre>
+
+A transferable object must be able to provide a list of formats (called " data flavors") for which it can provide the data, ordered from the most-richly descriptive flavor to the least.  It must also be able to return the data (in the form of an Object reference) when requested in a particular flavor (or throw an exception if that flavor is not supported or the data is no longer available).
+<p>Convenience classes which implement the Transferable interface for common data types will be provided to make transfer of these common types easy for the developer.  For example:
+<pre><code>	<a href="../../../../api/java/awt/datatransfer/StringSelection.html">java.awt.datatransfer.StringSelection</a>
+</code></pre>
+
+
+<p>The purpose of this API is to ensure that once the work goes into making a particular element or type of data transferable, it can be easily be passed around using any of the higher-level transfer protocols (clipboard, drag-and-drop, etc.).<a name="919707">
+<p>
+<h3>Data Flavors</h3>
+</a>
+A typical aspect of common data transfer operations (clipboard, Drag-and-Drop) is a negotiation between the provider and the requestor on which flavor to transfer the data in. For example, when html text is selected in a browser and then copied/pasted into a separate word-processing application, the browser would typically offer the data in multiple flavors (probably html formatted text and plain ASCII) in order to maximize the number of potential target applications for a paste operation. 
+<p>This negotiation requires the definition of a data typing name-space such that these various flavors and data-types can be uniquely defined and recognized by distinct applications. In order to avoid the confusion of such overloaded terms such as "format", we have chosen the term "flavor" to represent this concept.
+<p>A data flavor is represented by an object which encapsulates all necessary information about a particular flavor to enable flavor negotiation and transfer between applications:
+<pre><code>	<a href="../../../../api/java/awt/datatransfer/DataFlavor.html">java.awt.datatransfer.DataFlavor</a>
+</code></pre>
+
+<p>This information includes a logical name for the flavor (to enable programmatic identification), a human-presentable name (which be used to present to the user and would be localizable), and the representation class which is used to define the class of object used to actually transfer the data.
+<p>
+<h3>MIME Types as Logical Names</h3>
+
+We are currently planning on using MIME type/subtype parameter notation to represent the logical name for data flavors (See RFC 1521 for the MIME type specification). We believe it is preferable to embrace an existing Internet standard rather than creating "yet another data typing namespace" for the Java environment. 
+<p>MIME type registration is currently handled by a third-party, the Internet Assigned Numbers Authority (IANA), enabling developers to easily locate the standard type/subtype name used for published data formats. Fortunately, formal registration is not required in order to define new MIME type/subtype names for less common formats (we agree that such a formal requirement would not be acceptable for basic Java data transfer). New type names can be created without formal registration by prepending "x-" in front of the name.
+<p>
+<h3>Representation Class</h3>
+
+Since the method in Transferable which actually returns the data:
+<pre><code>	Object getTransferData(DataFlavor flavor)
+</code></pre>
+
+is loosely defined to return an instance of class "Object" (for maximum flexibility), the DataFlavor's defined representation class becomes important to the receiving end of a transfer operation because it allows the returned object to be decoded unambiguously.
+<p>The current DataFlavor class defines two general kinds of data flavors:<ul>
+<li>DataFlavor which represents a specific Java class:
+</ul>
+<pre><code>	     MIME-type="application/x-java-serialized-object; class=&lt;implemenation class&gt;"
+</code></pre>
+
+<pre><code>	     RepresentationClass=&lt;implemenation class&gt;
+</code></pre>
+<p>
+<pre>        e.g. a DataFlavor representing an AWT GUI component:<p></pre>
+
+<pre><code>	     MIME-type="application/x-java-serialized-object; class=java.awt.Component"
+</code></pre>
+
+<pre><code>	     RepresentationClass=java.awt.Component
+</code></pre>
+
+<pre><code>	  If the requesting side of a transfer operation asks for the data in this flavor, 
+          it will be handed back an instance of the Component class.
+</code></pre>
+<ul>
+<li>DataFlavor which represents a particular MIME-type:
+</ul>
+<pre><code>	     MIME-type="application/&lt;mime-subtype&gt;"
+</code></pre>
+
+<pre><code>	     RepresentationClass=java.io.InputStream
+</code></pre>
+<p>
+<pre>        e.g. a DataFlavor representing RTF text:<p></pre>
+
+<pre><code>	     MIME-type="application/rtf"
+</code></pre>
+
+<pre><code>	     RepresentationClass=java.io.InputStream
+</code></pre>
+
+<pre><code>	  If the requesting side of a transfer operation asks for the data in this fla-vor, 
+          it will be handed back an InputStream instance from which it can read/
+          parse the RTF formatted text.
+</code></pre>
+<p>
+For a given MIME-type (type #2 above), a Java program is free to create multiple flavors with different representation classes.  For example, in addition to providing the flavor for the MIME-type "application/rtf" above, a program could specify another flavor:
+<pre>        e.g. a DataFlavor representing RTF text:<p></pre>
+
+<pre><code>	     MIME-type="application/rtf"
+</code></pre>
+
+<pre><code>	     RepresentationClass=foobar.fooRTF
+</code></pre>
+
+<p>
+<h3>Rationale Behind Encapsulation</h3>
+
+At first it may seem that using a class to define a data flavor (rather than simply the MIME-type string) is over-kill. We believe this encapsulation to be an advantage for the following reasons:<ol>
+
+<li>Usability - There are attributes that should be associated with data formats, like the human-presentable name for the data format, that could only be associated with a logical string baroquely.  With a DataFlavor object, these attributes are directly associated with the encapsulating DataFlavor object
+
+<li>Convenience - Using DataFlavor objects gives us a convenient way of handling data format comparisons.  An isMimeTypeEqual() method relieves the programmer or having to remember to convert his MIME types into a canonical form.  (This is an issue because MIME type, subtype, and parameter names are case insensitive and parameters can appear in any order.).
+
+<li>Extensibility - The abstraction will allow us to extend a flavor's attributes/methods over time if necessary.
+
+<li>Performance - Motif and Windows use atoms rather than strings to identify data formats.  Using an object to identify each data format gives us a handy place to cache the atom corresponding to the MIME type name, reducing the number of atom internments required.  Similarly, the results of mapping MIME types like "text/plain" to platform-specific clipboard formats like CF_TEXT on Windows and 'TEXT' on Macintosh can be cached.
+</ol>
+
+<p>The DataFlavor concept may seem complex and confusing, however our intent is to make this as convenient as possible for developers by defining a set of commonly used data flavors.<a name="919742">
+<p>
+<h3>Multiple Item Transfer</h3>
+</a>
+It is not uncommon for a transfer protocol to support the transfer of multiple distinct pieces of data in a single transfer operation (i.e. like a drag-and-drop of multiple file icons from a file manager application).  The transfer API needs to support some form of simultaneous transfer of multiple data items and the current proposal is to encapsulate this capability using an implementation of Transferable which can deal with a collection of distinct data objects.  This plan is currently under more rigorous investigation and will be discussed in more detail in a future revision of this proposal.<a name="919744">
+<p>
+<h2>Code Example for Creating a Transferable Object</h2>
+</a>
+The following code shows the StringSelection class source, which is an example
+of how the API in this proposal would be used to create a class which is capable of transferring plain unicode text.
+
+<pre><code>
+package java.awt.datatransfer;
+
+import java.io.*;
+
+/**
+ * A class which implements the capability required to transfer a
+ * simple java String in plain text format.
+ */
+public class StringSelection implements Transferable, ClipboardOwner {
+
+    final static int STRING = 0;
+    final static int PLAIN_TEXT = 1;
+
+    DataFlavor flavors[] = {DataFlavor.stringFlavor, DataFlavor.plainTextFlavor};
+
+    private String data;
+						   
+    /**
+     * Creates a transferable object capable of transferring the
+     * specified string in plain text format.
+     */
+    public StringSelection(String data) {
+        this.data = data;
+    }
+
+    /**
+     * Returns the array of flavors in which it can provide the data.
+     */
+    public synchronized DataFlavor[] getTransferDataFlavors() {
+	return flavors;
+    }
+
+    /**
+     * Returns whether the requested flavor is supported by this object.
+     * @param flavor the requested flavor for the data
+     */
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+	return (flavor.equals(flavors[STRING]) || flavor.equals(flavors[PLAIN_TEXT]));
+    }
+
+    /**
+     * If the data was requested in the "java.lang.String" flavor, return the
+     * String representing the selection, else throw an UnsupportedFlavorException.
+     * @param flavor the requested flavor for the data
+     */
+    public synchronized Object getTransferData(DataFlavor flavor) 
+			throws UnsupportedFlavorException, IOException {
+	if (flavor.equals(flavors[STRING])) {
+	    return (Object)data;
+	} else if (flavor.equals(flavors[PLAIN_TEXT])) {
+	    return new StringReader(data);
+	} else {
+	    throw new UnsupportedFlavorException(flavor);
+	}
+    }
+
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+    }
+}
+
+</code></pre>
+<hr>
+<a name="clipboard">
+<h1>Clipboard</h1>
+</a>
+Providing Cut/Copy/Paste operations as a means for transferring data both within and between applications is now a common and expected feature in most applications. The AWT API in JDK1.0 does not currently provide any facilities for this basic clipboard operation (except where is exists by default in native text widgets) and this ability is critical for Java programs to be well-integrated into a user's environment.<a name="919798">
+<p>
+<h2>Design Goals for Clipboard API</h2>
+</a>
+Following are the design goals of this API:<ul>
+<li>Make it *extremely* easy for programs to implement cut/copy/paste of text
+
+<li>Enable clipboard operations which interact with the platform's native clipboard
+
+<li>Enable the creation/use of private clipboards for inter-app clipboard operations
+</ul><a name="919803">
+<p>
+<h2>Clipboard API Overview</h2>
+</a>
+The clipboard API provides a standard mechanism to implement cut/copy/paste operations in Java programs.  Different clipboards can be created and named for different purposes (a program might wish to create it's own private clipboard), however there will be a single clipboard instance (named "System") that will be the one which interfaces with the platform's native facilities to allow Java programs to transfer data to/from non-Java applications.
+<p>The clipboard architecture relies on the data transfer mechanism defined by the <a href="#transfer">Java Data Transfer API</a>. The Clipboard API includes a single class which implements the data transfer model for a standard clipboard:
+<pre><code>	<a href="../../../../api/java/awt/datatransfer/Clipboard.html">java.awt.datatransfer.Clipboard</a> 
+</code></pre>
+
+<p>and an interface which is implemented by any classes which will be writing data to the clipboard:
+<pre><code>	<a href="../../../../api/java/awt/datatransfer/ClipboardOwner.html">java.awt.datatransfer.ClipboardOwner</a>
+</code></pre>
+
+<p>The Clipboard class provides two basic methods for reading-from/writing-to the clipboard:
+<pre><code>	void setContents(Transferable content, ClipboardOwner owner)
+</code></pre>
+
+<pre><code>	Transferable getContents(Object requestor)
+</code></pre>
+
+<p>The ClipboardOwner interface consists of a single method which is called if another object asserts ownership of the clipboard:
+<pre><code>	void lostOwnership(Clipboard clipboard)
+</code></pre>
+
+<p>To make the job of implementing clipboard operations on common data types easy for the developer, there will be convenience classes provided which implement the ClipboardOwner interface in a standard way:
+<pre><code>	<a href="../../../../api/java/awt/datatransfer/StringSelection.html">java.awt.datatransfer.StringSelection</a>
+</code></pre>
+
+
+<p>The following method in java.awt.Toolkit will provide access to the clipboard instance which interacts with the native platform facilities:
+<pre><code>	<a href="../../../../api/java/awt/Toolkit.html#getSystemClipboard()">Clipboard getSystemClipboard();</a>
+</code></pre>
+<a name="919819">
+<p>
+<h2>Implementing Cut/Copy/Paste using Clipboard API</h2>
+</a>
+The general sequence of operations for a program implementing "cut"/"copy":<ol>
+
+<li>Instantiate an object which implements the Transferable interface for the data to be cut/copied.
+
+<li>Instantiate an object which implements the ClipboardOwner interface (may be the same object as that which implements Transferable)
+
+<li>Pass this Transferable and ClipboardOwner objects to the clipboard's setContents() method; this establishes ownership of the clipboard.
+
+<li>Handle the call to your clipboard owner's lostOwnership() method, which will be called if/when another object asserts ownership of the clipboard (this method can be empty if you don't need to do anything when you lose ownership)
+</ol>
+
+<p>The general sequence for implementing "paste":<ol>
+
+<li>Request the contents of the clipboard using its getContents() method, which returns a handle to an object which implements the Transferable interface.
+
+<li>Request the list of available flavors for the data from the transferable object using its getTransferDataFlavors() method.
+
+<li>Retrieve the data in the desired available flavor using the transferable object's getTransferData() method.
+</ol>
+
+<p>
+<h3>Lazy Data Model</h3>
+</a>
+The clipboard model implies a level of persistence for the clipboard's contents, however to avoid unnecessary performance penalties at cut/copy time, the data may not actually be transferred from the owner until it has been requested by a consumer (this is known as a "lazy" data model).  If the clipboard owner is destroyed, then it may be necessary to attempt to retrieve the data and store it within the clipboard to ensure its availability after the provider has exited.  The clipboard owner should not, however, make any assumptions about when the transfer will occur and should attempt to keep the data available until its lostOwnership() method is called (if it cannot keep the data available indefinitely, then it should throw an IOException if the data is requested but no longer available).<a name="919832">
+<p>
+<h2>Security</h2>
+</a>
+There are definite security issues with allowing downloaded applets access to the native system's clipboard, both in terms of being able to read it's contents (which could be sensitive) and in terms of writing to it.  Initially, untrusted applets will not be allowed direct access to the *System* clipboard (there will be a SecurityManager method for clipboard access). We are exploring a mechanism which would allow untrusted applets to participate in clipboard operations if the initiation of the operation was from a user-generated event (such as a "cut" or "paste" keyboard event).
+<p>
+<H2>Sample Code using Clipboard API</h2>
+The following is a simple example of a program which is implementing cut/copy/paste of plain text
+<p>(note: for simplicity this example uses a TextArea as the source/dest for the copy/paste operation; on most platforms, cut/copy/paste is already implemented for the TextArea and TextField classes within the native peers)
+<pre><code>								       
+
+import java.awt.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.datatransfer.*;
+
+public class ClipboardTest extends Frame 
+                           <b>implements ClipboardOwner</b>, ActionListener {
+
+    TextArea srcText, dstText;
+    Button copyButton, pasteButton;
+
+    <b>Clipboard clipboard = getToolkit().getSystemClipboard();</b>
+
+    public ClipboardTest() {
+        super("Clipboard Test");
+        GridBagLayout gridbag = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
+        setLayout(gridbag);
+
+        srcText = new TextArea(8, 32);
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.CENTER;
+        gridbag.setConstraints(srcText, c);
+        add(srcText);
+
+        copyButton = new Button("Copy Above");
+        copyButton.setActionCommand("copy");
+        copyButton.addActionListener(this);
+        c.gridy = 1;
+        c.gridwidth = 1;
+        gridbag.setConstraints(copyButton, c);
+        add(copyButton);
+
+        pasteButton = new Button("Paste Below");
+        pasteButton.setActionCommand("paste");
+        pasteButton.addActionListener(this);
+        pasteButton.setEnabled(false);
+        c.gridx = 1;
+        gridbag.setConstraints(pasteButton, c);
+        add(pasteButton);
+
+        dstText = new TextArea(8, 32);
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 2;
+        gridbag.setConstraints(dstText, c);
+        add(dstText); 
+
+        pack();
+    }
+
+    public void actionPerformed(ActionEvent evt) {
+        String cmd = evt.getActionCommand();
+
+        if (cmd.equals("copy")) { 
+           // Implement Copy operation
+           String srcData = srcText.getText();
+           if (srcData != null) {
+                <b>StringSelection contents = new StringSelection(srcData);</b>
+                <b>clipboard.setContents(contents, this);</b>
+                pasteButton.setEnabled(true);
+            }
+        } else if (cmd.equals("paste")) {
+            // Implement Paste operation
+            <b>Transferable content = clipboard.getContents(this);</b>
+            <b>if (content != null) {</b>
+                <b>try {</b>
+                    <b>String dstData = (String)content.getTransferData(
+                                                DataFlavor.stringFlavor);</b>
+                    <b>dstText.append(dstData);</b>
+                <b>} catch (Exception e) {</b>
+                    <b>System.out.println("Couldn't get contents in format: "+</b>
+                           <b>DataFlavor.stringFlavor.getHumanPresentableName()); </b>
+                <b>}</b>
+             }
+        }
+    }
+    <b>public void lostOwnership(Clipboard clipboard, Transferable contents) {</b>
+       <b>System.out.println("Clipboard contents replaced");</b>
+    <b>}</b>
+     public static void main(String[] args) {
+        ClipboardTest test = new ClipboardTest();
+        test.show();
+     }
+}
+</code></pre>
+
+
+<hr>
+<a name="dnd">
+<h1>Drag and Drop</h1>
+</a>
+The Drag-and-drop specification which was previously contained in this document has been superceded by the
+<a href="../../../dragndrop/index.html">Drag-and-Drop documentation</a> in the 
+Java 2 SDK documentation.
+<p>
+<hr> 
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+ 
+<i>Copyright &#169; 1996, 1999, Sun Microsystems, Inc.   All rights
+reserved.</i
+
+
+<!-- This file was created with Quadralay WebWorks Publisher 3.0.5 -->
+<!-- -->
+<!-- For more information on how this document, and how the rest of -->
+<!-- this server was created, email yourEmail@xyzcorp.com -->
+<!-- -->
+<!-- Last updated: 09/13/96 16:57:17 -->
+
+</body>
+</html>

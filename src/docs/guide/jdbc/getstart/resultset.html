@@ -1,0 +1,547 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="statement.html">[Prev]</a> <a href="preparedstatement.html">[Next]</a> 
+<hr><br>
+ 
+<a name="1003004"> </a>
+<h2> ResultSet</h2>
+<p><a name="1029207"> </a>
+NOTE: The material in this chapter is based on <em>JDBC</em>tm<em> API Tutorial and Reference, Second Edition: Universal Data Access for the Java</em>tm<em> 2 Platform</em>, published by Addison Wesley as part of the Java series, ISBN 0-201-43328-1.
+</p><a name="998035"> </a>
+<h3>5.1	 ResultSet Overview</h3>
+<p><a name="996958"> </a>
+A </a><code>ResultSet</code> is a Java object that contains the results of executing an SQL query. In other words, it contains the rows that satisfy the conditions of the query. </a>The </a>data stored in a <code>ResultSet</code> object is retrieved through a set of <code>get</code> methods that allows access to the various columns of the current row. The <code>ResultSet.next</code> method is used to move to the next row of the <code>ResultSet</code>, making it the current row.
+</p><p><a name="999210"> </a>
+The general form of a result set is a table with column headings and the corresponding values returned by a query. For example, if your query is <code>SELECT a, b, c FROM Table1</code>, your result set will have the following form:
+</p><p><a name="1000122"> </a>
+
+</p><blockquote><pre>	
+a           b               c
+----------  ------------    ----------- 
+12345       Cupertino       2459723.495
+83472       Redmond         1.0
+83492       Boston          35069473.43
+</pre></blockquote>
+<p><a name="1011851"> </a>
+
+</p><p><a name="1011852"> </a>
+The following code fragment is an example of executing an SQL statement that will return a collection of rows, with column <code>a</code> as an <code>int</code>, column <code>b</code> as a <code>String</code>, and column <code>c</code> as a float:
+</p>
+<blockquote><pre>
+java.sql.Statement stmt = con.createStatement();
+ResultSet rs = stmt.executeQuery("SELECT a, b, c FROM Table1");
+while (rs.next()) {
+	// retrieve and print the values for the current row
+	int i = rs.getInt("a");
+	String s = rs.getString("b");
+	float f = rs.getFloat("c");
+	System.out.println("ROW = " + i + " " + s + " " + f);
+}
+</pre></blockquote><a name="997942"> </a>
+<h4>5.1.1	 Rows and Columns</h4>
+<p><a name="1012150"> </a>
+A relational database is made up of tables, with each table consisting of rows and columns. A row in a relational database table can be thought of as representing an instance of the entity that the table represents. For example, if there is a table of employees, each row will contain information about a particular employee. Each piece of data about the employee is stored in a column, so, for instance, the table of employees could have columns for an identification number, a name, a salary, and a date of hire. The columns in a row would contain the ID number, name, salary, and date of hire for a particular employee.
+</p><p><a name="1012162"> </a>
+A result set is also a table with rows and columns, but it contains only the column values from a database table that satisfy the conditions of a query. In other words, a result set row will contain a subset of the columns in the underlying database table (unless the query selects everything in the table, in which case the result set table will include all of the column values for every row in the database table). In the past, a column value in a relational database table (and consequently in a result set table) had to be atomic; that is, it could be only one indivisible value. For instance, an array could not be a column value because an array may be made up of multiple elements. With the advent of SQL3 data types, however, the permissible content of table columns has expanded dramatically. It is now possible for an array or even a user-defined structured type to be a column value. Because this new capability allows a relational database to store instances of complex types as column values, it makes a relational database more like an object database, blurring the distinction between relational and object databases. Programmers can take advantage of these new data types if they use a JDBC 2.0 driver that supports SQL3 types.
+</p><a name="1012149"> </a>
+<h4>5.1.2	 </a>Cursors</h4>
+<p><a name="997936"> </a>
+</a>A <code>ResultSet</code> object maintains a cursor, which points to its current row of data. The cursor moves down one row each time the method <code>next</code> is called. When a <code>ResultSet</code> object is first created, the cursor is positioned before the first row, so the first call to the <code>next</code> method puts the cursor on the first row, making it the current row. <code>ResultSet</code> rows can be retrieved in sequence from top to bottom as the cursor moves down one row with each successive call to the method <code>next</code>. This ability to move its cursor only forward is the default behavior for a <code>ResultSet</code> and is the only cursor movement possible with drivers that implement only the JDBC 1.0 API. This kind of result set has the type <code>ResultSet.TYPE_FORWARD_ONLY</code> and is referred to as a forward only result set. 
+</p><p><a name="1021983"> </a>
+If a driver implements the </a>cursor movement methods in the JDBC 2.0 core API, its result sets can be scrollable. A </a>scrollable result set's cursor can move both forward and backward as well as to a particular row. The following methods move the cursor backward, to the first row, to the last row, to a particular row number, to a specified number of rows from the current row, and so on: <code>previous</code>, <code>first</code>, <code>last</code>, <code>absolute</code>, <code>relative</code>, <code>afterLast</code>, and <code>beforeFirst</code>. An explanation and example of how to make a result set scrollable will be presented in the section <a href="resultset.html#1012735">"Creating Different Types of Result Sets" on page &#32;55</a>.
+</p><p><a name="1019363"> </a>
+When a cursor is positioned on a row in a <code>ResultSet</code> object (not before the first row or after the last row), that row becomes the </a>current row. This means that any methods called while the cursor is positioned on that row will (1) operate on values in that row (methods such as <code>getXXX</code> and <code>updateXXX</code>), (2) operate on the row as a whole (such as the methods <code>updateRow</code>, <code>insertRow</code>, <code>deleteRow</code>, <code>refresh-Row</code>), or (3) use that row as a starting point for moving to other rows (such as the method <code>relative</code>).
+</p><p><a name="1010990"> </a>
+A cursor remains </a>valid until the <code>ResultSet</code> object or its parent <code>Statement</code> object is closed.
+</p><a name="1013227"> </a>
+<h4>5.1.3	 Cursor Movement Examples</h4>
+<p><a name="1013228"> </a>
+As stated in the previous section, the standard cursor movement for forward only result sets is to use the method <code>next</code> to iterate through each row of a result set once from top to bottom. With scrollable result sets, it is possible to revisit a row or to iterate through the result set multiple times. This is possible because the cursor can be moved before the first row at any time (with the method <a <CB>beforeFirst<Default Para Font> method (<CB>ResultSet<Default Para Font> interface)><code>beforeFirst</code>). The cursor can begin another iteration through the result set with the method <code>next</code>. The following example positions the cursor before the first row and then iterates forward through the contents of the result set. The methods <code>getString</code> and <code>getFloat</code> retrieve the column values for each row until there are no more rows, at which time the method <code>next</code> returns the value <code>false</code>.
+</p><blockquote><pre>
+rs.beforeFirst();
+while (rs.next()) {
+	System.out.println(rs.getString("EMP_NO") +
+		" " + rs.getFloat("SALARY");
+}
+</pre></blockquote><p><a name="1026909"> </a>
+It is also possible to iterate through a result set backwards, as is shown in the next example. The cursor is first moved to the very end of the result set (with the method </a></a><code>afterLast</code>), and then the method <code>previous</code> is invoked within a <code>while</code> loop to iterate through the contents of the result set by moving to the previous row with each iteration. The method <code>previous</code> returns <code>false</code> when there are no more rows, so the loop ends after all the rows have been visited.
+</p><blockquote><pre>
+rs.afterLast();
+while (rs.previous()) {
+	System.out.println(rs.getString("EMP_NO") +
+		" " + rs.getFloat("SALARY");
+}
+</pre></blockquote><p><a name="1013259"> </a>
+The interface <code>ResultSet</code> offers still other ways to iterate through the rows of a scrollable result set. Care should be taken, however, to avoid incorrect alternatives such as the one illustrated in the following example:
+</p><blockquote><pre>
+// incorrect!
+while (!rs.isAfterLast()) {
+  rs.relative(1);
+  System.out.println(
+	rs.getString("EMP_NO") + " " + rs.getFloat("SALARY"));
+}
+</pre></blockquote>
+
+<p><a name="1013270"> </a>
+This example attempts to iterate forward through a scrollable result set and is incorrect for several reasons. One error is that if <code>ResultSet.isAfterLast</code> is called when the result set is empty, it will return a value of <code>false</code> since there is no last row. The loop body will be executed, which is not what is wanted. An additional problem occurs when the cursor is positioned before the first row of a result set that contains data. In this case, calling <code>rs.</a>relative(1)</code> is erroneous because there is no current row. The method <code>relative</code> moves the cursor the specified number of rows from the current row, and it must be invoked only while the cursor is on the current row.
+</p><p><a name="1013277"> </a>
+The following code fragment fixes the problems in the previous example. Here a call to the method <code>ResultSet.first</code> is used to distinguish the case of an empty result set from one that contains data. Because <code>ResultSet.isAfterLast</code> is called only when the result set is non-empty, the loop control works correctly. Since <code>ResultSet.<a <CB>first<Default Para Font> method (<CB>ResultSet<Default Para Font> interface)>first</code> initially positions the cursor on the first row, the method <code>ResultSet.relative(1)</code> steps through the rows of the result set as expected.
+</p><blockquote><pre>
+if (rs.first()) {
+  while (!rs.isAfterLast()) {
+    System.out.println(
+         rs.getString("EMP_NO") + " " + rs.getFloat("SALARY"));
+    rs.relative(1);
+    }
+}
+</pre></blockquote><a name="1022134"> </a>
+<h4>5.1.4	 Determining the Number of Rows in a Result Set</h4>
+<p><a name="1022135"> </a>
+With the new cursor movement methods, it is easy to see how many rows a scrollable <code>ResultSet</code> object contains. All that is necessary is to go to the last row of the result set and get the number of that row. In the following example, rs will have one row for each employee.
+</p><blockquote><pre>
+ResultSet rs = stmt.executeQuery(
+		"SELECT LAST_NAME, FIRST_NAME FROM EMPLOYEES");
+rs.last();
+int numberOfRows = rs.getRow();
+System.out.println("XYZ, Inc. has " + numberOfRows + " employees");
+rs.beforeFirst();
+while (next()) {
+	. . . // retrieve first and last names of each employee
+}
+</pre></blockquote><p><a name="1022141"> </a>
+Though not as convenient, it is also possible to find out how many rows a nonscrollable result set has. The following example shows one way to determine the number of rows.
+</p><blockquote><pre>
+ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM EMPLOYEES");
+rs.next();
+int count = rs.getInt(1);
+System.out.println("XYZ, Inc. has " + count + " employees");
+
+ResultSet rs2 = stmt.executeQuery(
+		"SELECT LAST_NAME, FIRST_NAME FROM EMPLOYEES");
+while (rs2.next()) {
+	. . . // retrieve first and last names of each employee
+}
+</pre></blockquote><p><a name="1022705"> </a>
+With the scrollable result set, the cursor was just repositioned to start iterating through the same result set to retrieve its data. In the preceding example, however, one query is needed to get the count, and another query is needed to get a result set with the data that is desired. Both queries must, of course, produce result sets of the same size for the count to be accurate.
+</p><p><a name="1022765"> </a>
+A second way to determine the number of rows in a forward-only result set is to iterate through the result set, incrementing a variable with each iteration, which is shown in the following example. Because an application can iterate through a forward-only result set just once, the same query needs to be executed twice. In the iteration through the first rs, the number of rows is counted; in the iteration through the second rs, the data is retrieved.
+</p><blockquote><pre>
+ResultSet rs = stmt.executeQuery(
+		"SELECT LAST_NAME, FIRST_NAME FROM EMPLOYEES");
+int count = 0;
+while (rs.next()) {
+	count++;
+}
+System.out.println("Company XYZ has " + count " employees.");
+rs = stmt.executeQuery(
+		"SELECT LAST_NAME, FIRST_NAME FROM EMPLOYEES");
+while (rs.next()) {
+	. . . // retrieve first and last names of each employee
+}
+</pre></blockquote><a name="1010994"> </a>
+<h4>5.1.5	 </a>Retrieving</a> Column</a> Values</a></h4>
+<p><a name="1010997"> </a>
+The <code>ResultSet.getXXX</code> methods provide the means for retrieving column values from the current row. For maximum portability with forward only result sets, values should be retrieved from left to right, and column values should be read only once. With scrollable result sets, however, there are no such restrictions.
+</p><p><a name="996961"> </a>
+Either the column name or the column number can be used to designate the column from which to retrieve data. For example, if the second column of a <code>ResultSet</code> object rs is named <code>TITLE</code>, and it stores values as strings, either of the following will retrieve the value stored in that column:
+</p><blockquote><pre>
+String s = rs.getString(2);
+String s = rs.getString("<code>TITLE</code>");
+</pre></blockquote><p><a name="1003486"> </a>
+Note that columns are numbered from left to right starting with column 1. Also, column names used as input to <code>getXXX</code> methods are case insensitive. 
+</p><p><a name="1003455"> </a>
+The option of using the column name was provided so that a user who specifies column names in a query can use those same names as the arguments to <code>getXXX</code> methods. If, on the other hand, the <code>SELECT</code> statement does not specify column names (as in "<code>SELECT * FROM TABLE1</code>" or in cases where a column is derived), column numbers should be used. In such situations, there is no way for the user to know for sure what the column names are.
+</p><p><a name="1002645"> </a>
+ In some cases, it is possible for an SQL query to return a result set that has more than one column with the same name. If a column name is used as the parameter to a <code>getXXX</code> method, <code>getXXX</code> will return the value of the first matching column name. </a>Thus, if there are </a>multiple columns with the same name, one needs to use a column index to be sure that the correct column value is retrieved. It may also be slightly more efficient to use column numbers.
+</p><p><a name="1003561"> </a>
+</a>If </a>the </a>name of a column is known but not its index, the method </a><code>findColumn</code> can be used to find the column number.
+</p><p><a name="997930"> </a>
+Information about the columns in a <code>ResultSet</code> is available by calling the method <code>ResultSet.getMetaData</code>. The <code>ResultSetMetaData</code> object returned gives the number, types, and properties of its <code>ResultSet</code> object's columns.
+</p><a name="1012368"> </a>
+<h4>5.1.6	 Which getXXX Method to Use</a></h4>
+<p><a name="1012369"> </a>
+JDBC drivers support type coercion. When a <code>getXXX</code> method is invoked, the driver attempts to convert the underlying data to the type <code>XXX</code> in the Java programming language and then returns a suitable value. For example, if the <code>getXXX</code> method is <code>getString</code>, and the data type of the data in the underlying database is <code>VARCHAR</code>, the JDBC Compliant driver will convert the <code>VARCHAR</code> value to a <code>String</code> object in the Java programming language. That <code>String</code> object will be the value returned by <code>getString</code>.
+</p><p><a name="1012284"> </a>
+The JDBC 2.0 API adds new <code>ResultSet.getXXX </code>methods for retrieving the new SQL3 data types. These methods work the same way the <code>getXXX</code> methods in the JDBC 1.0 API work; that is, they map the SQL3 JDBC type to a type in the Java programming language and return that type. For example, the method <code>getClob</code> retrieves a JDBC <code>CLOB</code> value from the database and returns a <code>Clob</code> object, which is an instance of the <code>java.sql.Clob</code> interface.
+</p><p><a name="1020705"> </a>
+The method </a><code>getObject</code> will retrieve any data type. This is possible because <code>Object</code>, being the type from which every other object type in the Java programming language is derived, is the most generic type. This is especially useful when the underlying data type is a database-specific type or when a generic application needs to be able to accept any data type. The method <code>getObject</code>, as would be expected from its name, returns a Java <code>Object</code> that must be narrowed if it is to be used as a more specific type. In other words, it must be cast from its generic <code>Object</code> type to its more derived type before it can be used as that derived type. The following code fragment illustrates using the method <code>getObject</code> to retrieve a <code>Struct</code> value from the column <code>ADDRESS</code> in the current row of the <code>ResultSet</code> object rs. The <code>Object</code> that <code>getObject</code> returns is narrowed to a <code>Struct</code> before assigning it to the variable address.
+</p><blockquote><pre>
+Struct address = (Struct)rs.getObject("ADDRESS");
+</pre></blockquote><p><a name="1020618"> </a>
+The method <code>getObject</code> is not only the one method capable of retrieving values of any data type but also the only <code>ResultSet.getXXX</code> method that does custom mapping. Therefore, to be custom mapped, a data type has to be retrieved with the method <code>getObject</code>. The two SQL data types that can be custom mapped are the user-defined types, SQL structured types and <code>DISTINCT</code> types. A JDBC <code>DISTINCT</code> value is normally retrieved with the <code>getXXX</code> method appropriate for its underlying type, but if it has a custom mapping, it must be retrieved by the method <code>getObject</code> in order to be custom mapped. A JDBC <code>STRUCT</code> can only be retrieved with the method <code>getObject</code>, guaranteeing that if there is a custom mapping for a JDBC <code>STRUCT</code> value, it will be used.
+</p><p><a name="1010363"> </a>
+ 
+<center><img src="resultset.gif" alt="use of ResultSet.getXXX methods to retriee JDBC types" longdesc="table5.1.html"><a href="table5.1.html" title="Long description for">[D]</a></center>
+
+</p><p><a name="1010365"> </a>
+ </a>An "x" indicates that the <code>getXXX</code> method may legally be used to retrieve the given JDBC type. 
+</p><p><a name="1000160"> </a>
+An "<strong>X</strong>" indicates that the <code>getXXX</code> method is <em>recommended</em> for retrieving the given JDBC type.
+</p><a name="1011815"> </a>
+<h4>5.1.7	 Types of Result Sets</h4>
+<p><a name="1011879"> </a>
+Results sets may have different levels of functionality. For example, they may be scrollable or nonscrollable. A </a>scrollable result set has a cursor that moves both forward and backward and can be moved to a particular row. Also, result sets may be sensitive or insensitive to changes made while they are open; that is, they may or may not reflect changes to column values that are modified in the database. A developer should always keep in mind the fact that adding capabilities to a <code>ResultSet</code> object incurs additional overhead, so it should be done only as necessary.
+</p><p><a name="1012587"> </a>
+Based on the capabilities of scrollability and sensitivity to changes, there are three types of result sets available with the JDBC 2.0 core API. The following constants, defined in the <code>ResultSet</code> interface, are used to specify these three  types of result sets:
+</p><ol>
+<a name="1011818"> </a>
+<li>TYPE_FORWARD_ONLY
+<ul>
+<li>The result set is nonscrollable; its cursor moves forward only, from top to bottom.
+<li>The view of the data in the result set depends on whether the DBMS materializes results incrementally.
+</ul>
+<li>TYPE_SCROLL_INSENSITIVE
+<ul>
+<li>The result set is scrollable: Its cursor can move forward or backward and can be moved to a particular row or to a row whose position is relative to its current position.
+<li>The result set generally does not show changes to the underlying database that are made while it is open. The membership, order, and column values of rows are typically fixed when the result set is created.
+</ul>
+<li>TYPE_SCROLL_SENSITIVE
+<ul>
+<li>The result set is scrollable; its cursor can move forward or backward and can be moved to a particular row or to a row whose position is relative to its current position.
+<li>The result set is sensitive to changes made while it is open. If the underlying column values are modified, the new values are visible, thus providing a dynamic view of the underlying data. The membership and ordering of rows in the result set may be fixed or not, depending on the implementation.
+</ul>
+</ol>
+<a name="1011841"> </a>
+<h4>5.1.8	 Concurrency Types</h4>
+<p>
+A result set may have different update capabilities. As with scrollability, making a <code>ResultSet</code> object updatable increases overhead and should be done only when necessary. That said, it is often more convenient to make updates programmatically, and that can only be done if a result set is made updatable. The JDBC 2.0 core API offers two update capabilities, specified by the following constants in the <code>ResultSet</code> interface:
+</p><ol>
+<a name="1013304"> </a>
+<li>CONCUR_READ_ONLY
+<ul>
+<li>Indicates a result set that <em>cannot</em> be updated programmatically
+<li>The one concurrency type available to drivers that implement only the JDBC 1.0 API
+<li>Offers the highest level of concurrency (allows the largest number of simultaneous users). When a <code>ResultSet</code> object with read-only concurrency needs to set a lock, it uses a read-only lock. This allow users to read data but not to change it. Because there is no limit to the number of read-only locks that may be held on data at one time, there is no limit to the number of concurrent users unless the DBMS or driver imposes one.
+</ul>
+<li>CONCUR_UPDATABLE
+<ul>
+<li>Indicates a result set that <em>can</em> be updated programmatically
+<li>Available to drivers that implement the JDBC 2.0 core API 
+<li>Reduces the level on concurrency. Updatable results sets may use write-only locks so that only one user at a time has access to a data item. This eliminates the possibility that two or more users might change the same data, thus ensuring database consistency. However, the price for this consistency is a reduced level of concurrency.
+</ul></ol>
+<p><a name="1011949"> </a>
+To allow a higher level of concurrency, an updatable result set may be implemented so that it uses an optimistic concurrency control scheme. This implementation assumes that conflicts will be rare and avoids using write-only locks, thereby permitting more users concurrent access to data. Before committing any updates, it determines whether a conflict has occurred by comparing rows either by value or by a version number. If there has been an update conflict between two transactions, one of the transactions will be aborted in order to maintain consistency. Optimistic concurrency control implementations can increase concurrency; however, if there are too many conflicts, they may actually reduce performance.
+<a name="1011961"> </a>
+<h4>5.1.9	 Providing Performance Hints</h4>
+<p><a name="1013894"> </a>
+Many DBMSs and drivers are optimized to give the best performance under various circumstances, which means that generally a database programmer is best advised to use their default settings. However, for programmers who may want to fine tune database performance for a particular application, the JDBC 2.0 API provides methods that give hints to the driver for making access to result set data more efficient. These </a>performance </a>hints are exactly that, just hints; a JDBC Compliant driver may choose to ignore them.
+</p><p><a name="1013900"> </a>
+The following two hints give the driver suggestions for improving performance:
+</p><ol>
+<a name="1013895"> </a>
+<li>The </a>number of rows that should be fetched from the database each time new rows are needed
+<a name="1026927"> </a>
+The number of rows to be fetched is called the <em>fetch size</em>, and it can be set by two different methods: <code>Statement.</a>setFetchSize</code> and <code>ResultSet.</a>setFetchSize</code>. The statement that creates a <code>ResultSet</code> object sets the default fetch size for that <code>ResultSet</code> object, using the <code>Statement</code> method <code>setFetchSize</code>. The following code fragment sets the fetch size for the <code>ResultSet</code> object rs to 25. Until the fetch size is changed, any result set created by the <code>Statement</code> object stmt will automatically have a fetch size of 25.
+<blockquote><pre>
+Statement stmt = con.createStatement();
+stmt.setFetchSize(25);
+ResultSet rs = stmt.executeQuery(SELECT * FROM EMPLOYEES);
+</pre></blockquote><a name="1012653"> </a>
+A result set can, at any time, change its default fetch size by setting a new fetch size with the <code>ResultSet</code> version of the method <code>setFetchSize</code>. Continuing from the previous code fragment, the following line of code changes the fetch size of rs to 50:
+<blockquote><pre>
+rs.setFetchSize(50);
+</pre></blockquote><a name="1019880"> </a>
+Normally the most efficient fetch size is already the default for the driver. The method <code>setFetchSize</code> simply allows a programmer to experiment to see if a certain fetch size is more efficient than the default for a particular application.
+<a name="1029122"> </a>
+<p>
+<li>The </a>direction in which rows will be processed
+<p>
+The interface <code>ResultSet</code> defines the following three constants for specifying the direction in which to process rows: <code>FETCH_FORWARD</code>, <code>FETCH_REVERSE</code>, and <code>FETCH_UNKNOWN.</code> As with the fetch size, there are two methods for setting the fetch direction, one in the interface <code>Statement</code>, and the other in the interface <code>ResultSet</code>. The statement that creates the result set determines the default fetch direction by using the <code>Statement</code> method </a><code>setFetchDirection</code>. The following code fragment sets the fetch direction for the <code>ResultSet</code> object rs so that it will process rows from the bottom up. Until the fetch direction is changed, any result set created by the <code>Statement</code> object stmt will automatically have a fetch direction of backward.
+<blockquote><pre>
+Statement stmt = con.createStatement();
+stmt.setFetchDirection(FETCH_REVERSE);
+ResultSet rs = stmt.executeQuery(SELECT * FROM EMPLOYEES);
+</pre></blockquote><a name="1012739"> </a>
+A result set can, at any time, change its default fetch direction by setting a new fetch direction with the <code>ResultSet</code> method </a><code>setFetchDirection</code>. Continuing from the previous code fragment, the following line of code changes the fetch direction of rs to forward.
+<blockquote><pre>
+rs.setFetchDirection(FETCH_FORWARD);
+</pre></blockquote>
+The <code>ResultSet</code> object rs will hint that the driver process rows in a forward direction. This hint will be in effect until the method <code>ResultSet.setFetchDirection</code> is again called on rs to change the suggested fetch direction.
+<p>
+As with the fetch size, drivers are commonly optimized to use the most efficient fetch direction, and changing the default may actually work against this optimization. The method <code>setFetchDirection</code> simply allows a programmer to try to fine tune an application for even better performance.
+</ol>
+<a name="1012735"> </a>
+<h4>5.1.10	 Creating Different Types of Result Sets</h4>
+<p><a name="1011962"> </a>
+A result set is created by executing a query, and the type of result set depends on the arguments that are supplied to the <code>Connection</code> method <code>createStatement</code> (or <code>prepareStatement</code> or <code>prepareCall</code>). The following code fragment, which uses only JDBC 1.0 API, supplies no arguments to the method <code>createStatement</code> and thus creates a default <code>ResultSet</code> object, one that is forward-only and uses read-only concurrency.
+</p><blockquote><pre>
+Connection con = DriverManager.getConnection(
+		"jdbc:my_subprotocol:my_subname");
+Statement stmt = con.createStatement();
+ResultSet rs = stmt.executeQuery(
+	"SELECT EMP_NO, SALARY FROM EMPLOYEES");
+</pre></blockquote><p><a name="1011971"> </a>
+The variable rs represents a <code>ResultSet</code> object that contains the values for the columns <code>EMP_NO</code> and <code>SALARY</code> from every row in the table <code>EMPLOYEES</code>. This result set is not scrollable, so only the method <code>next</code> can be used to move the cursor from the top down through the rows of the result set. The <code>ResultSet</code> object rs cannot be updated, and since no performance hints were given, the driver is free to do whatever it thinks will produce the best performance. The transaction isolation level was likewise not set, so rs will use the default transaction isolation level of the underlying database. (See <a href="connection.html#998958">"Transaction Isolation Levels" on page &#32;22</a> for an explanation of transaction isolation levels.)
+</p><p><a name="1011989"> </a>
+The next example uses the new JDBC 2.0 core API to create a scrollable result set that is sensitive to updates (by specifying <code>ResultSet.TYPE_SCROLL_SENSITIVE</code>) and that is updatable (by specifying <code>ResultSet.CONCUR_UPDATABLE</code>). 
+</p><blockquote><pre>
+Connection con = DriverManager.getConnection(
+		"jdbc:my_subprotocol:my_subname");
+
+Statement stmt = con.createStatement(
+		ResultSet.TYPE_SCROLL_SENSITIVE,
+ 		ResultSet.CONCUR_UPDATABLE);
+stmt.setFetchSize(25);
+
+ResultSet rs2 = stmt.executeQuery(
+		"SELECT EMP_NO, SALARY FROM EMPLOYEES");
+
+</pre></blockquote><p><a name="1012080"> </a>
+The variable rs2 contains the same values as rs, from the previous example, but unlike rs, it is scrollable, updatable, and sensitive to changes in the underlying table's data. It also hints that the driver should fetch 25 rows from the database each time new rows are needed. Each time the <code>Statement</code> object stmt is executed, it will create a result set that is scrollable, is updatable, is sensitive to changes in its data, and has a fetch size of 25. The result set may change its fetch size, but it cannot change its type or concurrency.
+</p><p><a name="1021935"> </a>
+As stated previously, there is a cost to making a result set scrollable or updatable, so it is good practice to create result sets with these features only when they are needed.
+</p><a name="1020844"> </a>
+<h4>5.1.11	 Using a Prepared Statement to Create Result Sets</h4>
+<p><a name="1020845"> </a>
+Because <code>PreparedStatement</code> and <code>CallableStatement</code> objects inherit the methods defined in the <code>Statement</code> interface, they, too, can </a>create different types of <code>ResultSet</code> objects.
+</p><p><a name="1012116"> </a>
+The following code fragment creates a result set using a <code>PreparedStatement</code> object instead of a <code>Statement</code> object. The result set has the same attributes as in the previous example, except that a transaction isolation level is set for the connection.
+</p><blockquote><pre>
+Connection con = DriverManager.getConnection(
+			"jdbc:my_subprotocol:my_subname");
+con.setTransactionIsolation(TRANSACTION_READ_COMMITTED);
+
+PreparedStatement pstmt = con.prepareStatement(
+			"SELECT EMP_NO, SALARY FROM EMPLOYEES WHERE EMP_NO = ?",
+			ResultSet.TYPE_SCROLL_SENSITIVE,
+			ResultSet.CONCUR_UPDATABLE);
+pstmt.setFetchSize(25);
+pstmt.setString(1, "1000010");
+
+ResultSet rs3 = pstmt.executeQuery();
+</pre></blockquote><p><a name="1012129"> </a>
+The variable rs3 contains the values from the columns <code>EMP_NO</code> and <code>SALARY</code> for the row where the value for <code>EMP_NO</code> is <code>1000010</code>. The <code>ResultSet</code> object rs3<code> </code>is like rs2<code> </code>in that it is scrollable, is updatable, is sensitive to changes in its data, and hints that the driver should fetch 25 rows at a time from the database. It is different in that its connection specifies that dirty reads (reading values before they are committed) will be prevented. Because no transaction isolation level was set for rs2, it will by default have the isolation level of the underlying database.
+</p><a name="1012090"> </a>
+<h4>5.1.12	 Requesting Features That Are Not Supported</h4>
+<p><a name="1025246"> </a>
+With the addition of new functionality in the JDBC 2.0 API, it is possible for an application to request features that a DBMS or driver do not support. If the driver does not support scrollable result sets, for example, it may return a forward-only result set. Also, some queries will return a result set that cannot be updated, so requesting an updatable result set would have no effect for those queries. A general rule is that a query should include the primary key as one of the columns it selects, and it should reference only one table. 
+</p><p><a name="1025261"> </a>
+New methods in the JDBC 2.0 API let an application discover which result set features a driver supports. If there is any doubt about whether a feature is supported, it is advisable to call these methods before requesting the feature. The following <code>DatabaseMetaData</code> methods indicate whether a driver supports a given result set</a> type or a given result set </a>concurrency:
+</p>
+<ul>
+<li><code>DatabaseMetaData.supportsResultSetType</code> - returns a <code>boolean</code> indicating whether the driver supports the given result set type
+<a name="1012463"> </a>
+<li><code>DatabaseMetaData.supportsResultSetConcurrency</code> - returns a <code>boolean</code> indicating whether the driver supports the given concurrency type in combination with the given result set type
+</ul>
+<p><a name="1012443"> </a>
+The following <code>ResultSet</code> methods return the result set type and result set concurrency for the particular result set on which the method is called:
+</p>
+<ul>
+<li><code>ResultSet.getType</code> - returns the type of this result set
+<a name="1012457"> </a>
+<li><code>ResultSet.getConcurrency</code> - returns the concurrency mode of this result set
+</ul>
+<p><a name="1012484"> </a>
+If an application specifies a scrollable result set and the driver does not support scrolling, the driver will issue a warning on the <code>Connection</code> object that produced the statement and return a result set that is forward-only. Even if the driver supports scrollable result sets, it is possible for an application to request a scrollable type that the driver does not </a>support. In such a case, the driver will issue an <code>SQLWarning</code> on the <code>Connection</code> object that produced the statement and return a scrollable result set of a type that it does support, even if it differs from the exact type requested. For example, if an application requests a <code>TYPE_SCROLL_SENSITIVE</code> result set and the driver does not support that type, it could return a <code>TYPE_SCROLL_INSENSITIVE</code> result set if it supports that type. The driver would also alert the application that it did not return the exact type requested by issuing an <code>SQLWarning</code> on the <code>Connection</code> object that produced the statement requesting the unsupported result set type.
+</p><p><a name="1012481"> </a>
+Similarly, if an application specifies an updatable result set, a driver that does not support </a>updatable result sets will issue an <code>SQLWarning</code> on the <code>Connection</code> object that produced the statement and return a read-only result set. If the application requests both an unsupported result set type and an unsupported concurrency type, the driver should choose the result set type first.
+</p><p><a name="1012521"> </a>
+In some situations, a driver may need to choose an alternate result set type or concurrency type at statement execution time. For example, a <code>SELECT</code> statement that contains a join over multiple tables might produce a result set that is not updatable. In such a situation, the driver will issue an <code>SQLWarning</code> on the <code>Statement</code>, <code>PreparedStatement</code>, or <code>CallableStatement</code> object that tried to create the result set instead of issuing it on the <code>Connection</code> object. The driver will then choose an appropriate result set type and/or concurrency type according to the guidelines in the preceding two paragraphs.
+</p></pre></blockquote><a name="1012546"> </a>
+<h4>5.1.13	 Using updateXXX Methods</h4>
+<p><a name="1012816"> </a>
+A <code>ResultSet</code> object may be updated (have its rows modified, inserted, or deleted) programmatically if its concurrency type is <code>CONCUR_UPDATABLE</code>. The JDBC 2.0 API adds </a><code>updateXXX</code> methods and various other methods to the <code>ResultSet</code> interface so that rows can be programmatically updated in both the <code>ResultSet</code> object and the database.
+</p><p><a name="1012817"> </a>
+The new <code>updateXXX</code> methods make it possible to update values in a result set without using SQL commands. There is an <code>updateXXX</code> method for each data type, and as with the <code>getXXX</code> and <code>setXXX</code> methods, the <code>XXX</code> is a data type in the Java programming language. As with the <code>setXXX</code> methods, the driver converts this data type to an SQL data type before sending it to the database. So for example, the method <code>updateBoolean</code> sends a JDBC <code>BIT</code> value to the database, and the method <code>updateCharacterStream</code> sends a JDBC <code>LONGVARCHAR</code> value to the database.
+</p><p><a name="1012813"> </a>
+The <code>updateXXX</code> methods take two parameters, the first to indicate which column is to be updated, and the second to give the value to assign to the specified column. As is true with the <code>getXXX</code> methods, the column can be specified by giving either its name or its index. If an application retrieved a value from a result set by using the column name, it will generally use the column name when it wants to update that value. Similarly, if the <code>getXXX</code> method was given a column index to retrieve a value, the corresponding <code>updateXXX</code> method will generally use the column index to update that value.
+</p><p><a name="1013018"> </a>
+Note that the column index used with <code>ResultSet</code> methods refers to the column number in the result set, not the column number in the database table, which might well be different. (The column numbers will be the same only in the case where all of a table's columns are selected.) In both result set tables and database tables, the index for the first column is <code>1</code>, the index for the second column is <code>2</code>, and so on.
+</p><p><a name="1012931"> </a>
+In the following code fragment, the value in the third column of the <code>ResultSet</code> object rs is retrieved using the method <code>getInt</code>, and the method <code>updateInt</code> is used to update that column value with an <code>int</code> value of <code>88</code>:
+</p><blockquote><pre>
+int n = rs.getInt(3); // n contains the value in column 3 of rs
+. . .
+rs.updateInt(3, 88); // the value in column 3 of rs is set to 88
+int n = rs.getInt(3); // n = 88
+</pre></blockquote><p><a name="1012823"> </a>
+If the third column is named <code>SCORES</code>, the following lines of code will also update the third column of the <code>ResultSet</code> object rs by assigning it the <code>int</code> value <code>88</code>:
+</p><blockquote><pre>
+int n = rs.getInt("SCORES");
+. . .
+rs.updateInt("SCORES", 88);
+</pre></blockquote><p><a name="1012844"> </a>
+The <code>updateXXX</code> methods update a value in the current row of the result set, but they do not update the value in the underlying database table. It is the method <code>updateRow</code> that updates the database. It is very important that the <code>updateRow</code> method be called while the cursor is still on the current row (the row to be updated). In fact, if an application moves the cursor before it calls <code>updateRow</code>, the driver must discard the update, and neither the result set nor the database will be updated.
+</p><p><a name="1012859"> </a>
+An application may explicitly cancel the updates to a row by calling the method <code>cancelRowUpdates</code>. To take effect, it must be called after the method <code>updateXXX</code> is called and before the method <code>updateRow</code> is called. If <code>cancelRowUpdates</code> is called at any other time, it has no effect.
+</p><p><a name="1012872"> </a>
+The following example demonstrates updating the second and third columns in the fourth row of the <code>ResultSet</code> object rs. Since updates affect the current row, the cursor is first moved to the row to be updated, which in this case is the fourth row. Next the method <code>updateString</code> <code>is</code> called to change the value in the second column of rs to <code>321 Kasten</code>. The method <code>updateFloat</code> changes the value in the third column of rs to <code>10101.0</code>. Finally, the method <code>updateRow</code> is called to update the row in the database that contains the two modified column values.
+</p><blockquote><pre>
+rs.absolute(4);
+rs.updateString(2, "321 Kasten");
+rs.updateFloat(3, 10101.0f);
+rs.updateRow();
+</pre></blockquote><p><a name="1012890"> </a>
+If the second column is named <code>ADDRESS</code> and the third column is named <code>AMOUNT</code>, the following code will have exactly the same effect as the previous example.
+</p><blockquote><pre>
+rs.absolute(4);
+rs.updateString("ADDRESS", "321 Kasten");
+rs.updateFloat("AMOUNT", 10101.0f);
+rs.updateRow();
+</pre></blockquote><p><a name="1013075"> </a>
+In addition to making updates programmatically, the JDBC 2.0 core API provides the ability to send batch updates. The batch update facility operates through a <code>Statement</code> object, which is explained in the section <a href="statement.html#1000712">"Sending Batch Updates" on page &#32;39</a>.
+</p><a name="1013056"> </a>
+<h4>5.1.14	 Deleting a Row</h4>
+<p><a name="1013057"> </a>
+The JDBC 2.0 API provides the method <code>deleteRow</code> </a>so that a row in a <code>ResultSet</code> object can be deleted using only methods in the Java programming language. This method deletes the current row, so before calling <code>deleteRow</code>, an application must position the cursor on the row it wants to delete. Unlike the <code>updateXXX</code> methods, which affect only a row in the result set, this method affects both the current row in the result set and the underlying row in the database. The following two lines of code remove the first row of the <code>ResultSet</code> object rs and also delete the underlying row from the database (which may or may not be the first row of the database table).
+</p><blockquote><pre>
+rs.first();
+rs.deleteRow();
+</pre></blockquote><a name="1012952"> </a>
+<h4>5.1.15	 Inserting Rows</h4>
+<p><a name="1012964"> </a>
+New rows may be </a>inserted into a result set table and into the underlying database table using new methods in the JDBC 2.0 core API. To make this possible, the API defines the concept of an </a><em>insert row</em>. This is a special row, associated with the result set but not part of it, that serves as a staging area for building the row that is to be inserted. To access the insert row, an application calls the <code>ResultSet</code> method <code>moveToInsertRow</code>, which positions the cursor on the insert row. Then it calls the appropriate <code>updateXXX</code> methods to add column values to the insert row. When all of the columns of the row to be inserted have been set, the application calls the method <code>insertRow</code>. This method adds the insert row to both the result set and the underlying database simultaneously. Finally, the application needs to position the cursor on a row back in the result set.
+</p><p><a name="1013128"> </a>
+The following code fragment demonstrates these steps for inserting a row from an application written in the Java programming language.
+</p><blockquote><pre>
+rs.moveToInsertRow();
+rs.updateObject(1, myArray);
+rs.updateInt(2, 3857);
+rs.updateString(3, "Mysteries");
+rs.insertRow();
+rs.first();
+</pre></blockquote><p><a name="1013142"> </a>
+Several details deserve attention. First, it is possible to retrieve values from the insert row using the <code>ResultSet.getXXX</code> methods. Until a value has been assigned to the insert row with an <code>updateXXX</code> method, however, its contents are undefined. Therefore, if a <code>getXXX</code> method is called after the <code>moveToInsertRow</code> method has been called but before an <code>updateXXX</code> method has been called, the value it returns will be undefined.
+</p><p><a name="1013155"> </a>
+Second, calling an <code>updateXXX</code> method on the insert row is different from calling it on a row in <code>the ResultSet</code> object. When the cursor is on a row in a result set, a call to an <code>updateXXX</code> method changes a value in the result set. When the cursor is on the insert row, a call to an <code>updateXXX</code> method updates a value in the insert row but does nothing to the result set. In both cases, though, the <code>updateXXX</code> method has no effect on the underlying database.
+</p><p><a name="1013156"> </a>
+Third, calling the method <code>insertRow</code>, which adds the insert row to both the result set and database, may throw an <code>SQLException</code> if the number of columns in the insert row does not match the number of columns in the database table. For example, if a column is not given a value by calling an <code>updateXXX</code> method, an <code>SQLException</code> will be thrown unless that column allows null values. Also, if the result set is missing a column, that, too, will cause an <code>SQLException</code> to be thrown unless the column allows null values.
+</p><p><a name="1013190"> </a>
+Fourth, a result set keeps track of where its </a>cursor was positioned when the cursor moved to the insert row. As a result, a call to the method <code>ResultSet</code>.<code>moveToCurrentRow</code> will return the cursor to the row that was the current row immediately before the method <code>moveToInsertRow</code> was called. The other cursor movement methods also work from the insert row, including those that use positioning relative to the current row.
+</p><a name="1012961"> </a>
+<h4>5.1.16	 </a>Positioned </a>Updates</a></h4>
+<p><a name="1011955"> </a>
+Before the JDBC 2.0 API made programmatic updates available in the Java programming language, the only way to change a row that had been fetched with a result set was to use what is called a <em>positioned update</em></a>. A positioned update is done with SQL commands and requires a named cursor to indicate the result set row in which updates are to be made.
+</p><p><a name="1019695"> </a>
+The <code>Statement</code> interface provides the method <code>setCursorName</code>, which allows an application to specify a cursor name for the cursor associated with the next result set produced by a statement. This name can then be used in SQL positioned update or delete statements to identify the current row in the <code>ResultSet</code> object generated by the statement. In order to enable a positioned update or delete on a result set, the query that produces it must have the following form:
+</p><blockquote><pre>
+SELECT . . . FROM . . . WHERE . . . FOR UPDATE . . .
+</pre></blockquote><p><a name="1019746"> </a>
+Including the words "<code>FOR UPDATE</code>" ensures that the cursor has the proper isolation level to support an update.
+</p><p><a name="1019716"> </a>
+After the method <code>executeQuery</code> has been called on the statement, the cursor name for the resulting <code>ResultSet</code> object can be obtained by calling the <code>ResultSet</code> </a>method </a><code>getCursorName</code>.</a> If a DBMS allows positioned updates or positioned deletes, the name of the cursor can be supplied as a parameter to the SQL command for updates or deletes. A <code>Statement</code> object other than the one that created the <code>ResultSet</code> object must be used for the positioned update. The following code fragment, in which stmt and stmt2 are two different <code>Statement</code> objects, demonstrates the form for naming a cursor and then using it in an SQL update statement:
+</p><blockquote><pre>
+stmt.setCursorName("x");
+ResultSet rs = stmt.executeQuery(
+		"SELECT . . . FROM . . . WHERE . . . FOR UPDATE . . .")
+String cursorName = rs.getCursorName;
+int updateCount = stmt2.executeUpdate(
+		"UPDATE . . . WHERE CURRENT OF " + cursorName);
+</pre></blockquote><p><a name="1019723"> </a>
+Note that just because the method <code>getCursorName</code> has been invoked on a <code>ResultSet</code> object does not necessarily mean that it can be updated using the <code>ResultSet.updateXXX</code> methods available in the JDBC 2.0 core API. In order to update a <code>ResultSet</code> object using the <code>updateXXX</code> methods, the <code>executeQuery</code> statement that produces the result set must include the specification <code>CONCUR_UPDATABLE</code>. </a>Positioned updates, however, are possible for a result set created without this specification if all the proper steps are taken: (1) a cursor is named, (2) the SQL query that produces the result set is of the form SELECT . . . FROM . . . WHERE . . . FOR UPDATE . . ., and (3) the SQL update statement is of the form <code>UPDATE . . . WHERE CURRENT OF &lt;cursorName&gt;</code>. 
+</p><p><a name="1019751"> </a>
+Not all DBMSs support positioned updates. To verify that a DBMS supports positioned updates, an application can call the <code>DatabaseMetaData</code> methods <code>supportsPositionedDelete</code> and <code>supportsPositionedUpdate</code> to discover whether a particular connection supports these operations. When they are supported, the DBMS/driver must ensure that rows selected are properly locked so that positioned updates do not result in update anomalies or other concurrency problems.
+</p><a name="1013200"> </a>
+<h4>5.1.17	 Queries That Produce Updatable Result Sets</h4>
+<p><a name="1013201"> </a>
+Some queries will produce result sets that cannot be updated no matter what the result set type. For example, a query that does not select the primary key column might generate a result set that cannot be updated. Because of differences in database implementations, the JDBC 2.0 core API does not specify an exact set of SQL queries that must yield updatable result sets. Instead it defines a set of criteria that should generally produce updatable result sets for JDBC Compliant drivers that support updatability. If queries adhere to the following guidelines, a developer can generally expect that they will produce updatable result sets:
+</p><ol>
+<a name="1013208"> </a>
+<li>The query references only a single table in the database
+<a name="1013209"> </a>
+<li>The query does not contain a join operation or a <code>GROUP BY</code> clause
+<a name="1013210"> </a>
+<li>The query selects the primary key of the table it references
+<p><a name="1013221"> </a>
+If inserts are to be performed on the result set, an SQL query should satisfy conditions one through three plus the following three additional conditions:
+</p>
+<a name="1013212"> </a>
+<li>The user has read/write database privileges on the table
+<a name="1025213"> </a>
+<li>The query selects all of the nonnullable columns in the underlying table
+<a name="1013213"> </a>
+<li>The query selects all columns that do not have a default value
+</ol>
+<p><a name="1013222"> </a>
+The fourth and fifth conditions are necessary because a row to be inserted into a table must have a value for each column in the table unless the column accepts null values or default values. If the result set on which insertion operations are to be performed does not contain every column that requires a value, the insertion will fail.
+</p><p><a name="1020922"> </a>
+Result sets created by means other than the execution of a query, such as those returned by several methods in the <code>DatabaseMetaData</code> interface, are not scrollable or updatable, nor are they required to be.
+</p>
+<a name="1013482"> </a>
+<h4>5.1.18	 Using Streams</a> for Very Large Row </a>Values</h4>
+<p><a name="1013426"> </a>
+Two new interfaces in the JDBC 2.0 core API, <code>Blob</code> and <code>Clob</code>, are the mapping of the SQL3 data types <code>BLOB</code> (Binary Large Object) and <code>CLOB</code> (Character LargeObject) in the Java programming language. With the availability of these data types, databases will undoubtedly start using them to store very large binary or character objects. If this is the case, the <code>ResultSet</code> methods <code>getBlob</code> and <code>getClob</code> should be used to retrieve them.
+</p><p><a name="1013453"> </a>
+</a>Using only the JDBC 1.0 API, a </a><code>ResultSet</code> object still makes it possible to retrieve arbitrarily large <code>LONGVARBINARY</code> or <code>LONGVARCHAR</code> data. The methods <code>getBytes</code> and <code>getString</code> return data as one large chunk (up to the limits imposed by the return value of <code>Statement.getMaxFieldSize</code>). It is possible to retrieve this large chunk of data in smaller, fixed-size chunks. This is done by having the <code>ResultSet</code> class return <code>java.io.Input</code> streams from which data can be read in chunks. Note that these streams must be accessed immediately because they will be closed automatically when the next <code>getXXX</code> method is called on the <code>ResultSet</code> object. (This behavior is not a limitation of the JDBC API but rather a constraint on large blob access imposed by the underlying implementations in some database -systems.)
+</p><p><a name="997800"> </a>
+The JDBC 1.0 API has three separate methods for getting streams, each with a different return value: 
+</p><ul><a name="997807"> </a>
+<li><code>getBinaryStream</code> - returns a stream that simply provides the raw bytes from the database without any conversion
+<li><code>getAsciiStream</code> - returns a stream that provides one-byte ASCII characters. This method can be more efficient for a DBMS that stores characters in ASCII format.
+<li><code>getUnicodeStream</code> - returns a stream that provides two-byte Unicode characters. This method, though still available, has been deprecated in favor of the new method <code>getCharacterStream</code>. (See below.)
+</ul><p>
+The following method for retrieving streams of both ASCII and Unicode characters is new in the JDBC 2.0 core API:
+</p><p><a name="1026999"> </a>
+
+</p><a name="1027000"> </a>
+<ul>
+<li><code>getCharacterStream</code> - returns a <code>java.io.Reader</code> object that provides Unicode characters. No matter how a DBMS stores characters, the driver will return them as a stream of Unicode characters.
+</ul><p><a name="1010928"> </a>
+Note that the stream returned by <code>getAsciiStream</code> returns a stream of bytes in which each byte is an ASCII character. This differs from <code>getCharacterStream</code>, which returns a stream of two-byte Unicode characters. The method <code>getCharacterStream </code>can be used for both ASCII and Unicode characters because the driver will convert ASCII characters to Unicode before it returns a <code>Reader</code> object. If you must use <code>getUnicodeStream</code> because your DBMS and driver do not support the JDBC 2.0 API, note also that JDBC Unicode streams return big-endian data; </a>that is, they expect data with the high byte first and the low byte second. </a>This conforms to the standard endian defined by the Java programming language, </a>which is important if a program is to be portable. Refer to <em>The Java</em>tm<em> Virtual Machine Specification</em>, by Tim Lindholm and Frank Yellin, for more detailed information about big-endian order.
+</p><p><a name="1010933"> </a>
+</a>The following code fragment demonstrates how to use the <code>getAsciiStream</code> method.
+</p><blockquote><pre>
+java.sql.Statement stmt = con.createStatement();
+ResultSet rs = stmt.executeQuery("SELECT x FROM Table2");
+// Now retrieve the column 1 results in 4 K chunks:
+byte [] buff = new byte[4096];
+while (rs.next()) {
+	java.io.InputStream fin = rs.getAsciiStream(1);
+	for (;;) {
+		int size = fin.read(buff);
+		if (size == -1) { // at end of stream
+					break;
+		}
+
+
+		// Send the newly-filled buffer to some ASCII output stream
+		output.write(buff, 0, size);
+	}
+}
+</pre></blockquote><a name="997826"> </a>
+<h4>5.1.19	 NULL Result Values</h4>
+<p><a name="1021009"> </a>
+</a>To </a>determine</a> if a given result value is </a>JDBC <code>NULL</code>, one must first read the column and then use the method </a><code>ResultSet.wasNull</code>. This is true because a JDBC <code>NULL</code> retrieved by one of the <code>ResultSet.getXXX</code> methods may be converted to either <code>null</code>, <code>0</code>, or <code>false</code>, depending on the type of the value.
+</p><p><a name="997698"> </a>
+The following list shows which values are returned by the various <code>getXXX</code> methods when they have retrieved a JDBC <code>NULL</code>.
+</p><blockquote><pre>
+</pre></blockquote><ul><a name="1026596"> </a>
+<li><code>null</code>-for those <code>getXXX</code> methods that return objects in the Java programming language (<code>getString</code>, <code>getBigDecimal</code>, <code>getBytes</code>, <code>getDate</code>, <code>getTime</code>, <code>getTime-stamp</code>,  <code>getAsciiStream</code>, <code>getCharacterStream</code>, <code>getUnicodeStream</code>, <code>getBinary-Stream</code>, <code>getObject</code>, <code>getArray</code>, <code>getBlob</code>, <code>getClob</code>, and <code>getRef</code>)
+<a name="1003944"> </a>
+<li><code>0</code> (zero)-for <code>getByte</code>, <code>getShort</code>, <code>getInt</code>, <code>getLong</code>, <code>getFloat</code>, and <code>getDouble</code>
+<a name="997701"> </a>
+<li><code>false</code>-for <code>getBoolean</code>
+</ul><p><a name="1021031"> </a>
+For example, if the method <code>getInt</code> returns <code>0</code> from a column that allows <code>null</code> values, an application cannot know for sure whether the value in the database was <code>0</code> or <code>NULL</code> until it calls the method <code>wasNull</code>, as shown in the following code fragment, where rs is a <code>ResultSet</code> object.
+</p></ul><blockquote><pre>
+int n = rs.getInt(3);
+boolean b = rs.wasNull();
+
+</pre></blockquote><p><a name="1021038"> </a>
+If b is <code>true</code>, the value stored in the third column of the current row of rs is JDBC <code>NULL</code>. The method <code>wasNull</code> checks only the last value retrieved, so to determine whether n was <code>NULL</code>, <code>wasNull</code> had to be called before another <code>getXXX</code> method was invoked.
+</p><a name="1003662"> </a>
+<h4>5.1.20	 </a>Closing a ResultSet Object</h4>
+<p><a name="1021049"> </a>
+Normally, nothing needs to be done to close a <code>ResultSet</code> object; it is automatically closed by the <code>Statement</code> object that generated it when that <code>Statement</code> object is closed, is re-executed, or is used to retrieve the next result from a sequence of multiple results. </a>The method </a><code>close</code> is provided so that a <code>ResultSet</code> object can be closed explicitly, thereby immediately releasing the resources held by the <code>ResultSet</code> object. This could be necessary when several statements are being used and the automatic close does not occur soon enough to prevent database resource conflicts. 
+</p><a name="1021052"> </a>
+<h4>5.1.21	 JDBC Compliance</h4>
+<p><a name="1021053"> </a>
+Drivers that are JDBC Compliant should normally support scrollable result sets, but they are not required to do so. The intent is for JDBC drivers to implement scrollable result sets using the support provided by the underlying database systems. If the DBMS does not provide support for scrollability, then the driver may omit this feature.
+</p><p><a name="1014855"> </a>
+Making scrollability optional is not meant to encourage omitting it. It is simply meant to minimize the complexity of implementing JDBC drivers for data sources that do not support scrollability. Indeed, the recommended alternative is for a driver to implement scrollability as a layer on top of the DBMS. One way to do this is to implement a result set as a rowset. The <code>RowSet</code> interface, which provides methods for doing this, is part of the JDBC Standard Extension API.
+</p><p><a name="1019456"> </a>
+
+</p>
+<hr><br>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="statement.html">[Prev]</a> <a href="preparedstatement.html">[Next]</a> 
+<hr><br>
+
+
+
+<i><a href="copyright.html">Copyright</a> &#169; 1999, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

@@ -1,0 +1,405 @@
+<HTML>
+<HEAD>
+   <TITLE>Getting Started with Java IDL: Developing a Client Application</TITLE>
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+
+<H1 ALIGN=CENTER>Getting Started with Java IDL: Developing a Client 
+Application</H1>
+<HR>
+
+
+
+<P>This topic introduces the basics of writing a CORBA 
+<A href="../jidlGlossary.html#client">client</A> application.  
+Included in this lesson are:
+
+<OL>
+<LI><A href="#create">Creating HelloClient.java</A>
+<LI><A href="#understand">Understanding HelloClient.java</A>
+<LI><A href="#compile">Compiling HelloClient.java</A>
+</OL>
+
+
+<!--********************************************-->
+<A NAME="create">
+<H2>Creating HelloClient.java</H2></A>
+
+
+<P>To create <TT>HelloClient.java</TT>,
+<P>
+<OL>
+<LI>Start your text editor and create a file named <TT>HelloClient.java</TT> in 
+your main
+project directory, <TT>Hello</TT>.
+<P>
+<LI>Enter the following code for <TT>HelloClient.java</TT> in the text file.  The 
+following 
+section, <A HREF="#understand">Understanding HelloClient.java</A>, explains each 
+line of code in 
+some detail.
+<P>
+<EM><STRONG>HelloClient.java</STRONG></EM>
+<P>
+
+<PRE>// <A HREF="../examplelicense.html">Copyright and License</A> 
+&nbsp;
+import HelloApp.*;
+import org.omg.CosNaming.*;
+import org.omg.CosNaming.NamingContextPackage.*;
+import org.omg.CORBA.*;
+
+public class HelloClient
+{
+  static Hello helloImpl;
+
+  public static void main(String args[])
+    {
+      try{
+        // create and initialize the ORB
+	ORB orb = ORB.init(args, null);
+
+        // get the root naming context
+        org.omg.CORBA.Object objRef = 
+	    orb.resolve_initial_references("NameService");
+        // Use NamingContextExt instead of NamingContext. This is 
+        // part of the Interoperable naming Service.  
+        NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+ 
+        // resolve the Object Reference in Naming
+        String name = "Hello";
+        helloImpl = HelloHelper.narrow(ncRef.resolve_str(name));
+
+        System.out.println("Obtained a handle on server object: " + helloImpl);
+        System.out.println(helloImpl.sayHello());
+        helloImpl.shutdown();
+
+	} catch (Exception e) {
+          System.out.println("ERROR : " + e) ;
+	  e.printStackTrace(System.out);
+	  }
+    }
+
+}
+&nbsp;</PRE>
+
+
+<P>
+<LI>Save and close <TT>HelloClient.java</TT>.
+</OL>
+
+<A name="understand">
+<H2>Understanding HelloClient.java</H2></A>
+
+<P>This section explains each line of <TT>HelloClient.java</TT>, describing what 
+the code
+does, as well as why it is needed for this application.
+
+<A name="setup">
+<H3>Performing Basic Setup</H3></A>
+
+<P>The basic shell of a CORBA client is the same as many Java 
+applications:&nbsp;You import required library packages, declare the application
+class, define a 
+<TT>main</TT> method, and handle exceptions. 
+
+
+<A NAME="import"><H4>Importing Required Packages</H4></A>
+
+<P>First, we import the packages required for the client class:
+<PRE>
+import HelloApp.*; // the package containing our stubs
+import org.omg.CosNaming.*; // HelloClient will use the Naming Service
+import org.omg.CosNaming.NamingContextPackage.*;
+import org.omg.CORBA.*; // All CORBA applications need these classes
+</PRE>
+
+<A name="class">
+<H4>Declaring the Client Class</H4></A>
+
+<P>The next step is to declare the client class:
+<PRE>
+public class HelloClient
+{
+  // The main() method goes here.
+}
+</PRE>
+
+
+<A name="main">
+<H4>Defining a <TT>main()</TT> Method</H4></A>
+
+<P>Every Java application needs a <TT>main()</TT> method.  It is
+declared within the scope of the <TT>HelloClient</TT> class, 
+as follows:
+<PRE>
+  public static void main(String args[])
+  {
+    // The try-catch block goes here.
+  }
+</PRE>
+
+<A name="except">
+<H4>Handling CORBA System Exceptions</H4></A>
+
+<P>Because all CORBA programs can throw CORBA system exceptions at runtime, 
+ all of the <TT>main()</TT> functionality is placed within a 
+try-catch block. CORBA programs throw system exceptions whenever trouble
+occurs during any of the processes (marshaling, unmarshaling, upcall) 
+involved in invocation. 
+
+<P>Our exception handler
+simply prints the name of the exception and its stack trace to standard output 
+so you can see what kind of thing has gone wrong. 
+
+
+<P>The try-catch block is set up inside <TT>main()</TT>, 
+<PRE>
+    try{
+    
+      // Add the rest of the HelloClient code here.
+    
+    } catch(Exception e) {
+        System.out.println("ERROR : " + e);
+        e.printStackTrace(System.out);
+      }
+</PRE>
+
+</OL>
+
+
+<!--******************************************-->
+<A name="orb">
+<H3>Creating an ORB Object</H3></A>
+
+<P>A CORBA client needs a local ORB object to perform all of its marshaling and
+<A href="../jidlGlossary.html#IIOP">IIOP</A> work. Every client instantiates 
+an <TT>org.omg.CORBA.ORB</TT> object and 
+<A href="../jidlInitialization.html">initializes</A> it by
+passing to the object certain information about itself.
+
+
+
+<P>The ORB variable is declared and initialized inside the try-catch block.
+<PRE>
+	ORB orb = ORB.init(args, null);
+</PRE>
+
+<P>The call to the ORB's <TT>init()</TT> method passes
+in your application's command line arguments, allowing you to set certain 
+ properties at runtime. 
+
+
+
+
+<!--**********************************************-->
+<A name="hello">
+<H3>Finding the Hello Server</H3></A>
+
+<P>Now that the application has an ORB, it can ask the ORB to locate the actual
+service it needs, in this case the Hello server.  There are a number of ways
+for a CORBA client to get an initial object reference; our client application
+will use the COS Naming Service specified by OMG and 
+provided with Java&nbsp;IDL. See <A href="GSstring.html">Using Stringified Object 
+References</A> 
+for information on how to get an 
+initial object reference when there is no naming service available.
+
+<P>The two options for Naming Services shipped with J2SE v.1.4 are <tt><a 
+href="../orbd.html">orbd</a></tt>, which is a daemon process containing a Bootstrap Service, 
+a Transient Naming Service, a Persistent Naming Service, and a Server Manager, and <tt><a 
+href="../jidlNaming.html">tnameserv</a></tt>, a transient naming service. This example uses 
+<tt>orbd</tt>.
+
+
+<A name="rootnc">
+<H4>Obtaining the Initial Naming Context</H4></A>
+
+<P>The first step in using the naming service is to get the 
+<A href="../jidlGlossary.html#initial naming context">initial naming context</A>. 
+In the try-catch block, below your ORB initialization,  you call
+<TT>orb.resolve_initial_references()</TT> to get an object reference to the 
+name server:
+
+<PRE>
+        org.omg.CORBA.Object objRef = 
+            orb.resolve_initial_references("NameService");
+</PRE>
+
+<P>The string "NameService" is defined for all CORBA ORBs. When you pass in 
+that string, the ORB returns the initial naming context, an object reference
+to the name service.  The string "NameService" indicates:
+<P>
+<UL>
+<LI>The persistent naming service will be used when using ORBD as the naming service.
+<LI>The transient naming service will be used when using <tt>tnameserv</tt> as the
+naming service.
+</UL>
+ 
+<P>The string "TNameService" indicates that the transient
+naming service will be used when ORBD is the naming service.  In this example, we are using 
+the persistent naming
+service that is a part of <tt>orbd</tt>.
+
+<A name="narrow">
+<H4>Narrowing the Object Reference</H4></A>
+
+<P>As with all CORBA object references, <TT>objRef</TT> is a generic CORBA 
+object. To use
+it as a <TT>NamingContextExt</TT> object, you must narrow it to its proper type. 
+
+
+<PRE>
+        NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+</PRE>
+
+<P>Here we see the use of an <TT>idlj</TT>-generated helper class, similar in
+function to <TT>HelloHelper</TT>. The <TT>ncRef</TT> object is now an 
+<TT>org.omg.CosNaming.NamingContextExt</TT>
+and you can use it to access the naming service and find other services.
+You will do that in the next step.
+
+<P>The <TT>NamingContextExt</TT> object is new to J2SE v.1.4, and is part of the <a 
+href="../INStutorial.html">Interoperable 
+Naming Service</a>.  
+
+
+
+<A name="hello">
+<H4>Resolve the Object Reference in Naming</H4></A>
+
+
+<P>To publish a reference in the Naming Service to the <tt>Hello</tt> object
+implementing the <tt>Hello</tt> interface, you first need an identifying string for the 
+<tt>Hello</tt> object.
+
+<PRE>
+      String name = "Hello";
+</PRE>
+
+
+<P>Finally, we pass <TT>name</TT> to the naming service's
+<TT>resolve_str()</TT> method to get an object reference to the Hello server 
+and narrow it to a <TT>Hello</TT> object:
+
+<PRE>
+        helloImpl = HelloHelper.narrow(ncRef.resolve-str(name));
+        System.out.println("Obtained a handle on server object: " + helloImpl);     
+</PRE>
+
+<P>Here you see the <TT>HelloHelper</TT> helper class at work. The 
+<TT>resolve-str()</TT> method returns 
+a generic CORBA object as you saw above when locating the name service itself.
+Therefore, you immediately narrow it to a <TT>Hello</TT> object, which is the 
+object
+reference you need to perform the rest of your work.  Then, you send a message to the screen 
+confirming that the object reference has been obtained.
+
+
+
+<!--**************************************************-->
+<A name="invoke">
+<H3>Invoking the <TT>sayHello()</TT> Operation</H3></A>
+
+<P>CORBA invocations look like a method call on a local object. The complications
+of marshaling parameters to the wire, routing them to the server-side ORB, 
+unmarshaling, and placing the upcall to the server method are completely 
+transparent to the client programmer. Because so much is done for you by
+generated code, invocation is really the easiest part of CORBA programming.
+
+
+<P>Finally, we print the results of the invocation to standard output and explicitly shutdown 
+the ORB:
+
+<PRE>
+        System.out.println(helloImpl.sayHello());
+        helloImpl.shutdown();
+</PRE>
+
+
+
+
+
+<!--**************************************************-->
+<A name="compile">
+<H2>Compiling HelloClient.java</H2></A>
+
+<P>Now we will compile <TT>HelloClient.java</TT> so that we can correct any 
+errors before 
+continuing 
+with this tutorial.
+
+<P>Windows users note that you should substitute backslashes (\) for the
+slashes (/) in all paths in this document.
+
+<P>To compile <TT>HelloClient.java</TT>,
+
+<OL>
+<LI>Change to the <TT>Hello</TT> directory.<P>
+<LI>Run the Java compiler on <TT>HelloClient.java</TT>:
+<PRE>
+javac HelloClient.java HelloApp/*.java
+</PRE>
+<LI>Correct any errors in your file and recompile if necessary. 
+<LI>The <TT>HelloClient.class</TT> is generated to the <TT>Hello</TT> directory.
+</OL>
+
+<A name="running">
+<H3>Running the Client Application</H3></A>
+Running the Hello World application is covered 
+in <A 
+HREF="GScompile.html">Running the Hello World Application</A>.
+
+
+
+
+<!--**************************************-->
+<A name="information">
+<H2>For More Information</H2></A>
+
+<DL>
+
+<DT><A href="../jidlClients.html">Developing Clients</A>
+<DD>Covers topics of interest to CORBA client programmers
+
+<DT><A href="../jidlExceptions.html#systemexceptions">Exceptions: System 
+Exceptions</A>
+<DD>Explains how CORBA system exceptions work and provides details on the
+minor codes of Java&nbsp;IDL's system exceptions
+
+<DT><A 
+href="../jidlInitialization.html#systempropertiesobject">Initialization:&nbsp;
+System Properties</A>
+<DD>Explains what properties can be passed to the ORB at initialization
+
+<DT><A href="../jidlNaming.html">Naming Service</A>
+<DD>Covers the COS Naming Service in greater detail
+
+</DL>
+
+
+<P><HR>
+<CENTER><P><A href="GSserver.html">Previous: Developing the Hello World 
+Server</A> <BR>
+<A href="GScompile.html">Next: Running the Hello World Application</A> <BR>
+<A href="../GShome.html">Tutorial home: Getting Started with Java IDL</A> 
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="../index.html">
+Java IDL Home</A></TD>
+</TR></TABLE></CENTER>
+
+<HR>
+<FONT
+SIZE="-2"><A HREF="http://www.sun.com/share/text/SMICopyright.html">Copyright
+&copy;</A></FONT><FONT SIZE="-2"> 1996-2001 Sun Microsystems, Inc.,
+2550 Garcia Ave., Mtn. View, CA. 94043-1100 USA., All rights
+reserved.</FONT></P>
+
+</BODY>
+</HTML>
+
+

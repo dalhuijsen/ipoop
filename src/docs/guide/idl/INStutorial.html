@@ -1,0 +1,592 @@
+<HTML>
+
+<HEAD>
+
+   <TITLE>Java IDL: Interoperable Naming Service (INS) Example</TITLE>
+
+<!-- Changed by: carson 9/2001 for j2se 1.4 -->
+
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+
+<H1 ALIGN=CENTER>Java IDL: Interoperable Naming Service (INS) Example</H1>
+
+<HR>
+<P>
+<P>The Interoperable Naming Service (INS) is an extension to the  
+<a href="jidlNaming.html"><tt>CosNaming</tt> service</a>.  It provides the following 
+additional features:<P>
+	<UL>
+	<LI>Capability to resolve using <a href="#string">stringified names</a>
+	 (e.g., Department/Accounting/TravelExpenses)
+	<LI>URLs for CORBA object references (<a href="#corbaloc">corbaloc:</a>
+	 and <a href="#corbaname">corbaname:</a> formats)
+	<LI>Convenient <a href="#extAPI">APIs in <tt>NamingContextExt</tt></a> for 
+	handling CosNames
+	and URLs
+	<LI>ORB arguments for <a href="#bootstrap">bootstrapping</a> 
+	(<tt>ORBInitRef</tt> and
+	<tt>ORBDefaultInitRef</tt>)
+	</UL>
+	
+<P>The following diagram shows how INS fits into ORBD:
+ 
+<P>
+<P>
+<center><IMAGE SRC="images/ORBDNS.gif" ALT="ORBD"></center>
+<P><P>
+<BR>
+<BR><P>
+<P>
+
+<P>
+An object reference contains at least three pieces of information: an address, the name
+ of the POA that created an object reference, and an Object ID.
+
+<a name="string"></a>
+<P>Using INS, you can provide an URL to access the CORBA object, which is more readable
+than a stringified Interoperable Object References (IOR). The following stringified 
+object reference formats are allowed:
+ <P>
+ <UL>
+ <LI>Interoperable Object References (IOR)
+ <P>An IOR is an object reference that is understood by ORBs that can interoperate
+ using the OMG-defined protocols General Inter-ORB Protocol (GIOP) and Internet Inter-ORB Protocol (IIOP).  A client can obtain an object 
+ reference using <tt>orb.object_to_string(objRef)</tt>, as shown in the 
+ <a href="jidlNaming.html#example3"><em>Browsing the Namespace</em></a> example, 
+ or as a result of an invocation on another object reference.
+ <P>
+ <LI>Human-Readable URL Formats for CORBA Object References
+ <P>The <tt>corbaloc</tt> and <tt>corbaname</tt> formats enable you to provide a
+ URL to access CORBA objects.  Use the <tt>corbaloc</tt> format for resolving to a particular CORBAservice without going through a naming service.  Use the <tt>corbaname</tt> format
+  to resolve a stringified name from a specific naming  context.
+ <P>
+ 	<UL>
+ 	<a name="corbaloc"></a>
+ 	<LI>corbaloc:
+ 	<P>The <tt>corbaloc:</tt> format is used to locate CORBA services, is 
+ 	useful for CORBA client programs, 
+ 	and is typically used to resolve the
+ 	reference using the GIOP <tt>LocateRequest</tt> or <tt>Request</tt>
+ 	 message.  For example,
+ 	a <tt>corbaloc:</tt> object reference might look like this:
+ 	<PRE>
+ 	corbaloc:iiop:1.2@MyBank.com:2050/TraderService
+ 	</PRE>
+ 	<P>This example show how to get an object reference for
+ 	 <tt>TraderService</tt> from
+ 	host  <tt>myBank.com</tt> on port <tt>2050</tt>.
+ 	<P><STRONG>NOTE: </STRONG>The <STRONG>1.2</STRONG> in the example
+ 	URL refers to GIOP version 1.2 for the IOR that corresponds to 
+ 	that <tt>corbaloc</tt> URL.  GIOP 1.2 is the default value for Sun's
+ 	Java CORBA ORB.  It is shown in this example
+ 	in order to demonstrate how you can plug in a different version.
+ 	
+ 	<P>
+ 	<a name="corbaname"></a>
+ 	<LI>corbaname:
+ 	<P>The <tt>corbaname:</tt> format provides a mechanism for a client to
+ 	bootstrap directly, and is typically used to resolve the stringified 
+ 	name from the
+ 	root naming context.  For example, a <tt>corbaname:</tt> object 
+ 	reference might look like this:
+ 	<PRE>
+ 	corbaname::myBank.com:2050#Personal/schedule
+ 	</PRE>
+ 	<P>where <tt>myBank.com</tt> is the host, <tt>2050</tt> is the port. The
+ 	portion of the reference up to the hash mark (<tt>corbaname::myBank.com:2050
+ 	</tt>) is the URL that returns the root naming context.
+ 	This example provides the URL to use to: a) locate the Naming Service,
+ 	and, b) resolve the name 
+ 	 <tt>Personal/schedule</tt> from the Naming Service.
+ 	<P>
+ 	</UL>
+ 	
+ </UL>
+ 
+ <a name="extAPI"></a>
+ <H4><tt>NamingContextExt</tt> API</H4>
+
+ 
+ <P>The <a href="../../api/org/omg/CosNaming/NamingContextExt.html">
+ <tt>NamingContextExt</tt></a> interface, derived from <tt>NamingContext</tt> provides the operations required to use URLs and stringified names.  Some of the APIs in <tt>NamingContextExt</tt> for converting between CosNames, Stringified Names, and URLs are listed below.  See the <a href="ftp://ftp.omg.org/pub/docs/ptc/00-08-07.pdf">COS Naming Specification</a>, Section 3.6.4, for more 
+ information on these API.
+ 
+ <UL>
+ <LI><tt>to_string</tt>
+ <P>This operation accepts a <tt>Name</tt> and returns a stringified name. If the <tt>Name</tt> is invalid, an <tt>InvalidName</tt> exception is raised.
+ <P>
+ <LI><tt>to_name</tt> 
+ <P>This operation accepts a stringified name and returns a <tt>Name</tt>. If the stringified name is syntactically malformed or violates an implementation limit, an <tt>InvalidName</tt> exception is raised. 
+ <P>
+ <LI><tt>resolve_str</tt> 
+ <P>This is a convenience operation that performs a resolve in the same manner as <tt>NamingContext.resolve()</tt>. It accepts a stringified name as an argument instead of a <tt>Name</tt>. 
+ <P>
+ <LI><tt>to_url</tt> 
+ <P>This operation takes a corbaloc URL &lt;address&gt; and &lt;<tt>key_string</tt>&gt; component such as
+ <P>
+ 	<UL>
+ 	<LI><tt>:myhost.555xyz.com</tt>
+ 	<LI><tt>:myhost.555xyz.com/a/b/c </tt>
+ 	<LI><tt>atm:00002112...,:myhost.xyz.com/a/b/c</tt> 
+ 	</UL>
+ 	
+<P>for the first parameter, and a stringified name for the second. It then performs any escapes necessary on the parameters and returns a fully formed URL string. An exception is raised if either the corbaloc address and key parameter or name parameter are malformed. 
+<P>It is legal for the stringified_name to be empty. If the address is empty, an <tt>InvalidAddress</tt> exception is raised. <P>
+ 
+</UL> 
+
+
+ <P>Conversions from URLs to objects are handled by <tt>org.omg.CORBA.ORB.string_to_object()</tt> as described in the CORBA 2.3 Specification, Section 13.6.6.
+
+<P>The following Java IDL tutorials use <tt>NamingContextExt</tt>:
+<P>
+<UL>
+<LI><a href="jidlExample.html">Java IDL: The "Hello World" Example</a> (using the POA and a transient server)
+<LI><a href="jidlExample2.html">Java IDL: The "Hello World" Example</a> (using the POA, a persistent server, and a persistent naming service)
+<LI><a href="jidlTieServer.html">Java IDL: The "Hello World" Example</a> (using the POA-Tie server-side model)
+</UL>
+<P>
+ 
+<a name="bootstrap"></a>
+<H4>Bootstrap Options for the ORB</H4>
+<P>The ORB can be configured to return 
+the handle of a customized CORBA service from <tt>resolve_initial_references()</tt>
+using either <tt>ORBInitRef</tt> and/or <tt>ORBDefaultInitRef</tt>.  For example,
+<P>
+<UL>
+<LI>Use <tt>-ORBInitRef</tt> to resolve to specific CORBA services, for example,
+<P>
+<PRE>
+-ORBInitRef TraderService=corbaloc::myBank.com:2050/TraderService
+</PRE>
+<P>
+<LI>If no <tt>-ORBInitRef</tt> is given, <tt>-ORBDefaultInitRef</tt> 
+is used to resolve.  In the <tt>TraderService</tt> example,
+<P><PRE>
+-ORBDefaultInitRef corbaloc:iiop:1.2:myBank.com:2050
+</PRE>
+</UL>
+
+<P>The order of resolution when these options are used is as follows:
+<P>
+<OL>
+<LI>Objects registered with <tt>register_initial_references</tt>
+<LI><tt>-ORBInitRef</tt>
+<LI><tt>-ORBDefaultInitRef</tt>
+<LI>Proprietary Bootstrap (Sun ORBs only)
+</OL>
+
+
+<P>
+	
+<P>For more information about INS, refer to the OMG specification at (<a 
+href="http://cgi.omg.org/cgi-bin/doc?ptc/00-08-07">ptc/00-08-07</a>).
+
+<P>
+
+<HR>
+<a name="tutorial"></a>
+<H1>INS Example: Publishing a Reference to be Accessed by INS URL's</H1>
+
+
+<P>This document is a high-level overview of how to create a complete CORBA (Common 
+Object 
+Request Broker Architecture) application using the Interoperable Naming Service (INS). 
+
+
+
+
+
+
+<P>This example makes use of the following files:
+<UL>
+
+   <LI>The <A href="#IDL">IDL</A> for a simple interface for this example
+
+   
+
+   <LI>A <A href="#server">server</A> that creates an object and 
+   publishes it to be used by INS URL's
+   
+   <LI>The <a href="#impl">implementation</a> of the <tt>Service</tt> 
+   interface
+
+   
+
+   <LI>An <A HREF="#application">application client</A>  that retrieves 
+   a reference from the server using <tt>corbaloc:</tt> URL
+
+   
+   <LI><A href="#instructions">Instructions</A> for compiling and running
+   the example
+
+   </UL>
+
+
+<P><img src="images/computer.gif" alt="step">Each step in the tutorial is indicated by 
+this symbol.
+<P>
+
+
+
+
+
+
+<!--************IDL*************-->
+
+
+
+<A name="IDL">
+
+<H2>Defining the Interface (<code>Service.idl</code>)</H2></A>
+
+<P>The first step to creating a CORBA application is to specify all of
+your objects and their interfaces using the OMG's Interface
+Definition Language (IDL). 
+
+<P>The following code is written in the OMG IDL, and describes a CORBA
+ object whose <TT>ping()</TT> operation pings the INS <tt>Service</tt>.</P>
+ 
+<P><img src="images/computer.gif" alt="step">Create the file <tt>Service.idl</tt>
+and add the following code:
+<P>
+<EM><STRONG>Service.idl</STRONG></EM>
+<P>
+
+<PRE>
+// A very simple interface to explain this example
+interface Service {
+    void ping();
+};
+</PRE>
+
+
+
+<!--************TRANSIENT SERVER*************-->
+
+
+
+<A NAME="server">
+
+<H2>Implementing the Server (<code>INSServer.java</code>)</H2></A>
+
+
+<P>The <tt>INSServer</tt> class has the server's <TT>main()</TT> method, which:
+
+</P>
+<UL>
+
+    <LI>Sets the <tt>ORBPeristentServerPort</tt> property in order to 
+    open up a port to listen for INS requests (Sun proprietary property)
+
+   <LI>Creates and initializes an ORB instance
+   
+   <LI>Gets a reference to the root POA and activates its <tt>POAManager</tt>
+
+   <LI>Creates a servant (the implementation of one CORBA
+
+   <TT>ServiceImpl</TT> object)
+
+
+   <LI>Registers the new object in the naming context under the name "PingService"
+
+
+   <LI>Waits for invocations of the new object from the client
+</UL>
+
+<P><img src="images/computer.gif" alt="step">Create the file <tt>INSServer.java</tt>
+and add the following code:
+<P>
+<EM><STRONG>INSServer.java</STRONG></EM>
+<P>
+
+<PRE>
+// <STRONG>INSServer.java</STRONG>
+// <A HREF="examplelicense.html">Copyright and License</A> 
+import java.util.Properties;
+import org.omg.CORBA.Object;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Policy;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.*;
+import org.omg.PortableServer.Servant;
+
+public class INSServer {
+    public static void main( String args[] ) {
+        try {
+            Properties properties = System.getProperties( );
+            // STEP 1: Set ORBPeristentServerPort property
+            // Set the proprietary property to open up a port to listen to
+            // INS requests. 
+            // <STRONG>Note: This property is subject to change in future releases</STRONG>
+            properties.put( "com.sun.CORBA.POA.ORBPersistentServerPort",
+                Integer.toString(1060) );
+
+            // STEP 2: Instantiate the ORB, By passing in the 
+            // ORBPersistentServerPort property set in the previous step
+            ORB orb = ORB.init( args, properties );
+
+
+            // STEP 3: Instantiate the Service Object that needs to be published
+            // and associate it with RootPOA.
+            ServiceImpl servant = new ServiceImpl( );
+            POA rootPOA = POAHelper.narrow( orb.resolve_initial_references( "RootPOA" ));
+            rootPOA.the_POAManager().activate();
+            rootPOA.activate_object( servant );
+
+            // STEP 4: Publish the INS Service using 
+            // orb.register_initial_reference( &lt;ObjectKey&gt;, &lt;ObjectReference&gt; 
+            // <STRONG>NOTE: Sun private internal API, not part of CORBA 2.3.1.</STRONG>
+            // <STRONG>May move as our compliance with OMG standards evolves.</STRONG>
+            ((com.sun.corba.se.internal.Interceptors.PIORB) orb).
+                register_initial_reference( 
+                "PingService", rootPOA.servant_to_reference(servant) );
+
+            System.out.println( "INS Server is Ready..." );
+             
+            // STEP 5: We are ready to receive requests
+            orb.run( );
+        } catch ( Exception e ) {
+             System.err.println( "Error in setup : " + e );
+        }
+    } 
+}
+&nbsp;</PRE>
+
+
+<!--************  IMPL  *************-->
+
+<A NAME="impl">
+
+<H2>Implementing the Service (<code>ServiceImpl.java</code>)</H2></A>
+
+
+
+<P>The example implementation, <TT>ServiceImpl</TT>, is the implementation of
+the <TT>Service</TT> IDL interface.</P>
+
+<P><img src="images/computer.gif" alt="step">Create the file <tt>ServiceImpl.java</tt>
+and add the following code:
+<P>
+<EM><STRONG>ServiceImpl.java</STRONG></EM>
+<P>
+
+<PRE>
+// <STRONG>ServiceImpl.java</STRONG>
+// <A HREF="examplelicense.html">Copyright and License</A> 
+
+// Implementation of Service interface
+public class ServiceImpl extends ServicePOA {
+    public void ping( ) {
+        System.out.println( "PingService.ping called..." );
+    }
+}
+</PRE>
+
+<!--************APPLICATION*************-->
+
+
+
+<A name="application">
+
+<H2>Implementing the Client Application (<code>INSClient.java</code>)</H2></A>
+
+
+
+<P>The example application client that follows:</P>
+
+
+
+<UL>
+
+   <LI>Creates and initializes an ORB
+
+   
+
+   <LI>Retrieves <tt>PingService</tt> object reference using
+    <tt>resolve_initial_references()</tt>
+
+   
+
+    <LI>Invokes the <tt>PingService</tt>'s <TT>ping()</TT> operation and prints the result
+
+</UL>
+
+<P><img src="images/computer.gif" alt="step">Create the file <tt>INSClient.java</tt>
+and add the following code:
+<P>
+<EM><STRONG>INSClient.java</STRONG></EM>
+<P>
+
+<PRE>
+// <STRONG>INSClient.java</STRONG>
+// <A HREF="examplelicense.html">Copyright and License</A> 
+&nbsp;
+import org.omg.CORBA.ORB;
+
+public class INSClient {
+    public static void main( String args[] ) {
+        try {
+            // STEP 1: Instantiate the ORB
+            ORB orb = ORB.init( args, null );
+
+            // STEP 2: Resolve PingService using orb.resolve_initial_references()
+            // In this example we have used <a href="#client">-ORBInitRef</a> argument to locate the
+            // PingService. User can also choose to pass the corbaloc: url to
+            // orb.string_to_object to resolve the published PingService 
+            // reference.
+            org.omg.CORBA.Object object = orb.resolve_initial_references(
+                "PingService" );
+
+            // STEP 3: Narrow the reference and we are ready to invoke method
+            // on PingService.
+            Service insService = ServiceHelper.narrow( object );
+
+            insService.ping( );
+            System.out.println( "The server has been pinged" );
+            
+        } catch ( Exception e ) {
+            System.err.println( "Exception in INSClient " + e );
+            e.printStackTrace( );
+        }
+    }
+}
+&nbsp;</PRE>
+
+
+
+
+<!--************COMPILING THE EXAMPLES************-->
+
+
+
+<A name="instructions">
+
+<H2>Building and Running the INS Example</H2></A>
+
+
+
+<P>When running this example, we recommend that you use a port number greater than or equal to 1024. This is because you must become root to start a process on a port under 1024  when using Solaris software. The <tt>ORBPersistentServerPort</tt>
+property of the server has been set to 1060 in this example.</P>
+
+
+<H3>Compile the Interface Definition</H3>
+
+<P><img src="images/computer.gif" alt="step">Change to the directory that contains the file <TT>Service.idl</TT>, and run the IDL-to-Java compiler as shown below:
+
+<PRE>
+  idlj -fall  Service.idl
+</PRE>
+
+<P>You must use the <TT>-fall</TT> option with the <TT>idlj</TT> compiler to generate both 
+client and server-side bindings.  For more information on the 
+<TT>idlj</TT> options, link 
+to <A HREF = "../rmi-iiop/toJavaPortableUG.html">IDL-to-Java compiler options</A>.  
+
+<P>The files generated by the <TT>idlj</TT> compiler for <TT>Service.idl</TT>, with the <TT>-fall</TT> command line option, are: 
+<P>
+<UL>
+<LI><TT>ServicePOA.java</TT> - the server skeleton  
+<P>
+<LI><TT>_ServiceStub.java</TT> - client stub
+<P>
+<LI><TT>Service.java</TT> - the Java version of our IDL interface
+<P>
+<LI><TT>ServiceHelper.java</TT> -  auxiliary functionality, notably the 
+<TT>narrow()</TT> method 
+<P>
+<LI><TT>ServiceHolder.java</TT> - holds a public instance member of type <TT>INS</TT>
+<P>
+<LI><TT>ServiceOperations.java</TT> - contains the method <TT>ping()</TT> 
+</UL>
+
+<P>
+<h3>Compile the Java files</h3>
+<P><img src="images/computer.gif" alt="step">
+Compile the <TT>.java</TT> files, including the stubs and skeletons, as follows:
+<PRE>
+   javac *.java 
+</PRE>
+
+<H3>Start the INS Server</H3>
+
+<P><img src="images/computer.gif" alt="step">Start the INS server:
+
+
+   <P>   
+<PRE>
+  java -classpath . INSServer 
+</PRE>
+
+<P>If the INS Server is running correctly, the following message will display:
+<P>
+<PRE>
+INS Server is Ready...
+</PRE>
+
+
+<a name="client"></a>
+<H3>Start the Client Application</H3>
+  
+<P><img src="images/computer.gif" alt="step">Open another terminal window or DOS shell  and
+ run the client application:<P>
+<PRE>
+  java -classpath . INSClient -ORBInitRef 
+    PingService=corbaloc:iiop:1.2@localhost:1060/PingService
+</PRE>
+
+
+<P>When the client is run with the <tt>-ORBInitRef</tt> option, it will be able
+to locate <tt>PingService</tt>.  The following message displays in the client window:
+<P>
+<PRE>
+The server has been pinged
+</PRE>
+
+<P>And the following message displays in the server window:
+
+<P>
+<PRE>
+PingService.ping called...
+</PRE>
+   
+   
+<P>When you have finished this tutorial, be sure to shut down or kill the INS 
+server.  To do this from a DOS prompt, select 
+the window 
+that is running the server and enter <TT>Ctrl+C</TT> to shut it down.  
+To do this from a Unix shell, open the shell that was running the client and type
+<tt>pkill INSServer</tt>.
+
+
+
+
+<CENTER><P><HR>
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html">Home</A></TD>
+</TR></TABLE>
+
+
+<HR><P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-2001
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+  All Rights Reserved.</FONT></P>
+
+</CENTER>
+
+
+
+</BODY>
+
+</HTML>

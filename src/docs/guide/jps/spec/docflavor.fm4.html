@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide: 3 - Specifying Document Types
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="docflavor.fm3.html">PREV</a>
+ | <a href="printing.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="1000526"><i></i> How to Use DocFlavor 
+</a></h2>
+
+<blockquote>
+<a name="1000527"><!-- --></a>
+These steps illustrate the role of the DocFlavor in a typical application:<p>
+<ol>
+<li>A client determines the format of the print data and decides how to present the data to the printer. The client then creates or obtains a DocFlavorrepresenting the format:DocFlavor flavor = DocFlavor.INPUT_STREAM.GIF;
+<li>The client uses the DocFlavor to find printers that can understand the format specified by the DocFlavor and has the capabilities specified in the client&#39;s attribute set:PrintService[] services = 				PrintServiceLookup.lookupPrintServices(flavor, aset);
+<li>From a print service, the client creates a print job, represented by a DocPrintJob object:DocPrintJob printJob = services[0].createPrintJob();
+<li>The client creates a Doc representing the document to be printed:Doc doc = new InputStreamDoc(&#34;duke.gif&#34;, flavor);
+<li>The client prints the document by calling the print method of the DocPrintJob object:printJob.print(doc, aset);When the client passes the Doc object to the print method, the DocPrintJob object obtains the print data from the Doc object and determines the doc flavor that the client can supply. The doc flavor's representation class is a conduit for the DocPrintJob to obtain a sequence of characters or bytes from the client. 
+</ol>
+<a name="998217"><!-- --></a>
+The <a href="printing.fm.html#996958"><em>Printing and Streaming Documents</em></a> chapter demonstrates a complete printing application.<p>
+<a name="998218"><!-- --></a>
+<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="docflavor.fm3.html">PREV</a>
+ | <a href="printing.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

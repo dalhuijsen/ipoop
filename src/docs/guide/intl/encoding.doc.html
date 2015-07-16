@@ -1,0 +1,1082 @@
+<!--This file created by Claris Home Page version 2.0-->
+<HTML>
+<HEAD>
+   <TITLE>Supported Encodings</TITLE>
+   <META NAME=GENERATOR CONTENT="Claris Home Page 2.0">
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" VLINK="#000077">
+
+<P><TABLE summary="layout" BORDER=0 WIDTH="100%">
+   <TR>
+      <TD WIDTH=60>
+         <P><IMG SRC="../../images/javalogo52x88.gif" ALT="Java"
+         WIDTH=52 HEIGHT=88 BORDER=0 ALIGN=bottom>
+      </TD><TD>
+         <H1><CENTER>Supported Encodings</CENTER></H1>
+      </TD><TD WIDTH=60>
+         <P>
+      </TD></TR>
+</TABLE><!-- Body text begins here --></P>
+
+<P>The classes java.io.InputStreamReader, java.io.OutputStreamWriter,
+java.lang.String, and classes in the java.nio.charset package can
+convert between Unicode and a number of other character encodings.
+The supported encodings vary between different implementations of the
+Java 2 platform. The
+<A HREF="../../api/java/lang/package-summary.html#charenc">java.lang
+package specification</A> and the
+<A HREF="../../api/java/nio/charset/Charset.html">class description
+for java.nio.charset.Charset</A> list the encodings that any
+implementation of the Java 2 platform, Standard Edition, v. 1.4.2 is
+required to support.</P>
+
+<P>Sun's Java 2 Software Development Kit, Standard Edition, v. 1.4.2
+for all platforms (Solaris<SUP><FONT SIZE="-2">TM</FONT></SUP>
+operating environment, Linux, and Microsoft Windows) and the Java 2
+Runtime Environment, Standard Edition, v. 1.4.2 for Solaris and Linux
+support all encodings shown on this page. Sun's Java 2 Runtime
+Environment, Standard Edition, v. 1.4.2 for Windows may be installed
+as a complete international version or as a European languages
+version. The J2RE installer by default installs a European languages
+version if it recognizes that the host operating system only supports
+European languages. If the installer recognizes that any other
+language is needed, or if the user requests support for non-European
+languages in a customized installation, a complete international
+version is installed. The European languages version only supports
+the encodings shown in the first table. The international version
+(which includes the <TT>lib/charsets.jar</TT> file) supports all
+encodings shown on this page.</P>
+
+<P>The following tables show the encoding sets supported by J2SE
+1.4.2. The canonical names used by the new java.nio APIs are in many
+cases not the same as those used in the java.io and java.lang APIs.
+</P>
+
+<P><STRONG><FONT SIZE="+2">Basic Encoding Set (contained in
+lib/rt.jar)</FONT><BR>
+
+<FONT SIZE="+1">Supported by java.nio, java.io and java.lang
+APIs</FONT></STRONG></P>
+
+<P><TABLE summary="Basic encoding set" BORDER=1>
+   <Thead>
+      <TH WIDTH=125>
+         <P ALIGN=LEFT>Canonical Name for java.nio API
+      </TH><TH WIDTH=125>
+         <P>Canonical Name for java.io and java.lang API
+      </TH><TH WIDTH=400>
+         <P ALIGN=LEFT>Description
+      </TH></Thead>
+   <TR>
+      <TD WIDTH=125>
+         <P>US-ASCII
+      </TD><TD WIDTH=125>
+         <P>ASCII
+      </TD><TD WIDTH=400>
+         <P>American Standard Code for Information Interchange
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1250
+      </TD><TD WIDTH=125>
+         <P>Cp1250
+      </TD><TD WIDTH=400>
+         <P>Windows Eastern European
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1251
+      </TD><TD WIDTH=125>
+         <P>Cp1251
+      </TD><TD WIDTH=400>
+         <P>Windows Cyrillic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1252
+      </TD><TD WIDTH=125>
+         <P>Cp1252
+      </TD><TD WIDTH=400>
+         <P>Windows Latin-1
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1253
+      </TD><TD WIDTH=125>
+         <P>Cp1253
+      </TD><TD WIDTH=400>
+         <P>Windows Greek
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1254
+      </TD><TD WIDTH=125>
+         <P>Cp1254
+      </TD><TD WIDTH=400>
+         <P>Windows Turkish
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1257
+      </TD><TD WIDTH=125>
+         <P>Cp1257
+      </TD><TD WIDTH=400>
+         <P>Windows Baltic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-1
+      </TD><TD WIDTH=125>
+         <P>ISO8859_1
+      </TD><TD WIDTH=400>
+         <P>ISO 8859-1, Latin Alphabet No. 1
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-2
+      </TD><TD WIDTH=125>
+         <P>ISO8859_2
+      </TD><TD WIDTH=400>
+         <P>Latin Alphabet No. 2
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-4
+      </TD><TD WIDTH=125>
+         <P>ISO8859_4
+      </TD><TD WIDTH=400>
+         <P>Latin Alphabet No. 4
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-5
+      </TD><TD WIDTH=125>
+         <P>ISO8859_5
+      </TD><TD WIDTH=400>
+         <P>Latin/Cyrillic Alphabet
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-7
+      </TD><TD WIDTH=125>
+         <P>ISO8859_7
+      </TD><TD WIDTH=400>
+         <P>Latin/Greek Alphabet
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-9
+      </TD><TD WIDTH=125>
+         <P>ISO8859_9
+      </TD><TD WIDTH=400>
+         <P>Latin Alphabet No. 5
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-13
+      </TD><TD WIDTH=125>
+         <P>ISO8859_13
+      </TD><TD WIDTH=400>
+         <P>Latin Alphabet No. 7
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-15
+      </TD><TD WIDTH=125>
+         <P>ISO8859_15
+      </TD><TD WIDTH=400>
+         <P>Latin Alphabet No. 9
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>KOI8-R
+      </TD><TD WIDTH=125>
+         <P>KOI8_R
+      </TD><TD WIDTH=400>
+         <P>KOI8-R, Russian
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>UTF-8
+      </TD><TD WIDTH=125>
+         <P>UTF8
+      </TD><TD WIDTH=400>
+         <P>Eight-bit UCS Transformation Format
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>UTF-16
+      </TD><TD WIDTH=125>
+         <P>UTF-16
+      </TD><TD WIDTH=400>
+         <P>Sixteen-bit UCS Transformation Format, byte order
+         identified by an optional byte-order mark
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>UTF-16BE
+      </TD><TD WIDTH=125>
+         <P>UnicodeBigUnmarked
+      </TD><TD WIDTH=400>
+         <P>Sixteen-bit Unicode Transformation Format, big-endian
+         byte order
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>UTF-16LE
+      </TD><TD WIDTH=125>
+         <P>UnicodeLittleUnmarked
+      </TD><TD WIDTH=400>
+         <P>Sixteen-bit Unicode Transformation Format, little-endian
+         byte order
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>Not available
+      </TD><TD WIDTH=125>
+         <P>UnicodeBig
+      </TD><TD WIDTH=400>
+         <P>Sixteen-bit Unicode Transformation Format, big-endian
+         byte order, with byte-order mark
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>Not available
+      </TD><TD WIDTH=125>
+         <P>UnicodeLittle
+      </TD><TD WIDTH=400>
+         <P>Sixteen-bit Unicode Transformation Format, little-endian
+         byte order, with byte-order mark
+      </TD></TR>
+</TABLE></P>
+
+<P><STRONG><FONT SIZE="+2">Extended Encoding Set (contained in
+lib/charsets.jar)</FONT><BR>
+
+<FONT SIZE="+1">Supported by java.nio, java.io and java.lang
+APIs</FONT></STRONG></P>
+
+<P><TABLE summary="extended encoding set" BORDER=1>
+   <Thead>
+      <TH WIDTH=125>
+         <P ALIGN=LEFT>Canonical Name for java.nio API
+      </TH><TH WIDTH=125>
+         <P>Canonical Name for java.io and java.lang API
+      </TH><TH WIDTH=400>
+         <P ALIGN=LEFT>Description
+      </TH></Thead>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1255
+      </TD><TD WIDTH=125>
+         <P>Cp1255
+      </TD><TD WIDTH=400>
+         <P>Windows Hebrew
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1256
+      </TD><TD WIDTH=125>
+         <P>Cp1256
+      </TD><TD WIDTH=400>
+         <P>Windows Arabic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-1258
+      </TD><TD WIDTH=125>
+         <P>Cp1258
+      </TD><TD WIDTH=400>
+         <P>Windows Vietnamese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-3
+      </TD><TD WIDTH=125>
+         <P>ISO8859_3
+      </TD><TD WIDTH=400>
+         <P>Latin Alphabet No. 3
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-6
+      </TD><TD WIDTH=125>
+         <P>ISO8859_6
+      </TD><TD WIDTH=400>
+         <P>Latin/Arabic Alphabet
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-8859-8
+      </TD><TD WIDTH=125>
+         <P>ISO8859_8
+      </TD><TD WIDTH=400>
+         <P>Latin/Hebrew Alphabet
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>windows-31j
+      </TD><TD WIDTH=125>
+         <P>MS932
+      </TD><TD WIDTH=400>
+         <P>Windows Japanese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>EUC-JP
+      </TD><TD WIDTH=125>
+         <P>EUC_JP
+      </TD><TD WIDTH=400>
+         <P>JISX 0201, 0208 and 0212, EUC encoding Japanese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>x-EUC-JP-LINUX
+      </TD><TD WIDTH=125>
+         <P>EUC_JP_LINUX
+      </TD><TD WIDTH=400>
+         <P>JISX 0201, 0208 , EUC encoding Japanese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>Shift_JIS
+      </TD><TD WIDTH=125>
+         <P>SJIS
+      </TD><TD WIDTH=400>
+         <P>Shift-JIS, Japanese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-2022-JP
+      </TD><TD WIDTH=125>
+         <P>ISO2022JP
+      </TD><TD WIDTH=400>
+         <P>JIS X 0201, 0208, in ISO 2022 form, Japanese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>x-mswin-936
+      </TD><TD WIDTH=125>
+         <P>MS936
+      </TD><TD WIDTH=400>
+         <P>Windows Simplified Chinese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>GB18030
+      </TD><TD WIDTH=125>
+         <P>GB18030
+      </TD><TD WIDTH=400>
+         <P>Simplified Chinese, PRC standard
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>x-EUC-CN
+      </TD><TD WIDTH=125>
+         <P>EUC_CN
+      </TD><TD WIDTH=400>
+         <P>GB2312, EUC encoding, Simplified Chinese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>GBK
+      </TD><TD WIDTH=125>
+         <P>GBK
+      </TD><TD WIDTH=400>
+         <P>GBK, Simplified Chinese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISCII91
+      </TD><TD WIDTH=125>
+         <P>ISCII91
+      </TD><TD WIDTH=400>
+         <P>ISCII91 encoding of Indic scripts
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>x-windows-949
+      </TD><TD WIDTH=125>
+         <P>MS949
+      </TD><TD WIDTH=400>
+         <P>Windows Korean
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>EUC-KR
+      </TD><TD WIDTH=125>
+         <P>EUC_KR
+      </TD><TD WIDTH=400>
+         <P>KS C 5601, EUC encoding, Korean
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>ISO-2022-KR
+      </TD><TD WIDTH=125>
+         <P>ISO2022KR
+      </TD><TD WIDTH=400>
+         <P>ISO 2022 KR, Korean
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>x-windows-950
+      </TD><TD WIDTH=125>
+         <P>MS950
+      </TD><TD WIDTH=400>
+         <P>Windows Traditional Chinese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>x-MS950-HKSCS
+      </TD><TD WIDTH=125>
+         <P>MS950_HKSCS
+      </TD><TD WIDTH=400>
+         <P>Windows Traditional Chinese with Hong Kong extensions
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>x-EUC-TW
+      </TD><TD WIDTH=125>
+         <P>EUC_TW
+      </TD><TD WIDTH=400>
+         <P>CNS11643 (Plane 1-3), EUC encoding, Traditional Chinese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>Big5
+      </TD><TD WIDTH=125>
+         <P>Big5
+      </TD><TD WIDTH=400>
+         <P>Big5, Traditional Chinese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>Big5-HKSCS
+      </TD><TD WIDTH=125>
+         <P>Big5_HKSCS
+      </TD><TD WIDTH=400>
+         <P>Big5 with Hong Kong extensions, Traditional Chinese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=125>
+         <P>TIS-620
+      </TD><TD WIDTH=125>
+         <P>TIS620
+      </TD><TD WIDTH=400>
+         <P>TIS620, Thai
+      </TD></TR>
+</TABLE></P>
+
+<P><A NAME="extended_io_lang"></A><STRONG><FONT SIZE="+2">Extended
+Encoding Set (contained in lib/charsets.jar)</FONT><BR>
+
+<FONT SIZE="+1">Supported by java.io and java.lang
+APIs</FONT></STRONG></P>
+
+<P><TABLE summary="extended encoding set" BORDER=1>
+   <Thead>
+      <TH WIDTH=150>
+         <P ALIGN=LEFT>Canonical Name
+      </TH><TH WIDTH=500>
+         <P ALIGN=LEFT>Description
+      </TH></Thead>
+   <TR>
+      <TD WIDTH=150>
+         <P>Big5_Solaris
+      </TD><TD WIDTH=500>
+         <P>Big5 with seven additional Hanzi ideograph character
+         mappings for the Solaris zh_TW.BIG5 locale
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp037
+      </TD><TD WIDTH=500>
+         <P>USA, Canada (Bilingual, French), Netherlands, Portugal,
+         Brazil, Australia
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp273
+      </TD><TD WIDTH=500>
+         <P>IBM Austria, Germany
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp277
+      </TD><TD WIDTH=500>
+         <P>IBM Denmark, Norway
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp278
+      </TD><TD WIDTH=500>
+         <P>IBM Finland, Sweden
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp280
+      </TD><TD WIDTH=500>
+         <P>IBM Italy
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp284
+      </TD><TD WIDTH=500>
+         <P>IBM Catalan/Spain, Spanish Latin America
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp285
+      </TD><TD WIDTH=500>
+         <P>IBM United Kingdom, Ireland
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp297
+      </TD><TD WIDTH=500>
+         <P>IBM France
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp420
+      </TD><TD WIDTH=500>
+         <P>IBM Arabic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp424
+      </TD><TD WIDTH=500>
+         <P>IBM Hebrew
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp437
+      </TD><TD WIDTH=500>
+         <P>MS-DOS United States, Australia, New Zealand, South
+         Africa
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp500
+      </TD><TD WIDTH=500>
+         <P>EBCDIC 500V1
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp737
+      </TD><TD WIDTH=500>
+         <P>PC Greek
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp775
+      </TD><TD WIDTH=500>
+         <P>PC Baltic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp838
+      </TD><TD WIDTH=500>
+         <P>IBM Thailand extended SBCS
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp850
+      </TD><TD WIDTH=500>
+         <P>MS-DOS Latin-1
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp852
+      </TD><TD WIDTH=500>
+         <P>MS-DOS Latin-2
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp855
+      </TD><TD WIDTH=500>
+         <P>IBM Cyrillic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp856
+      </TD><TD WIDTH=500>
+         <P>IBM Hebrew
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp857
+      </TD><TD WIDTH=500>
+         <P>IBM Turkish
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp858
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp850 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp860
+      </TD><TD WIDTH=500>
+         <P>MS-DOS Portuguese
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp861
+      </TD><TD WIDTH=500>
+         <P>MS-DOS Icelandic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp862
+      </TD><TD WIDTH=500>
+         <P>PC Hebrew
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp863
+      </TD><TD WIDTH=500>
+         <P>MS-DOS Canadian French
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp864
+      </TD><TD WIDTH=500>
+         <P>PC Arabic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp865
+      </TD><TD WIDTH=500>
+         <P>MS-DOS Nordic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp866
+      </TD><TD WIDTH=500>
+         <P>MS-DOS Russian
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp868
+      </TD><TD WIDTH=500>
+         <P>MS-DOS Pakistan
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp869
+      </TD><TD WIDTH=500>
+         <P>IBM Modern Greek
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp870
+      </TD><TD WIDTH=500>
+         <P>IBM Multilingual Latin-2
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp871
+      </TD><TD WIDTH=500>
+         <P>IBM Iceland
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp874
+      </TD><TD WIDTH=500>
+         <P>IBM Thai
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp875
+      </TD><TD WIDTH=500>
+         <P>IBM Greek
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp918
+      </TD><TD WIDTH=500>
+         <P>IBM Pakistan (Urdu)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp921
+      </TD><TD WIDTH=500>
+         <P>IBM Latvia, Lithuania (AIX, DOS)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp922
+      </TD><TD WIDTH=500>
+         <P>IBM Estonia (AIX, DOS)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp930
+      </TD><TD WIDTH=500>
+         <P>Japanese Katakana-Kanji mixed with 4370 UDC, superset of
+         5026
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp933
+      </TD><TD WIDTH=500>
+         <P>Korean Mixed with 1880 UDC, superset of 5029
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp935
+      </TD><TD WIDTH=500>
+         <P>Simplified Chinese Host mixed with 1880 UDC, superset of
+         5031
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp937
+      </TD><TD WIDTH=500>
+         <P>Traditional Chinese Host miexed with 6204 UDC, superset
+         of 5033
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp939
+      </TD><TD WIDTH=500>
+         <P>Japanese Latin Kanji mixed with 4370 UDC, superset of
+         5035
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp942
+      </TD><TD WIDTH=500>
+         <P>IBM OS/2 Japanese, superset of Cp932
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp942C
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp942
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp943
+      </TD><TD WIDTH=500>
+         <P>IBM OS/2 Japanese, superset of Cp932 and Shift-JIS
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp943C
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp943
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp948
+      </TD><TD WIDTH=500>
+         <P>OS/2 Chinese (Taiwan) superset of 938
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp949
+      </TD><TD WIDTH=500>
+         <P>PC Korean
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp949C
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp949
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp950
+      </TD><TD WIDTH=500>
+         <P>PC Chinese (Hong Kong, Taiwan)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp964
+      </TD><TD WIDTH=500>
+         <P>AIX Chinese (Taiwan)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp970
+      </TD><TD WIDTH=500>
+         <P>AIX Korean
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1006
+      </TD><TD WIDTH=500>
+         <P>IBM AIX Pakistan (Urdu)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1025
+      </TD><TD WIDTH=500>
+         <P>IBM Multilingual Cyrillic: Bulgaria, Bosnia,
+         Herzegovinia, Macedonia (FYR)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1026
+      </TD><TD WIDTH=500>
+         <P>IBM Latin-5, Turkey
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1046
+      </TD><TD WIDTH=500>
+         <P>IBM Arabic - Windows
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1097
+      </TD><TD WIDTH=500>
+         <P>IBM Iran (Farsi)/Persian
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1098
+      </TD><TD WIDTH=500>
+         <P>IBM Iran (Farsi)/Persian (PC)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1112
+      </TD><TD WIDTH=500>
+         <P>IBM Latvia, Lithuania
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1122
+      </TD><TD WIDTH=500>
+         <P>IBM Estonia
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1123
+      </TD><TD WIDTH=500>
+         <P>IBM Ukraine
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1124
+      </TD><TD WIDTH=500>
+         <P>IBM AIX Ukraine
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1140
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp037 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1141
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp273 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1142
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp277 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1143
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp278 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1144
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp280 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1145
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp284 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1146
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp285 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1147
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp297 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1148
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp500 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1149
+      </TD><TD WIDTH=500>
+         <P>Variant of Cp871 with Euro character
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1381
+      </TD><TD WIDTH=500>
+         <P>IBM OS/2, DOS People's Republic of China (PRC)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp1383
+      </TD><TD WIDTH=500>
+         <P>IBM AIX People's Republic of China (PRC)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>Cp33722
+      </TD><TD WIDTH=500>
+         <P>IBM-eucJP - Japanese (superset of 5050)
+      </TD></TR>
+   <TR>
+	  <TD WIDTH=150>
+		 <P>ISO2022_CN_CNS
+      </TD><TD WIDTH=500>
+		 <P>CNS11643 in ISO 2022 CN form, Traditional Chinese (conversion from Unicode only)
+		 </TD></TR>
+   <TR>
+	  <TD WIDTH=150>
+		 <P>ISO2022_CN_GB
+      </TD><TD WIDTH=500>
+		 <P>GB2312 in ISO 2022 CN form, Simplified Chinese (conversion from Unicode only)
+		 </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>JISAutoDetect
+      </TD><TD WIDTH=500>
+         <P>Detects and converts from Shift-JIS, EUC-JP, ISO 2022 JP
+         (conversion to Unicode only)
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MS874
+      </TD><TD WIDTH=500>
+         <P>Windows Thai
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacArabic
+      </TD><TD WIDTH=500>
+         <P>Macintosh Arabic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacCentralEurope
+      </TD><TD WIDTH=500>
+         <P>Macintosh Latin-2
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacCroatian
+      </TD><TD WIDTH=500>
+         <P>Macintosh Croatian
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacCyrillic
+      </TD><TD WIDTH=500>
+         <P>Macintosh Cyrillic
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacDingbat
+      </TD><TD WIDTH=500>
+         <P>Macintosh Dingbat
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacGreek
+      </TD><TD WIDTH=500>
+         <P>Macintosh Greek
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacHebrew
+      </TD><TD WIDTH=500>
+         <P>Macintosh Hebrew
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacIceland
+      </TD><TD WIDTH=500>
+         <P>Macintosh Iceland
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacRoman
+      </TD><TD WIDTH=500>
+         <P>Macintosh Roman
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacRomania
+      </TD><TD WIDTH=500>
+         <P>Macintosh Romania
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacSymbol
+      </TD><TD WIDTH=500>
+         <P>Macintosh Symbol
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacThai
+      </TD><TD WIDTH=500>
+         <P>Macintosh Thai
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacTurkish
+      </TD><TD WIDTH=500>
+         <P>Macintosh Turkish
+      </TD></TR>
+   <TR>
+      <TD WIDTH=150>
+         <P>MacUkraine
+      </TD><TD WIDTH=500>
+         <P>Macintosh Ukraine
+      </TD></TR>
+</TABLE></P>
+
+<P><!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE="3" NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%">
+   <TR>
+      <TD VALIGN=top>
+         <P><FONT
+         SIZE="-2"><A HREF="../../relnotes/SMICopyright.html">Copyright
+         &copy;</A></FONT><FONT SIZE="-2"> 2002 </FONT><FONT
+         SIZE="-2"><A HREF="http://www.sun.com/">Sun Microsystems,
+         Inc.</A></FONT><FONT SIZE="-2"> All Rights Reserved.</FONT>
+         </P>
+         
+         <P><FONT SIZE="-1">Please send comments to: </FONT><FONT
+         SIZE="-1"><A HREF="mailto:java-intl@java.sun.com">java-intl@java.sun.com</A></FONT><FONT
+         SIZE="-1"> </FONT>
+      </TD><TD VALIGN=top align=RIGHT>
+         <P ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif"
+         ALT="Sun" WIDTH=64 HEIGHT=30 BORDER=0 ALIGN=bottom><BR>
+         
+         <I><FONT SIZE="+1">Java Software</FONT></I><FONT SIZE="+1">
+         </FONT>
+      </TD></TR>
+</TABLE></P>
+</BODY>
+</HTML>

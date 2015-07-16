@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+    <title>How and When to Deprecate APIs</title>
+</head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT=" Sun Microsystems, Inc " BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+
+<TD>
+<center>
+                   <h1>How and When<br>
+                    To Deprecate APIs</h1>
+             <b>(based on a writeup by John Rose)</b>
+                             <p>
+<font size="-1">Maintained by <a href="mailto:doug.kramer@sun.com">doug.kramer@sun.com</a></font>
+</center>
+</TD>
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+   <font size="-1"><a href="index.html">Deprecation<br> Home Page</a></font>
+</TD>
+</TR>
+</TABLE>
+
+<!-- Body text begins here -->
+<h3>Contents</h3>
+<ul>
+<li><a href="#what">What "Deprecated" means</a>
+<li><a href="#when">When to Deprecate</a>
+<li><a href="#what">What happens when an API is Deprecated</a>
+<li><a href="#how">How to Deprecate</a>
+</ul>
+
+<p>
+
+
+<a name="what"></a>
+<h3>What "Deprecated" means</h3>
+<blockquote>
+You may have heard the term, "self-deprecating humor". That is humor
+that minimizes your importance. A deprecated class or method is like
+that. It is no longer important. It is <em>so</em> unimportant, in fact,
+that it should no longer be used at all, as it will probably cease to exist in the future.
+<p>
+The need for deprecation comes about because, as a class evolves, its API changes. 
+Methods are renamed for consistency. New and better methods are added. 
+Attributes change. But making such changes introduces a problem. 
+You need to keep the old API around until people make the transition to the new one, 
+but you don't want developers to continue programming to the old API. 
+<p>
+The ability to mark a class or method as "deprecated" solves the problem. 
+Existing classes that use the old API continue to work, but the compiler can issue 
+a warning when it finds references to deprecated items. Meanwhile, the API comments 
+can warn the user against using the deprecated item and tell the user how to avoid doing so.
+The <code>@deprecated</code> tag achieves these goals.
+<blockquote>
+<b>Note: </b>"Deprecated" and "depreciated" are not same. "Depreciated" is a financial term 
+that means "lowered value". Although the meanings are similar, classes and methods are 
+deprecated, not depreciated.
+</blockquote>
+</blockquote>
+
+<a name="when"></a>
+<h3>When to Deprecate</h3>
+<blockquote>
+Designers of new APIs should carefully consider whether they are
+superseding old APIs.  For each such API, if they wish to encourage
+users of the old previous API to migrate to the new API, they should
+add a deprecation paragraph to the documentation comment.  Empty
+deprecation paragraphs are bad form, because they do not help the
+user fix the warnings that arise from the deprecation.
+<p>
+Valid reasons for wishing one's users to migrate to the new API include:
+ - the old API is insecure, buggy, or highly inefficient
+ - the old API is going away in a future release
+ - the old API encourages very bad coding practices
+
+Not all of these reasons are of equal weight, yet deprecation is a
+reasonable (though not mandatory) choice in all these cases.  Therefore,
+the use of deprecated APIs can never be made a hard error by default.
+Also, the deprecation comments need to help the user decide when to
+move to the new API, and so should briefly mention the technical reasons
+for deprecation.
+</blockquote>
+
+<a name="what"></a>
+<h3>What happens when an API is Deprecated</h3>
+<blockquote>
+In parallel with the access-checking logic for classes and
+members, the compiler looks for deprecated attributes of classes and
+members being accessed, and issues warnings when the deprecated classes
+or members are used.
+<blockquote>
+<b>Note: </b>A deprecation warning is suppressed if the compilation unit containing
+the deprecation is being compiled at the same time as the compilation
+unit using the deprecated class or member. This allows legacy APIs to
+be built without warnings. There currently is no other way to suppress
+the deprecation warnings.
+</blockquote>
+JavaDoc also pays special attention to @deprecated tags when generating html files.
+Javadoc parses the entire paragraph following the @deprecated tag and moves 
+it to the front of the description, placing it in italics and preceding 
+it with a warning, "Note: foo is deprecated", in bold.  It also adds 
+"Deprecated" in bold to any index entries mentioning the deprecated entity.
+</blockquote>
+
+<a name="how"></a>
+<h3>How to Deprecate</h3>
+<blockquote>
+To deprecate a class or method, use the <code>@deprecated</code> tag,
+as explained in <a href="/j2se/javadoc/writingdoccomments/index.html">How to Write Doc Comments for JavaDoc</a>.
+The paragraph following the <code>@deprecated</code> tag should explain why the item
+has been deprecated and suggest how the user can avoid using it.
+<p>
+It is not necessary to deprecate individual members of a deprecated
+class, unless of course the programmer wants to explain some specific
+point about one member.
+<blockquote>
+  <b>Note: </b>Deprecation applies to classes and to individual members, not
+  to their names.  It is possible for a single method to have deprecated
+  and non-deprecated overloadings.  It is possible for a non-deprecated
+  member to hide or override a deprecated one, which removes deprecation.
+  It is the responsibility of the programmer to deprecate overrides of
+  a deprecated method, if in fact they should be deprecated.
+</blockquote>
+It is probably <em>not</em> good to specifically mention a timetable for
+phase-out of the deprecated API; this is a business decision that needs
+to be communicated other ways.
+<p>
+When a feature is deprecated, it is a good idea to notify the
+engineering organization of this fact, so that other engineers can
+respond to the change (pro or con) in a timely manner.
+</blockquote>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 1 - Introduction
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-intro.html">PREV</a>
+ | <a href="rmi-intro3.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	1.1	</i> Background
+</a></h2>
+
+
+<a name="5102"><!-- --></a>
+<blockquote>
+<a name="712"><!-- --></a>
+Distributed systems require that computations running in different address spaces, potentially on different hosts, be able to communicate. For a basic communication mechanism, the Java<sup><font size="-2">TM</font></sup> programming language supports sockets, which are flexible and sufficient for general communication. However, sockets require the client and server to engage in applications-level protocols to encode and decode messages for exchange, and the design of such protocols is cumbersome and can be error-prone. <p>
+<a name="209"><!-- --></a>
+An alternative to sockets is Remote Procedure Call (RPC), which abstracts the communication interface to the level of a procedure call. Instead of working directly with sockets, the programmer has the illusion of calling a local procedure, when in fact the arguments of the call are packaged up and shipped off to the remote target of the call. RPC systems encode arguments and return values using an external data representation, such as XDR.<p>
+<a name="213"><!-- --></a>
+RPC, however, does not translate well into distributed object systems, where communication between program-level <em>objects</em> residing in different address spaces is needed. In order to match the semantics of object invocation, distributed object systems require <em>remote method invocation</em> or RMI. In such systems, a local surrogate (stub) object manages the invocation on a remote object.<p>
+<a name="214"><!-- --></a>
+The Java platform&#39;s remote method invocation system described in this specification has been specifically designed to operate in the Java application environment. The Java programming language&#39;s RMI system assumes the homogeneous environment of the Java virtual machine (JVM), and the system can therefore take advantage of the Java platform&#39;s object model whenever possible.<p>
+</blockquote>
+</ul>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-intro.html">PREV</a>
+ | <a href="rmi-intro3.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

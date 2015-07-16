@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Scrolling</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Scrolling: JViewport, JScrollPane, and Related Classes</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+  <h2>New JViewport scrollMode Property</h2>
+
+
+    Interactive scrolling speed has proven to be perhaps the most
+    important factor in users perception of overall swing performance.
+    1.3 adds a new optimization, called "BLIT_SCROLL_MODE" (now the
+    default) that copies unobscured areas of the components heavy
+    weight ancestor to effect a scroll.  Previously we had offered a
+    related optimzation that managed a per viewport backing store
+    image.  Although still supported, the backingStoreEnabled property
+    has been deprecated.
+<P>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JViewport.html#BLIT_SCROLL_MODE">public static final int BLIT_SCROLL_MODE</a>
+<li><a href="../../../api/javax/swing/JViewport.html#BACKINGSTORE_SCROLL_MODE">public static final int BACKINGSTORE_SCROLL_MODE</a>
+<li><a href="../../../api/javax/swing/JViewport.html#SIMPLE_SCROLL_MODE">public static final int SIMPLE_SCROLL_MODE</a>
+<li><a href="../../../api/javax/swing/JViewport.html#setScrollMode(int)">public void setScrollMode(int mode)</a>
+<li><a href="../../../api/javax/swing/JViewport.html#getScrollMode()">public int getScrollMode()</a>
+<li><a href="../../../api/javax/swing/JViewport.html#backingStore">protected boolean backingStore</a> // Deprecated
+<li><a href="../../../api/javax/swing/JViewport.html#isBackingStoreEnabled()">public boolean isBackingStoreEnabled()</a> // Deprecated
+<li><a href="../../../api/javax/swing/JViewport.html#setBackingStoreEnabled(boolean)">public void setBackingStoreEnabled(boolean enabled)</a> // Deprecated
+</tt>
+</ul>
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

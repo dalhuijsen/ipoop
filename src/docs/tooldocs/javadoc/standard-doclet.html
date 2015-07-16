@@ -1,0 +1,435 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Doclet Overview</title>
+  </head>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+<td align=center>
+
+      <h1>The Standard Doclet</h1>
+
+</td>
+
+<td align=right valign=top>
+
+      <font size="-1"><a href="index.html">Javadoc 1.4</a></font>
+</td>
+
+</tr>
+
+</table>
+
+<!-- Body text begins here -->
+
+<h2>Contents</h2>
+   <ul>
+   <li><a href=#what">What the Standard Doclet Is</a>
+   <li><a href="#api">Classes in the Standard Doclet</a>
+   <li><a href="#running">Running the Standard Doclet from the Command Line</a>
+   <li><a href="#runningprogrammatically">Running the Standard Doclet Programmatically</a>
+   <li><a href="#source">The Source for the Standard Doclet</a>
+   </ul>
+
+
+<a name="what">
+<h2>What the Standard Doclet Is</h2></a>
+
+The standard doclet is the doclet provided by 
+Sun<font size="-2"><sup>TM</sup></font> that produces Javadoc's default 
+HTML-formatted API output.  The 
+<a href="../../api/index.html">API documentation</a> for the 
+Java<font size="-2"><sup>TM</sup></font> platform in this 
+SDK documentation is an example of 
+the standard doclet's output. Javadoc uses the standard doclet if 
+no other doclet is specified using Javadoc's <tt>-doclet</tt> option 
+on the command line.
+<p>
+
+The classes listed below are part of the internal implementation 
+of the standard doclet, subject to change without notice from
+version to version -- they are not an API.  
+These classes are published here as a good example of the use of much 
+of the doclet  API. Also, by seeing how the standard doclet produces 
+the default HTML output, it will be easier for you to modify the standard 
+doclet to make your own doclet for generating custom API documentation.
+<p>
+
+The next version of the standard doclet will be written to a
+Doclet Toolkit API that we will support.
+<p>
+
+<p><a name="api">
+<h2>Classes in the Standard Doclet</h2></a>
+The standard doclet is composed of 
+the classes in the <tt>com.sun.tools.doclets</tt>, 
+<tt>com.sun.tools.doclets.standard</tt> and 
+<tt>com.sun.tools.doclets.standard.tags</tt> packages. 
+Classes in the standard doclet that play key roles in generating 
+the default HTML output are summarized here:
+<p>
+
+<blockquote>
+   <b>Important - These classes are part of the internal implementation 
+   of the standard doclet, and are subject to change without notice from
+   version to version -- they are not an API.  Use them at your
+   own risk.</b>
+</blockquote>
+
+<b><code>com.sun.tools.doclets</code></b>
+<ul>
+<li><b>HtmlWriter</b> - This class contains code for writing the various 
+HTML tags needed for generating any output in HTML form.
+
+<li><b>HtmlDocWriter</b> - This class extends HtmlWriter, and contains 
+additional HTML-related code for producing the specialized hyperlinks 
+used in the default HTML output, including links in the headers and 
+footers of the HTML pages.
+
+<li><b>Taglet</b> - An interface that represents a class used to format the 
+ouput of a tag. You can develop a Taglet to format the output of
+your custom tags. For more information about Taglets, please see the   
+<a href="taglet/overview.html">taglet overview</a>.
+
+<li><b>TagletManager</b> - This class manages the Taglets being used by 
+the doclet.
+It has methods for registering Taglets, retrieving Taglets and
+checking whether or not a tag is known by the TagletManager
+(used for error checking).  The TagletManager also checks for tags that
+are used in the wrong places.  For example, a warning message is printed
+if a @param tag is used in class documentation because that tag should only
+be used in constructor and method documentation.
+
+</ul>
+
+<b><code>com.sun.tools.doclets.standard</code></b>
+<ul>
+<li><b>Standard</b> - This class contains the <tt>start</tt> method and 
+hence serves as the entry point for the standard doclet. It orchestrates 
+the generation of the HTML API files for the packages and classes upon 
+which javadoc is operating.
+
+<li><b>PackageIndexWriter</b> - This class generates the <tt>overview-summary.html</tt> 
+file that lists all packages specified on the javadoc command line. As an 
+example, see the <a href="../../api/overview-summary.html">
+<tt>overview-summary.html</tt></a> file in the API documentation.
+
+<li><b>PackageIndexFrameWriter</b> - This generates the 
+<tt>overview-frame.html</tt> file used for displaying the list of package 
+links in the upper-left frame in the frame-formatted default output. See 
+the <a href="../../api/overview-frame.html"><tt>overview-frame.html</tt></a> 
+file in the API documentation of this release of the J2SE documentation.
+
+<li><b>PackageFrameWriter</b> - This generates the 
+<tt>package-frame.html</tt> file that lists the interfaces and classes in a 
+given package for displaying in the lower-left frame of the frame-formatted 
+default output. As an example of this type of page, see 
+the <a href="../../api/java/awt/package-frame.html"><tt>package-frame.html</tt></a> 
+file for <tt>java.awt</tt> in the API documentation of this release of the 
+platform API documentation.
+
+<li><b>FrameOutputWriter</b> - This generates the <tt>index.html</tt> file 
+used for presenting the frame-formated "cover page" of the API 
+documentation.  See the 
+<a href="../../api/index.html"><tt>index.html</tt></a> file from the 
+platform API documentation as an example.
+
+<li><b>PackageWriter</b> - This generates the <tt>package-summary.html</tt> 
+files that list the interfaces and classes for a given package. For an 
+example of this type of page, see the 
+<a href="../../api/java/lang/package-summary.html"><tt>package-summary.html</tt></a> 
+page for <tt>java.lang</tt> in the API documentation of this release.
+
+<li><b>ClassWriter</b> - This generates the HTML API documentation for 
+each individual interface and class.  For an example from the Java 2 Platform  
+API documentation, see <a href="../../api/java/awt/Font.html"><tt>Font.html</tt></a>.
+
+<li><b>SingleIndexWriter</b> - This generates the single index file of 
+class members that the standard doclet produces when the 
+<tt>-splitindex</tt> option is not used.
+
+<li><b>SplitIndexWriter</b> - This generates the mutliple index files for the 
+class members that is generated when the Javadoc runs the standard doclet 
+with the <tt>-splitindex</tt> command-line option. The files are numbered such as 
+<a href="../../api/index-files/index-1.html"><tt>index-1.html</tt></a>.
+
+<li><b>TreeWriter</b> - This class generates the <tt>overview-tree.html</tt> file 
+that lists the Class Hierarchy for the classes upon which the standard doclet 
+operates. For an example from the Java 2 Platform API documentation, 
+see <a href="../../api/overview-tree.html"><tt>overview-tree.html</tt></a>.
+
+<li><b>DeprecatedListWriter</b> - This generates the file 
+<tt>deprecatedlist.html</tt> which lists deprecated APIs. As an example, 
+see the <a href="../../api/deprecated-list.html"><tt>deprecated-list.html</tt></a> 
+file from the API documentation in this release.
+
+<li><b>ClassUseMapper</b>, <b>ClassUseWriter</b>, and <b>PackageUseWriter</b> - 
+These classes generate the "Use" files for classes and packages. Click the 
+"Use" link in the navigation bar to go to a class or package "use" page. 
+Examples of such pages are those for class 
+<a href="../../api/java/lang/class-use/Character.html">Character</a> and 
+package <a href="../../api/java/lang/package-use.html">java.lang</a>.
+
+<li><b>PackageListWriter</b> 
+- generates the <tt>package-list</tt> text file that gets placed in the top-level 
+directory of the API documetation. This file is required for use with 
+standard doclet's <tt>-link</tt> command-line option. Standard doclet 
+class <b>Extern</b> also plays 
+a role in making the <tt>-link</tt> option work. See the Javadoc 
+reference pages ([<a href="../windows/javadoc.html">Windows</a>]&nbsp;[<a href="../solaris/javadoc.html">Solaris</a>]) for details about this option.
+
+<li><b>Group</b> - This class handles
+the grouping of packages in one or more tables on the 
+<a href="../../api/overview-summary.html"><tt>overview-summary.html</tt></a> page. 
+It supports the standard doclet's <tt>-group</tt> command-line option. See the 
+Javadoc reference pages ([<a href="../windows/javadoc.html">Windows</a>]&nbsp;[<a href="../solaris/javadoc.html">Solaris</a>]) for details about this option.
+
+</ul>
+
+<b><code>com.sun.tools.doclets.standard.tags</code></b>
+<ul>
+
+<li><b>AbstractExecutableMemberTaglet</b> - This is an abstract Taglet that
+formats the output for a tag used in documentation for executable members.
+
+<li><b>AbstractInlineTaglet</b> - This is an abstract Taglet that formats
+the output for an inline tag. You should subclass this abstract class if you
+would like to create your own custom inline tag.
+ 
+<li><b>DocRootTaglet</b> - A taglet that formats the output for {@docRoot}.
+
+<li><b>InheritDocTaglet</b> - A taglet that formats the output for {@inheritDoc}.
+
+<li><b>ParamTaglet</b> - A taglet that formats the output for @param.
+
+<li><b>ReturnTaglet</b> - A taglet that formats the output for @return.
+
+<li><b>SeeTaglet</b> - A taglet that formats the output for @see.
+ 
+<li><b>SimpleTaglet</b> - A taglet that formats the output for single 
+argument tags such as @author and @version.
+ 
+<li><b>ThrowsTaglet</b> - A taglet that formats the output for @throws.
+ 
+<li><b>ValueTaglet</b> - A taglet that formats the output for {@value}.
+
+</ul>
+For more information about Taglets, please see the
+<a href="taglet/overview.html">taglet overview</a>.
+
+<a name="running">
+<h2>Running the Standard Doclet from the Command Line</h2></a>
+The standard doclet is invoked by default when no other doclet is 
+specified with the <tt>-doclet</tt> tag on the command line.  For example, 
+running
+<blockquote><pre>
+% javadoc myPackage
+</pre></blockquote>
+will use the standard doclet to produce the default-style HTML API 
+documentation for <tt>myPackage</tt>. Running javadoc without the 
+<tt>-doclet</tt> option is equivalent to running javadoc using the 
+<tt>-doclet</tt> option to invoke the standard doclet. That is, 
+the above command is equivalent to 
+<blockquote><pre>
+% javadoc -docletpath /home/user/j2sdk1.4.0/lib/tools.jar \
+  -doclet com.sun.tools.doclets.standard.Standard \
+  myPackage
+</pre></blockquote>
+
+
+<a name="runningprogrammatically"></a>
+<h2>Running the Standard Doclet Programmatically</h2></a>
+
+The Javadoc tool has a programmatic interface with public methods 
+for invoking the Javadoc tool from another program written in 
+the Java language.  These methods are located in class 
+<code>com.sun.tools.javadoc.Main</code> in <code>lib/tools.jar</code>.
+An example is given below.<p>
+<p>
+
+The disadvantages of calling <code>main</code> are: 
+(1) It can only be called once per run -- for 1.2.x or 1.3.x, 
+use <code>java.lang.Runtime.exec("javadoc ...")</code>  
+if more than one call is needed,
+(2) it exits using <code>System.exit()</code>,
+which exits the entire program, and
+(3) an exit code is not returned.
+
+<pre>
+public static void <b>main</b>(java.lang.String[] args)
+</pre>
+<blockquote>
+<dl>
+  <dt>Command line interface.<br>
+  <dt><b>Parameters:</b>
+      <dd><code>args</code> - The command line parameters.
+</dl>
+</blockquote>
+
+The <code>execute</code> method overcomes all the disadvantages of  
+<code>main</code>.
+<p>
+
+<pre>
+public static int <b>execute</b>(java.lang.String[] args)
+</pre>
+<blockquote>
+<dl>
+  <dt>Programmatic interface.
+  <dt><b>Parameters:</b>
+      <dd><code>args</code> - The command line parameters.
+  <dt><b>Returns:</b>
+      <dd>The return code.
+</dl>
+</blockquote>
+
+<pre>
+public static int <b>execute</b>(java.lang.String programName,
+                          java.lang.String[] args)
+</pre>
+<blockquote>
+<dl>
+  <dt>Programmatic interface.
+  <dt><b>Parameters:</b>
+         <dd><code>programName</code> - Name of the program (for error messages).
+         <dd><code>args</code> - The command line parameters.
+  <dt><b>Returns:</b>
+         <dd>The return code.
+</dl>
+</blockquote>
+
+<pre>
+public static int <b>execute</b>(java.lang.String programName,
+                          java.lang.String defaultDocletClassName,
+                          java.lang.String[] args)
+</pre>
+<blockquote>
+<dl>
+  <dt>Programmatic interface.
+  <dt><b>Parameters:</b>
+         <dd><code>programName</code> - Name of the program (for error messages).
+         <dd><code>defaultDocletClassName</code> - Fully qualified class name.
+         <dd><code>args</code> - The command line parameters.
+  <dt><b>Returns:</b>
+         <dd>The return code.
+</dl>
+</blockquote>
+
+
+<pre>
+public static int <b>execute</b>(java.lang.String programName,
+                          java.io.PrintWriter errWriter,
+                          java.io.PrintWriter warnWriter,
+                          java.io.PrintWriter noticeWriter,
+                          java.lang.String defaultDocletClassName,
+                          java.lang.String[] args)
+</pre>
+<blockquote>
+<dl>
+  <dt>Programmatic interface.
+  <dt><b>Parameters:</b>
+         <dd><code>programName</code> - Name of the program (for error messages).
+         <dd><code>errWriter</code> - PrintWriter to receive error messages.
+         <dd><code>warnWriter</code> - PrintWriter to receive error messages.
+         <dd><code>noticeWriter</code> - PrintWriter to receive error messages.
+         <dd><code>defaultDocletClassName</code> - Fully qualified class name.
+         <dd><code>args</code> - The command line parameters.
+  <dt><b>Returns:</b>
+         <dd>The return code.
+</dl>
+</blockquote>
+<p>
+
+<b>Example</b>
+<p>
+
+With classpath set to <code>lib/tools.jar</code> in the Java 2 SDK,
+pass in each option and argument as a separate string:
+
+<p>
+<code>
+com.sun.tools.javadoc.Main.execute(new String[] {"-d", "docs", "-sourcepath", "/home/usr/src", "p1", "p2"});
+</code>
+<br>
+<br>
+
+<a name="source">
+<h2>The Source for the Standard Doclet</h2></a>
+You can download the source code for the standard doclet as part of the 
+Java 2 SDK at:
+<ul>
+<li><a href="http://www.sun.com/software/communitysource/java2/"><b>Java 2 
+SDK v1.4 Source Code Release</b></a><BR>  
+(Note: There is a delay between when the J2SE SDK is available and the 
+source code release is available.)
+</ul>
+
+The source files are located in the directory 
+<code>src/share/classes/com/sun/tools/doclets</code>.
+
+<p>
+
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-98
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT>
+</P>
+
+
+
+
+
+   <FONT SIZE="-1">Please send comments to: <a href="mailto:javadoc-tool@sun.com">javadoc-tool@sun.com</a> 
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+  </body>
+</html>

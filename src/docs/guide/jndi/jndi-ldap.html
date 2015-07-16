@@ -1,0 +1,2328 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <title>JNDI/LDAP Service Provider
+   </title>
+</head>
+<body bgcolor="#FFFFFF">
+
+<h1>
+
+<hr SIZE=3 NOSHADE WIDTH="100%"></h1>
+
+<center>
+<h1>
+LDAP Naming Service Provider for the 
+<br>
+Java Naming and Directory Interface<font size=4><sup>TM</sup></font> (JNDI)
+</h1></center>
+
+<hr SIZE=3 NOSHADE WIDTH="100%">
+<p><font size=-1>Please send feedback to <font color="#CC0000"><a href="mailto:jndi@eng.sun.com">jndi@java.sun.com</a></font></font>
+
+<P>
+<P><I>Table of Contents</I>
+
+<ol>
+<li>
+<a href="#INTRO">Introduction</a>
+
+<li>
+<a href="#CONFORMANCE">Conformance</a>
+
+<li>
+<a href="#PROP">Environment Properties</a>
+
+<li>
+<a href="#NAME">Names</a>
+
+<li>
+<a href="#ATTRIBUTES">Attributes</a>
+
+<li>
+<a href="#URLs">URLs</a>
+
+<li>
+<a href="#OBJECTS">Java Objects</a>
+
+<li>
+<a href="#SCHEMA">Schema</a>
+
+<li>
+<a href="#EXCEPTIONS">Exceptions</a>
+
+<li>
+<a href="#API">API Mapping</a>
+
+<li>
+<a href="#FEDERATION">Federation</a>
+
+<li>
+<a href="#EVENT">Event Notification</a>
+
+<li>
+<a href="#SASL">SASL Authentication</a>
+
+<li>
+<a href="#SSL">SSL and Start TLS</a>
+
+<li>
+<a href="#POOL">Connection Pooling</a>
+
+<li>
+<a href="#SEC">Security Considerations</a>
+
+</ol>
+
+<br>
+<p>
+<hr>
+<br><a NAME="INTRO"></a>
+<h2>
+1. Introduction</h2>
+
+The Lightweight Directory Access Protocol (LDAP) is an Internet standard
+for accessing directory services.
+The JNDI/LDAP service provider provides access to servers implementing
+the LDAP protocols.
+<p>
+
+This document describes the features of the LDAP service provider.  A major
+portion of the description is couched in terms of how the LDAP service
+provider behaves with respect to the descriptions in
+<a href="jndi-ldap-gl.html">Guidelines for LDAP Service Providers</a>.
+For examples and descriptions of how to use this provider, 
+please see the 
+<a href=/products/jndi/tutorial>JNDI Tutorial</a>.
+
+<p>
+The LDAP service provider implements the basic features for LDAP access.
+Additional functionality, such as support for a number of popular
+LDAP controls, and for storing and reading
+RMI and CORBA objects, can be added to the basic provider
+by installing a <em>booster pack</em>, available for download
+at the 
+<a href=/products/jndi/#download>JNDI Web site</a>.
+
+<p>
+<hr><a NAME="CONFORMANCE"></a>
+<h2>
+2. Conformance</h2>
+The LDAP service provider conforms to the following standards:
+<br>&nbsp;
+<center><table summary="service provider standards" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Standard</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>LDAPv3 (<a href="http://www.ietf.org/rfc/rfc2251.txt">RFC 2251</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>LDAPv3 Attributes (<a href="http://www.ietf.org/rfc/rfc2252.txt">RFC 2252</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>LDAPv3 Distinguished Names (<a href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td>LDAP Search Filters (<a href="http://www.ietf.org/rfc/rfc2254.txt">RFC 2254</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td>LDAP&nbsp; URL Format (<a href="http://www.ietf.org/rfc/rfc2255.txt">RFC 2255</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td>LDAPv3 Schema (<a href="http://www.ietf.org/rfc/rfc2256.txt">RFC 2256</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>LDAPv2 (<a href="http://www.ietf.org/rfc/rfc1777.txt">RFC 1777</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>LDAP Authentication (<a href="http://www.ietf.org/rfc/rfc2829.txt">RFC 2829</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>Start TLS Extension (<a href="http://www.ietf.org/rfc/rfc2830.txt">RFC 2830</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>DIGEST-MD5 (<a href="http://www.ietf.org/rfc/rfc2831.txt">RFC 2831</a>)</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+</table></center>
+
+<p>
+<hr><a NAME="PROP"></a>
+<h2>
+3. Environment Properties</h2>
+<a NAME="JNDIPROPS"></a>
+Descriptions of JNDI, LDAP-specific, and SASL-specific properties are found in
+<a href="jndi-ldap-gl.html#PROP">Guidelines for LDAP Service Providers</a>.
+
+<h3>
+3.1 JNDI Properties</h3>
+The LDAP service provider supports the following JNDI environment properties:
+<br>&nbsp;
+<table summary="supported JNDI environment properties" BORDER CELLPADDING=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th>Property</th>
+
+<th NOSAVE>Supported</th>
+
+<th>Comments</th>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#batchsize">java.naming.batchsize</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>Default value is <tt>1</tt>.</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#control">java.naming.factory.control</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td><tt>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#initial">java.naming.factory.initial</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>
+Specify
+<tt>com.sun.jndi.ldap.LdapCtxFactory</tt> to use the LDAP service provider
+as the initial context.
+</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#object">java.naming.factory.object</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;
+</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#state">java.naming.factory.state</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;
+</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#language">java.naming.language</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>No</td>
+
+<td>Ignored by the provider.</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#url">java.naming.provider.url</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>
+On systems earlier than the Java 2 SDK, v 1.4.1, can contain only
+a single URL.
+On systems earlier than the Java 2 SDK, v 1.4.2, cannot contain
+LDAPS URLs.
+</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#referral">java.naming.referral</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#authentication">java.naming.security.authentication</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td><tt>simple</tt>, <tt>none</tt>, list of SASL mechanisms
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#credentials">java.naming.security.credentials</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#principal">java.naming.security.principal</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#protocol">java.naming.security.protocol</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td><tt>ssl</tt></td>
+</tr>
+</table>
+<a NAME="LDAPPROPS"></a>
+<h3>
+3.2 LDAP-specific Properties</h3>
+The provider supports the following LDAP-specific environment properties:
+<br>&nbsp;
+<table summary="supported LDAP-specific environment properties" BORDER CELLPADDING=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Property</th>
+
+<th NOSAVE>Supported</th>
+
+<th>Comments</th>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#binary">java.naming.ldap.attributes.binary</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#connect">java.naming.ldap.control.connect</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#deleteRDN">java.naming.ldap.deleteRDN</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#derefAliases">java.naming.ldap.derefAliases</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#socket">java.naming.ldap.factory.socket</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>Default value is <tt>javax.net.ssl.SSLSocketFactory</tt> when the <tt><a href="jndi-ldap-gl.html#protocol">java.naming.security.protocol</a></tt>&nbsp;
+property is set to <tt>ssl</tt>. See the <a href=#SSL>SSL Section</a> for details.
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#separator">java.naming.ldap.ref.separator</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#limit">java.naming.ldap.referral.limit</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#typesOnly">java.naming.ldap.typesOnly</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#version">java.naming.ldap.version</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table>
+
+<a NAME="SASLPROPS"></a>
+<h3>
+3.3 SASL-specific Properties</h3>
+The provider supports the following SASL-specific environment properties:
+<br>&nbsp;
+<table summary="supported SASL-specific environment properties" BORDER CELLPADDING=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Property</th>
+
+<th NOSAVE>Supported</th>
+
+<th>Comments</th>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#authorizationId">java.naming.security.sasl.authorizationId</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#callback">java.naming.security.sasl.callback</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#realm">java.naming.security.sasl.realm</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#qop">javax.security.sasl.qop</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#strength">javax.security.sasl.strength</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>
+Cipher selected depends on the ciphers available
+from the <a href=/products/jce/>Java Cryptography Extension 
+(JCE)</a> service providers in the Java platform.
+</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#maxbuffer">javax.security.sasl.maxbuffer</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#mutual">javax.security.sasl.server.authentication</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#policy_forward">javax.security.sasl.policy.forward</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#policy_creds">javax.security.sasl.policy.credentials</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#policy_noplain">javax.security.sasl.policy.noplaintext</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#policy_noactive">javax.security.sasl.policy.noactive</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#policy_nodictionary">javax.security.sasl.policy.nodictionary</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td><tt><a href="jndi-ldap-gl.html#policy_noanonymous">javax.security.sasl.policy.noanonymous</a></tt></td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+</table>
+
+
+<p><a NAME="SPIPROPS"></a>
+
+<h3>
+3.4 Provider-specific Properties</h3>
+The LDAP service provider 
+defines the following provider-specific environment properties:
+<br>&nbsp;
+
+<a NAME=POOLPROP></a>
+<dt>
+<b><tt>com.sun.jndi.ldap.connect.pool</tt></b></dt>
+<blockquote>
+This property is used to specify that a pooled connection should be
+used when creating the initial context instance. If its value is "true",
+the provider will use a pooled connection if the parameters for creating
+a connection (referred to as the <em>connection request</em>) meet
+the criteria set forth by the connection pool configuration.
+If this property has not been set, or if it has been set to any other value,
+or if the connection request does not meet the criteria,
+the provider will not use a pooled connection.
+See the <a href=#POOL>Connection Pooling section</a> for more information
+on connection pooling.
+
+<p>For example, the following code
+<blockquote>
+<tt>
+env.put("com.sun.jndi.ldap.connect.pool", "true");
+</tt>
+</blockquote>
+directs the LDAP provider to use a pooled connection when creating
+an initial context.
+
+<p><b>NOTE</b>:
+On systems earlier than the Java 2 SDK, v 1.4.1, connection pooling
+is not supported and therefore, this property is ignored.
+
+</blockquote>
+
+<dt>
+<b><tt>com.sun.jndi.ldap.connect.timeout</tt></b></dt>
+
+<blockquote>
+
+The value of this property is the string representation of an integer
+representing the connection timeout in milliseconds.  If the LDAP
+provider cannot establish a connection within that period, it aborts
+the connection attempt.  The integer should be greater than zero. An
+integer less than or equal to zero means to use the network protocol's
+(i.e., TCP's) timeout value.
+
+<p>If this property is not specified, the default is to wait for the
+connection to be established or until the underlying network times out.
+<p>For example,
+<blockquote><tt>env.put("com.sun.jndi.ldap.connect.timeout", "500");</tt></blockquote>
+causes the LDAP service provider to abort the connection attempt
+if a connection cannot be established in half a second.
+
+<p>When connection pooling has been requested for a connection, this property 
+also determines the maximum wait time for a connection when all connections
+in the pool are in use and the maximum pool size has been reached.
+If the value of this property is less than or equal to zero 
+under such circumstances,
+the provider will wait indefinitely for a connection to become available;
+otherwise, the provider will abort the wait when
+the maximum wait time has been exceeded.
+See the <a href=#POOL>Connection Pooling section</a> for details.
+
+<p><b>NOTE</b>: On systems earlier than the Java 2 SDK, v 1.4, this
+property is ignored because there is no support in the SDK for
+connection timeouts.
+
+</blockquote>
+
+<dt>
+<b><tt>com.sun.jndi.ldap.netscape.schemaBugs</tt></b></dt>
+
+<blockquote>
+The Netscape Directory Server 4.0 and earlier releases do not support schema
+entries that comply with RFC 2252. Specifically, contrary to RFC 2252, the Netscape
+server requires OIDs (such as those for SUP and SYNTAX) be delimited by single
+quotes and MUST/MAY lists be enclosed by parentheses.
+When you update the schema of the Netscape Directory Server 4.0,
+you need to use this property to get around these problems.
+<p>
+The following values are defined for this property:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>true</tt>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activate
+the workaround.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>false</tt>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; do not
+activate the workaround.
+<p>If this property is not set then its default value is <tt>false</tt>.
+<p>For example,
+<blockquote>
+<pre>env.put("com.sun.jndi.ldap.netscape.schemaBugs", "true");</pre>
+</blockquote>
+activates the workaround.
+<p><b>NOTE 1</b>: This property may only be passed to the initial context
+and becomes fixed for the provider. It is unaffected by the <tt>addToEnvironment</tt>
+or <tt>removeFromEnvironment</tt> methods.
+<p><b>NOTE 2</b>:
+If you are using Netscape Directory Server 4.1, <strong>do not</strong>
+use this property. The 4.1 server has problems parsing object class
+definitions that contain MUST/MAY clauses without parentheses.
+If you are creating or modifying an object class definition that
+contains a single MUST/MAY item, work around the bug by adding
+a superfluous value (such as 'objectClass') to the MUST/MAY list.
+<p>
+</blockquote>
+<dt>
+<b><tt>com.sun.jndi.ldap.trace.ber</tt></b></dt>
+
+<blockquote>The value of this property is a <tt>java.io.OutputStream</tt>
+object into which a hexadecimal dump of the incoming and outgoing LDAP
+ASN.1 BER packets is written.
+<p>No default is defined for this property.
+<p>For example,
+<blockquote><tt>env.put("com.sun.jndi.ldap.trace.ber", System.out);</tt></blockquote>
+directs the LDAP protocol trace to the standard output stream.
+<p><b>NOTE</b>: This property may only be passed to the initial context
+and becomes fixed for the provider. It is unaffected by the <tt>addToEnvironment</tt>
+or <tt>removeFromEnvironment</tt> methods.</blockquote>
+
+<p>
+<hr><a NAME="NAME"></a>
+<h2>
+4. Names</h2>
+
+The LDAP service provider supports names in accordance with the description in
+<a href="jndi-ldap-gl.html#NAME">Guidelines for LDAP Service Providers</a>.
+
+It supports LDAP distinguished names in the following formats:
+<br>&nbsp;
+<table summary="distinguished name formats" BORDER CELLPADDING=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Distinguished Name format</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>String</tt></td>
+
+<td ALIGN=LEFT NOSAVE>Treat as composite name. 
+Process the first component of the composite name as a
+distinguished name. Use rest of the components for federation.
+</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>Name</tt></td>
+
+<td ALIGN=LEFT NOSAVE>
+If instance of <tt>CompositeName</tt>, treat as composite name, which means
+process the first component of the composite name as a
+distinguished name and use the rest for federation.
+Otherwise, treat as parsed LDAP name, where each component of
+<tt>Name</tt> is a component of the LDAP name as defined in
+<a href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>.
+</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>LDAP URL String</td>
+
+<td ALIGN=LEFT NOSAVE>
+
+When passed to the initial context, the LDAP URL string is interpreted
+according to 
+<a href="http://www.ietf.org/rfc/rfc2255.txt">RFC 2255</a>, and its
+distinguished name component interpreted according to 
+<a href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>.
+</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>LDAPS URL String</td>
+
+<td ALIGN=LEFT NOSAVE>
+
+When passed to the initial context, the LDAPS URL string is interpreted
+like an LDAP URL, except that an SSL connection is used to communicate
+with the server.
+
+<p><b>NOTE</b>:
+On systems earlier than the Java 2 SDK, v 1.4.2, the LDAP service provider
+does not recognize LDAPS URLs.
+</td>
+</tr>
+
+</table>
+<p>
+The name parser returned by an invocation of <tt>getNameParser()</tt>
+returns a parser that, when given a string name, parses it into
+components in accordance with
+<a href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>.
+<p>
+<hr><a NAME="ATTRIBUTES"></a>
+<h2>
+5. Attributes</h2>
+
+The LDAP service provider supports attributes in accordance with the description in
+<a href="jndi-ldap-gl.html#ATTRS">Guidelines for LDAP Service Providers</a>.
+
+It supports the following formats for specifying LDAP attribute values:
+<br>&nbsp;
+<table summary="attribute value formats" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Attribute value format</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>String </tt>values</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>byte[] </tt>values</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table>
+
+<p>
+Some LDAP servers support attribute subtyping, attribute name synonyms,
+and language codes for specifying language preferences for
+attribute values. In such cases, the attribute name returned by an
+LDAP server may be different from the one which was requested.
+<p>In LDAP, attribute names are case-insensitive. Therefore, when creating
+a collection of attributes to be passed as a parameter to JNDI
+operations, it is recommended to use a case-insensitive attributes
+class. For example,
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>Attributes attrs = new
+BasicAttributes(true); // ignoreCase=true</tt>
+
+<p>
+For
+all attribute values, regardless of whether they are <tt>String</tt> or
+<tt>byte[]</tt>, you need to
+know the syntax and format of the attribute value. You can typically find
+this out by reading the schema document in which the attribute and its
+syntax is defined.
+<p>When attributes are supplied as arguments to JNDI calls then they must
+satisfy whatever schema is enforced at the LDAP directory.&nbsp; In
+particular, the <tt>objectClass</tt> attribute is normally required
+when creating a new LDAP entry (for example, when using <a href="../../api/javax/naming/Context.html#bind(java.lang.String, java.lang.Object)">Context.bind</a>,
+<a href="../../api/javax/naming/Context.html#rebind(java.lang.String, java.lang.Object)">Context.rebind</a>
+or <a href="../../api/javax/naming/directory/DirContext.html#createSubcontext(java.lang.String, javax.naming.directory.Attributes)">DirContext.createSubcontext</a>).
+<p>
+<hr><a NAME="URLs"></a>
+<h2>
+6. URLs</h2>
+
+<h3>6.1 Uses</h3>
+
+The LDAP service provider supports URLs in accordance with the description in
+<a href="jndi-ldap-gl.html#URLS">Guidelines for LDAP Service Providers</a>.
+It supports both LDAP and LDAPS URLs.
+
+<p>
+It supports the following use of URLs:
+<br>&nbsp;
+<table summary="URL usage" BORDER CELLPADDING=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>URL usage</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr NOSAVE>
+<td>LDAP and LDAPS URLs to configure the LDAP service provider.</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td ALIGN=LEFT NOSAVE>URLs passed as names to the <tt>InitialDirContext
+</tt>methods.</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td ALIGN=LEFT NOSAVE>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td>URLs in LDAP referrals</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>The scope component of LDAP/LDAPS URLs is supported. The attributes, filter
+and extensions components are ignored.</td>
+</tr>
+
+<tr NOSAVE>
+<td>URLs returned as names in <tt>list</tt>,
+<tt>listBindings</tt>, and <tt>search</tt> enumerations.</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td ALIGN=LEFT NOSAVE>URLs linking federated namespaces.</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td ALIGN=LEFT NOSAVE>&nbsp;</td>
+</tr>
+</table>
+
+<p><b>NOTE</b>:
+On systems earlier than the Java 2 SDK, v 1.4.2, the LDAP service
+provider does not recognize or return LDAPS URLs.
+
+
+<h3>6.2 Automatic Discovery of LDAP Service</h3>
+
+The LDAP service provider supports the use of DNS configuration
+for automatically discovering the LDAP service.
+When an LDAP/LDAPS URL in the above usage cases
+is missing the hostname and port but has a non-empty distinguished name,
+the LDAP service provider will attempt to locate the LDAP servers to use
+as  described in the
+<a href="jndi-ldap-gl.html#URLS">Guidelines for LDAP Service Providers</a>.
+<p>
+For example,  given a URL of <tt>ldap:///dc=example,dc=com</tt>, the
+service provider will try to locate the DNS SRV records for
+<tt>_ldap._tcp.example.com</tt>. If the provider finds such records, 
+it will then
+extract and use the hostnames and ports of the LDAP servers from the records.
+The order in which it uses these records
+follows the algorithm described in the Internet draft
+<a href="http://www.ietf.org/internet-drafts/draft-ietf-ldapext-locate-08.txt">
+draft-ietf-ldapext-locate-08.txt</a>.
+
+<p>
+For locating the DNS SRV records of the LDAP service,
+the LDAP service provider uses the DNS service
+configured for the underlying platform (on Solaris or Linux, for
+example, the DNS client configuration is read from the 
+/etc/resolv.conf file).  
+If DNS has not been configured for the underlying platform, 
+the LDAP service provider will use <tt>localhost</tt> and 53 as
+the hostname and port of the DNS server. 
+If no DNS service is available, or if the
+DNS service does not have the LDAP service's SRV records,
+the LDAP service provider will use <tt>localhost</tt> as the hostname,
+and 389 as the port for a plain connection and 636 as the port
+for an SSL connection.
+
+<p><b>NOTE 1</b>:
+On systems earlier than the Java 2 SDK, v 1.4.1, unspecified hostname
+and port always default to <tt>localhost</tt> and 389, respectively; no
+attempt is made to use DNS.
+
+<p><b>NOTE 2</b>:
+On systems earlier than the Java 2 SDK, v 1.4.2, the default port
+is always 389 regardless of whether SSL is being used.
+
+<p>
+<hr>
+<br><a NAME="OBJECTS"></a>
+<h2>
+7. Java Objects</h2>
+
+The LDAP service provider supports storing and reading 
+the following types of objects, as specified in
+<a href="jndi-ldap-gl.html#OBJ">Guidelines for LDAP Service Providers</a>.
+
+<br>&nbsp;
+<table summary="supported storable/readable objects" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Storable/Readable Objects</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>Reference </tt>objects</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>Referenceable</tt> objects</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>Serializable</tt> objects</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>DirContext</tt> objects</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table>
+<p>
+See the <a href=/products/jndi/tutorial/objects>JNDI Tutorial</a>
+for examples.
+
+<p>
+<hr><a NAME="SCHEMA"></a>
+<h2>
+8. Schema</h2>
+The LDAP service provider supports the following schema bindings,
+as specified in 
+<a href="jndi-ldap-gl.html#SCHEMA">Guidelines for LDAP Service Providers</a>.
+
+<br>&nbsp;
+<table summary="supported schema bindings" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Schema Tree</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td ALIGN=CENTER NOSAVE>AttributeDefinition</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td ALIGN=LEFT NOSAVE>
+<!--Attribute definitions may be added or deleted but not modified.-->
+&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td ALIGN=CENTER NOSAVE>ClassDefinition</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td ALIGN=LEFT NOSAVE>
+<!--Class definitions may be added or deleted but not modified.-->
+&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td ALIGN=CENTER NOSAVE>SyntaxDefinition</td>
+
+<td ALIGN=CENTER NOSAVE>Yes</td>
+
+<td ALIGN=LEFT NOSAVE>
+<!--Syntax definitions may be added or deleted but not modified.-->
+&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>MatchingRule</td>
+
+<td>Yes</td>
+
+<td ALIGN=LEFT NOSAVE>
+<!--Matching rules may be added or deleted but not modified.-->
+&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>ExtensionDefinition</td>
+
+<td>No</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>ControlDefinition</td>
+
+<td>No</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>SASLMechanism</td>
+
+<td>No</td>
+
+<td>&nbsp;</td>
+</tr>
+</table>
+
+<p>
+<hr><a NAME="EXCEPTIONS"></a>
+<h2>
+9. Exceptions</h2>
+The LDAP service provider maps LDAP error codes to JNDI exceptions according to 
+<a href="jndi-ldap-gl.html#EXCEPT">Guidelines for LDAP Service Providers</a>.
+<br>&nbsp;
+<!--
+<center><table summary="mapped LDAP error codes" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Mapping for LDAP error code</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>success (0)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>operationsError (1)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>protocolError (2)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>timeLimitExceeded (3)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>sizeLimitExceeded (4)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>compareFalse (5)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>compareTrue (6)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>authMethodNotSupported (7)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>strongAuthRequired (8)</td>
+
+<td>Yes</td>
+
+<td NOSAVE>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>partialResults (9)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>referral (10)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>adminLimitExceeded (11)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>unavailableCriticalExtension (12)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>confidentialityRequired (13)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>saslBindInProgress (14)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>noSuchAttribute (16)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>undefinedAttributeType (17)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>inappropriateMatching (18)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>constraintViolation (19)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>attributeOrValueExists (20)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>invalidAttributeSyntax (21)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>noSuchObject (32)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>aliasProblem (33)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>invalidDNSyntax (34)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>aliasDereferencingProblem (36)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>inappropriateAuthentication (48)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>invalidCredentials (49)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>insufficientAccessRights (50)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>busy (51)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>unavailable (52)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>unwillingToPerform (53)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>loopDetect (54)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>namingViolation (64)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>objectClassViolation (65)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>notAllowedOnNonLeaf (66)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>notAllowedOnRDN (67)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>entryAlreadyExists (68)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>objectClassModsProhibited (69)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>affectsMultipleDSAs (71)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>other (80)</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table></center>
+-->
+
+<p>
+<hr><a NAME="API"></a>
+<h2>
+10. API Mapping</h2>
+The LDAP service provider maps the following JNDI API methods to LDAP according 
+to
+<a href="jndi-ldap-gl.html#API">Guidelines for LDAP Service Providers</a>:
+<br>&nbsp;
+<center><table summary="supported mapping for Context methods" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Mapping for <tt>Context</tt> methods</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>addToEnvironment</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>bind</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>close</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>composeName</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>destroySubcontext</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>getEnvironment</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>getNameInNamespace</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>getNameParser</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>list</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>listBindings</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>lookup</tt></td>
+
+<td>Yes</td>
+
+<td>Does not process <tt>LinkRef</tt> specially.
+</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>lookupLink</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>rebind</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>removeFromEnvironment</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td><tt>rename</tt></td>
+
+<td NOSAVE>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>unbind</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table></center>
+
+<center><table summary="supported mapping for DirContext methods" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Mapping for <tt>DirContext</tt> methods</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>bind</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>createSubcontext</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>destroySubcontext</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>getAttributes</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>getSchema</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>getSchemaClassDefinition</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>modifyAttributes</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>rebind</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>search</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table></center>
+
+<center><table summary="supported mapping for LdapContext methods" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Mapping for <tt>LdapContext</tt> methods</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>extendedOperation</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>getRequestControls</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>getResponseControls</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>newInstance</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>reconnect</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>setRequestControls</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table></center>
+
+<center><table summary="supported mapping for EventDirContext methods" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Mapping for <tt>EventDirContext</tt> methods</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>addNamingListener</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>removeNamingListener</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><tt>targetMustExist</tt></td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table></center>
+
+<p>
+<hr><a NAME="FEDERATION"></a>
+<h2>
+11. Federation</h2>
+The LDAP service provider supports federation in accordance with the description in
+<a href="jndi-ldap-gl.html#FED">Guidelines for LDAP Service Providers</a>.
+It supports the following federation techniques:
+
+<br>&nbsp;
+<center><table summary="supported federation techniques" BORDER COLS=3 NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Federation Technique</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>Junction</td>
+
+<td>Yes</td>
+
+<td NOSAVE>Except when subordinate naming system is another LDAP system</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>Implicit Next Naming System Pointer</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table></center>
+
+&nbsp;<p>
+The LDAP service provider treats composite names as <em>strongly separated</em>.
+That is, it processes the first component of the composite name as 
+a distinguished name and the rest of the components as names in the next
+naming system(s). For example, here are examples that lists
+the root of the next naming system federated beyond an LDAP context
+and looks up a name using a multicomponent composite name:
+<blockquote>
+<pre>
+// List the root of the nns, 
+// Note use of the trailing slash to indicate traversal into the nns
+NamingEnumeration enum = ctx.list("cn=objects,ou=Sales/");
+
+// A composite name lookup
+Object obj = ctx.lookup("cn=objects,ou=Sales/some/x/y/z");
+</pre>
+</blockquote>
+
+<p>
+<hr><a NAME="EVENT"></a>
+<h2>
+12. Event Notification</h2>
+
+The LDAP service provider supports event notification
+in accordance with the description in
+<a href="jndi-ldap-gl.html#EVENT">Guidelines for LDAP Service Providers</a>.
+It supports the following events:
+<br>&nbsp;
+<table summary="supported event notification" BORDER COLS=3 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<th NOSAVE>Event</th>
+
+<th NOSAVE>Supported</th>
+
+<th NOSAVE>Comments</th>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>Namespace change notification</td>
+
+<td>Yes</td>
+
+<td NOSAVE>Uses the 
+persistent search control*</td>
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>Object change notification</td>
+
+<td>Yes</td>
+<td NOSAVE>Uses the 
+persistent search control*</td>
+</tr>
+
+</tr>
+
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE>Unsolicited notification</td>
+
+<td>Yes</td>
+
+<td>&nbsp;</td>
+</tr>
+</table>
+
+<p>
+* The persistent search control is defined in the IETF Internet-Draft
+<tt>draft-ietf-ldapext-psearch-03.txt</tt>.
+</p>
+
+<p>
+<hr><a NAME="SASL"></a>
+<h2>
+13. SASL Authentication</h2>
+
+The LDAP service provider supports SASL authentication
+in accordance with the description in
+<a href="jndi-ldap-gl.html#SASL">Guidelines for LDAP Service Providers</a>.
+<p>
+The LDAP service provider supports the following SASL mechanisms.
+<ul>
+<li>EXTERNAL (<A HREF="ftp://ftp.isi.edu/in-notes/rfc2222.txt">RFC 2222</A>).
+This mechanism obtains authentication information 
+from an external source (such as SSL/TLS or IPsec).
+<li>DIGEST-MD5 (<a href=ftp://ftp.isi.edu/in-notes/rfc2831.txt>RFC 2831</a>)
+is for Digest Authentication.
+<li>GSSAPI (<A HREF="ftp://ftp.isi.edu/in-notes/rfc2222.txt">RFC 2222</A>)
+is for Kerberos V5 authentication.
+</ul>
+
+In addition to these mechanisms, the provider supports additional SASL
+mechanisms made available via the framework defined in the
+Java SASL API
+(<a href=http://www.worldspot.com/jsr28/publicreview/doc/index.html>JSR 28 Public
+Review Draft</a>),
+with the exception that the package is named
+<tt>com.sun.security.sasl.preview</tt> instead of <tt>javax.security.sasl</tt>.
+
+<p>
+<hr><a NAME="SSL"></a>
+<h2>
+14. SSL and Start TLS</h2>
+
+<h3>14.1 SSL</h3>
+
+The LDAP service provider supports SSL in accordance with the description in
+<a href="jndi-ldap-gl.html#SSL">Guidelines for LDAP Service Providers</a>.
+It uses the default socket factory
+<a href="../../api/javax/net/ssl/SSLSocketFactory.html">
+<tt>javax.net.ssl.SSLSocketFactory</tt></a> unless the
+<tt><a href="jndi-ldap-gl.html#socket">java.naming.ldap.factory.socket</a></tt>&nbsp;
+property has been set to the class name of some other socket factory.
+
+<p>When SSL is being used and no port has been specified, 636 is
+used as the default port. 
+
+<p><b>NOTE</b>:
+On Java 2 SDK, v 1.4.1 and earlier systems, the default port is always 389,
+regardless of whether SSL is being used.
+
+<p>
+<h3>14.2 Start TLS</h3>
+
+The LDAP provider supports the
+the <a href="http://www.ietf.org/rfc/rfc2830.txt">"Start
+TLS" extension</a> ("1.3.6.1.4.1.1466.20037") by supplying a concrete
+implementation of the 
+<a href=../../api/javax/naming/ldap/StartTlsResponse.html><tt>StartTlsResponse</tt></a> abstract class.
+Hostname verification is performed as per the
+<a href="jndi-ldap-gl.html#SSL">Guidelines for LDAP Service Providers</a>.
+<p>
+
+<hr>
+<A name=POOL><h2>15. Connection Pooling</h2></a>
+
+<p><b>NOTE</b>:
+Connection pooling is supported only on the Java 2 SDK, v 1.4.1 and later 
+releases.
+
+<h3>15.1 Overview</h3>
+
+<p>
+The LDAP service provider supports connection pooling by maintaining
+pools of previously used connections. Whenever the LDAP provider needs
+a connection (and the application has requested pooling), 
+it gets a connection from the pool.  If an existing
+connection is available, it will be used. If no existing connection is
+available, a new connection is created and used. When the provider is
+done with the connection, the connection is marked idle and can be reused.
+<p>
+An application requests connection pooling by adding the property,
+<a href=#POOLPROP><tt>com.sun.jndi.ldap.connect.pool</tt></a>, to the
+environment properties passed to the initial context constructor.  An
+application can decide whether to use pooling on a <em>per-context</em>
+basis by using environment properties with and without this
+property. This same mechanism is used to control whether pooled
+connections are used for referral handling and processing of LDAP/LDAPS URLs
+passed to the initial context. For example, when this property
+is present in the environment when the provider is processing a referral,
+the provider will use a pooled connection for the referral.
+<p>
+Here is sample code that requests that connection pooling be used
+for a new initial context and all contexts derived from it.
+
+<blockquote><pre>
+Hashtable env = new Hashtable();
+env.put("com.sun.jndi.ldap.connect.pool", "true");
+env.put(Context.PROVIDER_URL, url);
+env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+DirContext ctx = new InitialDirContext(env);
+...
+</pre></blockquote>
+
+<p>
+Only the addition of the single property,
+<tt>com.sun.jndi.ldap.connect.pool</tt>, is required; 
+no other changes are required to the application.
+
+<p>
+The LDAP provider keeps track of whether a connection is being used
+through indications from the application. It assumes that an
+application that is maintaining an open context handle is using the
+connection.  Therefore, in order for the LDAP provider to properly
+manage the pooled connections, the application must be diligent about
+invoking <tt>Context.close()</tt> on contexts that it no longer needs.
+
+<p>
+Bad connections are automatically detected and removed from the
+pool. The probability of a context ending up with a bad connection is the
+same regardless of whether connection pooling is used.
+
+<h3>15.2 When Not to Use Pooling</h3>
+
+Pooled connections are intended to be reused. Therefore, an
+application that plans on performing operations on a context that might
+alter the underlying connection's state should not use connection
+pooling for the context. 
+Specifically, if an application is planning to use the Start
+TLS extended operation on a context, or is planning to change
+security-related properties (such as
+<tt>java.naming.security.principal</tt> or
+<tt>java.naming.security.protocol</tt>) after the initial context has
+been created, it should not use connection pooling for that context.
+Using connection
+pooling under such circumstances might compromise the security of the
+application and/or create unexpected behavior.
+
+
+<h3>15.3 Global Configuration</h3>
+
+Connection pooling is configured and maintained per Java runtime.
+Connections are not shared across different runtimes.  To use
+connection pooling, no configuration is required.  Configuration is
+necessary only if you want to customize how pooling is done, such as
+controlling the size of the pools and which connections are pooled.
+<p>
+Connection pooling is configured by a number of System properties at
+runtime startup time. Note that these are <em>System</em> properties,
+not environment properties and that they affect all connection pooling
+requests.
+
+<p>
+Here is a summary of the system properties. They are described in more detail
+in the rest of this section. 
+<p>
+
+<center><table summary="system properties" BORDER COLS=3 WIDTH="100%" NOSAVE>
+<tr NOSAVE>
+<th NOSAVE>System Property Name</th>
+
+<th NOSAVE>Description</th>
+
+<th NOSAVE>Default</th>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE><tt>com.sun.jndi.ldap.connect.pool.authentication</tt></td>
+<td NOSAVE>A list of space-separated authentication types of connections
+that may be pooled. Valid types are "none", "simple", and "DIGEST-MD5".
+</td>
+<td NOSAVE><tt>"none simple"</tt></td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE><tt>com.sun.jndi.ldap.connect.pool.debug</tt></td>
+<td NOSAVE>A string that indicates the level of debug output to produce.
+Valid values are <tt>"fine"</tt> (trace connection creation and removal)
+and "all" (all debugging information).
+</td>
+<td NOSAVE>&nbsp;</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE><tt>com.sun.jndi.ldap.connect.pool.initsize</tt></td>
+<td NOSAVE>The string representation of an integer that represents
+the number of connections per connection identity to create when
+initially creating a connection for the identity.  
+</td>
+<td NOSAVE>1</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE><tt>com.sun.jndi.ldap.connect.pool.maxsize</tt></td>
+<td NOSAVE>The string representation of an integer that represents
+the maximum number of connections per connection identity that
+can be maintained concurrently.</td>
+<td NOSAVE>no maximum size</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE><tt>com.sun.jndi.ldap.connect.pool.prefsize</tt></td>
+<td NOSAVE>The string representation of an integer that represents
+the preferred number of connections per connection identity that
+should be maintained concurrently.</td>
+<td NOSAVE>no preferred size</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE><tt>com.sun.jndi.ldap.connect.pool.protocol</tt></td>
+<td NOSAVE>A list of space-separated protocol types of connections
+that may be pooled. Valid types are "plain" and "ssl".
+</td>
+<td NOSAVE><tt>"plain"</tt></td>
+</tr>
+
+
+<tr NOSAVE>
+<td NOSAVE><tt>com.sun.jndi.ldap.connect.pool.timeout</tt></td>
+<td NOSAVE>The string representation of an integer that represents
+the number of milliseconds that an idle connection may remain
+in the pool without being closed and removed from the pool.
+</td>
+<td NOSAVE>no timeout</td>
+</tr>
+
+</table>
+</center>
+
+<p>
+Here is an example that
+sets the maximum pool size to 20, the preferred pool size to 10,
+and the idle timeout to 5 minutes for pooled connections.
+<blockquote><pre>
+# java -Dcom.sun.jndi.ldap.connect.pool.maxsize=20 \
+       -Dcom.sun.jndi.ldap.connect.pool.prefsize=10 \
+       -Dcom.sun.jndi.ldap.connect.pool.timeout=300000 \
+    YourProgram
+</pre></blockquote>
+
+<h4>15.3.1 What Gets Pooled</h4>
+
+The LDAP provider will use a pooled connection only if the
+application has requested it and the request for the connection
+meets the <em>pooling criteria</em>.  The application requests that a
+connection be pooled by using the
+<tt>com.sun.jndi.ldap.connect.pool</tt> environment property.  The
+default pooling criteria is that plain (non-SSL) connections that use
+simple or no authentication are allowed to be pooled.  The pooling
+criteria can be adjusted to include SSL connections and the DIGEST-MD5
+authentication type by using System properties.  No other type of
+customization of the pooling criteria is supported.  
+In addition, a connection that requires the use of a 
+custom socket factory or one that has enabled protocol tracing
+(via the <tt>com.sun.jndi.ldap.trace.ber</tt> environment property)
+cannot be pooled.
+<p>
+To allow SSL connections to be pooled, include the string <tt>"ssl"</tt>
+in the <tt>com.sun.jndi.ldap.connect.pool.protocol</tt> System property.
+For example, to allow both plain and SSL connections to be pooled, set
+this System property to the string <tt>"plain ssl"</tt>.
+<p>
+To allow DIGEST-MD5 connections to be pooled, 
+include the string <tt>"DIGEST-MD5"</tt>
+in the <tt>com.sun.jndi.ldap.connect.pool.authentication</tt> System property.
+For example, to allow connections of anonymous, simple and 
+DIGEST-MD5 authentication types to be pooled, set
+this System property to the string <tt>"none simple DIGEST-MD5"</tt>.
+
+<h4>15.3.2 How Connections are Pooled</h4>
+
+The LDAP provider maintains pooled connections so that they can be
+reused. When an application requests to use a pooled connection,
+the LDAP provider needs to determine whether the request can be
+satisfied by an existing pooled connection. It does this by
+assigning a <em>connection identity</em> to each pooled connection 
+and checking whether the incoming request has the same connection
+identity as that of one of its pooled connections.
+<p>
+<p>
+A connection identity is the set of the parameters required to create a
+possibly authenticated LDAP connection. Its composition depends on the
+authentication type of the request, as shown in the following table.
+<p>
+<table summary="authentication type and connection identity contents" BORDER CELLPADDING=3 WIDTH="70%" NOSAVE >
+<tr>
+<th>
+Authentication type
+</th>
+<th>Connection identity contents</th>
+</tr>
+
+<tr>
+<td>none</td>
+<td>
+<ul>
+<li>connection controls
+<li>hostname, port number and scheme as specified in the <tt>java.naming.provider.url</tt>
+property, referral, or URL supplied to the initial context
+<li>
+the contents of the following properties:
+<blockquote><pre>
+java.naming.security.protocol
+java.naming.ldap.version
+</pre></blockquote>
+</ul>
+</td>
+</tr>
+
+<tr>
+<td>simple</td>
+<td>
+<ul>
+<li>all of the information listed for anonymous
+<li>the contents of following properties:
+<blockquote><pre>
+java.naming.security.principal
+java.naming.security.credentials
+</pre></blockquote>
+</td>
+</ul>
+</tr>
+
+<tr>
+<td>DIGEST-MD5</td>
+<td>
+<ul>
+<li>all of the information listed for simple
+<li>the contents of following properties:
+<blockquote><pre>
+java.naming.security.sasl.authorizationId
+java.naming.security.sasl.realm
+javax.security.sasl.qop
+javax.security.sasl.strength
+javax.security.sasl.server.authentication
+javax.security.sasl.maxbuffer
+javax.security.sasl.policy.noplaintext
+javax.security.sasl.policy.noactive
+javax.security.sasl.policy.nodictionary
+javax.security.sasl.policy.noanonymous
+javax.security.sasl.policy.forward
+javax.security.sasl.policy.credentials
+</pre></blockquote>
+</ul>
+</td>
+</table>
+</dl>
+</blockquote>
+
+<p>
+
+
+<h4>15.3.3 Pool Sizes</h4>
+
+The LDAP provider maintains pools of connections; each pool
+holds connections (either in-use or idle) 
+that have the same connection identity.
+There are three sizes that affect the management of each pool.
+These sizes are global and affect all pools.
+<p>
+
+The <em>initial pool size</em> is the number of connections per
+connection identity that the LDAP service provider creates when first
+creating the pool (which corresponds to when the application first
+requests a pooled connection for that connection identity).
+Authentication of each connection in the pool is performed on
+demand, as the connection gets used.  By default, the initial pool
+size is 1 and can be changed by using the System property
+<tt>com.sun.jndi.ldap.connect.pool.initsize</tt>.  It is typically used at
+application start-up time to prime the pool with a certain number of
+connections to a server.
+
+<p>
+The <em>maximum pool size</em> is the maximum number of connections
+per connection identity that can be maintained concurrently by the
+LDAP service provider.  Both in-use and idle connections contribute to
+this number.  When the pool size reaches this number, no new
+connection for the corresponding connection identity may be created
+until a connection in the pool has been removed (i.e., the physical
+connection is closed).  When the pool size reaches the maximum and all
+of the connections in the pool are in use, the application's request
+for a connection from that pool is blocked until a connection in the
+pool either becomes idle or is removed.  A maximum pool size of 0
+means that there is no maximum size: A request for a pooled connection
+will use an existing pooled idle connection or a newly created pooled
+connection.
+
+<p>
+The <em>preferred pool size</em> is the preferred number of
+connections per connection identity that the LDAP service provider
+should maintain. Both in-use and idle connections contribute to this
+number. When an application requests the use of a pooled connection
+and the pool size is less than the preferred size, the LDAP provider
+will create and use a new pooled connection regardless of whether an
+idle connection is availble.  When an application is finished with a
+pooled connection (by invoking <tt>Context.close()</tt> on all
+contexts that share the connection) and the pool size is greater than
+the preferred size, the LDAP provider will close and remove the pooled
+connection from the pool.  A preferred pool size of 0 means that there
+is no preferred size: A request for a pooled connection will result in
+a newly created connection only if no idle ones are available.
+<p>
+Note that the maximum pool size overrides both the initial and
+preferred pool sizes. For example, setting the preferred pool size
+greater than the maximum pool size is effectively setting it to the
+maximum pool size.
+
+
+<h4>15.3.4 Idle Connections</h4>
+
+When the application is finished with a pooled connection (by invoking
+<tt>Context.close()</tt> on all contexts that share the connection),
+the underlying pooled connection is marked as idle, waiting to be
+reused.  By default, idle connections remain in the pool indefinitely
+until they are garbage-collected.  If the
+<tt>"com.sun.jndi.ldap.connect.pool.timeout"</tt> System property has
+been set, the LDAP provider will automatically close and remove pooled
+connections that have been idle for more than the specified period.
+
+
+<h3>15.4 Per-Context Configuration</h2>
+
+<h4>15.4.1 Enabling Pooling</h4>
+
+To use pooling, set the <tt>com.sun.jndi.ldap.connect.pool</tt>
+property to <tt>"true"</tt> in the environment properties passed to
+the initial context constructor. The provider will apply the pooling
+criteria to the supplied environment properties and decide whether to
+use pooling for that context.  
+If the provider determines that a connection cannot be
+pooled, it creates and uses an unpooled connection for the context.
+<p>
+If this property is omitted, the context will not use connection pooling.
+
+
+<h4>15.4.2 Connection Timeout</h4>
+
+The <tt>com.sun.jndi.ldap.connect.timeout</tt> environment property is
+used to specify a timeout period for establishment of the LDAP
+connection. This property affects the TCP timeout when opening a
+connection to an LDAP server. When connection pooling has been
+requested, this property also specifies the maximum wait time for a
+connection when all connections in pool are in use and the maximum
+pool size has been reached.
+<p>
+If this property has not been specified, the LDAP provider will wait
+indefinitely for a pooled connection to become available, and to wait
+for the default TCP timeout to take effect when creating a new
+connection.
+<p>
+Note that this property is different from the System property
+<tt>com.sun.jndi.ldap.connect.pool.timeout</tt>, which is related to
+the removal of idle pooled connections.
+
+<p>
+<hr>
+<A name=SEC><h2>16. Security Considerations</h2></a>
+
+When a security manager has been installed,
+you must grant to the application using JNDI and
+the LDAP service provider the following permissions:
+
+<p>
+<pre>permission java.net.SocketPermission "<em>host</em>[:<em>port</em>]", "connect";</pre>
+<blockquote>
+For each host/port identified in the <tt>java.naming.factory.initial</tt> 
+property and in URL string names supplied to context methods.
+</blockquote>
+
+
+<pre>permission java.net.SocketPermission "<em>host</em>[:<em>port</em>]", "connect,accept";</pre>
+<blockquote>
+For each host/port named in the URL strings in <tt>References</tt> and
+<tt>javaCodebase</tt>
+attributes stored with <tt>Serializable</tt> objects.
+</blockquote>
+
+If you are using SASL authentication and will be setting the SASL client
+factory programmatically, grant your application the following permission.
+<pre>
+permission java.lang.RuntimePermission "setFactory"
+</pre>
+
+
+If you use the "GSSAPI" SASL mechanism, you need the following additional
+permissions.
+
+<pre>permission javax.security.auth.AuthPermission "createLoginContext.<em>appClassName</em>";
+permission javax.security.auth.AuthPermission "doAsPrivileged";</pre>
+<blockquote>
+For the application class that's going to be logging in and 
+invoking the <tt>doAsPrivileged</tt> method.
+</blockquote>
+
+<pre>permission java.net.SocketPermission "<em>host</em>[:<em>port</em>]", "connect";</pre>
+<blockquote>
+For the host/port of the Kerberos Key Distribution Center (KDC).
+</blockquote>
+
+<pre>permission javax.security.auth.kerberos.ServicePermission "krbtgt/<em>realm</em>@<em>realm</em>", "initiate";
+permission javax.security.auth.kerberos.ServicePermission "ldap/<em>fully-qualified-hostname</em>@<em>realm</em>", "initiate";</pre>
+<blockquote>
+For the realm and host of the LDAP service and KDC.
+</blockquote>
+
+<hr SIZE=3 NOSHADE WIDTH="100%">
+<br><i>Copyright &copy; 2002 Sun Microsystems, Inc. All rights reserved.</i>
+</body>
+</html>

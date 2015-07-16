@@ -1,0 +1,181 @@
+<HTML>
+<HEAD>
+   <TITLE>Java IDL: Developing Clients</TITLE>
+<!-- Changed by: vlc, 6/20/97 -->
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1 ALIGN=CENTER>Developing Clients</H1>
+<P><i>This document was not updated for the 
+J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> release.  If you downloaded
+ this document as part of the 
+J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> documentation bundle, check the
+Web site at <a href="http://java.sun.com/j2se/1.4.2/docs/guide/idl/jidlClients.html">
+http://java.sun.com/j2se/1.4.2/docs/guide/idl/jidlClients.html</a> for updates.</i>
+
+<HR>
+
+<P>When updated, topics in this section will include:
+<UL>
+<LI><A href="#orbsandinvocations">ORBs and Invocations</A>
+<LI><A href="#staticinvoke">Static Invocation</A>
+<LI><A href="#DynamicInvocation">Dynamic Invocation</A>
+<!--<LI><A href="#torque">Using Portable Stubs</A>
+<LI><A href="#otherorbs">Initializing Applets</A>-->
+</UL>
+
+
+
+<!--*******ORBS AND INVOCATIONS********-->
+
+<A name="orbsandinvocations">
+<H2>ORBs and Invocations</H3></A>
+
+<P>For a client to invoke a CORBA object operation, both the client
+and the server (the object implementation) must use a CORBA software
+component called an ORB (object request broker). ORBs are the common
+denominators that bridge the differences in location, platform, and
+programming language that can separate a client and a server. ORBs
+can contact each other across the network, can create and interpret
+object references (CORBA object handles), and can marshal parameters
+into and out of the format used by IIOP. In addition to enabling
+client/server communication, ORBs provide other services, but they
+are not described here.</P>
+
+<P>The two ways to invoke an operation on a CORBA object are: </P>
+
+<UL>
+   <LI><I><A HREF="#staticinvoke">Static invocation</A></I>, 
+   which is used most often and most resembles
+   conventional Java programming, is type-checked by the compiler.
+   But it can only be used for objects whose interface definitions
+   exist when the invoking client is compiled. <P>
+   
+   <LI><I><A HREF="#DynamicInvocation">Dynamic invocation</A></I> is more
+   flexible because clients can invoke objects they discover at
+   runtime. However, compile-time type-checking is impossible with
+   dynamic invocation. Although it's possible to type-check
+   parameters at runtime, doing so requires a CORBA Interface
+   Repository, which the current release of Java&nbsp;IDL does not
+   provide. 
+</UL>
+
+
+<!--*******STATIC INVOCATION********-->
+
+<A name="staticinvoke">
+<H2>Static Invocation</H2></A>
+
+<P>To make a static invocation on a CORBA object, a Java client
+needs an object reference to the servant that performs the operation. The 
+object reference has two important functions:</P>
+
+<UL>
+   <LI>It uniquely identifies the servant, wherever it is located.<P>
+   
+   <LI>It implements the client stub interface, making the reference a local
+   proxy for the servant object.
+</UL>
+
+</P>Clients don't create object references but 
+obtain them, 
+typically from other objects such as factories or 
+<A href="jidlNaming.html">naming</A> contexts.
+
+<P>OMG IDL is the language in which CORBA object interfaces are
+defined. For each OMG IDL module, the <TT>idlj</TT> compiler
+generates a Java package. For each interface <CODE>Foo</CODE> defined
+in an OMG IDL module, the generated package contains the following
+items of interest to the client programmer:</P>
+
+<UL>
+   <LI>A Java <em>signature</em> interface <CODE>Foo</CODE>, which extends 
+<TT>org.omg.portable.IDLEntity</TT>, <TT>org.omg.CORBA.Object</TT>, and the 
+operations interface.  The signature interface is used as the signature type in 
+method declarations when interfaces of the specified type are used in other 
+interfaces. From the client's point
+   of view, an object reference for a CORBA <CODE>Foo</CODE> object
+   implements this interface.<P>
+   
+   <P>Note:  The Stub implements the <CODE>Foo</CODE> interface, where it
+generates code for each method to marshall the arguments,
+invoke the method, and then unmarshall the arguments.<P>
+
+   <LI>A Java <em>operations</em> interface <CODE>FooOperations</CODE>, which is used 
+in the server-side mapping and as a mechanism for providing optimized calls for 
+co-located clients and server.   The server developer provides implementation for the 
+methods indicated by the operations interface.
+   <P>Note: The server writer usually extends <CODE>FooPOA</CODE> and provides 
+implementation for the methods provided by the operations interface.
+<P>
+   
+   <LI>A Java class <CODE>FooHelper</CODE>, that defines auxiliary
+   methods, notably <CODE>narrow()</CODE>, which is the CORBA
+   counterpart of Java casting.<P>
+   
+   <LI>A Java class called <TT>FooHolder</TT>, that holds a public 
+   <TT>Foo</TT> member. Holders are
+   required for CORBA operations that take <TT>out</TT> or
+   <TT>inout</TT> arguments, which, unlike CORBA <TT>in</TT>
+   arguments, don't map directly to Java's pass-by-value semantics.
+</UL>
+
+
+
+<!--*******DYNAMIC INVOCATION********-->
+
+<A NAME="DynamicInvocation">
+<H2>Dynamic Invocation</H2></A>
+
+<P>CORBA dynamic invocation uses an object called a <I>request</I> to
+hold everything pertinent to an invocation: the object reference, the
+name of the operation, its parameters, and space for the result. The
+client builds a request object describing an operation, then calls
+the request's <CODE>invoke</CODE> method, which dispatches the
+request just as a stub would. When the invoke method returns, the
+result is available in the request object.</P>
+
+<P>The key to dynamic invocation is the ability of requests to hold
+self-describing data. This facility enables a request object to
+represent any invocation of any operation, regardless of its
+parameters. Each self-describing data element has a special type
+known in OMG IDL as <CODE>Any</CODE>. An <CODE>Any</CODE> consists of
+a typecode (whose values are defined by OMG IDL) and a value; the
+typecode specifies the type of the value.</P>
+
+
+
+<P><HR>
+<CENTER><P>
+Clients | <A href="jidlServers.html">Servers</A> | <A 
+href="jidlExceptions.html">Exceptions</A> | <A 
+href="jidlInitialization.html">Initialization</A> | <A 
+href="jidlNaming.html">Naming</A> 
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html"><IMAGE 
+SRC="images/1top_lt.gif"><BR>Home</A></TD>
+  <TD ALIGN=CENTER><A href="fund.html"><IMAGE 
+SRC="images/2fundamentals_lt.gif"><BR>Fundamentals</A></TD>  
+  <TD ALIGN=CENTER><A href="program.html"><IMAGE 
+SRC="images/3programming_lt.gif"><BR>Programming</A></TD>  
+  <TD ALIGN=CENTER><A href="reference.html"><IMAGE 
+SRC="images/4ref_lt.gif"><BR>References</A></TD>  
+  <TD ALIGN=CENTER><A href="examples.html"><IMAGE 
+SRC="images/4ex_lt.gif"><BR>Tutorial</A>
+</TD>
+</TR></TABLE>
+
+<HR><FONT
+SIZE="-2">
+<A HREF="http://www.sun.com/share/text/SMICopyright.html">Copyright
+&copy;</A></FONT><FONT SIZE="-2"> 1996, 1997 Sun Microsystems, Inc.,
+2550 Garcia Ave., Mtn. View, CA. 94043-1100 USA., All rights
+reserved.</FONT></P>
+</CENTER>
+
+
+</BODY>
+</HTML>

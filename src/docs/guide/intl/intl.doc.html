@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title></title>
+</head>
+<body bgcolor=#ffffff>
+ 
+<table summary="layout" width=100%><tr>
+<td><font size=-1>
+<a href="intlTOC.doc.html">Contents</a>
+</font></td><td align=right><i> </i></td>
+</tr></table>
+
+
+<hr>
+<br>
+ 
+<a name="25268"></a>
+<center>
+<h1> Java 2 SDK Internationalization Overview</h1>
+<h3></h3>
+<h3></h3>
+<h3></h3>
+<h4></h4>
+</center>
+<hr><p>
+<a name="26034"></a>
+<h1>Introduction  </h1>
+<a name="22420"></a>
+<!--Begin Comments<p><a name="26030"></a>
+Note: This html file was created with FrameMaker. If you need to change the contents, including URLs in the links, change the intl.doc FrameMaker file and then convert it to html. The intl.doc resides in this directory:<p><a name="26793"></a>
+/java/web/docs/writing/jdk/1.1/masterspecs/intl/fm/overview<p><a name="26043"></a>
+.<p><a name="26029"></a>
+End Comments --><p><a name="26041"></a>
+Revision Date: 2 December 1999<p><a name="26022"></a>
+The global Internet demands global software- that is, software that can be developed independently of the countries or languages of its users, and then localized for multiple countries or regions. The Java 2 Platform provides a rich set of APIs for developing global applications. These internationalization APIs are based on the Unicode 2.1 character encoding and include the ability to adapt text, numbers, dates, currency, and user-defined objects to any country's conventions.<p><a name="22411"></a>
+This document summarizes the internationalization APIs and features of the Java 2 Platform. For coding examples and step-by-step instructions, see the <a href="http://java.sun.com/docs/books/tutorial/i18n/index.html"> Java Tutorial</a>. The detailed APIs are found at <a href="../../api/index.html">The Java Platform API Specification</a>.<p><a name="26777"></a>
+For additional information, see the <a href="index.html">JDK Internationalization home page</a>.<p>
+<a name="22429"></a>
+<h1>Locales  </h1>
+<a name="23002"></a>
+On the Java platform, a locale is simply an identifier for a particular combination of language and region. It is not a collection of locale-specific attributes. Instead, each locale-sensitive class maintains its own locale-specific information. With this design, there is no difference in how user and system objects maintain their locale-specific resources. Both use the standard localization mechanism.<p><a name="23551"></a>
+Java programs are <em>not</em> assigned a single global locale. All locale-sensitive operations may be explicitly given a locale as an argument. This greatly simplifies multilingual programs. While a global locale is not enforced, a default locale is available for programs that do not wish to manage locales explicitly. A default locale also makes it possible to affect the behavior of the entire presentation with a single choice.<p><a name="23007"></a>
+Java locales act as requests for certain behavior from another object. For example, a French Canadian locale passed to a Calendar object asks that the Calendar behave correctly for the customs of Quebec. It is up to the object accepting the locale to do the right thing. If the object has not been localized for a particular locale, it will try to find a "close" match with a locale for which it has been localized. Thus if a Calendar object was not localized for French Canada, but was localized for the French language in general, it would use the French localization instead.<p>
+<a name="26726"></a>
+<h2>		 Locale Class</h2>
+<a name="26727"></a>
+A <a href="../../api/java/util/Locale.html">Locale</a> object represents a specific geographical, political, or cultural region. An operation that requires a locale to perform its task is called locale-sensitive and uses the Locale object to tailor information for the user. For example, displaying a number is a locale-sensitive operation- the number should be formatted according to the customs and conventions of the user's native country, region, or culture. <p>
+<a name="23344"></a>
+<h2>		 Supported Locales</h2>
+<a name="26715"></a>
+On the Java platform, there does not have to be a single set of supported locales, since each class maintains its own localizations. Nevertheless, there is a consistent set of localizations supported by the classes of the Java 2 Platform. Other implementations of the Java platform may support different locales. Those supported by the JDK software are summarized in the web page <a href="locale.doc.html">Supported Locales</a>. Subsequent releases of the Java 2 SDK may include additional locales.<p>
+<a name="26051"></a>
+<h1>Localized Resources  </h1>
+<a name="23033"></a>
+All locale-sensitive classes must be able to access resources customized for the locales they support. To aid in the process of localization, it helps to have these resources grouped together by locale and separated from the locale-neutral parts of the program. <p>
+<a name="23039"></a>
+<h2>		 ResourceBundle Class</h2>
+<a name="22544"></a>
+The class <a href="../../api/java/util/ResourceBundle.html">ResourceBundle</a> is an abstract base class representing containers of resources. Programmers create subclasses of ResourceBundle that contain resources for a particular locale. New resources can be added to an instance of ResourceBundle, or new instances of ResourceBundle can be added to a system without affecting the code that uses them. Packaging resources as classes allows developers to take advantage of Java's class loading mechanism to find resources.<p><a name="22504"></a>
+Resource bundles contain locale-specific objects. When a program needs a locale-specific resource, a String object for example, the program can load it from the resource bundle that is appropriate for the current user's locale. In this way, the programmer can write code that is largely independent of the user's locale isolating most, if not all, of the locale-specific information in resource bundles. <p><a name="22580"></a>
+This allows Java programmers to write code that can: <p>
+<ul><a name="22582"></a>
+<li>be easily localized, or translated, into different languages <br><br>
+<a name="22583"></a>
+<li>handle multiple locales at once <br><br>
+<a name="22584"></a>
+<li>be easily modified later to support even more locales <br><br>
+</ul>
+<a name="22577"></a>
+<h2>		 ListResourceBundle Class</h2>
+<a name="23357"></a>
+<a href="../../api/java/util/ListResourceBundle.html">ListResourceBundle</a> is an abstract subclass of ResourceBundle that manages resources for a locale in a convenient and easy to use list.<p>
+<a name="23349"></a>
+<h2>		 PropertyResourceBundle Class</h2>
+<a name="23360"></a>
+<a href="../../api/java/util/PropertyResourceBundle.html">PropertyResourceBundle</a> is a concrete subclass of ResourceBundle that manages resources for a locale using a set of static strings from a property file.<p>
+<a name="22506"></a>
+<h1>Calendar and Time Zone Support  </h1>
+<a name="24560"></a>
+Version 1.0 of the JDK software introduced the java.util.Date class for the representation of dates and times. The java.util.Date class allowed for the interpretation of dates as year, month, day, hour, minute, and second values, and it formatted and parsed date strings. Unfortunately, the API for these functions was not amenable to internationalization. Only the "representation" part of this class is retained in version 1.1 of the JDKsoftware.<p><a name="24561"></a>
+As of release 1.1 of JDK software, the Date class should only be used as a wrapper for a date or time. That is, Date objects represent a specific instant in time with millisecond precision. Instead, programmers should use the Calendar class to convert between date and time fields, and the DateFormat class to format and parse date strings. The corresponding methods in version 1.0 of the JDK software of the Date class have been deprecated.<p>
+<a name="23265"></a>
+<h2>		 Calendar Class</h2>
+<a name="22626"></a>
+The class <a href="../../api/java/util/Calendar.html">Calendar</a> is an abstract base class which can convert between a point in time (represented as milliseconds from 00:00:00 GMT, Jan 1, 1970) and a set of integers representing the year, month, week and so on. GregorianCalendar is a concrete subclass of Calendar that does this according to the rules of the Gregorian calendar.<p><a name="22512"></a>
+Calendar and its subclasses are useful for doing various manipulations with time values. Arithmetic can be performed on a Calendar object's fields and the resulting date determined. A Calendar object can produce all the time field values needed to implement the date-time formatting for a particular language and calendar style<p>
+<a name="23291"></a>
+<h2>		 TimeZone Class</h2>
+<a name="23918"></a>
+The abstract class <a href="../../api/java/util/TimeZone.html">TimeZone</a> encapsulates a time zone offset from UTC (Universal Coordinated Time) and a possible daylight-savings time offset. The class <a href="../../api/java/util/SimpleTimeZone.html">SimpleTimeZone</a> is a concrete subclass that encapsulates some simple rules about daylight-savings time. These rules do not take into account historical changes in the laws affecting daylight-savings time. The Calendar class and its subclasses use the TimeZone and SimpleTimeZone classes to convert between local time and UTC, which is the internal representation used by Date objects. Most programs will not have to deal with TimeZone objects directly.<p>
+<a name="22697"></a>
+<h1>Formatting  </h1>
+<a name="23335"></a>
+It is in formatting data for output that many cultural conventions are applied. Numbers, dates, times, and messages may all require formatting before they can be displayed. The Java platform provides a set of flexible formatting classes that can handle both the standard locale formats and programmer defined custom formats. These formatting classes are also able to parse formatted strings back into their constituent objects.<p>
+<a name="23321"></a>
+<h2>		 Format Class</h2>
+<a name="23322"></a>
+The class <a href="../../api/java/text/Format.html">Format</a> is an abstract base class for formatting locale-sensitive information such as dates, times, messages, and numbers. Three main subclasses are provided: DateFormat, NumberFormat, and MessageFormat. These three also provide subclasses of their own.<p>
+<a name="23294"></a>
+<h2>		 DateFormat Class</h2>
+<a name="23952"></a>
+Dates and times are stored internally in a locale-independent way, but should be formatted so that they can be displayed in a locale-sensitive manner. For example, the same date might be formatted as:<p>
+<ul><a name="23953"></a>
+<li>November 3, 1997 (English)<br><br>
+<a name="23954"></a>
+<li>3 novembre 1997 (French)<br><br>
+</ul><a name="23942"></a>
+The class <a href="../../api/java/text/DateFormat.html">DateFormat</a> is an abstract base class for formatting and parsing date and time values in a locale-independent manner. It has a number of static factory methods for getting standard time formats for a given locale. <p><a name="22714"></a>
+The DateFormat object uses Calendar and TimeZone objects in order to interpret time values. By default, a DateFormat object for a given locale will use the appropriate Calendar object for that locale and the system's default TimeZone object. The programmer can override these choices if desired.<p>
+<a name="23370"></a>
+<h2>		 SimpleDateFormat Class</h2>
+<a name="23374"></a>
+The class <a href="../../api/java/text/SimpleDateFormat.html">SimpleDateFormat</a> is a concrete class for formatting and parsing dates and times in a locale-sensitive manner. It allows for formatting (milliseconds to text), parsing (text to milliseconds), and normalization.<p>
+<a name="24005"></a>
+<h2>		 DateFormatSymbols Class</h2>
+<a name="24014"></a>
+The class <a href="../../api/java/text/DateFormatSymbols.html">DateFormatSymbols</a> is used to encapsulate localizable date-time formatting data, such as the names of the months, the names of the days of the week, time of day, and the time zone data. The DateFormat and SimpleDateFormat classes both use the DateFormatSymbols class to encapsulate this information. <p><a name="24018"></a>
+Usually, programmers will not use the DateFormatSymbols directly. Rather, they will implement formatting with the DateFormat class's factory methods. <p>
+<a name="22518"></a>
+<h2>		 NumberFormat Class</h2>
+<a name="25878"></a>
+The class <a href="../../api/java/text/NumberFormat.html">NumberFormat</a> is an abstract base class for formatting and parsing numeric data. It contains a number of static factory methods for getting different kinds of locale-specific number formats. <p><a name="24089"></a>
+The NumberFormat class helps programmers to format and parse numbers for any locale. Code using this class can be completely independent of the locale conventions for decimal points, thousands-separators, the particular decimal digits used, or whether the number format is even decimal. The application can also display a number as a normal decimal number, currency, or percentage: <p>
+<ul><a name="24098"></a>
+<li>1234.5 (decimal number)<br><br>
+<a name="24099"></a>
+<li>$1,234.50 (U.S. currency)<br><br>
+<a name="24100"></a>
+<li>Fr1.234,5 (French currency)<br><br>
+<a name="24101"></a>
+<li>123450% (percent)<br><br>
+</ul>
+<a name="24091"></a>
+<h2>		 DecimalFormat Class</h2>
+<a name="24144"></a>
+Numbers are stored internally in a locale-independent way, but should be formatted so that they can be displayed in a locale-sensitive manner. For example, when using "#,###.00" as a pattern, the same number might be formatted as:<p>
+<ul><a name="23387"></a>
+<li>1.234,56 (German)<br><br>
+<a name="25888"></a>
+<li>1,234.56 (English)<br><br>
+</ul><a name="25889"></a>
+The class <a href="../../api/java/text/DecimalFormat.html">DecimalFormat</a>, which is a concrete subclass of the NumberFormat class, can format decimal numbers. Programmers generally will not instantiate this class directly but will use the factory methods provided. <p><a name="23388"></a>
+The DecimalFormat class has the ability to take a pattern string to specify how a number should be formatted. The pattern specifies attributes such as the precision of the number, whether leading zeros should be printed, and what currency symbols are used. The pattern string can be altered if a program needs to create a custom format. <p>
+<a name="25590"></a>
+<h2>		 DecimalFormatSymbols Class</h2>
+<a name="25591"></a>
+The class <a href="../../api/java/text/DecimalFormatSymbols.html">DecimalFormatSymbols</a> represents the set of symbols (such as the decimal separator, the grouping separator, and so on) needed by DecimalFormat to format numbers. DecimalFormat creates for itself an instance of DecimalFormatSymbols from its locale data. A programmer needing to change any of these symbols can get the DecimalFormatSymbols object from the DecimalFormat object and then modify it. <p>
+<a name="23391"></a>
+<h2>		 ChoiceFormat Class</h2>
+<a name="23392"></a>
+The class <a href="../../api/java/text/ChoiceFormat.html">ChoiceFormat</a> is a concrete subclass of the NumberFormat class. The ChoiceFormat class allows the programmer to attach a format to a range of numbers. It is generally used in a MessageFormat object for handling plurals. See the "MessageFormat Class" section that follows for more information.<p>
+<a name="24167"></a>
+<h2>		 MessageFormat Class</h2>
+<a name="22835"></a>
+Programs often need to build messages from sequences of strings, numbers and other data. For example, the text of a message displaying the number of files on a disk drive will vary:<p>
+<ul><a name="24171"></a>
+<li>The disk C contains 100 files.<br><br>
+<a name="24172"></a>
+<li>The disk D contains 1 file.<br><br>
+<a name="24173"></a>
+<li>The disk F contains 0 files.<br><br>
+</ul><a name="24168"></a>
+If a message built from sequences of strings and numbers is hard-coded, it cannot be translated into other languages. For example, note the different positions of the parameters "3" and "G" in the following translations:<p>
+<ul><a name="24201"></a>
+<li>The disk G contains 3 files. (English)<br><br>
+<a name="24202"></a>
+<li>Il y a 3 fichiers sur le disque G. (French)<br><br>
+</ul><a name="22849"></a>
+The class <a href="../../api/java/text/MessageFormat.html">MessageFormat</a> provides a means to produce concatenated messages in language-neutral way. The MessageFormat object takes a set of objects, formats them, and then inserts the formatted strings into the pattern at the appropriate places. <p>
+<a name="22781"></a>
+<h2>		 ParsePosition Class</h2>
+<a name="24212"></a>
+The class <a href="../../api/java/text/ParsePosition.html">ParsePosition</a> is used by the Format class and its subclasses to keep track of the current position during parsing. The parseObject() method in the Format class requires a ParsePosition object as an argument. <p>
+<a name="24227"></a>
+<h2>		 FieldPosition Class</h2>
+<a name="24231"></a>
+The <a href="../../api/java/text/FieldPosition.html">FieldPosition</a> class is used by the Format class and its subclasses to identify fields in formatted output. One version of the format() method in the Format class requires a FieldPosition object as an argument. <p>
+<a name="24262"></a>
+<h1>Locale-Sensitive String Operations  </h1>
+<a name="23410"></a>
+Programs frequently need to manipulate strings. Common operations on strings include searching and sorting. Some tasks, such as collating strings or finding various boundaries in text, are surprisingly difficult to get right and are even more difficult when multiple languages must be considered. The Java 2 Platform provides classes for handling many of these common string manipulations in a locale-sensitive manner. <p>
+<a name="22523"></a>
+<h2>		 Collator Class</h2>
+<a name="22902"></a>
+The <a href="../../api/java/text/Collator.html">Collator</a> class performs locale-sensitive string comparison. Programmers use this class to build searching and alphabetical sorting routines for natural language text. Collator is an abstract base class. Its subclasses implement specific collation strategies. One subclass, RuleBasedCollator, is currently provided with the Java 2 Platform and is applicable to a wide set of languages. Other subclasses may be created to handle more specialized needs. <p>
+<a name="23421"></a>
+<h2>		 RuleBasedCollator Class</h2>
+<a name="23424"></a>
+The <a href="../../api/java/text/RuleBasedCollator.html">RuleBasedCollator</a> class, which is a concrete subclass of the Collator class, provides a simple, data-driven, table collator. Using RuleBasedCollator, a programmer can create a customized table-based collator. For example, a programmer can build a collator that will ignore (or notice) uppercase letters, accents, and Unicode combining characters.<p>
+<a name="24617"></a>
+<h2>		 CollationElementIterator Class</h2>
+<a name="24618"></a>
+The <a href="../../api/java/text/CollationElementIterator.html">CollationElementIterator</a> class is used as an iterator to walk through each character of an international string. Programmers use the iterator to return the ordering priority of the positioned character. The ordering priority of a character, or key, defines how a character is collated in the given Collator object. The CollationElementIterator class is used by the compare() method of the RuleBasedCollator class.<p>
+<a name="24329"></a>
+<h2>		 CollationKey Class</h2>
+<a name="24332"></a>
+A <a href="../../api/java/text/CollationKey.html">CollationKey</a> object represents a string under the rules of a specific Collator object. Comparing two CollationKey objects returns the relative order of the strings they represent. Using CollationKey objects to compare strings is generally faster than using the Collator.compare() method. Thus, when the strings must be compared multiple times, for example when sorting a list of strings, it is more efficient to use CollationKey objects. <p>
+<a name="24364"></a>
+<h2>		 BreakIterator Class</h2>
+<a name="24365"></a>
+The <a href="../../api/java/text/BreakIterator.html">BreakIterator</a> class indirectly implements methods for finding the position of the following types of boundaries in a string of text:<p>
+<ul><a name="24367"></a>
+<li>potential line break<br><br>
+<a name="24368"></a>
+<li>sentence<br><br>
+<a name="24369"></a>
+<li>word <br><br>
+<a name="24370"></a>
+<li>character<br><br>
+</ul><a name="24366"></a>
+The conventions on where to break lines, sentences, words, and characters vary from one language to another. Since the BreakIterator class is locale-sensitive, it can be used by programs that perform text operations. For example, consider a a word processing program that can highlight a character, cut a word, move the cursor to the next sentence, or word-wrap at a line ending. This word processing program would use break iterators to determine the logical boundaries in text, enabling it to perform text operations in a locale-sensitive manner.<p>
+<a name="24412"></a>
+<h2>		 StringCharacterIterator Class</h2>
+<a name="24428"></a>
+The <a href="../../api/java/text/StringCharacterIterator.html">StringCharacterIterator</a> class provides the ability to iterate over a string of Unicode characters in a bidirectional manner. This class uses a cursor to move within a range of text, and can return individual characters or their index values. The StringCharacterIterator class implements the character iterator functionality of the CharacterIterator interface. <p>
+<a name="25628"></a>
+<h2>		 CharacterIterator Interface</h2>
+<a name="25631"></a>
+The <a href="../../api/java/text/CharacterIterator.html">CharacterIterator</a> interface defines a protocol for bidirectional iteration over Unicode characters. Classes should implement this interface if they want to move about within a range of text and return individual Unicode characters or their index values. CharacterIterator is for searching is useful when performing character searches. <p>
+<a name="25296"></a>
+<h1>Character Set Conversion  </h1>
+<a name="25297"></a>
+The Java platform uses Unicode as its native character encoding; however, many Java programs still need to handle text data in other encodings. Java therefore provides a set of classes that convert many standard character encodings to and from Unicode. Java programs that need to deal with non-Unicode text data will typically convert that data into Unicode, process the data as Unicode, then convert the result back to the external character encoding. The <a href="../../api/java/io/InputStreamReader.html">InputStreamReader</a> and <a href="../../api/java/io/OutputStreamWriter.html">OutputStreamWriter</a> classes provide methods that can convert between other character encodings and Unicode.<p>
+<a name="25303"></a>
+<h2>		 Supported Encodings</h2>
+<a name="25307"></a>
+The InputStreamReader, OutputStreamWriter, and String classes can convert between Unicode and the following set of character encodings listed in the web page <a href="encoding.doc.html">Supported Encodings</a> .<p>
+<a name="26768"></a>
+<h1>AWT Attributes  </h1>
+<a name="23811"></a>
+To aid in the internationalization of a program's GUI, the Java 2 Platform provides two these attributes for the <a href="../../api/java/awt/Component.html">Component</a> class: Name and Locale.<p>
+<a name="23812"></a>
+<h2>		 Name Attribute</h2>
+<a name="23813"></a>
+The Name attribute is a String object which serves as a non-localizable identifier for a Component object. New constructors for the Component class and its subclasses allow the Name attribute to be set. If these constructors are not used, Component objects are assigned a default Name. The method Component.getName() can be used to examine a Component object's Name attribute.<p><a name="23814"></a>
+The Name attribute is particularly useful in writing Action handling routines in which a reference to the target is not known ahead of time. Such Action handlers are often generated by GUI builders. Previously, these routines tried to identify the target Component by looking at its label string. This approach failed when the label strings are localized. As of release 1.1 of the JDK software, programmers should use the Component.getName() method instead.<p>
+<a name="23817"></a>
+<h2>		 Locale Attribute</h2>
+<a name="23818"></a>
+The Component class now contains a Locale attribute. This attribute is accessed by the methods getLocale() and setLocale()methods. If a Component object's Locale is not explicitly set, its value defaults to the Locale of the Component object's parent. If no Component in the hierarchy has an explicit Locale, the default is the value of Locale.getDefault().<p><a name="23819"></a>
+The Locale attribute of Component allows the GUI (or portions of the GUI) to maintain its own default locale. This would be useful, for example, in an applet that used the Japanese locale even when the rest of the browser was using the USA locale.<p>
+<a name="23808"></a>
+<h1>Stream I/O  </h1>
+<a name="24462"></a>
+The Java 2 Platform provides features in the java.io package to improve the handling of character data: the new Reader and Writer classes, and an enhancement to the PrintStream class.<p>
+<a name="24684"></a>
+<h2>		 Reader and Writer Classes</h2>
+<a name="24649"></a>
+The <a href="../../api/java/io/Reader.html">Reader</a> and <a href="../../api/java/io/Writer.html">Writer</a> class hierarchies provide the ability to perform I/O operations on character streams. These hierarchies parallel the InputStream and OutputStream class hierarchies, but operate on streams of characters rather than streams of bytes. Character streams make it easy to write programs that are not dependent upon a specific character encoding, and are therefore easier to internationalize. The Reader and Writer classes also have the ability to convert between Unicode and other character encodings. Please refer to the <a href="../io/io.html"> Character Streams </a> document for more information about the Reader and Writer class hierarchies.<p>
+<a name="24681"></a>
+<h2>		 PrintStream Class</h2>
+<a name="22274"></a>
+The <a href="../../api/java/io/PrintStream.html">PrintStream</a> class produces output using the system's default character encoding and line terminator. This change allows methods such as System.out.println() to act more reasonably with non-ASCII data.<p>
+<a name="23766"></a>
+<h1>Character Classification  </h1>
+<a name="23759"></a>
+The Java platform stores character data in Unicode- an international character set standard. The Unicode Standard uses a 16-bit encoding to support all of the major scripts of the world, as well as common technical symbols. Most Java code is written in ASCII, a 7-bit standard, or ISO-Latin-1, an 8-bit standard, but is translated into Unicode before processing. Therefore, the Java character set is always represented in Unicode.<p><a name="24513"></a>
+Version 1.0 of the JDK software introduced the <a href="../../api/java/lang/Character.html">Character</a> class as an object wrapper to the char primitive type. The Character class also contained some static methods such as isLowerCase() and isDigit() for determining the properties of a character. This set of methods has been extended in version 1.1 of the JDK software to allow access to all the Unicode 2.1 defined properties for a character.<p><a name="27553"></a>
+<a name="inputmethod"></a><p>
+<a name="26911"></a>
+<h1>Input Methods  </h1>
+<a name="27637"></a>
+Input methods are software components that let the user enter text in ways other than simple typing on a keyboard. They are commonly used to enter Japanese, Chinese, or Korean - languages using thousands of different characters - on keyboards with far fewer keys. However, the Java 2 platform also supports input methods for other languages and the use of entirely different input mechanisms, such as handwriting or speech recognition.<p><a name="27644"></a>
+The Java 2 platform enables the use of native input methods provided by the host operating system, such as Windows or Solaris, as well as the implementation and use of input methods written in the Java programming language.<p><a name="27648"></a>
+The term input methods does not refer to class methods of the Java programming language.<p>
+<a name="27651"></a>
+<h2>		 Input Method Support in Swing</h2>
+<a name="27653"></a>
+The Swing text components provide an integrated user interface for text input using input methods. Depending on the locale, one of two input styles is used. With on-the-spot (inline) input, the style used for most locales, the input methods insert the text directly into the text component while the text is being composed. With below-the-spot input, the style used for Chinese locales, a separate composition window is used, which is positioned automatically to be near the point where the text is to be inserted after being committed.<p><a name="27789"></a>
+An application using Swing text components does not have to coordinate the interaction between the text components and input methods. However, it should call <a href="../../api/java/awt/im/InputContext.html#endComposition()">InputContext.endComposition</a> when all text must be committed, such as when a document is saved or printed.<p>
+<a name="27668"></a>
+<h2>		 Input Method Framework</h2>
+<a name="27670"></a>
+The input method framework enables the collaboration between text editing components and input methods in entering text. Programmers who develop text editing components or input methods use this framework. Other application developers generally make only minimal use of it. For example, they should call <a href="../../api/java/awt/im/InputContext.html#endComposition()">InputContext.endComposition</a> when all text must be committed, such as when a document is saved or printed.<p><a name="27679"></a>
+The <a href="../imf/index.html">Input Method Framework</a> web page contains links to the specifications and API documentation.<p>
+
+<br>
+<hr>
+<font size=-1>
+<a href="intlTOC.doc.html">Contents</a>
+</font>
+<hr>
+
+
+<address>
+<a href="mailto:java-intl@java.sun.com">java-intl@java.sun.com</a>
+</address>
+
+<font size=-1><i><a href="../../relnotes/SMICopyright.html">
+Copyright</a> &#169; 1996-2000 Sun Microsystems, Inc.   All rights reserved.</i></font>
+
+</body>
+</html>

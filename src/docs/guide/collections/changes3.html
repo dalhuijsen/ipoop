@@ -1,0 +1,74 @@
+<HTML>
+<HEAD>
+<title>Collections Framework Change Summary</title>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH=60>
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+<TD>
+<center>
+           <h1>Collections Framework API Change Summary</h1>
+</center>
+</TD>
+</TR>
+</TABLE>
+<!-- Body text begins here -->
+This page summarizes the differences between the 1.2 and 1.3 releases
+of the Collections Framework, along with a brief rationale for each change.
+
+<h3>Convenience Implementations</h3>
+<ul>
+<li><strong>Added <a
+href="../../api/java/util/Collections.html#singletonList(java.lang.Object)">singletonList</a> and <a
+href="../../api/java/util/Collections.html#singletonMap(java.lang.Object, java.lang.Object)">singletonMap</a>.</strong>
+Previously, there was a convenience implementation for singleton Set, but no
+corresponding implementation for List and Map.
+</ul>
+
+<ul>
+<li><strong>Added <a
+href="../../api/java/util/Collections.html#EMPTY_MAP">EMPTY_MAP</a>.</strong>
+Previously, there were constants for the empty Set and List, but no
+corresponding constant for Map.
+</ul>
+
+<h3>Special-purpose Implementation</h3>
+<ul>
+<li>
+<strong>Added <a
+href="../../api/java/util/WeakHashMap.html#WeakHashMap(java.util.Map)">Map
+constuctor</a> for WeakHashMap</strong>.  The 
+<a href="../../api/java/util/Map.html">Map</a> interface dictates that most
+Map implementations should have a "copy constructor" that takes a Map
+argument.  WeakHashMap lacked such a constructor in the 1.2 release.
+</ul>
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-99
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+   <br>
+   <br>
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:collections-comments@java.sun.com">collections-comments@java.sun.com</a> 
+   </FONT>
+</TD>
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+</TR>
+</TABLE>
+</body>
+</html>

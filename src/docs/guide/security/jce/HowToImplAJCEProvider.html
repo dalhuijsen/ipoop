@@ -1,0 +1,3986 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<HEAD>
+
+<TITLE>How to Implement a Provider for the Java Cryptography Extension</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="#ffffff">
+<HR>
+
+<center>
+<H1>How to Implement a Provider for the Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Cryptography Extension</H1> 
+
+<H2>in the Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition, v 1.4</H2>
+
+<br>
+
+</center>
+
+<HR>
+
+<p><dl>
+<dt><dd><a href="#Intro">
+<font size="+2"><b>Introduction</b></font></a>
+<dl>
+<dt><dd><a href="#Who">
+<b>Who Should Read This Document</b></a>
+<dt><dd><a href="#RelatedDocumentation">
+<b>Related Documentation</b></a>
+<dt><dd><a href="#Terminology">
+<b>A Note on Terminology</b></a>
+</dl>
+<br>
+
+<dt><dd><a href="#WhatsNew">
+<font size="+2"><b>What's New in JCE in the Java 2 SDK, v 1.4</b></font></a>
+<br>
+<br>
+
+<dt><dd><a href="#Engine">
+<font size="+2"><b>Engine Classes and Corresponding SPI Classes</b></font></a>
+<br>
+<br>
+
+<dt><dd><a href="#Steps">
+<font size="+2"><b>Steps to Implement and Integrate a Provider</b></font></a>
+<dl>
+
+<dt><dd><a href="#Step 1">
+<b>Step 1: Write your Service Implementation Code</b></a>
+
+<dt><dd><a href="#Step 2">
+<b>Step 2: Give your Provider a Name</b></a>
+
+<dt><dd><a href="#Step 3">
+<b>Step 3: Write your "Master Class," a subclass of Provider</b></a>
+
+<dt><dd><a href="#Step 4">
+<b>Step 4: Compile your Code</b></a>
+
+<dt><dd><a href="#Step 5">
+<b>Step 5: Prepare for Testing</b></a>
+
+<dt><dd><a href="#Step 6">
+<b>Step 6: Write and Compile Test Programs</b></a>
+
+<dt><dd><a href="#Step 7">
+<b>Step 7: Run your Test Programs</b></a>
+
+<dt><dd><a href="#Step 8">
+<b>Step 8: Apply for U.S. Government Export Approval If Required</b></a>
+
+<dt><dd><a href="#Step 9">
+<b>Step 9: Document your Provider and its Supported Services</b></a>
+
+<dt><dd><a href="#Step 10">
+<b>Step 10: Make Your Provider Software and Documentation Available to 
+Clients</b></a>
+</dl>
+<br>
+
+<dt><dd><a href="#MutualAuth">
+<font size="+2"><b>How a Provider Can Do Self-Integrity Checking</b></font></a>
+<br>
+<br>
+
+<dt><dd><a href="#FurtherImplDetails">
+<font size="+2"><b>Further Implementation Details
+and Requirements</b></font></a>
+<dl>
+<dt><dd><a href="#AlgAliases">
+<b>Algorithm Aliases</b></a>
+<dt><dd><a href="#AlgDependencies">
+<b>Service Interdependencies</b></a>
+<dt><dd><a href="#DefaultInits">
+<b>Default Initializations</b></a>
+<dt><dd><a href="#DHInts">
+<b>Diffie-Hellman Interfaces and their Required Implementations</b></a>
+<dt><dd><a href="#AlgParamSpecs">
+<b>Algorithm Parameter Specification Classes</b></a>
+<dt><dd><a href="#KeySpecs">
+<b>Key Specification Classes Required by Key Factories</b></a>
+<dt><dd><a href="#SecretKeyGen">
+<b>Secret-Key Generation</b></a>
+<dt><dd><a href="#EnsureExport">
+<b>Ensuring Exportablity</b></a>
+</dl>
+<br>
+
+<dt><dd><a href="#AppA">
+<font size="+2"><b> Appendix A: The "SunJCE" Provider's Master Class</b></font></a>
+<br>
+<br>
+<dt><dd><a href="#AppB">
+<font size="+2"><b> Appendix B: The "EMProvider" Provider's Master Class</b></font></a>
+<br>
+<br>
+<dt><dd><a href="#AppC">
+<font size="+2"><b> Appendix C: The java.security Master Properties File</b></font></a>
+
+</dl>
+
+
+<HR>
+
+<H1><a name="Intro">Introduction</a></H1>
+
+<blockquote>
+
+
+<P> The Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Cryptography Extension
+(JCE) provides a framework and implementations for encryption, key
+generation and key agreement, and Message Authentication Code (MAC)
+algorithms. Support for encryption includes symmetric, asymmetric,
+block, and stream ciphers. The software also supports secure streams
+and sealed objects.
+
+<p>JCE was previously an optional package (extension) to the
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition
+(Java 2 SDK), versions 1.2.x and 1.3.x. JCE has now been integrated into the 
+Java 2 SDK, v 1.4.
+
+<P> JCE is based on the same <a href="../CryptoSpec.html#Design">design
+principles</a> found elsewhere in the Java Cryptography Architecture
+framework utilized by all the cryptography-related security components
+of the Java 2 platform: implementation independence and, whenever
+possible, algorithm independence. It uses the same "<a
+href="../CryptoSpec.html#ProviderArch">provider</a>"
+architecture, which uses the notion of a <em>Cryptographic Service 
+Provider</em>, or "provider" for short. This term refers to
+a package (or a set of packages) that supply
+a concrete implementation of a subset of the cryptography aspects of
+the Java Security API.
+
+<p>JCE extends the list of cryptographic services of which a provider can
+supply implementations. A provider could,
+for example, contain an implementation of one or more digital signature
+algorithms and one or more cipher algorithms.
+
+<p>A program wishing to use cryptography functionality
+may simply request a particular type of object
+(such as a Cipher object) implementing a particular
+algorithm (such as DES) and get an implementation from one of 
+the installed providers. If an implementation from a
+particular provider is desired, the program can request
+that provider by name, along with the algorithm desired.
+
+<p>Each Java 2 SDK installation has one or more provider packages installed.
+Each provider package supplies implementations of cryptographic services
+defined in one or more security components of the Java 2 SDK (including JCE).
+
+<p>Clients may configure their runtimes with different providers,
+and specify a <i>preference order</i> for each of them. The preference
+order is the order in which providers are searched for requested 
+algorithms when no particular provider is requested. 
+
+<P> The Java 2 SDK, v 1.4 release comes standard with
+a JCE provider named "SunJCE", which comes pre-installed and
+registered and which supplies the following 
+cryptographic services:
+
+<ul>
+
+<li>An implementation of the DES (FIPS PUB 46-1), Triple DES, and
+Blowfish encryption algorithms in the Electronic Code Book (ECB),
+Cipher Block Chaining (CBC), Cipher Feedback (CFB), Output Feedback
+(OFB), and Propagating Cipher Block Chaining (PCBC) modes. (<B>Note:</B> 
+Throughout this document, the terms "Triple DES" and "DES-EDE" will be
+used interchangeably.)<p>
+
+<li>Key generators for generating keys suitable for the DES, Triple
+DES, Blowfish, HMAC-MD5, and HMAC-SHA1 algorithms.<p>
+
+<li>An implementation of the MD5 with DES-CBC password-based encryption
+(PBE) algorithm defined in PKCS #5.<p>
+
+<li>"Secret-key factories" providing bi-directional conversions
+between opaque DES, Triple DES and PBE key objects and transparent
+representations of their underlying key material.<p>
+
+<li>An implementation of the Diffie-Hellman key agreement algorithm between
+two or more parties.<p>
+
+<li>A Diffie-Hellman key pair generator for generating a pair of public and
+private values suitable for the Diffie-Hellman algorithm.<p>
+
+<li>A Diffie-Hellman algorithm parameter generator.<p>
+
+<li>A Diffie-Hellman "key factory" providing bi-directional conversions
+between opaque Diffie-Hellman key objects and transparent representations of
+their underlying key material.<p>
+
+<li>Algorithm parameter managers for Diffie-Hellman, DES, Triple DES,
+Blowfish, and PBE parameters.<p>
+
+<li>An implementation of the HMAC-MD5 and HMAC-SHA1 keyed-hashing algorithms
+defined in RFC 2104.<p>
+
+<li>An implementation of the padding scheme described in PKCS#5.<p>
+
+<li>A keystore implementation for the proprietary keystore type named "JCEKS".
+
+</ul>
+
+<p>New providers may be added statically or dynamically. 
+Clients may also query which providers are currently installed.
+<p>
+
+<p>The different implementations may have different
+characteristics. Some may be software-based, while others may be
+hardware-based. Some may be platform-independent, while others may be
+platform-specific. Some provider source code may be available for
+review and evaluation, while some may not.
+
+
+<H2><a name="Who">Who Should Read This Document</a></H2>
+
+<p>Programmers that only need to use the Java Security API to
+access existing cryptography algorithms and other services
+do <i>not</i> need to read this document.
+<p>This document is intended for developers of cryptographic service providers.
+It documents what you need to do in order
+to integrate your provider into Java Security so that
+your algorithms and other services can be found when Java 
+Security API clients request them.
+
+<p>Only providers signed by a trusted entity can be plugged into the JCE  framework. 
+
+
+<H2><a name="RelatedDocumentation">Related Documentation</a></H2>
+
+<p>This document assumes you have already read the following documents: <p>
+
+<ul>
+<li><a href = "../CryptoSpec.html">Java Cryptography Architecture API Specification and Reference</a>,
+<li><a href = "../HowToImplAProvider.html">How to Implement a Provider for the Java Cryptography Architecture</a>, and
+<li><a href = "JCERefGuide.html">Java<SUP><FONT SIZE=-2>TM</FONT></SUP>
+Cryptography Extension (JCE) Reference Guide for the
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition, v 1.4</a>.
+</ul>
+
+<p>It also discusses various classes and interfaces in the
+Java Security API. The complete reference documentation for 
+the relevant Security API packages can be found in these packages:
+
+<ul>
+
+   <li><a href="../../../api/java/security/package-summary.html"><code>java.security</code></a>
+   <li><a href="../../../api/java/security/spec/package-summary.html"><code>java.security.spec</code></a>
+   <li><a href="../../../api/java/security/interfaces/package-summary.html"><code>java.security.interfaces</code></a>
+
+   <li><a href="../../../api/javax/crypto/package-summary.html"><code>javax.crypto</code></a>
+   <li><a href="../../../api/javax/crypto/spec/package-summary.html"><code>javax.crypto.spec</code></a>
+   <li><a href="../../../api/javax/crypto/interfaces/package-summary.html"><code>javax.crypto.interfaces</code></a>
+</ul><p>
+
+
+
+<H2><a name="Terminology">A Note on Terminology</a></H2>
+
+<P> The JCE within the Java 2 SDK, v 1.4 includes two software components:
+
+<ul>
+<li>the framework that defines and supports cryptographic services 
+that providers can supply implementations for.
+This framework includes everything in 
+the <code>javax.crypto</code> package. <P> 
+<li>a provider named "SunJCE"
+</ul>
+
+Throughout this document, the term "JCE" by itself refers to the JCE 
+framework in the Java 2 SDK, v 1.4. Whenever the JCE provider supplied with
+the Java 2 SDK, v 1.4 is mentioned, it will be
+referred to explicitly as the "SunJCE" provider.
+
+</blockquote>
+
+
+<br>
+
+<H1><a name="WhatsNew">What's New in JCE in the Java 2 SDK, v 1.4</a></H1>
+
+<blockquote>
+
+<P> These are the differences between JCE 1.2.1 and the
+JCE in the Java 2 SDK, v 1.4 that affect providers:
+
+<ul>
+<li><a href="#InJ2">JCE Is Now in Java 2 SDK</a><P>
+<li><a href="#StrongCrypto">Strong Cryptography Is the Default, Unlimited Is 
+Available</a><P>
+<li><a href = "#NoFwAuthentication">Provider Authentication of JCE
+Framework No Longer Required</a><P> 
+</ul>
+
+
+
+<H3><a name="InJ2">JCE Is Now in Java 2 SDK</a></H3>
+
+<blockquote>
+
+<p>JCE was previously an optional package (extension) to the
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition (Java 2 SDK), 
+versions 1.2.x and 1.3.x. JCE has now been integrated into 
+the Java 2 SDK, v 1.4.  The SunJCE provider is also included and is automatically
+registered in the <code>java.security</code> security properties file
+included with the Java 2 SDK, v 1.4.
+
+</blockquote>
+
+
+<H3><a name="StrongCrypto">Strong Cryptography Is the Default, Unlimited Is 
+Available</a></H3>
+
+<blockquote>
+
+<p>Due to import control restrictions, the jurisdiction policy files 
+shipped with the Java 2 SDK, v 1.4 allow "strong" but limited cryptography 
+to be used. An "unlimited" version of these files indicating no restrictions on
+cryptographic strengths is available for those living in
+eligible countries (which is most countries). You can download this version 
+and replace the strong cryptography versions supplied with the Java 2 SDK, v 1.4  
+with the unlimited ones.  See
+
+<blockquote>
+<a href = "http://java.sun.com/products/jce/index-14.html">
+http://java.sun.com/products/jce/index-14.html</a> 
+</blockquote>
+
+for information indicating where to go to download the unlimited version.
+
+<p>The jurisdiction policy files have been relocated to 
+
+<blockquote><pre>
+&lt;java-home&gt;\lib\security         [Windows]
+&lt;java-home&gt;/lib/security         [Solaris]
+</pre></blockquote>
+
+where <tt>&lt;java-home&gt;</tt> refers to the directory where the 
+runtime software is installed, which is the top-level directory of the 
+Java<SUP><FONT SIZE="-2">TM</FONT></SUP> 2 Runtime Environment (JRE)
+or the <tt>jre</tt> directory in the 
+Java<SUP><FONT SIZE="-2">TM</FONT></SUP> 2 SDK (Java 2 SDK) software.
+They have been moved to this standard location so that it is
+easy to replace the strong cryptography versions that come with
+the Java 2 SDK, v 1.4 with the unlimited ones.
+
+</blockquote>
+
+
+<H3><a name="NoFwAuthentication">Provider Authentication of JCE
+Framework No Longer Required</H3></a>
+
+<blockquote>
+
+<p>In JCE 1.2.1, providers needed to include code to authenticate 
+the JCE framework to assure themselves of the integrity and
+authenticity of the JCE that they plugged into. Now that JCE
+is integrated into the Java 2 SDK, v 1.4, this is no longer necessary.
+
+<p>JCE 1.2.1 providers which follow the guidance in 
+<a href = "http://java.sun.com/products/jce/doc/guide/HowToImplAProvider.html">
+How to Implement a Provider for the Java Cryptography Extension 1.2.1</a>
+will continue to work with the JCE framework in the Java 2 SDK, v 1.4.
+
+<p>However, a provider whose framework authentication code 
+locates the JCE framework via protection
+domain instead of following the recommendations in the
+aforementioned JCE 1.2.1 JCE provider document will not work 
+in the Java 2 SDK, v 1.4. Now that JCE has been
+integrated into the Java 2 SDK, v 1.4, the JCE framework has a null 
+code source just like any other class in the Java 2 SDK, v 1.4.
+You can either modify your provider to follow the recommended
+approach for authenticating the framework, or put in a conditional 
+so that the framework authentication code is only executed 
+when the provider is being run with JCE 1.2.1.
+
+</blockquote>
+
+</blockquote>
+
+
+<br>
+
+
+<H1><a name="Engine">Engine Classes and Corresponding SPI Classes</a></H1>
+
+<blockquote>
+
+<p>
+An "engine class" defines a cryptographic service
+in an abstract fashion (without a concrete implementation).
+
+<p>A cryptographic service is always associated with a particular algorithm,
+and it either provides cryptographic operations 
+(like those for ciphers or key agreement protocols),
+or generates or supplies the
+cryptographic material (keys or parameters) required for cryptographic 
+operations. For example, two of the engine classes are the <code>Cipher</code> 
+and <code>KeyAgreement</code> classes. The <code>Cipher</code> 
+class provides access to the functionality of an encryption algorithm
+(such as DES), and the
+<code>KeyAgreement</code> class provides access to the functionality of a key
+agreement protocol (such as Diffie-Hellman).
+
+<p>The Java Cryptography Architecture encompasses the classes of the
+J2SE Java Security package related to cryptography, including the
+engine classes. Users of the API request and utilize 
+instances of the engine classes to carry out corresponding operations. 
+
+<p>JCE was previously an optional package (extension) to the
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition (Java 2 SDK),
+versions 1.2.x and 1.3.x.
+JCE has now been integrated into the Java 2 SDK, v 1.4.
+
+<p>JCE defines the following engine classes:
+
+<ul>
+
+<li><b><code>Cipher</code></b>: used 
+to encrypt or decrypt some specified data.<p>
+
+<li><b><code>KeyAgreement</code></b>: used to execute a key agreement (key exchange)
+protocol between 2 or more parties.<p>
+
+<li><b><code>KeyGenerator</code></b>: used to generate a secret (symmetric) 
+key suitable for a specified algorithm.<p>
+
+<li><b><code>Mac</code></b>: used to
+compute the <i>message authentication code</i> of some specified data.<p>
+
+<li><b><code>SecretKeyFactory</code></b>: used to 
+convert opaque cryptographic keys of type <code>SecretKey</code> 
+into <i>key specifications</i> (transparent representations of the underlying
+key material), and vice versa.<p>
+
+<li><b><code>ExemptionMechanism</code></b>: used to
+provide the functionality of an exemption mechanism such as
+<i>key recovery</i>, <i>key weakening</i>, 
+<i>key escrow</i>, or any other (custom) exemption mechanism.
+Applications or applets that use an 
+exemption mechanism may be granted
+stronger encryption capabilities than those which don't.
+However, please note that cryptographic restrictions are no longer
+required for most countries, and thus exemption mechanisms may only
+be useful in those few countries whose governments mandate
+restrictions.
+<p>
+
+</ul>
+ 
+<p>
+An engine class provides the interface to the functionality of a
+specific type of cryptographic service (independent
+of a particular cryptographic algorithm). 
+It defines "Application Programming Interface" (API)
+methods that allow applications to access the specific type
+of cryptographic service it provides. The actual implementations 
+(from one or more providers) are those for specific
+algorithms.  The <code>Cipher</code> engine
+class, for example, provides access to the functionality of a
+cipher algorithm. The actual implementation supplied
+in a <code>CipherSpi</code> subclass (see next paragraph) would be that 
+for a specific kind of encryption
+algorithm, such as DES or Triple DES. 
+
+<p>
+The application interfaces supplied by an engine class are
+implemented in terms of a <b>Service Provider Interface (SPI)</b>.
+That is, for each engine class, there is a corresponding
+abstract SPI class, which defines the Service Provider 
+Interface methods that cryptographic service providers must implement.
+
+<p>An instance of an engine class, the "API object", encapsulates (as a
+private field) an instance of the corresponding SPI class, the "SPI
+object".  All API methods of an API object are declared <code>final</code>, and
+their implementations invoke the corresponding SPI methods of the
+encapsulated SPI object. An instance of an engine class (and of its
+corresponding SPI class) is created by a call to
+the <code>getInstance</code> factory method of the engine class.
+
+<p>The name of each SPI class is the same as that of the corresponding 
+engine class, followed by <code>Spi</code>. For example,
+the SPI class corresponding to the <code>Cipher</code> engine class is the
+<code>CipherSpi</code> class.
+
+<p>
+<b>Each SPI class is abstract. To supply the implementation of a 
+particular type of service, for a specific algorithm,
+a provider must subclass the corresponding SPI class and provide
+implementations for all the abstract methods.</b>
+
+<p>
+Another example of an engine class is the <code>KeyAgreement</code> class, which
+provides access to a key agreement (key exchange) algorithm. Its
+implementations, in <code>KeyAgreementSpi</code> subclasses, may be those of various
+key agreement algorithms such as Diffie-Hellman.
+
+<p>
+As a final example, the <code>SecretKeyFactory</code> engine class supports the conversion 
+from opaque secret keys to transparent key specifications, and vice versa.
+(See <a href = "#KeySpecs">Key Specification Classes 
+Required by Key Factories</a>.)
+The actual implementation supplied in a <code>SecretKeyFactorySpi</code> subclass
+would be that for a specific type of secret keys, e.g., DES keys.
+
+</blockquote>
+
+
+<br>
+
+
+
+<H1><a name="Steps">Steps to Implement and Integrate a Provider</a></H1>
+
+<blockquote>
+
+The steps required in order to implement a provider
+and integrate it into JCE are the following:
+
+<P> <dl>
+<dt><dd><a href="#Step 1">
+<b>Step 1: Write your Service Implementation Code</b>
+
+</a><dt><dd><a href="#Step 2">
+<b>Step 2: Give your Provider a Name</b>
+
+</a><dt><dd><a href="#Step 3">
+<b>Step 3: Write your "Master Class," a subclass of Provider</b>
+
+</a><dt><dd><a href="#Step 4">
+<b>Step 4: Compile your Code</b>
+
+</a><dt><dd><a href="#Step 5">
+<b>Step 5: Prepare for Testing</b>
+
+
+</a><dl>
+
+<dt><dd><a href="#Step 5a">
+<b>Step 5a: Get a Code-Signing Certificate</b>
+
+<dt><dd><a href="#Step 5b">
+<b>Step 5b: Place Your Provider in a JAR File</b>
+
+<dt><dd><a href="#Step 5c">
+<b>Step 5c: Sign Your Provider</b>
+
+</a><dt><dd><a href="#Step 5d">
+<b>Step 5d: Install the Provider</b>
+
+</a><dt><dd><a href="#Step 5e">
+<b>Step 5e: Set Provider Permissions</b>
+
+</a></dl>
+
+
+<dt><dd><a href="#Step 6">
+<b>Step 6: Write and Compile Test Programs</b>
+
+</a><dt><dd><a href="#Step 7">
+<b>Step 7: Run your Test Programs</b>
+
+</a><dt><dd><a href="#Step 8">
+<b>Step 8: 
+Apply for U.S. Government Export Approval If Required</b> 
+
+</a><dt><dd><a href="#Step 9">
+<b>Step 9: Document your Provider and its Supported Services</b>
+
+</a><dt><dd><a href="#Step 10">
+<b>Step 10: Make Your Provider Software and Documentation Available to Clients</b>
+</a>
+
+</dl>
+
+<br>
+
+<H2><a name="Step 1">Step 1: Write your Service Implementation Code</a></H2>
+
+<blockquote>
+
+The first thing you need to do is write the code supplying 
+algorithm-specific implementations of the cryptographic 
+services you want to support.
+
+<p>
+Note that your provider may supply implementations of cryptographic
+services defined in one or more of the security components of
+the Java 2 SDK v 1.4, including JCE.
+
+<p>
+In JCE in the Java 2 SDK, v 1.4 (as in the previous JCE 1.2.1 release), you can 
+supply cipher, key agreement and MAC algorithms, as
+well as secret-key factories, secret-key generation services, and
+exemption mechanism implementations.
+
+<p>For cryptographic services not defined in JCE (e.g., signatures
+and message digests), please refer to 
+<a href = "../CryptoSpec.html">Java Cryptography Architecture API Specification and Reference</a>.
+
+<p>
+For each cryptographic service in the Java 2 SDK (including JCE ones), 
+you need to create a subclass of the appropriate SPI class. 
+JCE defines the following engine classes:
+<code>CipherSpi</code>, <code>KeyAgreementSpi</code>, 
+<code>KeyGeneratorSpi</code>, <code>MacSpi</code>, 
+<code>SecretKeyFactorySpi</code>, and <code>ExemptionMechanismSpi</code>. (See
+<a href = "#Engine">Engine Classes and Corresponding SPI Classes</a>
+in this document for information on the JCE 
+and other cryptographic classes in the Java 2 SDK, v 1.4.)
+
+<p>In your subclass, you need to:
+
+<ol>
+
+<li>Supply implementations for the abstract methods, whose names 
+usually begin with <code>engine</code>. See <a href = "#FurtherImplDetails">
+Further Implementation Details and Requirements</a> for
+additional information.<p>
+
+<li>Ensure there is a public constructor without any arguments. Here's why: 
+When one of your services is requested, Java Security looks up
+the subclass implementing that service, as specified by
+a property in your "master class" (see <a href = "#Step 3">Step 3</a>). 
+Java Security then creates the <code>Class</code> object associated with your subclass,
+and creates an instance of your subclass by calling the 
+<code>newInstance</code> method on that <code>Class</code> object.
+<code>newInstance</code> requires your subclass to have a public
+constructor without any parameters.<p>
+
+A default constructor without arguments will automatically be generated
+if your subclass doesn't have any constructors. But if your subclass
+defines any constructors, you must explicitly define a public
+constructor without arguments.
+
+</ol>
+
+
+<H3>Additional JCE Provider Requirements and Recommendations</H3>
+
+<blockquote>
+
+<P> When instantiating a provider's implementation (class) of a JCE
+service, the JCE framework will determine the provider's codebase 
+(JAR file) and verify its signature. In this way, 
+JCE authenticates the
+provider and ensures that only providers signed by a trusted entity can be plugged into JCE. Thus, 
+one requirement for JCE providers is that they must be signed,
+as described in later steps.
+
+<P> In addition, each provider should perform self-integrity checking to ensure 
+that the JAR file containing its code has not been manipulated
+in an attempt to invoke provider methods directly rather than
+through JCE. For further information, see
+<a href = "#MutualAuth">How a Provider Can Do Self-Integrity Checking</a>.
+
+<p>In order for provider classes to become unusable if instantiated by an
+application directly, bypassing JCE, providers should implement
+the following:
+
+<ul>
+
+<li>
+All SPI implementation classes in a provider package should be declared <tt>final</tt>
+(so that they cannot be subclassed), and their (SPI) implementation methods
+should be declared <tt>protected</tt>.</li>
+
+<p><li>
+All crypto-related helper classes in a provider package should have 
+package-private
+scope, so that they cannot be accessed from outside the provider package.</li>
+
+</ul>
+
+<P>For providers that may be exported outside the U.S.,
+<code>CipherSpi</code> implementations must include an implementation of the
+<code>engineGetKeySize</code> method which, given a <code>Key</code>,
+returns the key size. If there are restrictions on available
+cryptographic strength specified in jurisdiction policy files,
+each <code>Cipher</code> initialization method calls 
+<code>engineGetKeySize</code> and then compares the result with
+the maximum allowable key size for the particular location and
+circumstances of the applet or application being run.
+If the key size is too large, the initialization method throws
+an exception.
+
+<P> Additional <i>optional</i> features that providers may implement
+are 
+
+<ul>
+
+<li>the <code>engineWrap</code> and <code>engineUnwrap</code> methods of 
+<code>CipherSpi</code>. Wrapping a key enables secure 
+transfer of the key from one place to another. Information 
+about wrapping and unwrapping keys is provided in the 
+<a href="JCERefGuide.html#WrapUnwrap">Wrapping and Unwrapping Keys</a>
+section of the <i>Java Cryptography Extension (JCE) Reference Guide</i>. <p>
+
+<li>one or more <i>exemption mechanisms</i>. An exemption mechanism 
+is something such as key recovery, key escrow, or key weakening
+which, if implemented and enforced, may enable 
+reduced cryptographic restrictions for an application 
+(or applet) that uses it. 
+For information on the requirements for apps that
+utilize exemption mechanisms, see
+<a href="JCERefGuide.html#ExemptApps">How to Make Applications "Exempt" 
+from Cryptographic Restrictions</a> 
+in the <i>Java Cryptography Extension (JCE) Reference Guide</i>.
+
+</ul> 
+
+</blockquote>
+
+
+</blockquote>
+
+
+<H2><a name="Step 2">Step 2: Give your Provider a Name</a></H2>
+
+<blockquote>
+
+Decide on a name for your provider. This is the name to 
+be used by client applications to refer to your provider.
+
+</blockquote>
+
+
+<H2><a name="Step 3">Step 3: Write your "Master Class", a subclass of Provider</a></H2>
+
+<blockquote>
+
+The third step is to create a subclass of the
+<code>java.security.Provider</code> class. 
+
+<p>Your subclass should be a <code>final</code> class, and its 
+constructor should 
+
+<ul>
+
+<li>call <code>super</code>, specifying the provider name (see
+<a href = "#Step 2">Step 2</a>), version number, 
+and a string of information about the provider and algorithms it 
+supports. For example:
+
+<pre>
+    super("CryptoX", 1.0, "CryptoX provider v1.0, implementing " + 
+        "RSA encryption and key pair generation, and DES encryption.");
+</pre>
+
+<li>set the values of various properties that are required
+for the Java Security API to look up the cryptographic services
+implemented by the provider. 
+For each service implemented by the provider, there must be a
+property whose name is the type of service (<code>Cipher</code>, 
+<code>KeyAgreement</code>, <code>KeyGenerator</code>,
+<code>Mac</code>, <code>SecretKeyFactory</code>, or 
+<code>ExemptionMechanism</code>), 
+followed by a period and the name of the
+algorithm to which the service applies. The property value must 
+specify the fully qualified name of the class implementing the service. 
+
+<p>The list below
+shows the various types of properties that must be defined for
+the various types of JCE services, where the actual algorithm 
+name is substitued for <i>algName</i>:<p>
+
+<ul>
+<li>
+    <code>Cipher.</code><i>algName</i>
+<li>
+    <code>KeyAgreement.</code><i>algName</i>
+<li>
+    <code>KeyGenerator.</code><i>algName</i>
+<li>
+    <code>Mac.</code><i>algName</i>
+<li>
+    <code>SecretKeyFactory.</code><i>algName</i>
+<li>
+    <code>ExemptionMechanism.</code><i>algName</i>
+</ul>
+
+<p> In all of these except <code>ExemptionMechanism</code> and 
+<code>Cipher</code>, <i>algName</i> is the standard name of the 
+algorithm. 
+
+<P> In the case of <code>ExemptionMechanism</code>, <i>algName</i> 
+refers to the name of the exemption mechanism, which can be one of the
+following: <code>KeyRecovery</code>, <code>KeyEscrow</code>, 
+or <code>KeyWeakening</code>. Case does
+<i>not</i> matter.
+
+<P> In the case of <code>Cipher</code>, <i>algName</i> may actually
+represent a <i>transformation</i>, and may be composed of an algorithm
+name, a particular mode, and a padding scheme.
+(See <a href="JCERefGuide.html#AppA">Appendix A</a>
+of the <i>Java Cryptography Extension (JCE) Reference Guide</i> 
+for the standard algorithm names that should be used.)
+
+<p> The value of each property must be
+the fully qualified name of the class implementing the 
+specified algorithm. That is, it must be the package name
+followed by the class name, where the two are separated by
+a period.
+
+  <p> As an example, the "SunJCE" provider implements the
+Diffie-Hellman key agreement algorithm in a class named
+<code>DHKeyAgreement</code>
+in the <code>com.sun.crypto.provider</code> package. Its subclass of
+<code>Provider</code> (which is the <code>SunJCE</code> class in the 
+<code>com.sun.crypto.provider</code> package) sets the
+<code>KeyAgreement.DiffieHellman </code>property to have the value
+<code>com.sun.crypto.provider.DHKeyAgreement</code> via the following:
+
+<pre>
+    <code>put("KeyAgreement.DiffieHellman", 
+</code>          <code>"com.sun.crypto.provider.DHKeyAgreement")</code>
+</pre>
+
+</ul>
+
+<p> For further master class property setting examples, see
+<a href = "#AppA">Appendix A</a> to view the current 
+<code>SunJCE.java</code> source file. This shows
+how the <code>SunJCE</code> class constructor sets all the properties 
+for the "SunJCE" provider.
+
+<p> As mentioned above, in the case of a <code>Cipher</code> property,
+<i>algName</i> may actually represent a <i>transformation</i>.
+A <i>transformation</i> is a string that describes the operation (or set
+of operations) to be performed by a <code>Cipher</code> object on some given input.
+A transformation always includes the name of a cryptographic
+algorithm (e.g., <i>DES</i>), and may be followed by a mode
+and a padding scheme.
+
+<p> A transformation is of the form:<p>
+
+<ul>
+<li><i>algorithm/mode/padding</i>, or
+<p>
+<li><i>algorithm</i>
+</ul>
+
+<P> (In the latter case,
+provider-specific default values for the mode and padding scheme are used).
+For example, the following is a valid transformation:<p>
+
+<pre>
+    Cipher c = Cipher.getInstance("<FONT color="blue">DES/CBC/PKCS5Padding</FONT>");
+</pre>
+
+<p> When requesting a block cipher in stream cipher mode (e.g.,
+<code>DES</code> in <code>CFB</code> or <code>OFB</code> mode), a client
+may optionally specify the number of bits to be processed at a time,
+by appending this number to the mode name as shown in the following sample
+transformations:<p>
+
+<pre>
+    Cipher c1 = Cipher.getInstance("<FONT color="blue">DES/CFB8/NoPadding</FONT>");
+    Cipher c2 = Cipher.getInstance("<FONT color="blue">DES/OFB32/PKCS5Padding</FONT>");
+</pre>
+
+<p>If a number does not follow a stream cipher mode, a provider-specific
+default is used. (For example, the "SunJCE" provider uses a default of
+64 bits.)
+
+<p>A provider may supply a separate class for each combination
+of <i>algorithm/mode/padding</i>. Alternatively, a provider may decide to provide more generic
+classes representing sub-transformations corresponding to
+<i>algorithm</i> or <i>algorithm/mode</i> or <i>algorithm//padding</i>
+(note the double slashes); 
+in this case the requested mode and/or padding are set automatically by
+the <code>getInstance</code> methods of <code>Cipher</code>, which invoke the
+<code>engineSetMode</code> and <code>engineSetPadding</code> methods of the
+provider's subclass of <code>CipherSpi</code>.
+
+<p>That is, a <code>Cipher</code> property in a provider master class may have one of
+the formats shown in the table below.</P>
+
+<TABLE summary="Cipher property formats" WIDTH="535" BORDER="1" CELLSPACING="2" CELLPADDING="2">
+  <THEAD>
+    <TH WIDTH="45%" BGCOLOR="#CCCCFF">
+    <B><CODE>Cipher</CODE> Property Format</B></TH> 
+    <TH WIDTH="55%" BGCOLOR="#CCCCFF">
+    <B>Description</B></TH> 
+  </THEAD>
+  <TR>
+    <TD WIDTH="45%">
+    <CODE>Cipher.</CODE><I>algName</I></TD> 
+    <TD WIDTH="55%">
+    A provider's subclass of <CODE>CipherSpi</CODE> implements <I>algName</I>
+    with pluggable mode and padding</TD> 
+  </TR>
+  <TR>
+    <TD WIDTH="45%">
+    <CODE>Cipher.</CODE><I>algName/mode</I></TD> 
+    <TD WIDTH="55%">
+    A provider's subclass of <CODE>CipherSpi</CODE> implements <I>algName</I>
+    in the specified <I>mode</I>, with pluggable padding</TD> 
+  </TR>
+  <TR>
+    <TD WIDTH="45%">
+    <CODE>Cipher.</CODE><I>algName//padding</I></TD> 
+    <TD WIDTH="55%">
+    A provider's subclass of <CODE>CipherSpi</CODE> implements <I>algName</I>
+    with the specified <I>padding</I>, with pluggable mode </TD> 
+  </TR>
+  <TR>
+    <TD WIDTH="45%">
+    <CODE>Cipher.</CODE><I>algName/mode/padding</I></TD>
+    <TD WIDTH="55%">
+    A provider's subclass of <CODE>CipherSpi</CODE> implements <I>algName</I>
+    with the specified <I>mode</I> and <I>padding</I></TD>
+  </TR>
+</TABLE>
+
+<p>(See <a href="JCERefGuide.html#AppA">Appendix A</a>
+of the <i>Java Cryptography Extension (JCE) Reference Guide</i> for the 
+standard algorithm names, modes, and padding schemes
+that should be used.)
+
+<p>For example, a provider may supply a subclass of <code>CipherSpi</code>
+that implements <i>DES/ECB/PKCS5Padding</i>, one that implements
+<i>DES/CBC/PKCS5Padding</i>, one that implements
+<i>DES/CFB/PKCS5Padding</i>, and yet another one that implements
+<i>DES/OFB/PKCS5Padding</i>. That provider would have the following
+<code>Cipher</code> properties in its master class:<p>
+
+<ul>
+
+<li>
+<pre>
+    <code>Cipher.</code><i>DES/ECB/PKCS5Padding</i>
+</pre>
+
+<li>
+<pre>
+    <code>Cipher.</code><i>DES/CBC/PKCS5Padding</i>
+</pre>
+
+<li>
+<pre>
+    <code>Cipher.</code><i>DES/CFB/PKCS5Padding</i>
+</pre>
+
+<li>
+<pre>
+    <code>Cipher.</code><i>DES/OFB/PKCS5Padding</i>
+</pre>
+
+</ul>
+
+<p>Another provider may implement a class for each of the above modes
+(i.e., one class for <i>ECB</i>, one for <i>CBC</i>, one for <i>CFB</i>,
+and one for <i>OFB</i>), one class for <i>PKCS5Padding</i>,
+and a generic <i>DES</i> class that subclasses from <code>CipherSpi</code>.
+That provider would have the following
+<code>Cipher</code> properties in its master class:<p>
+
+<ul>
+
+<li>
+<pre>
+    <code>Cipher.</code><i>DES</i>
+</pre>
+
+</ul>
+
+<p>The <code>getInstance</code> factory method of the <code>Cipher</code>
+engine class follows these rules in order to instantiate a provider's
+implementation of <code>CipherSpi</code> for a
+transformation of the form "<i>algorithm</i>":
+
+<ol>
+<li>
+Check if the provider has registered a subclass of <code>CipherSpi</code>
+for the specified "<i>algorithm</i>".
+<p>If the answer is YES, instantiate this
+class, for whose mode and padding scheme default values (as supplied by
+the provider) are used.
+<p>If the answer is NO, throw a <code>NoSuchAlgorithmException</code>
+exception.
+</ol>
+
+<p>The <code>getInstance</code> factory method of the <code>Cipher</code>
+engine class follows these rules in order to instantiate a provider's
+implementation of <code>CipherSpi</code> for a
+transformation of the form "<i>algorithm/mode/padding</i>":
+
+<ol>
+<li>
+Check if the provider has registered a subclass of <code>CipherSpi</code>
+for the specified "<i>algorithm/mode/padding</i>" transformation.
+<p>If the answer is YES, instantiate it.
+<p>If the answer is NO, go to the next step.<p>
+<li>
+Check if the provider has registered a subclass of <code>CipherSpi</code>
+for the sub-transformation "<i>algorithm/mode</i>".
+<p>If the answer is YES, instantiate it, and call
+<code>engineSetPadding(<i>padding</i>)</code> on the new instance.
+<p>If the answer is NO, go to the next step.<p>
+<li>
+Check if the provider has registered a subclass of <code>CipherSpi</code>
+for the sub-transformation "<i>algorithm//padding</i>" (note the double
+slashes).
+<p>If the answer is YES, instantiate it, and call
+<code>engineSetMode(<i>mode</i>)</code> on the new instance.
+<p>If the answer is NO, go to the next step.<p>
+<li>
+Check if the provider has registered a subclass of <code>CipherSpi</code>
+for the sub-transformation "<i>algorithm</i>".
+<p>If the answer is YES, instantiate it, and call
+<code>engineSetMode(<i>mode</i>)</code> and
+<code>engineSetPadding(<i>padding</i>)</code> on the new instance.
+<p>If the answer is NO, throw a <code>NoSuchAlgorithmException</code>
+exception.
+</ol>
+
+</blockquote>
+
+
+<H2><a name="Step 4">Step 4: Compile your Code</a></H2>
+
+<blockquote>
+
+After you have created your implementation code
+(<a href="#Step 1">Step 1</a>), given your provider a name
+(<a href="#Step 2">Step 2</a>), and created the master class
+(<a href="#Step 3">Step 3</a>), use the Java compiler 
+to compile your files.
+
+</blockquote>
+
+
+
+
+<H2><a name="Step 5">Step 5: Prepare for Testing</a></H2>
+
+<blockquote>
+
+
+<H3><a name="Step 5a">Step 5a: Get a Code-Signing Certificate</a></H3>
+
+<blockquote>
+
+<P> The next step is to request a code-signing certificate so that
+you can use it to sign your provider prior to testing. The certificate 
+will be good for both testing and production. It will be valid for
+5 years.
+
+<P> Below are the steps you should use to get a 
+code-signing certificate. 
+For more information on the <b>keytool</b> tool, see <b>keytool</b> 
+(<a href="../../../tooldocs/solaris/keytool.html">for Solaris</a>) 
+(<a href="../../../tooldocs/windows/keytool.html">for Microsoft Windows</a>).
+
+
+<ol>
+
+<li>Use <b>keytool</b> to generate a DSA keypair.
+
+<pre>
+  keytool -genkey -alias &lt;alias&gt; -keyalg DSA -keysize 1024
+    -dname "cn=&lt;Company Name&gt;,ou=Java Software Code Signing, 
+    o=Sun Microsystems Inc" 
+    -keystore &lt;keystore file name&gt;
+    -storepass &lt;keystore password&gt;
+</pre>
+
+<P> (<B>Note:</B> This must be typed as a single line. Multiple lines 
+and indentation are used in the examples so that they are legible.)
+
+<P> This will generate a DSA keypair (a public key and an associated
+private key) and store it in an entry in
+the specified keystore. 
+The public key is stored in a self-signed certificate.
+The keystore entry can subsequently be accessed using the specified
+alias.
+
+<P> The option values in angle brackets ("&lt;" and "&gt;") represent the
+actual values that must be supplied. For example, <code>&lt;alias&gt;</code> must be
+replaced with whatever alias name you wish to be used to refer to the
+newly-generated keystore entry in the future, and 
+<code>&lt;keystore file name&gt;</code> 
+must be replaced with the name of the keystore to be used. 
+<B>Note:</B> Do not surround actual values
+with angle brackets. For example, if you want your alias to be
+<code>myTestAlias</code>, specify the <code>-alias</code>
+option as follows:
+
+<pre>
+    -alias myTestAlias
+</pre>
+
+
+<P> If you specify a keystore that doesn't yet exist, it will be created.
+
+<P> <B>Note:</B> If command lines you type are not allowed to be as long as
+the <code>keytool -genkey</code> command you want to execute (for example, 
+if you are typing to a Microsoft Windows DOS prompt), 
+you can create and execute a plain-text
+batch file containing the command. That is, create a new text file that 
+contains nothing but the full
+<code>keytool -genkey</code> command. (Remember to type it all on one line.)
+Save the file with a .bat extension. 
+Then in your DOS window, type the file name (with its path, if necessary). 
+This will cause the command in the batch file
+to be executed.<P> 
+
+
+<li>Use <b>keytool</b> to generate a certificate signing request.
+
+<blockquote>
+<pre>
+keytool -certreq -alias &lt;alias&gt; -sigalg DSA 
+        -file &lt;csr file name&gt; 
+        -keystore &lt;keystore file name&gt; 
+        -storepass &lt;keystore password&gt;
+</pre>
+</blockquote>
+
+Here, <code>&lt;alias&gt;</code> is the alias for the DSA keypair entry created in 
+the previous step.
+This command generates a Certificate Signing Request (CSR), 
+using the PKCS#10 format. It stores the CSR in the file whose 
+name is specified in <code>&lt;csr file name&gt;</code>.
+<P> 
+
+
+<li>Send the CSR, contact information, and other required documentation
+to the JCE Code Signing Certification Authority.
+
+<P> Send, via email, the CSR and contact information (see below) to 
+<A href="mailto:javasoft-cert-request@sun.com">javasoft-cert-request@sun.com</A>.
+Put the following in the <b>Subject</b> line of your email message:
+
+<pre>
+  <b>Request a Certificate for Signing a JCE Provider</b>
+</pre>
+
+<P> Put the contact information in the body of the
+message and send the CSR file as a plain text attachment to the message.
+If your mail tool has an option for specifying the encoding format
+to be used for attachments, select the "MIME" option. 
+<B>Note:</B> The CSR file is just a
+plain text file, in Base 64 encoding. Only the first and last lines
+are human-readable. 
+
+
+<P> Include the following contact information in the body of your message:
+
+<blockquote>
+<pre>
+Company Name
+Street Address (Not a post office box)
+City
+State/Province
+Country
+Company Telephone Number
+Company Fax Number
+Requester Name
+Requester Telephone Number
+Requester Email Address
+Brief description of your company (size, 
+    line of business, etc.)
+</pre>
+</blockquote>
+
+<P> All of the above information is required.
+
+<P> After the JCE Code Signing Certification Authority has received
+your email message, they will send you a <b>request number</b> via email.
+Once you receive this request number, you should print, fill out 
+and mail the  
+<a href = "CertForm.txt">Certification Form for CSPs</A>.
+
+<P>
+This form should be mailed to the address below. Be sure to 
+include the request number on the form so that your hardcopy mailing
+can be matched to the email message containing your CSR and contact 
+information. 
+
+<blockquote>
+Sun Microsystems, Inc.<BR>
+International Trade Services/Export Compliance<BR>
+Attn: Encryption Export<BR>
+4120 Network Circle MS: USCA12-204<BR>
+Santa Clara, CA  95054<BR>
+U.S.A.
+</blockquote>
+
+After the JCE Code Signing Certification Authority has received
+both your email message and the required form,
+they will authenticate you, 
+the requester. Then they will create and sign
+a code-signing certificate valid for 5 years.
+You will receive an email message containing two
+plain-text file attachments: one file containing this 
+code-signing certificate and another file containing
+its own CA certificate, which authenticates its public key.<P> 
+
+
+<li>Use <b>keytool</b> to import the certificates received from the CA.
+
+<P> Once you have received the two certificates from the 
+JCE Code Signing Certification Authority, you can use <b>keytool</b> 
+to import them into your keystore.
+
+<P> First import
+the CA's certificate as a "trusted certificate":
+
+<blockquote>
+<pre>
+keytool -import -alias &lt;alias for the CA cert&gt; 
+        -file &lt;CA cert file name&gt; 
+        -keystore &lt;keystore file name&gt; 
+        -storepass &lt;keystore password&gt;
+</pre>
+</blockquote>
+
+Then import the code-signing certificate:
+   
+<blockquote>
+<pre>
+keytool -import -alias &lt;alias&gt; 
+        -file &lt;code-signing cert file name&gt;
+        -keystore &lt;keystore file name&gt; 
+        -storepass &lt;keystore password&gt;
+</pre>
+</blockquote>
+
+Here, <code>&lt;alias&gt;</code> is the same alias as that which you created in 
+step 1 where you generated a DSA keypair. This command replaces
+the self-signed certificate in the keystore entry specified by
+<code>&lt;alias&gt;</code> with the one signed by the JCE Code Signing 
+Certification Authority.
+
+</ol>
+
+<P> Now that you have in your keystore a certificate from
+an entity trusted by JCE (the JCE Code Signing Certification Authority),
+you can place your provider code in a JAR file 
+(<a href = "#Step 5b">Step 5b</a>) and then use that certificate to 
+sign the JAR file (<a href = "#Step 5c">Step 5c</a>).
+
+</blockquote>
+
+
+<H3><a name="Step 5b">Step 5b: Place Your Provider in a JAR File</a></H3>
+
+<blockquote>
+
+<P> Place your provider code in a JAR file, in preparation
+for signing it in the next step. 
+For more information on the <b>jar</b> tool, see <b>jar</b> 
+(<a href="../../../tooldocs/solaris/jar.html">for Solaris</a>) 
+(<a href="../../../tooldocs/windows/jar.html">for Microsoft Windows</a>).
+
+<pre>
+jar cvf &lt;JAR file name&gt; &lt;list of classes, separated by spaces&gt;
+</pre>
+ 
+<P> This command creates a JAR file with the specified name containing
+the specified classes.
+
+</blockquote>
+
+
+<H3><a name="Step 5c">Step 5c: Sign Your Provider</a></H3>
+
+<blockquote>
+
+<P> Sign the JAR file created in the previous step
+with the code-signing certificate obtained
+in <a href = "#Step 5a">Step 5a</a>.
+For more information on the <b>jarsigner</b> tool, see <b>jarsigner</b> 
+(<a href="../../../tooldocs/solaris/jarsigner.html">for Solaris</a>) 
+(<a href="../../../tooldocs/windows/jarsigner.html">for Microsoft Windows</a>).
+
+<blockquote>
+<pre>
+jarsigner -keystore &lt;keystore file name&gt; 
+          -storepass &lt;keystore password&gt;
+          &lt;JAR file name&gt; &lt;alias&gt;
+</pre>
+</blockquote>
+
+<P> Here, <code>&lt;alias&gt;</code> is the alias into the keystore for the
+entry containing the code-signing certificate received from the
+JCE Code Signing Certification Authority (the same alias as that
+specified in the commands in <a href = "#Step 5a">Step 5a</a>).
+
+<P> You can test verification of the signature via the following:
+
+<blockquote>
+<pre>
+jarsigner -verify &lt;JAR file name&gt; 
+</pre>
+</blockquote>
+
+<P> The text "jar verified" will be displayed if the verification
+was successful.
+
+</blockquote>
+
+
+<H3><a name="Step 5d">Step 5d: Install the Provider</a></H3>
+
+<blockquote>
+
+In order to prepare for testing your provider, you must
+install it in the same manner as will be done by
+clients wishing to use it. The installation enables 
+Java Security to find your algorithm implementations
+when clients request them.
+
+<P> Installing a provider is done in two steps: installing the provider
+package classes, and configuring the provider.
+
+
+<H4><a name="InstallProv">Installing the Provider Classes</a></H4>
+
+<blockquote>
+
+The first thing you must do is make your classes available 
+so that they can be found when requested. 
+You ship your provider classes as a JAR (Java ARchive) file.
+There are a two possible ways to install provider classes:
+<UL>
+  <LI>Install the JAR file containing the provider classes as an
+        "installed" or "bundled" extension.</LI>
+  <LI>Place the JAR file containing the provider classes 
+        in your CLASSPATH.</LI>
+</UL>
+
+
+<P>The provider JAR file will be considered an installed
+extension if it is placed in 
+the standard place for the JAR files of an installed extension:
+<blockquote><pre>
+&lt;java-home&gt;/lib/ext         [Solaris]
+&lt;java-home&gt;\lib\ext         [Windows]
+</pre></blockquote>
+<p>
+
+<P> Here <tt>&lt;java-home&gt;</tt> refers to the directory where the 
+runtime software is installed, which is the top-level directory of the 
+Java<SUP><FONT SIZE="-2">TM</FONT></SUP> 2 Runtime Environment (JRE)
+or the <tt>jre</tt> directory in the 
+Java<SUP><FONT SIZE="-2">TM</FONT></SUP> 2 SDK (Java 2 SDK) software. 
+For example, if you have the Java 2 SDK, v 1.4 
+installed on Solaris in a directory named <code>/home/user1/J2SDK1.4.0</code>,
+or on Microsoft Windows in a directory named <code>C:\J2SDK1.4.0</code>, then you
+need to install the JAR file in the following directory:
+
+<blockquote><pre>
+/home/user1/J2SDK1.4.0/jre/lib/ext    [Solaris]
+C:\J2SDK1.4.0\jre\lib\ext             [Windows]
+</pre></blockquote>
+
+<P> Similarly, if you have the JRE, v 1.4 
+installed on Solaris in a directory named <code>/home/user1/j2re1.4.0</code>,
+or on Microsoft Windows in a directory named <code>C:\j2re1.4.0</code>, 
+you need to install the JAR file in the following directory:
+
+<blockquote><pre>
+/home/user1/j2re1.4.0/lib/ext         [Solaris]
+C:\j2re1.4.0\lib\ext                  [Windows]
+</pre></blockquote>
+
+
+<P> For more information on "installed" extensions, see 
+<a href ="../../extensions/spec.html#installed">Installed Extensions</a>. 
+
+<P> For more information on "bundled" extensions, see 
+<a href ="../../extensions/spec.html#bundled">Bundled Extensions</a>.
+
+</blockquote>
+
+
+<H4><a name="Configuring">Configuring the Provider</a></H4>
+
+<blockquote>
+
+<p>The next step is to add the provider to your list of approved
+providers. This is done statically by editing the security properties file
+
+<blockquote><pre>
+&lt;java-home&gt;/lib/security/java.security     [Solaris]
+&lt;java-home&gt;\lib\security\java.security     [Windows]
+</pre></blockquote>
+
+<p>Here <tt>&lt;java-home&gt;</tt> refers to the directory where the JRE
+was installed. For example, if you have the Java 2 SDK v 1.4 
+installed on Solaris in a directory named <code>/home/user1/J2SDK1.4.0</code>, 
+or on Microsoft indows in a directory named <code>C:\J2SDK1.4.0</code>, then you
+need to edit the following file:
+
+<blockquote><pre>
+/home/user1/J2SDK1.4.0/jre/lib/security/java.security  [Solaris]
+C:\J2SDK1.4.0\jre\lib\security\java.security           [Windows]
+</pre></blockquote>
+
+<p>Similarly, if you have the Java 2 Runtime Environment, v 1.4
+installed on Solaris in a directory named <code>/home/user1/j2re1.4.0</code>, 
+or on Windows in a directory named <code>C:\j2re1.4.0</code>, then you
+need to edit this file:
+
+<blockquote><pre>
+/home/user1/j2re1.4.0/lib/security/java.security       [Solaris]
+C:\j2re1.4.0\lib\security\java.security                [Windows]
+</pre></blockquote>
+
+<p>For each provider, this file should have a statement
+of the following form:
+
+<pre>
+    security.provider.<i>n</i>=<i>masterClassName</i>
+</pre>
+
+<p>This declares a provider, and specifies its preference order
+<i>n</i>. The preference order is the order in which providers are
+searched for requested algorithms when no specific provider is 
+requested. The order is 1-based; 1 is the most preferred, followed
+by 2, and so on.
+
+<p><i>masterClassName</i> must specify the fully qualified
+name of the provider's "master
+class", which you implemented in <a href = "#Step 3">Step 3</a>. 
+This class is always a subclass of the Provider
+class.
+
+<p>The Java 2 SDK, v 1.4 comes standard with a provider named "SUN", which is
+automatically configured as a static provider in the
+<code>java.security</code> properties file, as follows:
+
+<blockquote>
+<pre>
+security.provider.1=sun.security.provider.Sun
+</pre>
+</blockquote>
+
+<p>(The "SUN" provider's master class is the 
+<code>Sun</code> class in the <code>sun.security.provider</code>
+package.)
+
+<p>The JCE provider "SunJCE" and other security-related providers 
+shipped with the Java 2 platform are
+also automatically configured as static providers.
+
+<P> To utilize another JCE provider, add a line registering the
+alternate provider, giving it whatever preference order you prefer
+(and making corresponding adjustments to the other providers'
+orders, if needed).
+
+<p>Suppose that your master class is the <code>CryptoX</code> class in the
+<code>com.cryptox.provider</code> package,
+and that you would like to make your provider the second
+preferred provider. To do so, add the following line to the 
+<code>java.security</code> file below the line for the "SUN"
+provider, and increment the preference order numbers for all other
+providers whose numbers were greater than or equal to 2 before
+your addition:
+
+<pre>
+    security.provider.2=com.cryptox.provider.CryptoX
+</pre>
+
+<B>Note:</B> Providers may also be registered dynamically. To do so, 
+a program (such as your test program, to be written in 
+<a href = "#Step 6">Step 6</a>) 
+can call either the <code>addProvider</code> or
+<code>insertProviderAt</code> method in the <code>Security</code> class.
+This type of registration is not persistent and can only be
+done by code which is granted the following permission:
+
+<blockquote>
+<pre>
+java.security.SecurityPermission "insertProvider.{name}"
+</pre>
+</blockquote>
+
+where <code>{name}</code> is replaced by the actual provider name.
+For example, if the provider name is "MyJCE" and if the
+provider's code is in the <code>myjce_provider.jar</code> file in the 
+<code>/localWork</code> directory, then here is a sample policy file
+<code>grant</code> statement granting that permission:
+
+<blockquote>
+<pre>
+grant codeBase "file:/localWork/myjce_provider.jar" {
+  permission java.security.SecurityPermission
+      "insertProvider.MyJCE";
+};
+</pre>
+</blockquote>
+
+ 
+
+</blockquote>
+
+</blockquote>
+
+
+<H3><a name="Step 5e">Step 5e: Set Provider Permissions</a></H3>
+
+<blockquote>
+
+<P> Whenever JCE providers are not installed extensions, <a href = "../permissions.html">
+permissions</a> must be granted for when applets or applications using JCE 
+are run while a security manager is installed.
+There is typically a security manager installed whenever an applet is 
+running, and a security manager may be installed for an application 
+either via code in the application itself or via a command-line argument.
+Permissions do not need to be granted to installed extensions,
+since the default system <a href =
+"../PolicyFiles.html">
+policy file</a>
+grants all permissions to installed extensions.
+
+<P> Whenever a client does not install your provider as an installed 
+extension, your provider may need the following 
+permissions granted to it in the client environment:
+
+<P> 
+
+<ul>
+<li> <code>java.lang.RuntimePermission</code> to get class protection domains.
+The provider may need to get its own protection domain in the process
+of doing self-integrity checking.
+<li> <code>java.security.SecurityPermission</code> to set provider properties.
+</ul>
+
+<P> To ensure your provider works when a security manager is
+installed and the provider is not an installed extension, 
+you need to test such an installation and execution environment. 
+In addition, prior to testing you need to grant appropriate permissions to your provider
+and to any other providers it uses. For example, 
+a sample statement granting permissions to a provider whose
+name is "MyJCE" and whose code is in <code>myjce_provider.jar</code> appears
+below. Such a statement could appear in a 
+policy file. In this example, the
+<code>myjce_provider.jar</code> file is assumed
+to be in the <code>/localWork</code> directory.
+
+<blockquote>
+<pre>
+grant codeBase "file:/localWork/myjce_provider.jar" {
+  permission java.lang.RuntimePermission "getProtectionDomain";
+  permission java.security.SecurityPermission
+      "putProviderProperty.MyJCE";
+};
+</pre>
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+
+<H2><a name="Step 6">Step 6: Write and Compile your Test Programs</a></H2>
+
+<blockquote>
+
+Write and compile one or more test programs that test your provider's 
+incorporation into the Security API as well as the correctness 
+of its algorithm(s). Create any supporting files needed,
+such as those for test data to be encrypted.
+
+<p>The first tests your program should perform are ones
+to ensure that your provider is found, and that its name,
+version number, and additional information is as expected. To do so,
+you could write code like the following, substituting your
+provider name for <code>MyPro</code>:
+
+<pre>
+    import java.security.*;
+
+    Provider p = Security.getProvider("MyPro");
+    
+    System.out.println("MyPro provider name is " + p.getName());
+    System.out.println("MyPro provider version # is " + p.getVersion());
+    System.out.println("MyPro provider info is " + p.getInfo());
+</pre>
+
+<p>Next, you should ensure that your services are found.
+For instance, if you implemented the DES encryption
+algorithm, you could check to ensure it's found when requested by
+using the following code (again substituting your
+provider name for "MyPro"):
+
+<pre>
+    Cipher c = Cipher.getInstance("DES", "MyPro");
+
+    System.out.println("My Cipher algorithm name is " + c.getAlgorithm());
+</pre>
+
+<p>If you don't specify a provider name in the call to
+<code>getInstance</code>, all registered providers will be searched, in
+preference order (see <a href = "#Configuring">Configuring the Provider</a>),
+until one implementing the algorithm is found. 
+
+<P> If your provider implements an exemption mechanism, you should
+write a test applet or application that uses the exemption mechanism.
+Such an applet/application also needs to be signed, and needs to have
+a "permission policy file" bundled with it. See 
+<a href="JCERefGuide.html#ExemptApps">How to Make Applications "Exempt" 
+from Cryptographic Restrictions</a> 
+in the <i>Java Cryptography Extension (JCE) Reference Guide</i> 
+for complete information on 
+creating and testing such an application.
+
+</blockquote>
+
+
+<H2><a name="Step 7">Step 7: Run your Test Programs</a></H2>
+
+<blockquote>
+
+<p>Run your test program(s). Debug your code and continue testing as
+needed. If the Java Security API cannot seem to find one of your
+algorithms, review the steps above and ensure they are all
+completed.
+
+<P> Be sure to include testing of your programs using different
+installation options (e.g. making the provider an installed extension
+or placing it on the class path) and execution environments
+(with or without a security manager running). Installation options
+are discussed in <a href = "#Step 5d">Step 5d</a>. 
+In particular, you need to ensure your provider works when a security manager is
+installed and the provider is not an installed extension --
+and thus the provider must have permissions granted to it; therefore,  
+you need to test such an installation and execution environment,
+after granting required permissions to your provider
+and to any other providers it uses, as described in
+<a href = "#Step 5e">Step 5e</a>.
+
+<p>If you find during testing that your code needs modification, 
+make the changes, recompile (<a href = "#Step 4">Step 4</a>),
+place the updated provider code in a JAR file 
+(<a href = "#Step 5b">Step 5b</a>), sign the JAR file
+(<a href = "#Step 5c">Step 5c</a>), re-install the provider
+(<a href = "#Step 5d">Step 5d</a>), if needed fix or add to the
+permissions (<a href = "#Step 5e">Step 5e</a>), and then re-test
+your programs. Repeat these steps as needed.
+
+</blockquote>
+
+
+<H2><a name="Step 8">Step 8: Apply for U.S. Government Export Approval
+If Required</a></H2>
+
+<blockquote>
+
+<P> All U.S. vendors whose providers may be exported outside
+the U.S. should apply to the Bureau of Export Administration 
+in the U.S. Department of Commerce for export approval.
+Please consult your export
+counsel for more information.
+
+<P> <B>Note:</B> If your provider calls <code>Cipher.getInstance()</code> 
+and the returned <code>Cipher</code> object needs to perform strong cryptography 
+regardless of what
+cryptographic strength is allowed by the user's downloaded
+jurisdiction policy files, you should include a copy of the
+<code>cryptoPerms</code> permission policy file which you intend
+to bundle in the JAR file for your provider and which
+specifies an appropriate permission for the required cryptographic strength.
+The necessity for this file is just like the requirement that applets and
+applications "exempt" from cryptographic restrictions must include
+a <code>cryptoPerms</code> permission policy file in their
+JAR file. For more information on the creation and inclusion of
+such a file, see 
+<a href="JCERefGuide.html#ExemptApps">How to Make Applications "Exempt" 
+from Cryptographic Restrictions</a> 
+in the <i>Java Cryptography Extension (JCE) Reference Guide</i>.
+
+
+<P> Here are two URLs that may be useful:
+
+<ul>
+<li>U.S. Department of Commerce: 
+<a href = "http://www.doc.gov">http://www.doc.gov</a> <P> 
+<li>Bureau of Export Administration: 
+<a href = "http://www.bxa.doc.gov">http://www.bxa.doc.gov</a> 
+</ul>
+
+</blockquote>
+
+
+<H2><a name="Step 9">Step 9: Document your Provider and its Supported Services</a></H2>
+
+<blockquote>
+
+The next step is to write documentation for your clients. At the
+minimum, you need to specify:
+
+<ul>
+
+<li>the name programs should use to refer to your provider.
+<B>Note:</B> As of this writing, provider name searches are
+<b>case-sensitive</b>. That is, if your master class
+specifies your provider name as "CryptoX" but a user requests
+"CRYPTOx", your provider will not be found. This behavior may
+change in the future, but for now be sure to warn your
+clients to use the exact case you specify.<p>
+
+<li>the types of algorithms and other services implemented by your provider.<p>
+
+<li>instructions for installing the provider, similar to those provided
+in <a href = "#Step 5d">Step 5d</a>, except that the information and
+examples should be specific to your provider.<P> 
+
+<li>the permissions your provider will require if it is not installed
+as an installed extension and if a security manager is run,
+as described in <a href = "#Step 5e">Step 5e</a>.
+
+</ul>
+
+In addition, your documentation should specify anything else of
+interest to clients, such as any default algorithm parameters.
+
+
+<H4>MACs</H4>
+
+<p>For each MAC algorithm, tell whether or not
+your implementation is cloneable. This is not technically
+necessary, but it may save clients some time and coding
+by telling them
+whether or not intermediate "message authentication codes" (MACs)
+may be possible through
+cloning. Clients who do not know whether or not a MAC implementation is
+cloneable can find out by attempting
+to clone the <code>Mac</code> object and catching the
+potential exception, as illustrated by the following example:
+
+<pre>
+try {
+    // try and clone it
+    /* compute the MAC for i1 */
+    mac.update(i1); 
+    byte[] i1Mac = mac.clone().doFinal();
+
+    /* compute the MAC for i1 and i2 */
+    mac.update(i2); 
+    byte[] i12Mac = mac.clone().doFinal(); 
+
+    /* compute the MAC for i1, i2 and i3 */
+    mac.update(i3); 
+    byte[] i123Mac = mac.doFinal();
+} catch (CloneNotSupportedException cnse) {
+  // have to use an approach not involving cloning
+}
+</pre>
+
+where 
+
+<ul>
+
+<li><code>mac</code> is the MAC object they
+received when they requested one via a call to 
+<code>Mac.getInstance</code>,<p>
+
+<li><code>i1</code>,
+<code>i2</code> and <code>i3</code> are input byte arrays, and<p>
+
+<li>they want to calculate separate hashes for:
+
+<ul>
+<li><code>i1</code>
+<li><code>i1 and i2</code>
+<li><code>i1, i2, and i3</code>
+
+</ul>
+
+</ul>
+
+
+<H4>Key Pair Generators</H4>
+
+<p>For a key pair generator algorithm, 
+in case the client does not explicitly initialize the key pair generator
+(via a call to an <code>initialize</code> method), 
+each provider must supply and document a default initialization.
+For example, the Diffie-Hellman key pair generator supplied by the "SunJCE"
+provider uses a default prime modulus size (<code>keysize</code>) of 1024 bits.
+
+
+<H4>Key Factories</H4>
+
+A provider should document all the key specifications supported by its
+(secret-)key factory.
+
+
+<H4>Algorithm Parameter Generators</H4>
+
+In case the client does not explicitly initialize the algorithm
+parameter generator (via a call to an <code>init</code> method in the
+<code>AlgorithmParameterGenerator</code> engine class), each provider must supply
+and document a default initialization.  For example, the "SunJCE"
+provider uses a default prime modulus size (<code>keysize</code>) of 1024 bits for
+the generation of Diffie-Hellman parameters.
+
+</blockquote>
+
+
+<H2><a name="Step 10">Step 10: Make your Provider Software and 
+Documentation Available to Clients</a></H2>
+
+<blockquote>
+
+The final step is to make your provider software and documentation 
+available to your customers.
+
+</blockquote>
+
+</blockquote>
+
+<br>
+
+<H1><a name="MutualAuth">How a Provider Can Do Self-Integrity Checking</a></H1>
+
+<blockquote>
+
+Each provider should do self-integrity checking to ensure that the JAR file 
+containing its code has not been tampered with, for example in an attempt 
+to invoke provider methods directly rather than through JCE. Providers that 
+provide implementations for JCE services must be digitally signed and should
+be signed with a certificate issued by "trusted" Certification Authorities. 
+Currently, the following two Certification Authorities are considered 
+"trusted": 
+<UL>
+ <LI>Sun Microsystems' JCE Code Signing CA, and 
+ <LI>IBM JCE Code Signing CA. 
+</UL>
+
+Please refer to <a href = "#Step 5b">Step 5b</a> 
+for detailed information on how to get a  
+code-signing certificate from Sun Microsystems' 
+JCE Code Signing CA and the certificate of that CA. 
+<P>
+After getting the signing certificate from above Certification Authority, 
+provider packages should embed within themselves the bytes for its own 
+signing certificate, for example in an array like the 
+<code>bytesOfProviderCert</code> array referred to in the 
+<a href="#ChainRoots">Identifying Each of the Signers and 
+Determining If One is Trusted</a> section below. 
+At runtime, the embedded certificate will be used in 
+determining whether or not the provider code is authentic.  
+
+<P> The basic approach a provider can use to check its own
+integrity is:
+
+<ol>
+<li> Determine the URL of the JAR file containing the provider code, and<P> 
+<li> Verify the JAR file's digital signatures to 
+ensure that at least one signer of each entry of
+the JAR file is trusted.
+</ol>
+
+<P> Each of these steps is described in the following sections:
+
+<dl>
+<dt>
+<a href="#FindJFBasics"><b>Finding the Provider JAR File: Basics</b></a>
+
+  <dd>
+  <a href="#FindJFURL"><b>Determining the Provider's JAR File URL</b></a>
+
+  <dd>
+  <a href="#CreateJarFile"><b>Creating a JarFile Referring to the JAR File</b></a>
+</dl>
+
+
+<dl>
+<dt>
+<a href="#VerifyJFBasics"><b>Verifying the Provider JAR File: Basics</b></a>
+
+  <dd>
+  <a href="#VerifySetup"><b>Verification Setup</b></a>
+
+  <dd>
+  <a href="#CheckJARFile"><b>JAR File Signature Check</b></a>
+  
+  <dd>
+  <a href="#VerifySigs"><b>Verifying Signatures</b></a>
+
+  <dd>
+  <a href="#JCEAuthTrust"><b>Ensuring Signers Are Trusted</b></a>
+
+    <dl>
+       <dd>
+       <a href="#GetSignerCerts"><b>Getting the List of Certificates</b></a>
+       <dd>
+       <a href="#ChainRoots"><b>Identifying Each of the Signers and 
+       Determining If One is Trusted</b></a>
+    </dl>
+</dl>
+<dl>
+  <dt>
+  <a href="#SampleCodeNotes"><b>Notes on the Sample Code</b></a>
+</dl>
+
+<blockquote>
+<hr>
+<B>Note:</B> The sample code 
+<A HREF="MyJCE.java"><B><code>MyJCE.java</code></B></A>
+is a complete code example that implements these steps.
+You can download this code for your reference. The 
+<a href="#SampleCodeNotes">Notes on the Sample Code</a> 
+section traces how these concepts are implemented in the sample code. 
+<hr>
+</blockquote>
+
+<blockquote>
+<hr>
+<b>IMPORTANT NOTE: </b>
+
+<p>In JCE 1.2.1, providers needed to include code to authenticate 
+the JCE framework to assure themselves of the integrity and
+authenticity of the JCE that they plugged into. Now that JCE
+is integrated into the Java 2 SDK, v 1.4, this is no longer necessary.
+
+<p>One implication is that a provider written just for JCE 1.2.1
+will not work in the Java 2 SDK, v 1.4 because the provider's JCE
+framework authentication check will not work; the JCE framework 
+code is no longer where the provider expects it to be.
+If you want your provider to work only with the Java 2 SDK, v 1.4,
+it should not have code to authenticate the JCE framework.
+On the other hand, if you want your provider to work both with
+JCE 1.2.1 and with the JCE in the Java 2 SDK, v 1.4, then add a
+conditional statement. This way the provider
+code to authenticate the JCE framework is executed only when
+the provider is run with JCE 1.2.1. 
+The following is sample code:
+
+<blockquote>
+<pre>
+Class cipherCls = Class.forName("javax.crypto.Cipher");
+CodeSource cs = 
+    cipherCls.getProtectionDomain().getCodeSource();
+if (cs != null) {
+    // Authenticate JCE framework
+    . . .
+}
+</pre>
+</blockquote>
+<hr> 
+</blockquote>
+
+
+
+<H2><a name="FindJFBasics">Finding the Provider JAR File: Basics</H2></a>
+
+<blockquote>
+
+<a name="FindJFURL"></a>
+<H3>Determining the Provider's JAR File URL</H3>
+
+<blockquote>
+
+<P> The URL for the provider's JAR file can be
+obtained by determining the provider's <code>CodeSource</code> and then
+calling the <code>getLocation</code> method on the <code>CodeSource</code>.
+
+<blockquote>
+<pre>
+URL providerURL = (URL) AccessController.doPrivileged(
+                            new PrivilegedAction) {
+    public Object run() {
+        CodeSource cs = MyJCE.class.getProtectionDomain().
+                                    getCodeSource();
+        return cs.getLocation();
+    }
+});
+</pre>
+</blockquote>
+
+</blockquote>
+
+<H3><a name="CreateJarFile">Creating a JarFile Referring to the 
+JAR File</a></H3>
+
+<blockquote>
+
+<P> Once you have the URL for the provider's JAR file, you can
+create a <code>java.util.jar.JarFile</code>
+referring to the JAR file. 
+This instance is needed in the 
+step for <a href="#VerifyJFBasics">verifying the Provider JAR file</a>.
+<P> 
+To create the JAR file, first open a connection
+to the specified URL by calling its <code>openConnection</code>
+method. Since the URL is a JAR URL, the type is 
+<code>java.net.JarURLConnection</code>. Here's the basic code:
+
+<blockquote>
+<pre>
+// Prep the url with the appropriate protocol.
+jarURL = 
+    url.getProtocol().equalsIgnoreCase("jar") ?
+    url : 
+    new URL("jar:" + url.toString() + "!/");
+// Retrieve the jar file using JarURLConnection
+JarFile jf = (JarFile) AccessController.doPrivileged(
+	                 new PrivilegedExceptionAction() {
+    public Object run() throws Exception { 
+        <B>JarURLConnection conn = 
+              (JarURLConnection) jarURL.openConnection();</B>
+        ...   
+</pre>
+</blockquote>
+
+Now that you have a <code>JarURLConnection</code>, you can call its
+<code>getJarFile</code> method to get the JAR file:
+
+<blockquote>
+<pre>
+// Always get a fresh copy, so we don't have to
+// worry about the stale file handle when the
+// cached jar is closed by some other application.
+conn.setUseCaches(false);
+<B>jf = conn.getJarFile();</B>
+</pre>
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+<H2><a name="VerifyJFBasics">Verifying the Provider JAR File: Basics</H2></a>
+
+<blockquote>
+
+<P> Once you have determined the URL for your provider 
+JAR file and you have created a <code>JarFile</code> 
+referring to the JAR file, as shown in the steps above,
+you can then verify the file.
+
+<P> The basic approach is:
+
+<ol>
+<li>Ensure that at least one of each entry's signer's 
+certificates is equal to the provider's own code signing certificate.<P> 
+<li>Go through all the entries in the JAR file and ensure the 
+signature on each one verifies correctly.<P> 
+<li>Ensure that at least one of each entry's signer's certificates can be
+traced back to a trusted Certification Authority.
+</ol>
+
+<P> Sample code for each of these steps is presented
+and described in the following sections:
+
+<dl>
+  <dt>
+  <a href="#VerifySetup"><b>Verification Setup</b></a>
+
+  <dt>
+  <a href="#CheckJARFile"><b>JAR File Signature Check</b></a>
+  
+  <dt>
+  <a href="#VerifySigs"><b>Verifying Signatures</b></a>
+
+  <dt>
+  <a href="#JCEAuthTrust"><b>Ensuring Signers Are Trusted</b></a>
+
+       <dd>
+       <a href="#GetSignerCerts"><b>Getting the List of Certificates</b></a>
+       <dd>
+       <a href="#ChainRoots"><b>Identifying Each of the Signers and 
+       Determining If One is Trusted</b></a>
+</dl>
+
+
+<br>
+
+
+<H3><a name="VerifySetup">Verification Setup</H3></a>
+
+<P> 
+Our approach is to define a class <code>JarVerifier</code> to 
+handle the retrieval of a JAR file from a given URL and verify 
+whether the JAR file is signed with the specified certificate. 
+<P>
+The constructor of <code>JarVerifier</code> takes the provider 
+URL as a parameter which will be used to retrieve the JAR file later. 
+<P>
+The actual jar verification is implemented in the 
+<code>verify</code> method which takes the provider code signing 
+certificate as a parameter. 
+
+<blockquote>
+<pre>
+public void verify(X509Certificate targetCert) 
+	 throws IOException {
+    // variable 'jarFile' is a JarFile object created
+    // from the provider's Jar URL.
+    ...
+    Vector entriesVec = new Vector();
+</pre>
+</blockquote>
+
+Basically the 
+<code>verify</code> method will go through the JAR file 
+entries twice: 
+the first time checking the signature on each entry 
+and the second time verifying the signer is trusted. 
+<P>
+<B>Note:</B> In our code snippets the <code>jarFile</code> variable 
+is the <code>JarFile</code> object of 
+the provider's jar file. 
+
+<H3><a name="CheckJARFile">JAR File Signature Check</H3></a>
+
+<P> An authentic provider JAR file is signed. So the JAR file 
+has been tampered with if it isn't signed:
+
+<blockquote>
+<pre>
+// Ensure the jar file is signed.
+Manifest man = jarFile.getManifest();
+if (man == null) {
+    throw new SecurityException("The provider is not signed");
+}
+</pre>
+</blockquote>
+
+
+<H3><a name="VerifySigs">Verifying Signatures</H3></a>
+
+<P> The next step is to go through all the entries in the JAR file 
+and ensure the signature on each one verifies correctly.
+One possible way to verify the signature on a JAR file entry
+is to simply read the file. If a JAR file is signed,
+the <code>read</code> method itself automatically
+performs the signature verification. Here is sample code:
+
+<blockquote>
+<pre>
+// Ensure all the entries' signatures verify correctly
+byte[] buffer = new byte[8192];
+Enumeration entries = jarFile.entries();
+	
+while (entries.hasMoreElements()) {
+    JarEntry je = (JarEntry) entries.nextElement();
+
+    // Skip directories.
+    if (je.isDirectory()) continue;
+    entriesVec.addElement(je);
+    InputStream is = jarFile.getInputStream(je);
+
+    // Read in each jar entry. A security exception will
+    // be thrown if a signature/digest check fails.
+    int n;
+    while ((n = is.read(buffer, 0, buffer.length)) != -1) {
+        // Don't care
+    }
+    is.close();
+}
+</pre>
+</blockquote>
+
+
+<H3><a name="JCEAuthTrust">Ensuring Signers Are Trusted</H3></a>
+
+<P> The code in the previous section verified the 
+signatures of all the provider JAR file entries. The 
+fact that they all verify correctly is a requirement,  
+but it is not sufficient to verify the authenticity 
+of the JAR file. A final requirement is that the signatures were 
+generated by the same entity as the one that developed this provider. 
+To test that the signatures are trusted, we can again go through each entry
+in the JAR file (this time using the <code>entriesVec</code>
+built in the previous step), and for each entry that
+must be signed (that is, each entry that is not a directory
+and that is not in the META-INF directory):
+
+<ol>
+<li>Get the list of signer certificates for the entry. 
+<li>Identify each of the certificate chains and determine 
+whether any of the certificate chains are 
+trusted. At least one of the certificate chains must be trusted.
+</ol>
+
+The loop setup is the following:
+
+<blockquote>
+<pre>
+Enumeration e = entriesVec.elements();
+while (e.hasMoreElements()) {
+    JarEntry je = (JarEntry) e.nextElement();
+    ...
+}
+</pre>
+</blockquote>
+
+
+<blockquote>
+
+<H4><a name="GetSignerCerts">Getting the List of Certificates</H4></a>
+
+<P> The certificates for the signers of a JAR file entry
+<code>JarEntry</code> can be obtained simply by calling the 
+<code>JarEntry</code> <code>getCertificates</code> method:
+
+<blockquote>
+<pre>
+Certificate[] certs = je.getCertificates();
+</pre>
+</blockquote>
+
+<P> Adding this line of code to the previous loop setup code, and
+adding code to ignore directories and files in the
+META-INF directory gives us:
+
+<blockquote>
+<pre>
+while (e.hasMoreElements()) {
+    JarEntry je = (JarEntry) e.nextElement();
+
+    // Every file must be signed except files in META-INF.
+    Certificate[] certs = je.getCertificates();
+    if ((certs == null) || (certs.length == 0)) {
+        if (!je.getName().startsWith("META-INF"))
+            throw new SecurityException("The provider " +
+                                        "has unsigned " +
+                                        "class files.");
+        } else {
+            // Check whether the file is signed by the expected
+            // signer. The jar may be signed by multiple signers.
+            // See if one of the signers is 'targetCert'.
+            ...
+        }
+   ...
+</pre>
+</blockquote>
+
+
+<H4><a name="ChainRoots">Identifying Each of the Signers and 
+Determining If One is Trusted</a></H4>
+
+
+<P> The certificate array returned by the <code>JarEntry</code> 
+<code>getCertificates</code> method contains one or more 
+<b>certificate chains</b>.
+There is one chain per signer of the entry. Each chain contains
+one or more certificates. Each certificate in a chain authenticates
+the public key in the previous certificate.
+<P>
+The first certificate in a chain is the signer's certificate which contains 
+the public key corresponding to the private key actually used to sign the 
+entry. Each subsequent certificate is a certificate for the issuer of the 
+previous certificate. Since the self-integrity check is based on whether 
+the JAR file is signed with the provider's signing cert, the trust decision 
+will be made upon only the first certificate, the signer's  
+certificate.
+<P> 
+We need to go through the array of certificate chains and  
+check each chain and the associated signers  
+until we find a <em>trusted</em> entity. For each JAR 
+file entry, at least one of the signers must be trusted. 
+A signer is considered "trusted" if and only if its certificate is 
+equals to the embedded provider signing certificate. 
+<P>
+The following sample code loops through all the certificate chains, 
+compares the first certificate in a chain to the embedded provider  
+signing certificate, and only returns <code>true</code> if a match is found.
+
+<blockquote>
+<pre>
+int startIndex = 0;
+X509Certificate[] certChain;
+boolean signedAsExpected = false;
+		
+while ((certChain = getAChain(certs, startIndex)) != null) {
+    if (certChain[0].equals(targetCert)) {
+        // Stop since one trusted signer is found.
+        signedAsExpected = true;
+        break;
+    }
+    // Proceed to the next chain.
+    startIndex += certChain.length;
+}
+		
+if (!signedAsExpected) {
+    throw new SecurityException("The provider " +
+                                "is not signed by a " +
+                                "trusted signer");
+}
+</pre>
+</blockquote>
+
+The <code>getAChain</code> method is defined as follows:
+ 
+<blockquote>
+<pre>
+/**
+ * Extracts ONE certificate chain from the specified certificate array
+ * which may contain multiple certificate chains, starting from index
+ * 'startIndex'.
+*/
+private static X509Certificate[] getAChain(Certificate[] certs,
+					   int startIndex) {	
+    if (startIndex > certs.length - 1)
+        return null;
+	
+    int i;
+    // Keep going until the next certificate is not the 
+    // issuer of this certificate.
+    for (i = startIndex; i &lt; certs.length - 1; i++) {
+        if (!((X509Certificate)certs[i + 1]).getSubjectDN().
+               equals(((X509Certificate)certs[i]).getIssuerDN())) {
+            break;
+        }
+    }
+
+    // Construct and return the found certificate chain.
+    int certChainSize = (i-startIndex) + 1;
+    X509Certificate[] ret = new X509Certificate[certChainSize];
+    for (int j = 0; j &lt; certChainSize; j++ ) {
+        ret[j] = (X509Certificate) certs[startIndex + j];
+    }
+    return ret;
+}
+</pre>
+</blockquote>
+</blockquote>
+</blockquote>
+
+<a name="SampleCodeNotes"></a>
+<H2>Notes on the Sample Code</H2>
+
+<blockquote>
+
+The sample code, <A HREF="MyJCE.java"><code>MyJCE.java</code></A>, is  
+a sample provider which has a method <code>selfIntegrityChecking</code> 
+which performs self-integrity checking. It first determines the URL 
+of its own provider JAR file and then verifies that the provider JAR file 
+is signed with the embedded code-signing certificate. 
+<P>
+<B>Note:</B> The method <code>selfIntegrityChecking</code> should be 
+called by all the constructors of its cryptographic engine classes 
+to ensure that its integrity is not compromised.
+
+<P>
+Provider <code>MyJCE</code> performs self-integrity checking in the 
+following steps:
+
+<OL>
+<LI>Determine the URL to access the provider JAR file using its 
+own class, <code>MyJCE.class</code>. <P>
+
+<LI>Instantiate a <code>JarVerifier</code> object with the 
+provider URL in Step 1. <P>
+
+<LI>Create a <code>X509Certificate</code> object from the 
+embedded byte array <code>bytesOfProviderCert</code>. <P>
+
+<LI>Call the <code>JarVerifier.verify</code> method to verify all 
+entries in the provider JAR file are signed and are signed with the 
+same certificate instantiated in Step 3.
+</OL>
+
+<B>Note:</B> The class <code>JarVerifier</code> will retrieve 
+the JAR file from the given URL, make sure the JAR file is signed, 
+all entries have valid signatures, and that entries are signed 
+with the specified <code>X509Certificate</code>.
+
+<P>
+A security exception is thrown by <code>JarVerifier.verify</code> 
+in several cases: 
+<UL>
+  <li>The certificate passed to <code>verify</code> is null (invalid).
+  <li>When unable to retrieve JAR file from the given URL.
+  <li>The provider is not signed. (The jar has no manifest.) 
+  <li>The provider has unsigned class files.
+  <li>The provider is not signed with the specified certificate.
+</UL>
+
+<P>
+The <A HREF="MyJCE.java"><code>MyJCE.java</code></A> sample code is 
+comprised of the code snippets shown above. In addition, it 
+includes error handling, sample code signing certificate bytes, and code for 
+instantiating a <code>X509Certificate</code> object from the embedded 
+sample code signing certificate bytes.
+<P>
+Regarding the use of 
+<code>AccessController.doPrivileged</code>, please see 
+<a href = "../doprivileged.html">API For Privileged Blocks</a> 
+for information on the use of <code>doPrivileged</code>. 
+
+</blockquote>
+</blockquote>
+
+<H1><a name="FurtherImplDetails">Further Implementation Details
+and Requirements</a></H1>
+
+<blockquote>
+
+<H2><a name="AlgAliases">Algorithm Aliases</a></H2>
+
+<blockquote>
+
+For many cryptographic algorithms, there is a single official "standard name."
+The standard names defined by JCE in the Java 2 SDK, v 1.4 are listed in
+<a href="JCERefGuide.html#AppA">Appendix A</a>
+of the <i>Java Cryptography Extension (JCE) Reference Guide</i>.
+
+<p>For example, <code>DiffieHellman</code> is the standard name for the
+Diffie-Hellman key agreement algorithm defined in PKCS #3. 
+
+<p>JCE uses the same aliasing scheme for algorithm names as the rest of
+the security products in the Java 2 SDK, v 1.4.
+That scheme enables clients to use
+aliases when referring to algorithms, rather than their standard names.
+For example, the "SunJCE" provider's master class
+(<code>SunJCE.java</code>) defines the alias "DH" for the key agreement whose
+standard name is <code>DiffieHellman</code>. Thus, the following statements are
+equivalent:
+
+<pre>
+    KeyAgreement ka = KeyAgreement.getInstance("DiffieHellman", "SunJCE");
+
+    KeyAgreement ka = KeyAgreement.getInstance("DH", "SunJCE");
+</pre>
+
+Aliases can be defined in your "master class" (see
+<a href = "#Step 3">Step 3</a>). To define an alias, create a property
+named
+
+<pre>
+    <code>Alg.Alias.</code><i>engineClassName.aliasName</i>
+</pre>
+
+<p>where <i><code>engineClassName</code></i> is either <code>Cipher</code>, 
+<code>KeyAgreement</code>, <code>KeyGenerator</code>,
+<code>Mac</code>, <code>SecretKeyFactory</code>, or 
+<code>ExemptionMechanism</code>, and
+<i><code>aliasName</code></i> is your alias name. For all but
+<code>ExemptionMechanism</code>, the <i>value</i> of the property
+must be the standard algorithm name for the algorithm being aliased.
+For <code>ExemptionMechanism</code>, the value is the exemption mechanism
+name (<code>KeyRecovery</code>, <code>KeyEscrow</code>, or 
+<code>KeyWeakening</code>).
+
+<p>As an example, the "SunJCE" provider 
+defines the alias "DH" for the key agreement
+algorithm whose standard name is "DiffieHellman" by setting a property
+named <code>Alg.Alias.KeyAgreement.DH</code> to have the value 
+<code>DiffieHellman</code> via the following:
+
+<pre>
+    put("Alg.Alias.KeyAgreement.DH", "DiffieHellman");
+</pre>
+
+<p>Currently, aliases defined by the "SunJCE" provider are available to
+all clients, no matter which provider clients request. For example, if
+you create a provider named "MyPro" that implements the
+Diffie-Hellman algorithm,
+then even if you don't define
+any aliases for it, the "DH" alias defined by "SunJCE" can be used
+to refer to your provider's Diffie-Hellman implementation as follows:
+
+<pre>
+    KeyAgreement ka = KeyAgreement.getInstance("DH", "MyPro");
+</pre>
+
+<p>
+
+</blockquote>
+
+
+<H2><a name="AlgDependencies">Service Interdependencies</a></H2>
+
+<blockquote>
+
+Some algorithms require the use of other types of algorithms.
+For example, a PBE algorithm usually needs to use a message
+digest algorithm in order to transform a password into a key.
+
+<p>If you are implementing one type of algorithm that requires
+another, you can do one of the following: 
+
+<ol>
+
+<li>Provide your own implementations for both.<p>
+
+<li>Let your implementation of one algorithm 
+use an instance of the other type of algorithm, as supplied by the 
+default "SUN" provider that is included
+with every Java 2 Platform installation. For example, if you
+are implementing a PBE algorithm that requires a message 
+digest algorithm, you can obtain an instance of a class 
+implementing the MD5 message digest algorithm by calling 
+
+<pre>
+    MessageDigest.getInstance("MD5", "SUN")
+</pre><p>
+
+<li>Let your implementation of one algorithm 
+use an instance of the other type of algorithm, as supplied by
+another specific provider. This is only appropriate if you are
+sure that all clients who will use your provider will also have 
+the other provider installed.<P>  
+
+<li>Let your implementation of one algorithm 
+use an instance of the other type of algorithm, as supplied by
+another (unspecified) provider. That is, you can request an algorithm
+by name, but without specifying any particular provider, as in
+
+<pre>
+    MessageDigest.getInstance("MD5")
+</pre>
+
+This is only appropriate if you are sure that there will be at
+least one implementation of the requested algorithm (in this case,
+MD5) installed on each Java platform where
+your provider will be used.
+
+</ol>
+
+</blockquote>
+
+
+<H2><a name="DefaultInits">Default Initializations</a></H2>
+
+<blockquote>
+
+<p>In case the client does not explicitly initialize a key pair generator
+or an algorithm parameter generator, each provider of such a service must 
+supply (and document) a default initialization.
+For example, the "SunJCE" provider uses a default modulus size (keysize)
+of 1024 bits for the generation of Diffie-Hellman parameters.
+
+</blockquote>
+
+
+<H2><a name="DHInts">Diffie-Hellman Interfaces and their Required Implementations</a></H2>
+
+<blockquote>
+
+JCE contains the following interfaces 
+(in the <code>javax.crypto.interfaces</code> package)
+for the convenience of programmers implementing Diffie-Hellman services:
+
+<ul>
+
+<li><a href="../../../api/javax/crypto/interfaces/DHKey.html">
+<code>DHKey</code></a>
+<li><a href="../../../api/javax/crypto/interfaces/DHPrivateKey.html">
+<code>DHPrivateKey</code></a>
+<li><a href="../../../api/javax/crypto/interfaces/DHPublicKey.html">
+<code>DHPublicKey</code></a>
+
+</ul>
+
+The following sections discuss requirements for implementations
+of these interfaces.
+
+<H4><a name = "DHPrivAndPubKeys">
+</a>
+<a href="../../../api/javax/crypto/interfaces/DHPrivateKey.html">
+<code>DHPrivateKey</code></a> and 
+<a href="../../../api/javax/crypto/interfaces/DHPublicKey.html">
+<code>DHPublicKey</code></a> Implementations</H4>
+
+<blockquote>
+
+If you implement a Diffie-Hellman key pair generator or key factory, you 
+need to create classes implementing the <code>DHPrivateKey</code> and 
+<code>DHPublicKey</code> interfaces. 
+
+<p>If you implement a Diffie-Hellman key pair generator, your 
+<code>generateKeyPair</code> method (in your 
+<code>KeyPairGeneratorSpi</code> subclass) will return instances
+of your implementations of those interfaces.
+
+<p>If you implement a Diffie-Hellman key factory, your
+<code>engineGeneratePrivate</code> method (in your 
+<code>KeyFactorySpi</code> subclass) will return an instance 
+of your <code>DHPrivateKey</code> implementation, and your 
+<code>engineGeneratePublic</code> method will return an instance 
+of your <code>DHPublicKey</code> implementation.
+
+<p>Also, your <code>engineGetKeySpec</code> and
+<code>engineTranslateKey</code> methods
+will expect the passed-in key to be an instance of
+a <code>DHPrivateKey</code> or <code>DHPublicKey</code> implementation.
+The <code>getParams</code> method provided by the interface
+implementations is useful for obtaining and extracting the
+parameters from the keys. You can then use the parameters, for example, 
+as parameters to the <code>DHParameterSpec</code> 
+constructor called to create a parameter specification from 
+parameter values used to initialize a 
+<code>KeyPairGenerator</code> object for Diffie-Hellman.
+
+<p>If you implement the Diffie-Hellman key agreement algorithm, your 
+<code>engineInit</code> method (in your 
+<code>KeyAgreementSpi</code> subclass) will expect to be passed a
+<code>DHPrivateKey</code> and your <code>engineDoPhase</code> method
+will expect to be passed a <code>DHPublicKey</code>.
+
+<p><B>Note:</B> The <code>DHPublicKey</code> and <code>DHPrivateKey</code> interfaces
+define a very generic, provider-independent interface to Diffie-Hellman public
+and private keys, respectively. The <code>engineGetKeySpec</code> and
+<code>engineTranslateKey</code> methods (in your <code>KeyFactorySpi</code> 
+subclass) could additionally check if the passed-in key is actually 
+an instance of their provider's own implementation
+of <code>DHPrivateKey</code> or <code>DHPublicKey</code>, e.g., to take advantage of provider-specific
+implementation details. The same is true for the Diffie-Hellman
+algorithm
+<code>engineInit</code> and <code>engineDoPhase</code> methods (in your 
+<code>KeyAgreementSpi</code> subclass).
+
+<p>To see what methods need to be implemented by classes that
+implement the <code>DHPublicKey</code> and <code>DHPrivateKey</code> interfaces, first
+note the following interface signatures:
+
+<P>
+  In the <code>javax.crypto.interfaces</code> package:
+<blockquote>
+<pre>
+public interface DHPrivateKey extends DHKey, 
+                                 java.security.PrivateKey
+
+public interface DHPublicKey extends DHKey, 
+                                 java.security.PublicKey
+
+public interface DHKey
+</pre>
+</blockquote>
+<P>
+  In the <code>java.security</code> package:
+<blockquote>
+<pre>
+public interface PrivateKey extends Key
+
+public interface PublicKey extends Key
+
+public interface Key extends java.io.Serializable
+</pre>
+</blockquote>
+
+To implement the <code>DHPrivateKey</code> and 
+<code>DHPublicKey</code> interfaces, you must implement the methods
+they define as well as those defined by interfaces they
+extend, directly or indirectly.  
+
+
+<p>Thus, for private keys, you need to supply a class that implements:
+
+<ul>
+
+<li>the <code>getX</code> method from the 
+<a href="../../../api/javax/crypto/interfaces/DHPrivateKey.html">
+<code>DHPrivateKey</code></a> interface.
+
+<li>the <code>getParams</code> method from the 
+<a href="../../../api/javax/crypto/interfaces/DHKey.html">
+javax.crypto.interfaces.DHKey</a> interface, since 
+<code>DHPrivateKey</code> extends <code>DHKey</code>.
+
+<li>the <code>getAlgorithm</code>, <code>getEncoded</code>, and 
+<code>getFormat</code> methods from the 
+<a href="../../../api/java/security/Key.html">
+java.security.Key</a> interface, since <code>DHPrivateKey</code> 
+extends <code>java.security.PrivateKey</code>, and <code>PrivateKey</code> 
+extends <code>Key</code>. 
+
+</ul>
+
+Similarly, for public Diffie-Hellman keys, you need to supply a class that 
+implements:
+
+<ul>
+
+<li>the <code>getY</code> method from the 
+<a href="../../../api/javax/crypto/interfaces/DHPublicKey.html">
+<code>DHPublicKey</code></a> interface.
+
+<li>the <code>getParams</code> method from the 
+<a href="../../../api/javax/crypto/interfaces/DHKey.html">
+<code>javax.crypto.interfaces.DHKey</code></a> interface, since 
+<code>DHPublicKey</code> extends <code>DHKey</code>.
+
+<li>the <code>getAlgorithm</code>, <code>getEncoded</code>, and 
+<code>getFormat</code> methods from the 
+<a href="../../../api/java/security/Key.html">
+java.security.Key</a> interface, since <code>DHPublicKey</code> 
+extends <code>java.security.PublicKey</code>, and <code>PublicKey</code> 
+extends <code>Key</code>.
+
+</ul>
+
+</blockquote>
+
+</blockquote>
+
+
+<H2><a name="AlgParamSpecs">Algorithm Parameter Specification Classes</a></H2>
+
+<blockquote>
+
+<p> An algorithm parameter specification is a transparent representation of 
+the sets of parameters used with an algorithm.
+
+<p>A <i>transparent</i> representation of parameters means that you can access
+each value individually, through one of the "get" methods defined
+in the corresponding specification class (e.g., <code>DHParameterSpec</code>
+defines <code>getP</code>, <code>getG</code>, and
+<code>getL</code> methods, to access the p, g, 
+and l parameters, respectively).
+
+<p>This is contrasted with an <i>opaque</i> representation, as supplied by the 
+<code>AlgorithmParameters</code> engine class, in which
+you have no direct access to the key material values;
+you can only get the name of the algorithm associated with the
+parameter set (via <code>getAlgorithm</code>) and some kind of encoding for
+the 
+parameter set (via <code>getEncoded</code>).
+
+<p>If you supply an <code>AlgorithmParametersSpi</code>, 
+<code>AlgorithmParameterGeneratorSpi</code>,
+or <code>KeyPairGeneratorSpi</code> implementation, you must utilize the 
+<code>AlgorithmParameterSpec</code> interface, since each of those classes 
+contain methods that take an <code>AlgorithmParameterSpec</code> parameter.
+Such methods need to determine which actual implementation of
+that interface has been passed in, and act accordingly.
+
+<p>JCE contains a number of <code>AlgorithmParameterSpec</code> implementations for
+the most frequently used cipher and key agreement algorithm parameters.
+If you are operating on
+algorithm parameters that should be for a different type of
+algorithm not provided by JCE, you will need to supply your own
+<code>AlgorithmParameterSpec</code> 
+implementation appropriate for that type of algorithm.
+
+<p>JCE defines the following algorithm parameter specification
+classes in the <code>javax.crypto.spec</code> package:
+
+
+<H3><a name="IvParameterSpec">The 
+<a href="../../../api/javax/crypto/spec/IvParameterSpec.html">
+<code>IvParameterSpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <code>AlgorithmParameterSpec</code> 
+interface) specifies the initialization vector (IV) used with 
+a cipher in feedback mode. 
+<P>
+<TABLE summary="method in IvParameterSpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Method in <code>IvParameterSpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>byte[] getIV()</code>
+</td>
+<td>Returns the initialization vector (IV).
+</td>
+</tr>
+</table>
+</blockquote>
+
+
+<H3><a name="PBEParameterSpec">The 
+<a href="../../../api/javax/crypto/spec/PBEParameterSpec.html">
+<code>PBEParameterSpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <code>AlgorithmParameterSpec</code> interface)
+specifies the set of parameters used with a password-based encryption (PBE)
+algorithm. 
+
+<P>
+<TABLE summary="methods in PBEParameterSpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>PBEParameterSpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>int getIterationCount()</code>
+</td>
+<td>Returns the iteration count.
+</td>
+</tr>
+<tr>
+<td><code>byte[] getSalt()</code>
+</td>
+<td>Returns the salt.
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+
+<H3><a name="RC2ParameterSpec">The 
+<a href="../../../api/javax/crypto/spec/RC2ParameterSpec.html">
+<code>RC2ParameterSpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <code>AlgorithmParameterSpec</code> interface)
+specifies the set of parameters used with 
+the RC2 algorithm.
+
+<P>
+<TABLE summary="RC2ParameterSpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>RC2ParameterSpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>boolean equals(Object obj)</code>
+<td>Tests for equality between the specified object and this object.
+</td>
+</tr>
+<tr>
+<td><code>int getEffectiveKeyBits()</code>
+</td>
+<td>Returns the effective key size in bits.
+
+</td>
+</tr>
+<tr>
+<td><code>byte[] getIV()</code>
+</td>
+<td>Returns the IV or null if this parameter set does not contain an IV.
+</td>
+</tr>
+
+<tr>
+<td><code>int hashCode()</code>
+<td>Calculates a hash code value for the object.
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+<H3><a name="RC5ParameterSpec">The 
+<a href="../../../api/javax/crypto/spec/RC5ParameterSpec.html">
+<code>RC5ParameterSpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <code>AlgorithmParameterSpec</code> interface)
+specifies the set of parameters used with 
+the RC5 algorithm. 
+
+<P>
+<TABLE summary="methods in RC5ParameterSpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>RC5ParameterSpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>boolean equals(Object obj)</code>
+<td>Tests for equality between the specified object and this object.
+</td>
+</tr>
+
+<tr>
+<td><code>byte[] getIV()</code>
+</td>
+<td>Returns the IV or null if this parameter set does not contain an IV.
+</td>
+</tr>
+
+<tr>
+<td><code>int getRounds()</code>
+</td>
+<td>Returns the number of rounds.
+</td>
+</tr>
+
+<tr>
+<td><code>int getVersion()</code>
+</td>
+<td>Returns the version.
+</td>
+</tr>
+
+<tr>
+<td><code>int getWordSize()</code>
+</td>
+<td>Returns the word size in bits.
+</td>
+</tr>
+
+<tr>
+<td><code>int hashCode()</code>
+<td>Calculates a hash code value for the object.
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+
+<H3><a name="DHParameterSpec">The 
+<a href="../../../api/javax/crypto/spec/DHParameterSpec.html">
+<code>DHParameterSpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <code>AlgorithmParameterSpec</code> interface)
+specifies the set of parameters used with 
+the Diffie-Hellman algorithm. 
+
+<P>
+<TABLE summary="Methods in DHParameterSpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>DHParameterSpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>BigInteger getG()</code>
+</td>
+<td>Returns the base generator <code>g</code>.
+</td>
+</tr>
+<tr>
+<td><code>int getL()</code>
+</td>
+<td>Returns the size in bits, <code>l</code>, of the random exponent (private value).
+</td>
+</tr>
+
+<tr>
+<td><code>BigInteger getP()</code>
+<td>Returns the prime modulus <code>p</code>.
+</td>
+</tr>
+</table>
+
+<p>Many types of Diffie-Hellman services will find this class useful; for
+example, it is used by the Diffie-Hellman key agreement, key pair
+generator, algorithm parameter generator, and algorithm parameters classes
+implemented by the "SunJCE" provider. As a specific example, an
+algorithm parameters implementation must include an implementation
+for the <code>getParameterSpec</code> method, which returns an
+<code>AlgorithmParameterSpec</code>. The Diffie-Hellman algorithm parameters implementation
+supplied by "SunJCE" returns an instance of the <code>DHParameterSpec</code> class.
+
+</blockquote>
+
+</blockquote>
+
+
+<H2><a name="KeySpecs">Key Specification Classes Required by Key Factories</a></H2>
+
+<blockquote>
+
+<p>Key specifications are transparent representations of the key material
+that constitutes a key. JCE defines the following key specification 
+classes in the <code>javax.crypto.spec</code> package:
+<a href = "#DHPrivateKeySpec"><code>DHPrivateKeySpec</code></a>,
+<a href = "#DHPublicKeySpec"><code>DHPublicKeySpec</code></a>,
+<a href = "#DESKeySpec"><code>DESKeySpec</code></a>, 
+<a href = "#DESedeKeySpec"><code>DESedeKeySpec</code></a>,  
+<a href = "#PBEKeySpec"><code>PBEKeySpec</code></a>, and 
+<a href = "#SecretKeySpec"><code>SecretKeySpec</code></a>.
+
+<H3><a name="DHPrivateKeySpec">The 
+<a href="../../../api/javax/crypto/spec/DHPrivateKeySpec.html">
+<code>DHPrivateKeySpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <a href = "../../../api/java/security/spec/KeySpec.html"><code>KeySpec</code></a> interface)
+specifies a Diffie-Hellman private key with its associated parameters.
+<P>
+<TABLE summary="methods in DHPrviateKeySpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>DHPrivateKeySpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>BigInteger getG()</code>
+</td>
+<td>Returns the base generator <code>g</code>.
+</td>
+</tr>
+<tr>
+<td><code>BigInteger getP()</code>
+</td>
+<td>Returns the prime modulus <code>p</code>.
+</td>
+</tr>
+
+<tr>
+<td><code>BigInteger getX()</code>
+<td>Returns the private value <code>x</code>.
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+
+<H3><a name="DHPublicKeySpec">The 
+<a href="../../../api/javax/crypto/spec/DHPublicKeySpec.html">
+<code>DHPublicKeySpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <a href = "../../../api/java/security/spec/KeySpec.html"><code>KeySpec</code></a> interface)
+specifies a Diffie-Hellman public key with its associated parameters.
+<P>
+<TABLE summary="methods in DHPublicKeySpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>DHPublicKeySpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>BigInteger getG()</code>
+</td>
+<td>Returns the base generator <code>g</code>.
+</td>
+</tr>
+<tr>
+<td><code>BigInteger getP()</code>
+</td>
+<td>Returns the prime modulus <code>p</code>.
+</td>
+</tr>
+
+<tr>
+<td><code>BigInteger getY()</code>
+<td>Returns the public value <code>y</code>.
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+
+<H3><a name="DESKeySpec">The 
+<a href="../../../api/javax/crypto/spec/DESKeySpec.html">
+<code>DESKeySpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <a href = "../../../api/java/security/spec/KeySpec.html"><code>KeySpec</code></a> interface)
+specifies a DES key.
+
+<P>
+<TABLE summary="methods in DESKeySpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>DESKeySpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>byte[] getKey()</code>
+</td>
+<td>Returns the DES key bytes. 
+</td>
+</tr>
+<tr>
+<td><code>static boolean isParityAdjusted(byte[] key, int offset)</code>
+</td>
+<td>Checks if the given DES key material is parity-adjusted.
+</td>
+</tr>
+
+<tr>
+<td><code>static boolean isWeak(byte[] key, int offset)</code>
+</td>
+<td>Checks if the given DES key material is weak or semi-weak.
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+
+<H3><a name="DESedeKeySpec">The 
+<a href="../../../api/javax/crypto/spec/DESedeKeySpec.html">
+<code>DESedeKeySpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class (which implements the <a href = "../../../api/java/security/spec/KeySpec.html"><code>KeySpec</code></a> interface)
+specifies a DES-EDE (Triple DES) key. 
+
+<P>
+<TABLE summary="methods in DESedeKeySpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>DESedeKeySpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>byte[] getKey()</code>
+</td>
+<td>Returns the DES-EDE key.
+</td>
+</tr>
+
+<tr>
+<td><code>static boolean isParityAdjusted(byte[] key, int offset)</code>
+</td>
+<td>Checks if the given DES-EDE key is parity-adjusted.
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+
+<H3><a name="PBEKeySpec">The 
+<a href="../../../api/javax/crypto/spec/PBEKeySpec.html">
+<code>PBEKeySpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class implements the 
+<a href = "../../../api/java/security/spec/KeySpec.html"><code>KeySpec</code></a> 
+interface. A user-chosen password can be used with password-based 
+encryption (PBE); the password can be viewed as a type of raw key 
+material. An encryption mechanism that uses this class can 
+derive a cryptographic key from the raw key material. 
+
+<P>
+<TABLE summary="methods in PBEKeySpec" BORDER=1>
+
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>PBEKeySpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>void clearPassword</code>
+</td>
+<td>Clears the internal copy of the password.
+
+</td>
+</tr>
+
+<tr>
+<td width=250><code>int getIterationCount</code>
+</td>
+<td>Returns the iteration count or 0 if not specified.
+
+</td>
+</tr>
+
+<tr>
+<td><code>int getKeyLength</code>
+</td>
+<td>Returns the to-be-derived key length or 0 if not specified.
+
+</td>
+</tr>
+
+<tr>
+<td><code>char[] getPassword</code>
+</td>
+<td>Returns a copy of the password.
+
+</td>
+</tr>
+
+<tr>
+<td><code>byte[] getSalt</code>
+</td>
+<td>Returns a copy of the salt or null if not specified.
+
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+
+<H3><a name="SecretKeySpec">The 
+<a href="../../../api/javax/crypto/spec/SecretKeySpec.html">
+<code>SecretKeySpec</code></a> Class</a></H3>
+
+<blockquote>
+
+This class implements the <a href="../../../api/java/security/spec/KeySpec.html"><code>KeySpec</code></a>
+interface. Since it also implements the
+<a href="../../../api/javax/crypto/SecretKey.html"><code>SecretKey</code></a> interface, it
+can be used to construct a <code>SecretKey</code> object in a
+provider-independent fashion, i.e., without having to go through a
+provider-based <code>SecretKeyFactory</code>. 
+
+<P>
+<TABLE summary="methods in SecretKeySpec" BORDER=1>
+<tr>
+<td BGCOLOR="#CCCCFF" COLSPAN=2><B>Methods in <code>SecretKeySpec</code></B>
+</td>
+</tr>
+
+<thead>
+<th><B>Method</B>
+</th>
+<th><B>Description</B>
+</th>
+</thead>
+
+<tr>
+<td><code>boolean equals (Object obj)</code>
+</td>
+<td>Indicates whether some other object is "equal to" this one.
+</td>
+</tr>
+<tr>
+<td><code>String getAlgorithm()</code>
+<td>Returns the name of the algorithm associated with this secret key.
+</td>
+</tr>
+<tr>
+<td><code>byte[] getEncoded()</code>
+<td>Returns the key material of this secret key.
+</td>
+</tr>
+<tr>
+<td><code>String getFormat()</code>
+<td>Returns the name of the encoding format for this secret key.
+</td>
+</tr>
+<tr>
+<td><code>int hashCode()</code>
+<td>Calculates a hash code value for the object.
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+</blockquote>
+
+<H2><a name="SecretKeyGen">Secret-Key Generation</a></H2>
+
+<blockquote>
+
+If you provide a secret-key generator (subclass of
+<code>javax.crypto.KeyGeneratorSpi</code>) for a particular secret-key
+algorithm, you may return the generated secret-key object (which must
+be an instance of <code>javax.crypto.SecretKey</code>, see <a
+href="../../../api/javax/crypto/KeyGeneratorSpi.html#engineGenerateKey()"><code>engineGenerateKey</code></a>)
+in one of the following ways:
+
+<ul> <li>You implement a class whose instances represent secret-keys
+of the algorithm associated with your key generator. Your key
+generator implementation returns instances of that class. This
+approach is useful if the keys generated by your key generator have
+provider-specific properties.<p>
+
+<li>Your key generator returns an instance of <a
+href="../../../api/javax/crypto/spec/SecretKeySpec.html"><code>SecretKeySpec</code></a>,
+which already implements the <code>javax.crypto.SecretKey</code>
+interface. You pass the (raw) key bytes and the name of the
+secret-key algorithm associated with your key generator to the
+<code>SecretKeySpec</code> constructor. This approach is useful if the
+underlying (raw) key bytes can be represented as a byte array and have
+no key-parameters associated with them.
+</ul>
+
+</blockquote>
+
+
+<H2><a name="EnsureExport">Ensuring Exportability</a></H2>
+
+<blockquote>
+
+<P> A key feature of JCE is the exportability
+of the JCE framework and of the provider cryptography implementations 
+if certain conditions are met.
+
+<p>Due to import control restrictions by the governments of a few
+countries, the jurisdiction policy files shipped with the Java 2 SDK, v 1.4 from 
+Sun Microsystems specify that "strong" but limited cryptography may be used. 
+An "unlimited" version of these files indicating no restrictions on
+cryptographic strengths is available for those living in
+eligible countries (which is most countries). But only the
+"strong" version can be imported into those countries whose
+governments mandate restrictions.
+The JCE framework will enforce the restrictions specified in
+the installed jurisdiction policy files.
+
+<P> As noted elsewhere, you can write just one version of your provider
+software, implementing cryptography of maximum strength.
+It is up to JCE, not your provider, to enforce
+any jurisdiction policy file-mandated
+restrictions regarding the cryptographic algorithms 
+and maximum cryptographic strengths 
+available to applets/applications in different locations.
+
+<P> The conditions that must be met by your provider in order to
+enable it to be plugged into JCE in the Java 2 SDK, v 1.4 are the following:
+
+<ul>
+
+<li>The constructor of each SPI implementation class should 
+do self-integrity checking, as described in 
+<a href = "#MutualAuth">How a Provider Can Do Self-Integrity Checking</a>.<P>
+
+<li>The provider code should be written in such a way 
+that provider classes become unusable if instantiated by an
+application directly, bypassing JCE. See 
+<a href = "#Step 1">Step 1: Write Your Service Implementation Code</a> 
+in the <i>Steps to Implement
+and Integrate a Provider</i> section.<P> 
+
+<li>The provider package must be signed by an entity trusted by the
+JCE framework. (See <a href="#Step 5a">Step 5a</a> through
+<a href="#Step 5c">Step 5c</a>.) U.S. vendors whose providers may be 
+exported outside the U.S. first need to apply for U.S. government 
+export approval. (See <a href="#Step 8">Step 8</a>.)
+
+</ul>
+
+</blockquote>
+
+
+</blockquote>
+
+</blockquote>
+
+<br>
+
+
+<H1><a name="AppA">Appendix A: The "SunJCE" Provider's Master Class</a></H1>
+
+<blockquote>
+
+Below is an edited version of the <code>SunJCE.java</code> file,
+which contains a class named <code>SunJCE</code> that is the 
+<a href = "#Step 3">master class</a> for the provider named "SunJCE". 
+
+<p>As with all master classes, this class is a subclass 
+of <code>Provider</code>. It specifies the class names and package locations 
+of all the cryptographic service implementations
+supplied by the "SunJCE" provider. This information is used by the
+<code>getInstance</code> methods of the engine classes
+to look up the various algorithms and other services 
+when they are requested.
+
+<p>This code is supplied as an example of a provider master class.
+
+<pre>
+/*
+ * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
+ * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+
+package com.sun.crypto.provider;
+
+import java.security.AccessController;
+import java.security.Provider;
+. . .
+
+/**
+ * The "SunJCE" Cryptographic Service Provider.
+ *
+ * @author Jan Luehe
+ * @author Sharon Liu
+ *
+ * @version 1.42, 01/08/01
+ */
+
+/**
+ * Defines the "SunJCE" provider.
+ *
+ * Supported algorithms and their names:
+ *
+ * - DES (ECB, CBC, CFB, OFB, PCBC)
+ *
+ * - DES-EDE (ECB, CBC, CFB, OFB, PCBC)
+ *
+ * - Password-based Encryption (PBE)
+ *
+ * - Blowfish
+ *
+ * - Diffie-Hellman Key Agreement
+ *
+ * - HMAC-MD5, HMAC-SHA1
+ *
+ * - PKCS5Padding
+ */
+
+public final class SunJCE extends Provider {
+
+    private static String info = "SunJCE Provider " + 
+    "(implements DES, Triple DES, Blowfish, PBE, Diffie-Hellman, HMAC-MD5, "
+    + "HMAC-SHA1)";
+
+    public SunJCE() {
+	/* We are the "SunJCE" provider */
+	super("SunJCE", 1.4, info);
+
+        AccessController.doPrivileged(new java.security.PrivilegedAction() {
+            public Object run() {
+
+		/*
+		 * Cipher engines 
+		 */
+		put("Cipher.DES", "com.sun.crypto.provider.DESCipher");
+
+		put("Cipher.DESede", "com.sun.crypto.provider.DESedeCipher");
+		put("Alg.Alias.Cipher.TripleDES", "DESede");
+
+		put("Cipher.PBEWithMD5AndDES",
+		    "com.sun.crypto.provider.PBEWithMD5AndDESCipher");
+		put("Cipher.PBEWithMD5AndTripleDES",
+		    "com.sun.crypto.provider.PBEWithMD5AndTripleDESCipher");
+
+		put("Cipher.Blowfish",
+		    "com.sun.crypto.provider.BlowfishCipher");
+
+		/*
+		 *  Key(pair) Generator engines 
+		 */
+		put("KeyGenerator.DES", 
+		    "com.sun.crypto.provider.DESKeyGenerator");
+
+		put("KeyGenerator.DESede", 
+		    "com.sun.crypto.provider.DESedeKeyGenerator");
+		put("Alg.Alias.KeyGenerator.TripleDES", "DESede");
+
+		put("KeyGenerator.Blowfish", 
+		    "com.sun.crypto.provider.BlowfishKeyGenerator");
+
+		put("KeyGenerator.HmacMD5", 
+		    "com.sun.crypto.provider.HmacMD5KeyGenerator");
+
+		put("KeyGenerator.HmacSHA1", 
+		    "com.sun.crypto.provider.HmacSHA1KeyGenerator");
+
+		put("KeyPairGenerator.DiffieHellman", 
+		    "com.sun.crypto.provider.DHKeyPairGenerator");
+		put("Alg.Alias.KeyPairGenerator.DH", "DiffieHellman");
+
+		/*
+		 * Algorithm parameter generation engines
+		 */
+		put("AlgorithmParameterGenerator.DiffieHellman",
+		    "com.sun.crypto.provider.DHParameterGenerator");
+		put("Alg.Alias.AlgorithmParameterGenerator.DH",
+		    "DiffieHellman");
+
+		/* 
+		 * Key Agreement engines 
+		 */
+		put("KeyAgreement.DiffieHellman",
+		    "com.sun.crypto.provider.DHKeyAgreement");
+		put("Alg.Alias.KeyAgreement.DH", "DiffieHellman");
+
+		/* 
+		 * Algorithm Parameter engines 
+		 */
+		put("AlgorithmParameters.DiffieHellman",
+		    "com.sun.crypto.provider.DHParameters");
+		put("Alg.Alias.AlgorithmParameters.DH", "DiffieHellman");
+
+		put("AlgorithmParameters.DES",
+		    "com.sun.crypto.provider.DESParameters");
+
+		put("AlgorithmParameters.DESede",
+		    "com.sun.crypto.provider.DESedeParameters");
+		put("Alg.Alias.AlgorithmParameters.TripleDES", "DESede");
+
+		put("AlgorithmParameters.PBE",
+		    "com.sun.crypto.provider.PBEParameters");
+		put("Alg.Alias.AlgorithmParameters.PBEWithMD5AndDES", "PBE");
+
+		put("AlgorithmParameters.Blowfish",
+		    "com.sun.crypto.provider.BlowfishParameters");
+
+		/*
+		 * Key factories
+		 */
+		put("KeyFactory.DiffieHellman",
+		    "com.sun.crypto.provider.DHKeyFactory");
+		put("Alg.Alias.KeyFactory.DH", "DiffieHellman");
+
+		/*
+		 * Secret-key factories
+		 */
+		put("SecretKeyFactory.DES", 
+		    "com.sun.crypto.provider.DESKeyFactory");
+
+		put("SecretKeyFactory.DESede",
+		    "com.sun.crypto.provider.DESedeKeyFactory");
+		put("Alg.Alias.SecretKeyFactory.TripleDES", "DESede");
+
+		put("SecretKeyFactory.PBEWithMD5AndDES",
+		    "com.sun.crypto.provider.PBEKeyFactory");
+
+		/*
+		 * MAC
+		 */
+		put("Mac.HmacMD5", "com.sun.crypto.provider.HmacMD5");
+		put("Mac.HmacSHA1", "com.sun.crypto.provider.HmacSHA1");
+
+		/*
+		 * KeyStore
+		 */
+		put("KeyStore.JCEKS", "com.sun.crypto.provider.JceKeyStore");
+
+		return null;
+	    }
+	});
+    }
+
+}
+</pre>
+
+</blockquote>
+
+<br>
+
+
+
+<HR>
+
+
+<H1><a name="AppB">Appendix B: The "EMProvider" Provider's Master Class</a></H1>
+
+<blockquote>
+
+Below is an example of an <code>EMProvider.java</code> file,
+which contains a class named <code>EMProvider</code> that is the 
+<a href = "#Step 3">master class</a> for the provider named "EMProvider". 
+
+<p>As with all master classes, this class is a subclass 
+of <code>Provider</code>. It specifies the class names and package locations 
+of all the cryptographic service implementations
+supplied by the "EMProvider" provider. This information is used by the
+<code>getInstance</code> methods of the engine classes
+to look up the various algorithms and other services 
+when they are requested.
+
+<p>This code is supplied as an example of a master class for a
+provider that implements an 
+<a href = "JCERefGuide.html#ExemptApps">exemption mechanism</a>. 
+It is included
+in addition to the <a href = "#AppA">Appendix A</a> showing the master class
+for the "SunJCE" provider because the "SunJCE" provider does
+not include any exemption mechanism implementations.
+<B>Note:</B> A provider can implement both cryptographic services and
+exemption mechanism services. 
+
+<pre>
+package com.abc.crypto.provider;
+
+import java.security.AccessController;
+import java.security.Provider;
+
+/**
+ * The "EMProvider" Cryptographic Service Provider.
+ *
+ * @version 1.00, 03/15/2000
+ */
+
+/**
+ * Defines the "EMProvider" provider.
+ *
+ * Supported algorithm(s) and their name(s):
+ *
+ * - Key Recovery
+ */
+
+public final class EMProvider extends Provider {
+
+    private static String info = "EMProvider Exemption Mechanism Provider " + 
+    "(implements KeyRecovery)";
+
+    public EMProvider() {
+        /* We are the "EMProvider" provider */
+        super("EMProvider", 1.2, info);
+
+        AccessController.doPrivileged(new java.security.PrivilegedAction() {
+            public Object run() {
+
+                /* 
+                 * Algorithm Parameter engines 
+                 */
+                put("AlgorithmParameters.KeyRecovery",
+                    "com.abc.crypto.provider.KeyRecoveryParameters");
+                put("Alg.Alias.AlgorithmParameters.KR", "KeyRecovery");
+
+                /*
+                 * ExemptionMechanism
+                 */
+                put("ExemptionMechanism.KeyRecovery", 
+                    "com.abc.crypto.provider.KeyRecovery");
+                put("Alg.Alias.ExemptionMechanism.KR", "KeyRecovery");
+
+                return null;
+            }
+        });
+    }
+}
+</pre>
+
+</blockquote>
+
+
+
+
+<HR>
+
+
+<H1><a name="AppC">Appendix C: The java.security Properties File</a></H1>
+
+<blockquote>
+
+Below is a copy of the <code>java.security</code> 
+file that appears in every JRE installation. This file appears at
+
+<blockquote><pre>
+&lt;java-home&gt;/lib/security/java.security         [Solaris]
+&lt;java-home&gt;\lib\security\java.security         [Windows]
+</pre></blockquote>
+
+Here <tt>&lt;java-home&gt;</tt> refers to the directory where the JRE
+was installed. Thus, if you have the Java 2 SDK v 1.4 
+installed on Solaris in a directory named <code>/home/user1/J2SDK1.4.0</code>, 
+or on Microsoft Windows in a directory named <code>C:\J2SDK1.4.0</code>, then 
+the file would be
+
+<blockquote><pre>
+/home/user1/J2SDK1.4.0/jre/lib/security/java.security  [Solaris]
+C:\J2SDK1.4.0\jre\lib\security\java.security           [Windows]
+</pre></blockquote>
+
+Similarly, if you have Java 2 Runtime Environment v 1.4
+installed on Solaris in a directory named <code>/home/user1/j2re1.4.0</code>, 
+or on Windows in a directory named <code>C:\j2re1.4.0</code>, then 
+the file would be
+
+<blockquote><pre>
+/home/user1/j2re1.4.0/lib/security/java.security       [Solaris]
+C:\j2re1.4.0\lib\security\java.security                [Windows]
+</pre></blockquote>
+
+See <a href = "#Step 5d">Step 5d</a> for an example of adding information 
+about your provider to this file. 
+
+<pre>
+#
+# This is the "master security properties file".
+#
+# In this file, various security properties are set for use by
+# java.security classes. This is where users can statically register
+# Cryptography Package Providers ("providers" for short). The term
+# "provider" refers to a package or set of packages that supply a
+# concrete implementation of a subset of the cryptography aspects of
+# the Java Security API. A provider may, for example, implement one or
+# more digital signature algorithms or message digest algorithms.
+#
+# Each provider must implement a subclass of the Provider class.
+# To register a provider in this master security properties file,
+# specify the Provider subclass name and priority in the format
+#
+#    security.provider.&lt;n&gt;=&lt;className&gt;
+#
+# This declares a provider, and specifies its preference
+# order n. The preference order is the order in which providers are
+# searched for requested algorithms (when no specific provider is
+# requested). The order is 1-based; 1 is the most preferred, followed
+# by 2, and so on.
+#
+# &lt;className&gt; must specify the subclass of the Provider class whose
+# constructor sets the values of various properties that are required
+# for the Java Security API to look up the algorithms or other
+# facilities implemented by the provider.
+#
+# There must be at least one provider specification in java.security.
+# There is a default provider that comes standard with the JDK. It
+# is called the "SUN" provider, and its Provider subclass
+# named Sun appears in the sun.security.provider package. Thus, the
+# "SUN" provider is registered via the following:
+#
+#    security.provider.1=sun.security.provider.Sun
+#
+# (The number 1 is used for the default provider.)
+#
+# <B>Note:</B> Statically registered Provider subclasses are instantiated
+# when the system is initialized. Providers can be dynamically
+# registered instead by calls to either the addProvider or
+# insertProviderAt method in the Security class.
+
+#
+# List of providers and their preference orders (see above):
+#
+security.provider.1=sun.security.provider.Sun
+security.provider.2=com.sun.net.ssl.internal.ssl.Provider
+security.provider.3=com.sun.rsajca.Provider
+security.provider.4=com.sun.crypto.provider.SunJCE
+security.provider.5=sun.security.jgss.SunProvider
+
+#
+# Select the source of seed data for SecureRandom. By default an
+# attempt is made to use the entropy gathering device specified by 
+# the securerandom.source property. If an exception occurs when
+# accessing the URL then the traditional system/thread activity 
+# algorithm is used.
+#
+securerandom.source=file:/dev/random
+#
+# The entropy gathering device is described as a URL and can 
+# also be specified with the property "java.security.egd". For example,
+#   -Djava.security.egd=file:/dev/urandom
+# Specifying this property will override the securerandom.source setting.
+
+#
+# Class to instantiate as the javax.security.auth.login.Configuration
+# provider.
+#
+login.configuration.provider=com.sun.security.auth.login.ConfigFile
+
+#
+# Default login configuration file
+#
+#login.config.url.1=file:${user.home}/.java.login.config
+
+#
+# Class to instantiate as the system Policy. This is the name of the class
+# that will be used as the Policy object.
+#
+policy.provider=sun.security.provider.PolicyFile
+
+# The default is to have a single system-wide policy file,
+# and a policy file in the user's home directory.
+policy.url.1=file:${java.home}/lib/security/java.policy
+policy.url.2=file:${user.home}/.java.policy
+
+# whether or not we expand properties in the policy file
+# if this is set to false, properties (${...}) will not be expanded in policy
+# files.
+policy.expandProperties=true
+
+# whether or not we allow an extra policy to be passed on the command line
+# with -Djava.security.policy=somefile. Comment out this line to disable
+# this feature.
+policy.allowSystemProperty=true
+
+# whether or not we look into the IdentityScope for trusted Identities
+# when encountering a 1.1 signed JAR file. If the identity is found
+# and is trusted, we grant it AllPermission.
+policy.ignoreIdentityScope=false
+
+#
+# Default keystore type.
+#
+keystore.type=jks
+
+#
+# Class to instantiate as the system scope:
+#
+system.scope=sun.security.provider.IdentityDatabase
+
+#
+# List of comma-separated packages that start with or equal this string
+# will cause a security exception to be thrown when
+# passed to checkPackageAccess unless the
+# corresponding RuntimePermission ("accessClassInPackage."+package) has
+# been granted.
+package.access=sun.
+
+#
+# List of comma-separated packages that start with or equal this string
+# will cause a security exception to be thrown when
+# passed to checkPackageDefinition unless the
+# corresponding RuntimePermission ("defineClassInPackage."+package) has
+# been granted.
+#
+# by default, no packages are restricted for definition, and none of
+# the class loaders supplied with the JDK call checkPackageDefinition.
+#
+#package.definition=
+
+#
+# Determines whether this properties file can be appended to
+# or overridden on the command line via -Djava.security.properties
+#
+security.overridePropertiesFile=true
+
+#
+# Determines the default key and trust manager factory algorithms for 
+# the javax.net.ssl package.
+#
+ssl.KeyManagerFactory.algorithm=SunX509
+ssl.TrustManagerFactory.algorithm=SunX509
+
+#
+# Determines the default SSLSocketFactory and SSLServerSocketFactory
+# provider implementations for the javax.net.ssl package.  If, due to
+# export and/or import regulations, the providers are not allowed to be
+# replaced, changing these values will produce non-functional
+# SocketFactory or ServerSocketFactory implementations.
+#
+#ssl.SocketFactory.provider=
+#ssl.ServerSocketFactory.provider=
+
+#
+# The Java-level namelookup cache policy for successful lookups:
+#
+# any negative value: caching forever
+# any positive value: the number of seconds to cache an address for
+# zero: do not cache
+#
+# default value is forever (FOREVER). For security reasons, this
+# caching is made forever when a security manager is set.
+#
+# <B>NOTE:</B> Setting this value to anything other than the default value 
+#       can have serious security implications. Do not set it unless 
+#       you are sure you are not exposed to DNS spoofing attack.
+#
+#networkaddress.cache.ttl=-1 
+
+# The Java-level namelookup cache policy for failed lookups:
+#
+# any negative value: cache forever
+# any positive value: the number of seconds to cache negative lookup results
+# zero: do not cache
+#
+# In some Microsoft Windows networking environments that employ
+# the WINS name service in addition to DNS, name service lookups
+# that fail may take a noticeably long time to return (approx. 5 seconds).
+# For this reason the default caching policy is to maintain these
+# results for 10 seconds. 
+#
+#
+networkaddress.cache.negative.ttl=10
+</pre>
+
+</blockquote>
+
+<p>
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+<TD>
+
+<P><FONT SIZE="-2">
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A>  1996-2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:java-security@java.sun.com">java-security@java.sun.com</a>.
+   </FONT>
+
+</TD>
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+<!-- Created: Wed Jan 20 16:30:48 PST 1999 -->
+<!-- hhmts start -->
+Last modified: 17 Jan 2002
+<!-- hhmts end -->
+
+</BODY>
+
+</HTML>
+

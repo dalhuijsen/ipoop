@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Applet Persistence API</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Applet Persistence API </h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  Beginning with Java2 SKD, Standard Edition v 1.4, two new methods have been 
+  added to interface <code>AppletContext.java</code> to allow applet persistence 
+  across browser sessions. These methods are:</p>
+<ul>
+  <li><code>setStream(String key, InputStream stream)</code></li>
+  <li><code>getStream(String key)</code></li>
+</ul>
+<p>These new methods enable the applet developer to stream data and objects from 
+  one browser session so that they can be reused in subsequent browser sessions. 
+  This provides applet persistence and makes it unnecessary to use static objects 
+  in applets for this same purpose.</p>
+<p><code>setStream(key, stream)</code> maps a key to a stream. <code>getStream(key)</code> 
+  returns the stream mapped to the key. If the AppletContext already has a stream 
+  mapped to the key when <code>setStream(key, stream)</code> is invoked, the mapping 
+  is updated.</p>
+<p>See the <a href="http://java.sun.com/j2se/1.4.2/docs/api/index.html">API specification</a> 
+  for more information</p>
+<p>&nbsp; </p>
+</body>
+</html>

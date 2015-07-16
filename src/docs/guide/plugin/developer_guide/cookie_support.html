@@ -1,0 +1,116 @@
+<html>
+<head>
+<title>Cookie Support</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Cookie Support</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>This section covers the following topics:</p>
+<ul>
+  <li><a href="#intro">Introduction</a>&nbsp; </li>
+  <li><a href="#How">How Java Plug-in supports cookies</a></li>
+  <li><a href="#Protocol">Cookie policy support in Java Plug-in</a>&nbsp; </li>
+</ul>
+<h2><a name="intro"></a>Introduction</h2>
+<p>Cookies are a way of storing data on the client side. They have been used extensively 
+  for personalization of portal sites, user preference tracking, and logging into 
+  web sites. For enterprise customers using cookies in their web sites, cookie 
+  support in Java<font size="-2"></font> Plug-in facilitates deployment of client-side 
+  Java.</p>
+<p>Cookie support allows a Java component to pass a cookie back to a web server 
+  if that cookie originated from the web server. This provides the server with 
+  information about the state of the client. Java Plug-in provides bidirectional 
+  cookie support. <br>
+</p>
+<h2><a name="How"></a>How Java Plug-in Supports Cookies </h2>
+<p>Java Plug-in provides cookie support through the browser API. Because browsers 
+  on different platforms implement the browser's API differently, cookie support 
+  in Java Plug-in varies according to platform. </p>
+<p>When a browser makes an HTTP/HTTPS request through a URL connection, it normally 
+  checks the cookie cache and policy to determine if a cookie should be sent along 
+  with the HTTP/HTTPS request header. If so, the browser will read the cookie 
+  from the cache and append the cookie as part of the HTTP/HTTPS request header.</p>
+<p>When a browser processes the HTTP/HTTPS respond header through a URL connection, 
+  it will check the header to see if any cookies should be set. The browser also 
+  checks the cookie policy to determine if the action is allowed. If so, it will 
+  extract the cookie from the HTTP/HTTPS respond header and write it into the 
+  cookie cache.</p>
+<p>When an HTTP/HTTPS request is made using Java Plug-in, Java Plug-in consults 
+  the browser to determine if a cookie should be sent along. If so, the HTTP/HTTPS 
+  request will contain the cookie as part of the header. Otherwise, the HTTP/HTTPS 
+  request will be sent with no cookie attached.</p>
+<p>When a cookie needs to be set from the HTTP/HTTPS respond header, Java Plug-in 
+  uses the browser API to do so.</p>
+<p>Cookie support in Java Plug-in is triggered transparently when an HTTP/HTTPS 
+  connection needs to be made. </p>
+<h3>Netscape 4 Limitation</h3>
+<p>When using Java Plug-in with Netscape 4, cookie support works only if the <code>codebase</code> 
+  is the same or a subdirectory of the document base. See examples in the table 
+  below:</p>
+<table summary="Codebase examples" width="90%" border="2" cellpadding="5" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <th> 
+      <div align="center"><font size="4"><b>Document Base</b></font></div>
+    </th>
+    <th> 
+      <div align="center"><font size="4"><b>Codebase</b></font></div>
+    </th>
+    <th> 
+      <div align="center"><b><font size="4">Will It Work?</font></b></div>
+    </th>
+  </tr>
+  <tr> 
+    <td><code>http://host.com/my/</code></td>
+    <td><code>http://host.com/my/</code></td>
+    <td>Yes</td>
+  </tr>
+  <tr> 
+    <td><code>http://host.com/my/</code></td>
+    <td><code>http://host.com/my/pag</code>e</td>
+    <td>Yes</td>
+  </tr>
+  <tr> 
+    <td><code>http://host.com/my/page/</code></td>
+    <td><code>http://host.com/my/</code></td>
+    <td>No</td>
+  </tr>
+</table>
+<p>To ensure that cookie support in Java Plug-in always works as expected, the 
+  following is recommended:</p>
+<ul>
+  <li>Use Internet Explorer or Netscape 6</li>
+  <li>If you must use Netscape 4, avoid having your web server set cookies in 
+    an HTTP/HTTPS connection with an applet. </li>
+</ul>
+<p>The above recommendations apply to an intranet environment, where deployment 
+  of browsers and web servers is controllable.<br>
+</p>
+<h2><a name="Protocol"></a>Cookie Policy Support in Java Plug-in</h2>
+<p>Java Plug-in supports all cookie policies that are supported in both Internet 
+  Explorer and Netscape Navigator. Cookie policy can be configured in both browsers 
+  (see your browser guide for details). There are various options, including the 
+  following:</p>
+<ul>
+  <li>Always accept cookies</li>
+  <li>Disable all cookie use</li>
+  <li>Prompt/Warn before accepting a cookie</li>
+  <li>Only accept cookies from a server if they get sent back to that server</li>
+</ul>
+<p>When cookie policy is changed in the browser, it will take effect the next 
+  time an HTTP/HTTPS connection is made via Java Plug-in. </p>
+<p>Java Plug-in does not provide cookie-caching support. Instead, it consults 
+  the browser every time an HTTP/HTTPS connection is made. Any change to a cookie 
+  in the browser is reflected immediately in Java Plug-in when a new HTTP/HTTPS 
+  connection is made.<br>
+</p>
+<p>&nbsp; </p>
+</body>
+</html>

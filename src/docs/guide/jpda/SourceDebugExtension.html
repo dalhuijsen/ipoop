@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>SourceDebugExtension Class File Attribute</title>
+</head>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+<center>
+<h1><code>SourceDebugExtension</code></h1>
+</center>
+<h3>Motivation</h3>
+Debugger applications frequently need debugging information 
+about the source that exceeds
+what is delivered by the existing Java<sup><font size=-2>TM</font></sup>
+Virtual Machine class file attributes (SourceFile, LineNumber, and
+ LocalVariable).  This is particularly true for
+debugging the source of other languages which are 
+compiled to Java Virtual Machine 
+bytecodes.  In a distributed environment side files may not be accessible,
+the information must be directly associated with the class.
+
+<h3>Solution</h3>
+The solution is both simple and flexible - a class file attribute which
+holds a string is added; this string is made opaquely accessible at the
+three layers of the <A HREF="http://java.sun.com/products/jpda">
+      Java Platform Debugger Architecture</A> (JPDA).  The string 
+contains debugging information in a standardized format which allows
+for evolution and vendor extension. 
+<p>
+The remainder of this document describes these additions in detail:
+<ul>
+<li>An attribute added to the Java virtual machine class file format
+<li>Access to this attribute from each level of JPDA:
+<ul>
+<li><A HREF="http://java.sun.com/products/jpda/doc/architecture.html#jvmdi">
+      JVMDI</A>
+<li><A HREF="http://java.sun.com/products/jpda/doc/architecture.html#jdwp">
+      JDWP</A>
+<li><A HREF="http://java.sun.com/products/jpda/doc/jdi/index.html">
+     JDI</A>
+</ul>
+</ul>
+
+<h3>The <code>SourceDebugExtension</code> Attribute</h3>
+The <code>SourceDebugExtension</code> attribute is an optional attribute in the <code>attributes</code> 
+table of the <code>ClassFile</code>  structure. There can be no more than one 
+<code>SourceDebugExtension</code> &#32;attribute in the <code>attributes</code> table of a given <code>ClassFile</code> structure. 
+<p>
+The <code>SourceDebugExtension</code> attribute has the following format:<p>
+<pre><br></a>&nbsp;&nbsp;&nbsp;&nbsp;<code>SourceDebugExtension_attribute {
+</code>&nbsp;&nbsp;&nbsp;&nbsp;<code>	u2 attribute_name_index;
+</code>&nbsp;&nbsp;&nbsp;&nbsp;<code>	u4 attribute_length;
+</code>&nbsp;&nbsp;&nbsp;&nbsp;<code>	u1 debug_extension[attribute_length];
+</code>&nbsp;&nbsp;&nbsp;&nbsp;<code>}
+</code><br></pre>
+The items of the <code>SourceDebugExtension_attribute</code> structure are as follows:
+<p>
+<dl><dt><code>attribute_name_index</code>
+<dd> The value of the <code>attribute_name_index</code> item must be a valid index into the <code>constant_pool</code> table. The <code>constant_pool</code> entry at that index must be a <code>CONSTANT_Utf8_info</code>  structure representing the string <
+code>"SourceDebugExtension"</code>.<p>
+
+<dt><code>attribute_length</code>
+<dd> The value of the <code>attribute_length</code> item indicates the length of
+the attribute, excluding the initial six bytes.  The value of the 
+<code>attribute_length</code> item is thus the number of bytes in 
+the <code>debug_extension[]</code> item.<p>
+
+<dt><code>debug_extension[]</code>
+<dd> The <code>debug_extension</code> array holds a string, which must be 
+in UTF-8 format.  There is no terminating zero byte. <p>
+
+The string in the <code>debug_extension</code> item will be interpreted as 
+extended debugging information.  The content of this string has no semantic 
+effect on the Java Virtual Machine.<p>
+</dl>
+
+<h3>JVMDI Function</h3>
+The following function has been added to the Java Virtual Machine Debug Interface (JVMDI):
+
+<blockquote><pre>
+jvmdiError
+GetSourceDebugExtension(jclass clazz, char **sourceDebugExtensionPtr)
+</pre></blockquote>
+For the class indicated by <code>clazz</code>, return the debug extension via <code>sourceDebugExtensionPtr</code>. The returned UTF-8 string 
+contains exactly the debug extension information present in the
+class file of <code>clazz</code>. 
+<p>
+Parameters:
+<blockquote><dl>
+<dt>clazz<dd>the class to query
+<dt>sourceDebugExtensionPtr<dd>on return, refers to a pointer to the class's debug extension name (UTF-8).
+The returned debug extension string should be freed with 
+<code>Deallocate</code>
+</dl></blockquote>
+<p>
+This function returns either a universal error or one of the following errors:
+<blockquote><dl>
+    <p><dt><code>JVMDI_ERROR_NULL_POINTER</code>
+        <dd>
+        Invalid pointer.
+    <p><dt><code>JVMDI_ERROR_INVALID_CLASS</code>
+            <dd>
+        Invalid <code>clazz</code>.
+    <p><dt><code>JVMDI_ERROR_ABSENT_INFORMATION</code>
+	    <dd>
+	    Class information does not include a debug extension.
+</dl></blockquote>
+
+<h3>JDWP Command</h3>
+The following command has been added to the Java Debug Wire Protocol (JDWP)
+specification (in the <code>ReferenceType</code> command set):
+
+<h5><a name=JDWP_ReferenceType_SourceDebugExtension>SourceDebugExtension Command</a> (12)</h5>
+Returns the debug extension for this reference type.
+<dl>
+<dt>Out Data
+<dd><table summary="layout" border=1 cellpadding=3 cellspacing=0 width="90%">
+
+<tr>
+<td colspan=5>
+referenceTypeID<td><i>refType</i><td>The reference type ID.&nbsp;
+</table>
+<dt>Reply Data
+<dd><table summary="layout" border=1 cellpadding=3 cellspacing=0 width="90%">
+
+<tr>
+<td colspan=5>
+string<td><i>sourceDebugExtension</i><td>The debug extension string.&nbsp;
+</table>
+</dl>
+
+<h3>JDI Method</h3>
+The following method has been added to the Java Debug Interface (JDI) on
+<code>ReferenceType</code>:
+<H5>
+sourceDebugExtension</H5>
+<PRE>
+public <A HREF="../../../../../../api/java/lang/String.html">String</A> <B>sourceDebugExtension</B>()
+                  throws <A HREF="../../../com/sun/jdi/AbsentInformationException.html">AbsentInformationException</A></PRE>
+<DL>
+<DD>Gets the debug extension string.
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+<DT><B>Returns:</B><DD>the debug extension string<DT><B>Throws:</B><DD><CODE><A HREF="../../../com/sun/jdi/AbsentInformationException.html">AbsentInformationException</A></CODE> - if the debug extension string is not
+ specified<DD><CODE><A HREF="../../../com/sun/jdi/ObjectCollectedException.html">ObjectCollectedException</A></CODE> - if this reference type has been 
+ unloaded.</DL>
+</DD>
+</DL>
+
+</font>
+
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2>Copyright &copy; 2001 <A HREF="http://www.sun.com/">Sun
+Microsystems, Inc.</A> All Rights Reserved.</FONT>&nbsp;
+
+<P><FONT SIZE=-1>Please send comments to: <A HREF="mailto:java-debugger@sun.com">java-debugger@sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30></TD>
+</TR>
+</TABLE>
+
+</body></html>

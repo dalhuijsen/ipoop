@@ -1,0 +1,259 @@
+<html><head><title>Java AWT: Lightweight UI Framework</title></head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<a name="919682">
+<h1><img align=middle alt="Duke logo doing a cartwheel" src="images/flip_trans.sm.gif"> Java AWT: Lightweight UI Framework</h1>
+
+</a>
+<hr><p><a name="919687">
+<address>
+Last Updated: January 31, 1997
+</address>
+<h2>The Problem</h2>
+</a>
+One of the issues with the 1.0 AWT is that creating new components requires
+creating subclasses of java.awt.Canvas or java.awt.Panel, which means that each new
+component owns its own opaque native window.
+This one-to-one mapping between components and native windows results in three problems:
+<ol>
+<li> Native windows can be heavyweight,
+     so it's undesirable to have too many of them.
+<li> Native windows are opaque,
+     so they can't be used to implement transparent regions.
+<li> Native windows are handled differently across platforms,
+     so the AWT has to struggle
+     to maintain a consistent view across these varied platforms.
+</ol>
+Hooks have been implemented that enable the
+creation of "lightweight" UI components; these hooks are called the Lightweight
+UI Framework.
+<h2>Lightweight UI Framework</h2>
+The Lightweight UI Framework is very simple -- it boils down to the ability to now
+directly extend the <a href="../../../../api/java/awt/Component.html">java.awt.Component</a> and <a href="../../../../api/java/awt/Container.html">java.awt.Container</a> classes in order to
+create components which do not have native opaque windows associated with them.
+These lightweight components and containers fit right into the existing AWT models, 
+such as painting, layout, and events, and as such, require no special handling
+or additional APIs.  Existing subclasses of Canvas and Panel can be easily
+migrated to lightweight versions by simply changing their superclass appropriately.
+<p>
+The advantages of creating lightweight components are the following:
+<ul>
+<li> The Lightweight component can now have transparent areas by simply not rendering
+     to those areas in its paint() method (although, until we get full shape
+     support from Java2D, the bounding box will remain rectangular).
+<li> The Lightweight component is "lighter" in that it requires no native data-structures
+     or peer classes.
+<li> There is no native code required to process lightweight components, hence
+     handling of lightweights is 100% implemented in common java code, which leads
+     to complete consistency across platforms.
+</ul>
+<p>
+We are using this framework in an upcoming version of the toolkit (beyond 1.1)
+to implement pure-java versions of the base UI controls (Button, List, etc.) which
+implement a common look-and-feel across the platforms (and don't use the native
+peers).  
+
+<h3> Mixing Lightweight & Heavyweight Components</h3>
+Lightweight components can be freely mixed with existing heavyweight components.
+This means that lightweight components can be made direct children of 
+heavyweight containers, heavyweight components can be made direct children
+of lightweight containers, and heavyweight and lightweights can be mixed
+within containers (with the one caveat that the heavyweight sibling will
+always be "on top" if it overlaps with a lightweight, regardless of the
+specified z-order).
+
+<h3> Putting Lightweight components in Existing Panels</h3>
+The painting and event dispatching mechanism for lightweight components is
+handled by the Container class.  This means that the painting of lightweight
+components is triggered from within the paint() method of its container.
+Therefore, if a lightweight component is placed inside of a Container instance
+where the paint method has been overridden but which does not call super.paint(),
+the paint() method of the lightweight component will never be called.  This
+could be a common occurrence if you're using existing classes which extend Panel
+in order to implement the painting of a border or bevel, but which don't call
+"super.paint()" (because it was not an issue with 1.0.2).  So if your lightweight
+components are not showing up, this is the first thing to check!
+
+<h3> Double Buffering </h3>
+Because lightweight components are entirely rendered in Java, the use of
+double-buffering in their containers can really smooth out their rendering to
+avoid flashing.  By default, the Container class does not implement double-buffering, 
+but this is extremely easy to do!  Following is an example of a double-buffered Panel
+which implements smooth rendering for any lightweight components placed inside
+it:
+
+<pre><code>
+public class DoubleBufferPanel extends Panel {    
+  Image offscreen;
+
+  /**
+   * null out the offscreen buffer as part of invalidation
+   */
+  public void invalidate() {
+      super.invalidate();
+      offscreen = null;
+  }
+
+  /**
+   * override update to *not* erase the background before painting
+   */
+  public void update(Graphics g) {
+      paint(g);
+  }
+
+  /**
+   * paint children into an offscreen buffer, then blast entire image
+   * at once.
+   */
+  public void paint(Graphics g) {
+      if(offscreen == null) {
+         offscreen = createImage(getSize().width, getSize().height);
+      }
+      Graphics og = offscreen.getGraphics();
+      og.setClip(0,0,getSize().width, getSize().height);
+      super.paint(og);
+      g.drawImage(offscreen, 0, 0, null);
+      og.dispose();
+  }
+}
+</code></pre>
+<hr>
+
+<h2>Sample Code</h2>
+</a>
+Following is sample code showing the creation of a lightweight round button
+class, which shows off the transparency aspect of lightweight components.
+
+<pre><code>
+import java.lang.*;
+import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+
+/**
+ * RoundButton - a class that produces a lightweight button.
+ */
+public class RoundButton <b>extends Component</b> {
+
+  String label;                      // The Button's text
+  protected boolean pressed = false; // true if the button is detented.
+  
+  /**
+   * Constructs a RoundButton with the specified label.
+   * @param label the label of the button
+   */
+  public RoundButton(String label) {
+      this.label = label;
+      enableEvents(AWTEvent.MOUSE_EVENT_MASK);
+  }
+  
+  /**
+   * paints the RoundButton
+   */
+  public void paint(Graphics g) {
+      int s = Math.min(getSize().width - 1, getSize().height - 1);
+      
+      // paint the interior of the button
+      if(pressed) {
+          g.setColor(getBackground().darker().darker());
+      } else {
+          g.setColor(getBackground());
+      }
+      g.fillArc(0, 0, s, s, 0, 360);
+      
+      // draw the perimeter of the button
+      g.setColor(getBackground().darker().darker().darker());
+      g.drawArc(0, 0, s, s, 0, 360);
+      
+      // draw the label centered in the button
+      Font f = getFont();
+      if(f != null) {
+          FontMetrics fm = getFontMetrics(getFont());
+          g.setColor(getForeground());
+          g.drawString(label,
+                       s/2 - fm.stringWidth(label)/2,
+                       s/2 + fm.getMaxDescent());
+      }
+  }
+  
+  /**
+   * The preferred size of the button. 
+   */
+  public Dimension getPreferredSize() {
+      Font f = getFont();
+      if(f != null) {
+          FontMetrics fm = getFontMetrics(getFont());
+          int max = Math.max(fm.stringWidth(label) + 40, fm.getHeight() + 40);
+          return new Dimension(max, max);
+      } else {
+          return new Dimension(100, 100);
+      }
+  }
+  
+  /**
+   * The minimum size of the button. 
+   */
+  public Dimension getMinimumSize() {
+      return new Dimension(100, 100);
+  }
+   
+   /**
+    * Paints the button and distribute an action event to all listeners.
+    */
+   public void processMouseEvent(MouseEvent e) {
+       Graphics g;
+       switch(e.getID()) {
+          case MouseEvent.MOUSE_PRESSED:
+            // render myself inverted....
+            pressed = true;
+
+            // Repaint might flicker a bit. To avoid this, you can use
+            // double buffering (see the Gauge example).
+            repaint(); 
+            break;
+          case MouseEvent.MOUSE_RELEASED:
+            // render myself normal again
+            if(pressed == true) {
+                pressed = false;
+                // Repaint might flicker a bit. To avoid this, you can use
+                // double buffering (see the Gauge example).
+                repaint();
+            }
+            break;
+          case MouseEvent.MOUSE_ENTERED:
+            break;
+          case MouseEvent.MOUSE_EXITED:
+            if(pressed == true) {
+                // Cancel! Don't send action event.
+                pressed = false;
+
+                // Repaint might flicker a bit. To avoid this, you can use
+                // double buffering (see the DoubleBufferPanel example above).
+                repaint();
+
+                // Note: for a more complete button implementation,
+                // you wouldn't want to cancel at this point, but
+                // rather detect when the mouse re-entered, and
+                // re-highlight the button. There are a few state
+                // issues that that you need to handle, which we leave
+                // this an an excercise for the reader (I always
+                // wanted to say that!)
+            }
+            break;
+       }
+       super.processMouseEvent(e);
+   }   
+}
+</code></pre>
+
+<hr><br>
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1997, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+
+</body>
+</html>

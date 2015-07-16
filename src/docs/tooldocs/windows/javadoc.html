@@ -1,0 +1,4679 @@
+<html>
+<head>
+<title>javadoc-The Java API Documentation Generator</TITLE>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>javadoc - The Java API Documentation Generator</H1>
+<blockquote>
+Generates HTML pages of API documentation from Java source files. 
+This document contains Javadoc<SUP><FONT SIZE="-2">TM</FONT></SUP> 
+examples for Microsoft Windows. 
+</blockquote>
+
+<hr>
+
+<h2>CONTENTS</h2>
+
+<a href="#referenceguide"><b><font color="black">Reference Guide</font></b></a>
+
+<UL>
+  <LI><B><a href="#synopsis">Synopsis</a></B>
+  <LI><B><a href="#description">Description</a></B>
+  <UL>
+     <LI><a href="#processingofsourcefiles">Processing of Source Files</a>
+     <LI><a href="#doclets">Javadoc Doclets</a>
+     <LI><a href="#documentation">Related Documentation</a>
+     <LI><a href="#terminology">Terminology</a>
+  </UL>
+  <LI><B><a href="#sourcefiles">Source Files</a></B>
+  <UL>
+     <LI><a href="#javasourcefiles">Class Source Code Files</a>
+     <LI><a href="#packagecomment">Package Comment Files</a>
+     <LI><a href="#overviewcomment">Overview Comment File</a>
+     <LI><a href="#unprocessed">Miscellaneous Unprocessed Files</a>
+     <LI><a href="#testfiles">Test Files and Template Files</a>
+  </UL>
+  <LI><B><a href="#generatedfiles">Generated Files</a></B>
+  <UL>
+     <LI><a href="#generatedapideclarations">Generated API Declarations</a>
+  </UL>
+  <LI><B><a href="#documentationcomments">Documentation Comments</a></B>
+  <UL>
+     <LI><a href="#comments">Commenting the Source Code</a>
+     <LI><a href="#inheritingcomments">Automatic Copying of Method Comments</a>
+  </UL>
+  <LI><B><a href="#javadoctags">Javadoc Tags</a></B>
+<font size="-1">(<code>@tag</code>)</font>
+  <UL>
+     <LI><a href="#wheretags">Where Tags Can Be Used</a>
+  </UL>
+  <LI><B><a href="#options">Options</a></B> 
+<font size="-1">(<code>-option</code>)</font>
+  <UL>
+     <LI><a href="#javadocoptions">Javadoc Options</a>
+     <LI><a href="#standard">Options Provided by the Standard Doclet</a>
+  </UL>
+  <LI><B><a href="#argumentfiles">Command Line Argument Files</a></B>
+</UL>
+
+<a href="#running"><b><font color="black">Running</font></b></a>
+
+<UL>
+  <LI><B><a href="#runningjavadoc">Running Javadoc</a></B>
+  <LI><B><a href="#examples">Simple Examples</a></B>
+  <UL>
+     <LI><a href="#documentingpackages">Documenting One or More Packages</a>
+     <LI><a href="#documentingclasses">Documenting One or More Classes</a>
+     <LI><a href="#documentingboth">Documenting Both Packages and Classes</a>
+  </UL>
+  <LI><B><a href="#realworldexample">Real World Example</a></B>
+  <UL>
+     <LI><a href="#commandlineexample">Command Line Example</a>
+     <LI><a href="#makefileexample">Makefile Example</a>
+  </UL>
+  <LI><B><a href="#troubleshooting">Troubleshooting</a></B>
+  <UL>
+     <LI><a href="#generaltroubleshooting">General Troubleshooting</a>
+     <LI><a href="#errorsandwarnings">Errors and Warnings</a>
+  </UL>
+  <LI><B><a href="#environment">Environment</a></B>
+  <UL>
+     <LI><a href="#classpathenvironment">CLASSPATH</a>
+  </UL>
+  <LI><B><a href="#troubleshooting">Troubleshooting</a></B>
+  <LI><B><a href="#seealso">See Also</a></B>
+</UL>
+
+<hr>
+<!-- ===================== REFERENCE GUIDE ======================= -->
+<a name="referenceguide"></a>
+<H1 align="center">Reference Guide</H1>
+
+
+<hr>
+<!-- ==================== SYNOPSIS ======================= -->
+
+<a name="synopsis"></a>
+<h2>SYNOPSIS</h2>
+<blockquote>
+<code>
+<strong>javadoc</strong>&nbsp;[&nbsp;<a href="#options">options</a>&nbsp;]&nbsp;[&nbsp;packagenames&nbsp;]&nbsp;[&nbsp;sourcefilenames&nbsp;]&nbsp;[&nbsp;-subpackages</code>&nbsp;<em>pkg1:pkg2:...</em><code>&nbsp;]&nbsp;[&nbsp;<a href="#argumentfiles">@argfiles</a>&nbsp;]
+</code>
+<p>
+Arguments can be in any order.  See 
+<a href="#processingofsourcefiles">processing of Source Files</a>
+for details on how the Javadoc tool determines which "<code>.java</code>"
+files to process.
+<p>
+<blockquote>
+<dl>
+     <dt><a href="#options"><code>options</code></a>
+         <dd>Command-line options, as specified in this document.
+             To see a typical use of javadoc options, see 
+             <a href="#realworldexample">Real-World Example</a>.
+
+     <dt><code>packagenames</code>
+         <dd>A series of names of packages, 
+             separated by spaces, such as 
+             <code>java.lang&nbsp;java.lang.reflect&nbsp;java.awt</code>.
+             You must separately specify each package you want to document.
+             Wildcards are not allowed; use -subpackages for recursion.
+             The Javadoc tool uses 
+             <a href="#sourcepath"><code>-sourcepath</code></a>
+             to look for these package names.  
+             See <a href="#documentingpackages">Example - Documenting 
+             One or More Packages</a>
+
+     <dt><code>sourcefilenames</code>
+         <dd>A series of source file names, separated by spaces,
+             each of which can begin with a path and contain a wildcard
+             such as asterisk (*).  The Javadoc tool will process every file
+             whose name ends with ".java", and whose name, when stripped of 
+             that suffix, is actually a legal class name (see 
+             <a href="http://java.sun.com/docs/books/jls/second_edition/html/lexical.doc.html#40625">Identifiers</a>).
+             Therefore, you can name files with dashes (such as 
+             <code>X-Buffer</code>), or other illegal characters, to prevent 
+             them from being documented.  This is useful for 
+             <a href="#testfiles">test files and template files</a>
+             The path that precedes the source file name determines
+             where javadoc will look for the file. (The Javadoc tool does 
+             <i>not</i> use <code>-sourcepath</code> to look for these source 
+             file names.)
+             Relative paths are relative to the current directory, so passing
+             in <code>Button.java</code> is identical to <code>./Button.java</code>.
+             A source file name with an absolute path and a wildcard, for example, is 
+             <code>/home/src/java/awt/Graphics*.java</code>.
+             See <a href="#documentingclasses">Example&nbsp;-&nbsp;Documenting 
+             One or More Classes</a>.  You can also mix packagenames and
+             sourcefilenames, as in 
+             <a href="#documentingboth">Example&nbsp;-&nbsp;Documenting Both
+             Packages and Classes</a>
+
+     <dt><a href="#subpackages"><code>-subpackages </code> <em>pkg1:pkg2:...</em></a>
+         <dd>Generates documentation from source files in the specified 
+             packages and recursively in their subpackages. 
+             An alternative to supplying packagenames or sourcefilenames.
+
+     <dt><a href="#argumentfiles"><code>@argfiles</code></a>
+         <dd>One or more files that contain a list of Javadoc options, 
+             packagenames and sourcefilenames in any order.  
+             Wildcards (*) and <code>-J</code> options are not allowed in
+             these files.
+
+<!--  PERHAPS WE WILL FORMALIZE SOME DAY:
+         <dd>One or more files that contain any of the previous 
+             arguments in any order.
+-->
+</dl>
+</blockquote>
+
+</pre>
+</blockquote>
+
+<br>
+<!-- =================== DESCRIPTION ======================= -->
+
+<a name="description"></a>
+<h2>DESCRIPTION</h2>
+<blockquote>
+The <b>Javadoc</b><SUP><FONT SIZE="-2">TM</FONT></SUP> tool
+parses the declarations and documentation comments in a set of Java source
+files and produces a corresponding set of HTML pages describing (by default) 
+the public and protected classes, nested classes (but not anonymous inner 
+classes), interfaces, constructors, methods, and fields.  
+You can use it to generate the API (Application Programming Interface)
+documentation or the implementation documentation for a set of source
+files.
+<p>
+You can run the Javadoc tool on <a href="#documentingpackages">entire packages</a>,
+<a href="#documentingclasses">individual source files</a>,
+or <a href="#documentingboth">both</a>.
+When documenting entire packages, you can either use 
+<a href="#subpackages"><code>-subpackages</code></a> for traversing
+recursively down from a top-level directory, or pass in an explicit list
+of package names.  When documenting individual source files, you pass in 
+a list of source (<code>.java</code>) filenames.  
+<a href="#examples">Examples</a> are given at the end of this document.
+How Javadoc processes source files is covered next.
+<p>
+
+<!-- ====================== PROCESSING ========================= -->
+
+<a name="processingofsourcefiles"></a>
+<h3>Processing of source files</h3> 
+
+The Javadoc tool processes files that end in "<code>.java</code>" 
+plus other files described under <a href="#sourcefiles">Source Files</a>. 
+If you run the Javadoc tool by explicitly passing in individual source
+filenames, you can determine exactly which "<code>.java</code>" files 
+are processed.  However, that is not how most developers want to work, 
+as it is simpler to pass in package names.  
+The Javadoc tool can be run three ways without explicitly specifying 
+the source filenames.  You can (1) pass in package names, (2) use 
+<a href="#subpackages"><code>-subpackages</code></a>, and 
+(3) use wildcards with source filenames (<code>*.java</code>).  
+In these cases, the Javadoc tool processes a "<code>.java</code>" 
+file only if it fulfills all of the following requirements:
+<ul>
+   <li>Its name, after stripping off the "<code>.java</code>" suffix, 
+       is actually a legal class name (see 
+<a href="http://java.sun.com/docs/books/jls/second_edition/html/lexical.doc.html#40625">Identifiers</a> for legal characters)
+   <li>Its directory path relative to the root of the source tree
+       is actually a legal package name (after converting its separators to dots)
+   <li>Its package statement contains the legal package name (specified in the
+       previous bullet)
+</ul>
+<p>
+
+<a name="links"></a>
+<b>Processing of links</b> - 
+
+During a run, the Javadoc tool automatically adds cross-reference links to package, 
+class and member names that are being documented as part of that run.  
+Links appear in several places:
+<ul>
+  <li>Declarations (return types, argument types, field types)
+  <li>"See Also" sections generated from 
+      <a href="#@see"><code>@see</code></a> tags
+  <li>In-line text generated from <a href="#{@link}"><code>{@link}</code></a> tags
+  <li>Exception names generated from <a href="#@throws"><code>@throws</code></a> tags
+  <li>"<a href="#inheritingcomments">Specified by</a>" links to members in interfaces and 
+      "<a href="#inheritingcomments">Overrides</a>" links to members in classes
+  <li>Summary tables listing packages, classes and members
+  <li>Package and class inheritance trees
+  <li>The index
+</ul>
+
+You can add hyperlinks to existing text for classes not included 
+on the command line (but generated separately) by way of the 
+<a href="#link"><code>-link</code></a> and 
+<a href="#linkoffline"><code>-linkoffline</code></a> options.  
+<p>
+
+
+<a name="otherprocessing"></a>
+<b>Other processing details</b> - 
+
+The Javadoc tool produces one complete document each time it is run;  it cannot 
+do incremental builds -- that is, it cannot modify or <i>directly</i> 
+incorporate results from previous runs of the Javadoc tool.  However, it can 
+link to results from other runs, as just mentioned.
+<p>
+
+As implemented, the Javadoc tool requires and relies on the java compiler to do 
+its job. The Javadoc tool calls part of <code>javac</code> to compile the 
+declarations, ignoring the member implementation. It builds a rich
+internal representation of the classes, including the class hierarchy,
+and "use" relationships, then generates the HTML from that.  The Javadoc tool 
+also picks up user-supplied documentation from
+<a href="#documentationcomments">documentation comments</a> in the
+source code.
+<p>
+
+In fact, the Javadoc tool will run on <code>.java</code> source files that are 
+pure stub files with no method bodies. This means you can write documentation
+comments and run the Javadoc tool in the earliest stages of design while creating
+the API, before writing the implementation.
+<p>
+
+Relying on the compiler ensures that the HTML output corresponds exactly 
+with the actual implementation, which may rely on implicit, rather
+than explicit, source code. For example, the Javadoc tool documents
+<a href="http://java.sun.com/docs/books/jls/second_edition/html/names.doc.html#36154"> default 
+constructors</a> (section 8.6.7 of <i>Java Language Specification</i>) 
+that are present in the <code>.class</code> files but not in the source 
+code. 
+<p>
+
+<a name="allowsincompletecode"></a>
+In many cases, the Javadoc tool allows you to generate documentation 
+for source files whose code is incomplete or erroneous.  
+This is a benefit that enables you to generate documentation before all 
+debugging and troubleshooting is done.  For example, according to the
+<i>Java Language Specification</i>, a class that contains an abstract 
+method should itself be declared abstract.  The Javadoc tool does not 
+check for this, and would proceed without a warning, whereas the javac
+compiler stops on this error.
+The Javadoc tool does do some primitive checking of doc comments.
+Use the <a href="#doccheck">DocCheck doclet</a> to check the doc comments
+more thoroughly.
+<p>
+
+When the Javadoc tool builds its internal structure for the documentation, it
+loads all referenced classes.  Because of this, the Javadoc tool must be able
+to find all referenced classes, whether bootstrap classes, extensions,
+or user classes.  For more about this, see 
+<a href="../findingclasses.html">How Classes Are Found</a>. 
+Generally speaking, classes you create must either be loaded as an
+extension or in the Javadoc tool's class path.
+<p>
+
+<!-- ====================== DOCLETS ========================= -->
+
+<a name="doclets"></a>
+<h3>Javadoc Doclets</h3>
+
+You can customize the content and format of the Javadoc tool's output by 
+using doclets. The Javadoc tool has a default "built-in" doclet, called
+the standard doclet, that generates HTML-formatted API documentation.
+You can modify or subclass the standard doclet, or write your own
+doclet to generate HTML, XML, MIF, RTF or whatever output format
+you'd like.  Information about doclets and their use is at 
+the following locations:
+<ul>
+<li><a href="../javadoc/index.html">Javadoc Doclets</a>
+<li><a href="#doclet">The <code>-doclet</code> command-line option</a>
+</ul>  
+When a custom doclet is not specified with the <tt>-doclet</tt> command 
+line option, the Javadoc tool will use the default standard doclet. The javadoc 
+tool has several command line options that are 
+available regardless of which doclet is being used. The 
+standard doclet adds a supplementary set of command 
+line options. Both sets of options are described below in the 
+<a href="#options">options</a> section.
+
+
+<!-- ====================== DOCUMENTATION ========================= -->
+
+<a name="documentation"></a>
+<h3>Related Documentation and Doclets</h3>
+<ul>
+  <li><a href="../javadoc/index.html">Javadoc Enhancements</a> 
+      for details about improvements added in Javadoc 1.4.
+  <li><a href="http://java.sun.com/j2se/javadoc/faq/index.html">Javadoc FAQ</a>
+      for answers to common questions, information about Javadoc-related
+      tools, and workarounds for bugs.
+  <li><a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html">How
+      to Write Doc Comments for Javadoc</a> for more information about Sun conventions
+      for writing documentation comments.
+  <li><a href="http://java.sun.com/j2se/javadoc/writingapispecs/index.html">Requirements 
+      for Writing API Specifications</a> - 
+      Standard requirements used when writing the Java 2 Platform Specification.  
+      It can be useful whether you are writing API specifications in source file 
+      documentation comments or in other formats.  It covers requirements for 
+      packages, classes, interfaces, fields and methods to satisfy testable assertions.
+  <li><a href="http://java.sun.com/docs/books/jls/first_edition/html/18.doc.html">Documentation 
+      Comment Specification</a> - The original specification on documentation 
+      comments, Chapter 18, Documentation Comments, in the 
+      <em>Java Language Specification</em>, First Edition, by James Gosling, Bill Joy, 
+      and Guy Steele.  (This chapter was removed from the second edition.)
+<a name="doccheck"></a>
+  <li><a href="http://java.sun.com/javadoc/doccheck">DocCheck Doclet</a> 
+      - Checks doc comments in source files and generates a report listing the 
+      errors and irregularities it finds.  It is part of the Sun Doc Check Utilities.
+  <li><a href="http://java.sun.com/javadoc/mifdoclet">MIF Doclet</a>
+      - Can automate the generation of API documentation in MIF, FrameMaker and PDF 
+      formats.  MIF is Adobe FrameMaker's interchange format.
+</ul>
+
+
+<!-- ====================== TERMINOLOGY ========================= -->
+
+<a name="terminology"></a>
+<h3>Terminology</h3>
+
+The terms <em>documentation comment</em>, <em>doc comment</em>, 
+<em>main description</em>, <em>tag</em>, <em>block tag</em>, 
+and <em>in-line tag</em> are described at
+<a href="#documentationcomments">Documentation Comments</a>.
+These other terms have specific meanings within the context of 
+the Javadoc tool:
+
+<dl>
+<a name="generateddocument"></a>
+  <dt><i>generated document</i>
+    <dd>The document generated by the javadoc tool from the doc comments 
+        in Java source code. The default generated document is in HTML
+        and is created by the standard doclet.
+<p>
+
+<a name="name"></a>
+  <dt><i>name</i>
+    <dd>A name of a program element written in the Java Language -- that is,
+        the name of a package, class, interface, field, constructor 
+        or method.  A name can be fully-qualified,
+        such as <code>java.lang.String.equals(java.lang.Object)</code>, or 
+        partially-qualified, such as <code>equals(Object)</code>. 
+<p>
+
+<a name="documentedclasses"></a>
+  <dt><i>documented classes</i>
+    <dd>The classes and interfaces for which detailed documentation is generated 
+        during a javadoc run.  To be documented, the source files must be 
+        available, their source filenames or package names must 
+        be passed into the javadoc command, and they must not be filtered
+        out by their <a href="#public">access modifier</a>
+        (public, protected, package-private or private).
+        We also refer to these as the classes included in the javadoc output, 
+        or the <i>included classes</i>.
+<p>
+
+<a name="includedclasses"></a>
+  <dt><i>included classes</i>
+    <dd>Classes and interfaces whose details are documented during a
+        run of the Javadoc tool.  Same as <i>documented classes</i>.
+<p>
+
+<a name="excludedclasses"></a>
+  <dt><i>excluded classes</i>
+    <dd>Classes and interfaces whose details are <i>not</i> documented during 
+        a run of the Javadoc tool. 
+<p>
+
+<a name="referencedclasses"></a>
+  <dt><i>referenced classes</i>
+    <dd>The classes and interfaces that are explicitly referred to in the 
+        definition (implementation) or doc comments of the documented classes 
+        and interfaces.  
+        Examples of references include return type, parameter type, cast type, 
+        extended class, implemented interface, imported classes, classes used 
+        in method bodies, @see, {@link}, {@linkplain}, and {@inheritDoc} tags.
+        (Notice this definition has changed since 
+<a href="http://java.sun.com/j2se/1.3/docs/tooldocs/win32/javadoc.html#referencedclasses">1.3</a>.)
+        When the Javadoc tool is run, it should load into memory all of the referenced 
+        classes in javadoc's bootclasspath and classpath.  (The Javadoc tool prints a 
+        "Class not found" warning for referenced classes not found.)
+        The Javadoc tool can derive enough information from the .class files
+        to determine their existence and the fully-qualified names of their
+        members.  
+<p>
+
+<a name="externalreferencedclasses"></a>
+  <dt><i>external referenced classes</i>
+    <dd>The referenced classes whose documentation is not being generated
+        during a javadoc run.  In other words, these classes are not passed
+        into the Javadoc tool on the command line.  Links 
+        in the generated documentation to those classes are said 
+        to be <i>external references</i> or <i>external links</i>.
+        For example, if you run the Javadoc tool on only the 
+        <code>java.awt</code> package, then any class in 
+        <code>java.lang</code>, such as <code>Object</code>, is an external 
+        referenced class.  External referenced classes can be linked to 
+        using the <code>-link</code> and <code>-linkoffline</code> options.  
+        An important property of an external referenced class is that its 
+        source comments are normally not available to the Javadoc run.  
+        In this case, these comments cannot be 
+        <a href="#inheritingcomments">inherited</a>.
+<p>
+
+</dl>
+
+</blockquote>
+
+<br>
+<!-- ====================== SOURCE FILES ========================= -->
+
+<a name="sourcefiles"></a>
+<h2>SOURCE FILES</h2>
+<blockquote>
+
+The Javadoc tool will generate output originating from four different types of 
+"source" files:  Java language source files for classes 
+(<code>.java</code>), package comment files, overview comment files, 
+and miscellaneous unprocessed files.  This section also covers
+test files and template files that can also be in the source tree, 
+but which you want to be sure not to document.
+<p>
+
+<a name="javasourcefiles"></a>
+<h3>Class Source Code Files</h3>
+
+    Each class or interface and its members can have their own documentation
+    comments, contained in a <code>.java</code> file.  For more details about
+    these doc comments, see
+    <a href="#documentationcomments">Documentation Comments</a>.
+
+<a name="packagecomment"></a>
+<h3>Package Comment Files</h3>
+
+    Each package can have its own documentation comment, contained in its
+    own "source" file, that the Javadoc tool will merge into the package summary page 
+    that it generates.  You typically include in this comment any 
+    documentation that applies to the entire package.  
+<p>
+    To create a package comment file, you must name it 
+    <b><code>package.html</code></b> and place it in the package 
+    directory in the source tree along with the <code>.java</code> files.  
+    The Javadoc tool will automatically look for this filename in this location.
+    Notice that the filename is identical for all packages.  
+    For explicit details, see the 
+    <a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#packagecomments">example 
+    of <code>package.html</code></a>.
+<p>
+    The content of the package comment file is one big documentation
+    comment, written in HTML, like all other comments, with one 
+    exception:  The documentation comment should not include 
+    the comment separators <code>/**</code> and 
+    <code>*/</code> or leading asterisks.  When writing the comment,
+    you should make the first sentence a summary about the package, 
+    and not put a title or any other text between
+    <code>&lt;body&gt;</code> and the first sentence.
+    You can include <a href="#packagetags">package tags</a>; as with any 
+    documentation comment, all tags except <code>{@link}</code> must 
+    appear after the main description.  If you add a <code>@see</code> tag
+    in a package comment file, it must have a fully-qualified name.
+<p>
+    When the Javadoc tool runs, it will automatically look for 
+    this file; if found, the Javadoc tool does the following:
+
+<ul>
+   <li>Copies all content between <code>&lt;body&gt;</code> and 
+      <code>&lt;/body&gt;</code> tags for processing.
+
+   <li>Processes any <a href="#packagetags">package tags</a> that are present.
+
+   <li>Inserts the processed text at the bottom of the package summary page
+    it generates, as shown in 
+    <a href="../../api/java/applet/package-summary.html">Package Summary</a>.
+    
+   <li>Copies the first sentence of the package comment to the top of
+    the package summary page.  It also adds the package name and this
+    first sentence to the list of packages on the overview page, as shown in
+    <a href="../../api/overview-summary.html">Overview Summary</a>.
+    The end-of-sentence is determined by the same rules used 
+    for the end of the first sentence of class and member main descriptions.
+</ul>
+
+<a name="overviewcomment"></a>
+<h3>Overview Comment File</h3>
+
+    Each application or set of packages that you are documenting 
+    can have its own overview documentation comment, kept in its 
+    own "source" file, that the Javadoc tool will merge into the overview page 
+    that it generates.  You typically include in this comment any 
+    documentation that applies to the entire application or set
+    of packages.  
+<p>
+    To create an overview comment file, you can name the file anything
+    you want, typically <b><code>overview.html</code></b> and place it 
+    anywhere, typically at the top level of the source tree.
+    Notice you can have multiple overview comment files for the same 
+    set of source files, in case you want to run javadoc multiple 
+    times on different sets of packages.  
+    For example, if the source files for the <code>java.applet</code>
+    package are contained in <code>C:\user\src\java\applet</code>
+    directory, you could create an overview comment file at
+    <code>C:\user\src\overview.html</code>.
+<p>
+    The content of the overview comment file is one big documentation
+    comment, written in HTML, like the package comment file described
+    previously.  See that description for details.  To re-iterate,
+    when writing the comment, you should make the first sentence a 
+    summary about the application or set of packages, and not put a 
+    title or any other text between <code>&lt;body&gt;</code> and the
+    first sentence.  You can include <a href="#overviewtags">overview 
+    tags</a>; as with any documentation comment, all tags except in-line
+    tags, such as <code>{@link}</code>, must appear after the main description.  
+    If you add a <code>@see</code> tag, it must have a fully-qualified
+    name.
+<p>
+    When you run the Javadoc tool, you specify the overview comment file name 
+    with the <a href="#overview">-overview</a> option.  The file
+    is then processed similar to that of a package comment file.
+<p>
+
+<ul>
+   <li>Copies all content between <code>&lt;body&gt;</code> and 
+      <code>&lt;/body&gt;</code> tags for processing.
+
+   <li>Processes any <a href="#overviewtags">overview tags</a> that are present.
+
+   <li>Inserts the processed text at the bottom of the overview page
+    it generates, as shown in 
+    <a href="../../api/overview-summary.html">Overview Summary</a>.
+    
+   <li>Copies the first sentence of the overview comment to the top of
+    the overview summary page.
+</ul>
+ 
+<a name="unprocessed"></a>
+<h3>Miscellaneous Unprocessed Files</h3>
+
+    You can also include in your source any miscellaneous files that
+    you want the Javadoc tool to copy to the destination directory.  These typically
+    includes graphic files, example Java source (.java) and class (.class)
+    files, and self-standing HTML files whose content would overwhelm 
+    the documentation comment of a normal Java source file.
+<p>
+    To include unprocessed files, put them in a directory called
+    <b><code>doc-files</code></b> which can be a subdirectory of any 
+    package directory that contains source files.  You can have one 
+    such subdirectory for each
+    package.  You might include images, example code, source files, 
+    .class files, applets and HTML files.  For example, if you want to 
+    include the image of a button
+    <code>button.gif</code> in the <code>java.awt.Button</code> 
+    class documentation, you place that file in the
+    <code>/home/user/src/java/awt/doc-files/</code> directory.
+    Notice the <code>doc-files</code> directory should not be located at
+    <code>/home/user/src/java/doc-files</code> because <code>java</code>
+    is not a package -- that is, it does not directly contain any source 
+    files.
+<p>
+    All links to these unprocessed files must be hard-coded, because
+    the Javadoc tool does not look at the files -- it simply copies the directory
+    and all its contents to the destination.   For example, the 
+    link in the <code>Button.java</code> doc comment might look like:
+<pre>
+    /**
+     * This button looks like this: 
+     * &lt;img src="doc-files/Button.gif"&gt;
+     */
+</pre>
+
+
+<a name="testfiles"></a>
+<h3>Test Files and Template Files</h3>
+
+Some developers have indicated they want to store test files and 
+templates files in the source tree near their corresponding source 
+files.  That is, they would like to put them in the same directory, 
+or a subdirectory, of those source files.
+<p>
+
+If you run the Javadoc tool by explicitly passing in individual source
+filenames, you can deliberately omit test and templates files and
+prevent them from being processed.  However, if you are passing
+in package names or wildcards, you need to follow certain rules
+to ensure these test files and templates files are not processed.
+<p>
+
+Test files differ from template files in that the former are
+legal, compilable source files, while the latter are not, but
+may end with ".java".
+<p>
+
+<b>Test files</b> - Often developers want to put compilable, runnable 
+test files for a given package in the <em>same</em> directory as the 
+source files for that package.  But they want the test files to belong 
+to a package other than the source file package (such as the unnamed 
+package), as defined by the package statement.  In this scenario where 
+source files are not explicitly specified, this will cause warnings or 
+errors.  You need to put such test files in a subdirectory.  For example,
+if you want to add test files for source files in <code>com.package1</code>,
+put them in a directory:
+<pre>
+    com/package1/test-files/
+</pre>
+
+The test files will be ignored by the Javadoc tool (though this warning
+might appear: "No source files for package com.package1.test-files").
+<!-- INCLUDE WHEN BUG 4773013 IS FIXED: 
+The test directory will be skipped with no warnings. -->
+<p>
+
+If your test files contain doc comments, you can set up a separate 
+run of the Javadoc tool to produce documentation of the test files 
+by passing in source filenames with wildcards, such as 
+<code>com/package1/test-files/*.java</code>. 
+<p>
+
+<b>Templates for source files</b> - Template files have names that
+often end in ".java" and are not compilable. If you have a template 
+for a source file that you want to keep in the source directory, 
+you can name it with a dash (such as <code>Buffer-Template.java</code>), 
+or any other illegal Java character, to prevent it from being processed.
+This relies on the fact that the Javadoc tool will only process source
+files whose name, when stripped of the ".java" suffix, is actually 
+a legal class name (see 
+<a href="http://java.sun.com/docs/books/jls/second_edition/html/lexical.doc.html#40625">Identifiers</a>).
+
+</blockquote>
+
+<br>
+<!-- ====================== GENERATED FILES ========================= -->
+
+<a name="generatedfiles"></a>
+<h2>GENERATED FILES</h2>
+<blockquote>
+
+By default, javadoc uses a standard doclet that generates
+HTML-formatted documentation.  This doclet generates the following kinds
+of files (where each HTML "page" corresponds to a separate file).
+Note that javadoc generates files with two types of names: those named 
+after classes/interfaces, and those that are not (such as 
+<code>package-summary.html</code>).  Files in the latter group contain 
+hyphens to prevent filename conflicts with those in the former group.
+
+<p>
+
+<b>Basic Content Pages</b>
+<ul>
+  <li>One <b>class or interface page</b> (<i>classname</i><code>.html</code>) for each 
+      class or interface it is documenting.  
+
+<a name="package-summary.html"></a>
+  <li>One <b>package page</b> (<code>package-summary.html</code>) for each 
+      package it is documenting. The Javadoc tool will include any HTML text 
+      provided in a file named <code>package.html</code> in the 
+      package directory of the source tree.
+
+<a name="overview-summary.html"></a>
+  <li>One <b>overview page</b> (<code>overview-summary.html</code>) for the entire 
+      set of packages.  This is the front page of the generated document.  
+      The Javadoc tool will include any HTML text provided in a file specified with 
+      the <a href="#overview"><code>-overview</code></a> option. 
+      Note that this file is created only if you pass into javadoc
+      two or more package names.  For further explanation, see 
+      <a href="#htmlframes">HTML Frames</a>.)
+</ul>
+<p>
+<b>Cross-Reference Pages</b>
+<ul>
+<a name="overview-tree.html"></a>
+  <li>One <b>class hierarchy page for the entire set of packages</b> 
+      (<code>overview-tree.html</code>).  To view this, click on "Overview" in 
+      the navigation bar, then click on "Tree".
+<a name="package-tree.html"></a>
+  <li>One <b>class hierarchy page for each package</b> (<code>package-tree.html</code>)
+      To view this, go to a particular package, class or interface page;  click 
+      "Tree" to display the hierarchy for that package.
+<a name="*-use.html"></a>
+  <li>One <b>"use" page</b> for each package (<code>package-use.html</code>)
+      and a separate one for each class and interface 
+      (<code>class-use/</code><i>classname</i><code>.html</code>).  This page 
+      describes what packages, classes, methods, constructors and fields 
+      use any part of the given class, interface or package. Given a class
+      or interface A, its "use" page includes subclasses of A, fields declared as A, 
+      methods that return A, and methods and constructors with parameters of 
+      type A. You can access this page by first going to the package, class or 
+      interface, then clicking on the "Use" link in the navigation bar.
+<a name="deprecated-list.html"></a>
+  <li>A <b>deprecated API page</b> (<code>deprecated-list.html</code>) listing 
+      all deprecated names. (A deprecated name is not recommended for use, 
+      generally due to improvements, and a replacement name is usually given. 
+      Deprecated APIs may be removed in future implementations.)
+<a name="constant-values.html"></a>
+  <li>A <b>constant field values page</b> (<code>constant-values.html</code>) 
+      for the values of static fields.
+<a name="serialized-form.html"></a>
+  <li>A <b>serialized form page</b> (<code>serialized-form.html</code>) for information 
+      about serializable and externalizable classes. Each such class has a description 
+      of its serialization fields and methods. This information is of interest to 
+      re-implementors, not to developers using the API. While there is no link in 
+      the navigation bar, you can get to this information by going to any serialized 
+      class and clicking "Serialized Form" in the "See also" section of the class
+      comment. The standard doclet automatically generates a 
+      <a href="#serialized-form.html">serialized form page</a>: any class
+      (public or non-public) that implements Serializable is included, along 
+      with <code>readObject</code> and <code>writeObject</code> methods, the fields
+      that are serialized, and the doc comments from the 
+      <a href="#@serial"><code>@serial</code></a>, 
+      <a href="#@serialField"><code>@serialField</code></a>, and 
+      <a href="#@serialData"><code>@serialData</code></a> tags.
+      Public serializable classes can be excluded by marking them (or their
+      package) with <code>@serial exclude</code>, and package-private 
+      serializable classes can be included by marking them (or their package) 
+      with <code>@serial include</code>.
+      As of 1.4, you can generate the complete serialized form for public and 
+      private classes by running javadoc <i>without</i> specifying the 
+      <code>-private</code> option.
+
+<a name="index-*.html"></a>
+  <li>An <b>index</b> (<code>index-*.html</code>) of all class, interface, constructor, 
+      field and method names, alphabetically arranged.  This is internationalized 
+      for Unicode and can be generated as a single file or as a separate file for 
+      each starting character (such as A-Z for English).
+</ul>
+<p>
+<b>Support Files</b>
+<ul>
+<a name="help-doc.html"></a>
+  <li>A <b>help page</b> (<code>help-doc.html</code>) that describes the navigation 
+      bar and the above pages.  You can provide your own custom help file to override 
+      the default using <a href="#helpfile"><code>-helpfile</code></a>.
+<a name="index.html"></a>
+  <li>One <b>index.html file</b> which creates the HTML frames for display.  This is
+      the file you load to display the front page with frames.  This file itself 
+      contains no text content.
+<a name="*-frame.html"></a>
+  <li>Several <b>frame files</b>  (<code>*-frame.html</code>) containing lists of 
+      packages, classes and interfaces, used when HTML frames are being displayed.
+<a name="package-list"></a>
+  <li>A <b>package list</b> file  (<code>package-list</code>), used by the 
+      <code>-link</code> and <code>-linkoffline</code> 
+      options. This is a text file, not HTML, and is not reachable through any 
+      links.
+<a name="stylesheet.css"></a>
+  <li>A <b>style sheet</b> file (<code>stylesheet.css</code>) that controls
+      a limited amount of color, font family, font size, font style and 
+      positioning on the generated pages.
+<a name="doc-files"></a>
+  <li>A <b>doc-files</b> directory that holds any image, example, source code or
+      other files that you want copied to the destination directory.  These
+      files are not processed by the Javadoc tool in any manner -- that is, any 
+      javadoc tags in them will be ignored.  This directory is not generated
+      unless it exists in the source tree.
+</ul>
+
+<p>
+
+
+<a name="htmlframes"></a> 
+<b>HTML Frames</b>
+<p>
+
+The Javadoc tool will generate either two or three HTML frames, as shown in 
+the figure below. It creates the minimum necessary number of frames
+by omitting the list of packages if there is only one package (or no
+packages).  That is,
+when you pass a single package name or source files (*.java) 
+belonging to a single package as arguments into the javadoc command, 
+it will create only one frame 
+(C) in the left-hand column -- the list of classes.  
+When you pass into javadoc two or more package names, it creates a third 
+frame (P) listing all packages, as well as an overview page (Detail).  
+This overview page has the filename <code>overview-summary.html</code>.
+Thus, this file is created only if you pass in two or more package names.
+You can bypass frames by clicking on the "No Frames" link or entering at 
+overview-summary.html.
+<p>
+If you are unfamiliar with HTML frames, you should be aware that 
+frames can have <i>focus</i> for printing and scrolling.  To give
+a frame focus, click on it.  Then on many browsers the arrow keys
+and page keys will scroll that frame, and the print menu command will 
+print it.
+
+<pre>
+              ------------                  ------------
+              |C| Detail |                  |P| Detail |
+              | |        |                  | |        |
+              | |        |                  |-|        |
+              | |        |                  |C|        |
+              | |        |                  | |        |
+              | |        |                  | |        |
+              ------------                  ------------
+             javadoc *.java           javadoc java.lang java.awt
+</pre>
+
+Load one of the following two files as the starting page
+depending on whether you want HTML frames or not:
+<ul>
+   <li><code>index.html</code> (for frames)
+   <li><code>overview-summary.html</code> (for no frames)
+</ul>
+
+
+<a name="filestructure"></a>
+<b>Generated File Structure</b>
+<p>
+
+The generated class and interface files are organized in the
+same directory hierarchy that Java source files and class files
+are organized.  This structure is one directory per subpackage.
+<p>
+For example, the document generated for the class 
+<code>java.applet.Applet</code> class would be located at 
+<code>java\applet\Applet.html</code>.  The file structure for
+the java.applet package follows, given 
+that the destination directory is named <code>apidocs</code>. 
+All files that contain the word "frame" appear in the upper-left
+or lower-left frames, as noted.  All other HTML files appear in the 
+right-hand frame.
+<p>
+<blockquote>
+    NOTE -  Directories are shown in <b>bold</b>.
+    The asterisks (<code>*</code>) indicate the files
+    and directories that are <i>omitted</i> when the arguments to 
+    javadoc are source filenames (*.java) rather than package names. 
+    Also when arguments are source filenames, <code>package-list</code> 
+    is created but is empty.
+    The doc-files directory will not be created in the destination 
+    unless it exists in the source tree.
+</blockquote>
+
+<pre>
+
+<b>apidocs</b>                             Top directory
+   <a href="#index.html">index.html</a></a>                       Initial page that sets up HTML frames
+ * <a href="#overview-summary.html">overview-summary.html</a>            Lists all packages with first sentence summaries
+   <a href="#overview-tree.html">overview-tree.html</a>               Lists class hierarchy for all packages
+   <a href="#deprecated-list.html">deprecated-list.html</a>             Lists deprecated API for all packages
+   <a href="#constant-values.html">constant-values.html</a>             Lists values of static fields for all packages
+   <a href="#serialized-form.html">serialized-form.html</a>             Lists serialized form for all packages
+ * <a href="#*-frame.html">overview-frame.html</a>              Lists all packages, used in upper-left frame
+   <a href="#*-frame.html">allclasses-frame.html</a>            Lists all classes for all packages, used in lower-left frame
+   <a href="#help-doc.html">help-doc.html</a>                    Lists user help for how these pages are organized
+   <a href="#index-*.html">index-all.html</a>                   Default index created without -splitindex option
+   <b>index-files</b>                      Directory created with -splitindex option
+       <a href="#index-*.html">index-&lt;number&gt;.html</a>          Index files created with -splitindex option
+   <a href="#package-list">package-list</a>                     Lists package names, used only for resolving external refs
+   <a href="#stylesheet.css">stylesheet.css</a>                   HTML style sheet for defining fonts, colors and positions
+   <b>java</b>                             Package directory
+       <b>applet</b>                       Subpackage directory
+            Applet.html             Page for Applet class
+            AppletContext.html      Page for AppletContext interface
+            AppletStub.html         Page for AppletStub interface
+            AudioClip.html          Page for AudioClip interface
+          * <a href="#package-summary.html">package-summary.html</a>    Lists classes with first sentence summaries for this package
+          * <a href="#*-frame.html">package-frame.html</a>      Lists classes in this package, used in lower left-hand frame
+          * <a href="#package-tree.html">package-tree.html</a>       Lists class hierarchy for this package
+            <a href="#*-use.html">package-use</a>             Lists where this package is used
+            <b><a href="#doc-files">doc-files</a></b>               Directory holding image and example files
+            <b><a href="#*-use.html">class-use</a></b>               Directory holding pages API is used
+                Applet.html         Page for uses of Applet class
+                AppletContext.html  Page for uses of AppletContext interface
+                AppletStub.html     Page for uses of AppletStub interface
+                AudioClip.html      Page for uses of AudioClip interface
+   <b>src-html</b>                         Source code directory
+       <b>java</b>                         Package directory
+           <b>applet</b>                   Subpackage directory
+                Applet.html         Page for Applet source code
+                AppletContext.html  Page for AppletContext source code
+                AppletStub.html     Page for AppletStub source code
+                AudioClip.html      Page for AudioClip source code
+</pre>
+
+
+
+<!-- ================= GENERATED API DECLARATIONS ==================== -->
+<a name="generatedapideclarations"></a>
+<h3>Generated API Declarations</h3>
+
+The Javadoc tool generates a declaration at the start of each class, 
+interface, field, constructor, and method description for that API item.  
+For example, the declaration for the
+<code>Boolean</code> class is:
+<p>
+
+<code>public final class Boolean<br>
+extends Object<br>
+implements Serializable
+</code>
+<p>
+
+and the declaration for the <code>Boolean.valueOf</code>method is:
+<p>
+
+<code>public static Boolean valueOf(String s)</code>
+<p>
+
+The Javadoc tool can include the modifiers <code>public</code>, 
+<code>protected</code>, <code>private</code>, <code>abstract</code>, 
+<code>final</code>, <code>static</code>, <code>transient</code>, 
+and <code>volatile</code>, but not <code>synchronized</code> or 
+<code>native</code>.  These last two modifiers are considered 
+implementation detail and not part of the API specification.
+<p>
+
+Rather than relying on the keyword <code>synchronized</code>,
+APIs should document their concurrency semantics in the comment's
+main description, as in "a single <code>Enumeration</code> cannot be used by 
+multiple threads concurrently".  The document should not describe
+how to achieve these semantics.  As another example, while 
+<code>Hashtable</code> should be thread-safe, there's no 
+reason to specify that we achieve this by synchronizing all 
+of its exported methods.  We should reserve the right to synchronize 
+internally at the bucket level, thus offering higher concurrency. 
+
+</blockquote>
+
+
+<!-- ================= DOCUMENTATION COMMENTS ==================== -->
+<a name="documentationcomments"></a>
+<h2>DOCUMENTATION COMMENTS</h2>
+
+<blockquote>
+
+The original "Documentation Comment Specification" can be found
+under <a href="#documentation">related documentation</a>.
+
+<a name="comments"></a>
+<h3>Commenting the Source Code</h3>
+
+You can include <em>documentation comments</em> ("doc comments") in the source 
+code, ahead of declarations for any class, interface, method, 
+constructor, or field.  You can also create doc comments for each
+<a href="#packagecomment">package</a> and another one for the 
+<a href="#overviewcomment">overview</a>, though their syntax is slightly
+different.  Doc comments are also known informally as "Javadoc comments"
+(but this term violates its trademark usage).
+A doc comment consists of the characters between the characters
+<code>/**</code> that begin the comment and the characters
+<code>*/</code> that end it.  <a href="#leadingasterisks">Leading 
+asterisks</a> are allowed on each line and are described further below.
+The text in a comment can continue onto multiple lines. 
+<p>
+<pre>
+/**
+ * This is the typical format of a simple documentation comment
+ * that spans two lines.
+ */
+</pre>
+
+To save space you can put a comment on one line:
+<pre>
+/** This comment takes up only one line. */
+</pre>
+
+<b>Placement of comments</b> - Documentation comments are recognized 
+only when placed immediately before class, interface, constructor, 
+method, or field declarations -- see the 
+<a href="#classexample">class example</a>, 
+<a href="#methodexample">method example</a>, and 
+<a href="#fieldexample">field example</a>.
+Documentation comments placed in the body of a method are ignored.  
+Only one documentation comment per declaration statement is recognized 
+by the Javadoc tool.  
+<p>
+A common mistake is to put an <code>import</code> statement between 
+the class comment and the class declaration.  Avoid this, as the Javadoc tool
+will ignore the class comment.
+<pre>
+   /**
+    * This is the class comment for the class Whatever.
+    */
+
+    import com.sun;   // MISTAKE - Important not to put import statement here
+
+    public class Whatever {
+    }
+</pre>
+
+<a name="maindescription"></a> 
+<a name="tagsection"></a>
+<b>A doc comment is composed of a <em>main description</em> followed by a 
+<em>tag section</em></b> - 
+The <em>main description</em>
+begins after the starting delimiter <code>/**</code> and continues
+until the tag section.  The <em>tag section</em> starts with the first block
+tag, which is defined by the first <code>@</code> character that 
+begins a line (ignoring leading asterisks,
+white space, and leading separator <code>/**</code>).  
+It is possible to have a comment with only a tag section 
+and no main description.  The main description cannot continue 
+after the tag section begins.  The argument to a tag can span multiple
+lines.  There can be any number of tags -- some 
+types of tags can be repeated while others cannot.  For example, 
+this <code>@see</code> starts the tag section:
+<p>
+<pre>
+/**
+ * This sentence would hold the main description for this doc comment.
+ * @see java.lang.Object
+ */
+</pre>
+
+<a name="standaloneandinlinetags"></a> <a name="blockandinlinetags"></a>
+<b>Block tags and in-line tags</b> - A <a href="#javadoctags"><em>tag</em></a> 
+is a special keyword within 
+a doc comment that the Javadoc tool can process.  There are two kinds of tags:
+<a href="#blocktags">block tags</a>, which 
+appear as <code>@tag</code> (also known as "standalone tags"), 
+and <a href="#inlinetags">in-line tags</a>, which appear within curly braces,
+as <code>{@tag}</code>.  To be interpreted, a block tag must appear 
+at the beginning of a line, ignoring leading asterisks, white space, 
+and separator (<code>/**</code>).  This means you can use the 
+<code>@</code> character elsewhere in the text and it will not be interpreted 
+as the start of a tag.  If you want to start a line with the <code>@</code> character
+and not have it be interpreted, use the HTML entity <code>&amp#064;</code>.
+Each block tag has associated text, which includes any text following the 
+tag up to, but not including, either the next tag, or the end of the doc comment. 
+This associated text can span multiple lines. 
+An in-line tag is allowed and interpreted anywhere that text is allowed.  
+The following example contains the block tag <code>@deprecated</code> and 
+in-line tag <code>{@link}</code>.
+<p>
+<pre>
+/**
+ * @deprecated  As of JDK 1.1, replaced by {@link #setBounds(int,int,int,int)}
+ */
+</pre>
+
+<p>
+
+<b>Comments are written in HTML</b> - The text must be written in HTML, 
+in that they should use HTML entities and can use HTML tags. 
+You can use whichever version of HTML your browser supports; 
+we have written the standard doclet to generate 
+HTML 3.2-compliant code elsewhere (outside of the documentation comments) 
+with the inclusion of cascading style sheets and frames. 
+(We preface each generated file with "HTML 4.0" because of the frame sets.)
+
+<p>
+For example, entities for the less-than
+(<code>&lt;</code>) and greater-than (<code>&gt;</code>)
+symbols should be written <code>&amp;lt;</code> and <code>&amp;gt;</code>.
+Likewise, the ampersand (<code>&amp;</code>) should be written 
+<code>&amp;amp;</code>.  The bold HTML tag <code>&lt;b&gt;</code> is shown 
+in the following example.
+<p>
+Here is a doc comment: 
+<p>
+<pre>
+/**
+ * This is a &lt;b&gt;doc&lt;/b&gt; comment.
+ * @see java.lang.Object
+ */
+</pre>
+<p>
+
+<a name="leadingasterisks"></a>
+<b>Leading asterisks</b> - When javadoc parses a doc comment, 
+leading asterisk (<code>*</code>) 
+characters on each line are discarded; blanks and tabs preceding 
+the initial asterisk (<code>*</code>) characters 
+are also discarded. Starting with 1.4, if you omit the leading asterisk 
+on a line, the leading white space is no longer removed.  
+This enables you to paste code examples directly into a doc comment
+inside a <code>&lt;PRE&gt;</code> tag, and its indentation will
+be honored.  Spaces are generally interpreted by browsers more
+uniformly than tabs.  Indentation is relative to the left margin 
+(rather than the separator <code>/**</code> or 
+<code>&lt;PRE&gt;</code> tag).
+<p>
+
+<b>First sentence</b> - The first sentence of each doc comment 
+should be a summary sentence, 
+containing a concise but complete description of the declared entity. 
+This sentence ends at the first period that is followed by a blank, 
+tab, or line terminator, or at the first 
+<a href="#blocktags">block tag</a>.
+The Javadoc tool copies this first sentence to the member summary 
+at the top of the HTML page.  See 
+<a href="#breakiterator"><code>-breakiterator</code></a>
+for a description of how we are planning in a future release to 
+change the way the sentence break is determined.
+<p>
+
+<b>Declaration with multiple fields</b> - Java allows declaring multiple 
+fields in a single statement, but this statement can have only one 
+documentation comment, which is copied for all fields. Therefore if you 
+want individual documentation comments for each field, you must declare 
+each field in a separate statement. For example, the following 
+documentation comment doesn't make sense written as a single declaration
+and would be better handled as two declarations:
+
+<blockquote>
+<pre>
+/** 
+ * The horizontal and vertical distances of point (x,y)
+ */
+public int x, y;      // Avoid this  
+</pre>
+</blockquote>
+
+The Javadoc tool generates the following documentation from the above code:
+
+<blockquote>
+<pre>
+public int <b>x</b></pre>
+<dl>
+    <dd>The horizontal and vertical distances of point (x,y)
+</dl>
+
+<pre>
+public int <b>y</b></pre>
+<dl>
+    <dd>The horizontal and vertical distances of point (x,y)
+</dl>
+</blockquote>
+
+<b>Use header tags carefully</b> - When writing documentation
+comments for members, it's best not to use HTML heading tags such 
+as &lt;H1&gt; and &lt;H2&gt;, because the Javadoc tool creates an entire 
+structured document and these structural tags might interfere with 
+the formatting of the generated document.  However, it is fine
+to use these headings in class and package comments to provide 
+your own structure.
+<p>
+
+<a name="inheritingcomments"></a>
+<h3>Automatic Copying of Method Comments</h3>
+
+The Javadoc tool has the ability to copy or "inherit" method
+comments in classes and interfaces under the following two 
+circumstances.  Constructors, fields and nested classes 
+do not inherit doc comments.
+
+<ul>
+  <li><b>Automatically inherit comment to fill in missing text</b> - 
+When a <a href="#maindescription">main description</a>, or 
+<code>@return</code>, 
+<code>@param</code> or <code>@throws</code> <!-- or @see? -->
+tag is missing from a method comment, the Javadoc tool copies
+the corresponding main description or tag comment from the method it 
+overrides or implements (if any), according to the algorithm below.
+<p>
+  
+More specifically, when a <code>@param</code> tag for a particular 
+parameter is missing, then the comment for that parameter is copied
+from the method further up the inheritance hierarchy.
+When a <code>@throws</code> tag for a particular exception is 
+missing, the <code>@throws</code> tag is copied <i>only if that 
+exception is declared</i>.
+<p>
+  
+This behavior contrasts with version 1.3 and earlier, where the 
+presence of any main description or tag would prevent all comments from 
+being inherited.
+<p>
+
+<li><b>Explicitly inherit comment with {@inheritDoc} tag</b> - 
+Insert the inline tag 
+<a href="#{@inheritDoc}"><code>{@inheritDoc}</code></a> 
+in a method main description or <code>@return</code>, 
+<code>@param</code> or <code>@throws</code> tag comment 
+-- the corresponding inherited main description or tag comment is 
+copied into that spot.
+</ul>
+<p>
+
+The source file for the inherited method need only be on the
+path specified by <a href="#sourcepath">-sourcepath</a>
+for the doc comment to actually be available to copy.
+Neither the class nor its package needs to be passed in on the 
+command line.
+This contrasts with 1.3.x and earlier releases, where 
+the class had to be a <a href="#documentedclasses">documented class</a>
+<p>
+
+<b>Inherit from classes and interfaces</b> - 
+Inheriting of comments occurs in all three possible cases of
+inheritance from classes and interfaces:
+<ul>
+  <li>When a method in a class overrides a method in a superclass
+  <li>When a method in an interface overrides a method in a superinterface
+  <li>When a method in a class implements a method in an interface
+</ul>
+<p>
+
+In the first two cases, for method overrides, the Javadoc tool generates 
+a subheading "Overrides" in the documentation for the overriding
+method, with a link to the method it is overriding, whether or not
+the comment is inherited.
+<p>
+
+In the third case, when a method in a given class implements a method 
+in an interface, the Javadoc tool generates a subheading "Specified by" in 
+the documentation for the overriding method, with a link to the 
+method it is implementing.  This happens whether or not the comment
+is inherited.  
+<p>
+
+
+<a name="algorithmforinheriting"></a>
+<b>Algorithm for Inheriting Method Comments</b> -
+If a method does not have a doc comment, or has an {@inheritDoc} tag, 
+the Javadoc tool searches for an 
+applicable comment using the following algorithm, which is designed to find
+the most specific applicable doc comment, giving preference to interfaces 
+over superclasses:
+<p>
+
+<ol>
+ <li>Look in each directly implemented (or extended) interface in the order
+ they appear following the word implements (or extends) in the method
+ declaration.  Use the first doc comment found for this method. </li>
+
+ <li>If step 1 failed to find a doc comment, recursively apply this entire
+ algorithm to each directly implemented (or extended) interface, in the same
+ order they were examined in step 1. </li>
+
+ <li>If step 2 failed to find a doc comment and this is a class other than
+ Object (not an interface): </li>
+
+  <ol type=a>
+   <li>If the superclass has a doc comment for this method, use
+   it. </li>
+
+   <li>If step 3a failed to find a doc comment, recursively apply
+   this entire algorithm to the superclass. </li>
+  </ol>
+ </ol>
+
+</blockquote>
+
+<br>
+<!-- ====================== TAGS ========================= -->
+
+<a name="javadoctags"></a>
+<h2>JAVADOC TAGS</h2>
+
+<blockquote>
+
+The Javadoc tool parses special tags when they are embedded
+within a Java doc comment. These doc tags enable you to autogenerate a
+complete, well-formatted API from your source code. The tags start
+with an "at" sign (<code>@</code>) and are case-sensitive -- they must
+be typed with the uppercase and lowercase letters as shown.
+A tag must start at the beginning of a line (after any leading spaces
+and an optional asterisk) or it is treated as normal text.  By convention, 
+tags with the same name are grouped together.  For example, put all 
+<code>@see</code> tags together.
+
+<a name="standalonetags"></a> &nbsp;<a name="blocktags"></a>
+<p>
+<a name="inlinetags"></a> 
+Tags come in two types:
+<ul>
+  <li><b>Block tags</b> - Can be placed only in the 
+      <a href="#tagsection">tag section</a> that follows the main description.
+      Block tags are of the form: <code>@tag</code>.
+  <li><b>Inline tags</b> - Can be placed anywhere in the 
+      <a href="#maindescription">main description</a> 
+      or in the comments for block tags.
+      Inline tags are denoted by curly braces: <code>{@tag}</code>.
+</ul>
+For information about tags we might introduce in future releases, 
+see <a href="http://java.sun.com/j2se/javadoc/proposed-tags.html">Proposed Tags</a>.
+<p>
+The current tags are:
+
+<blockquote>
+<TABLE BORDER=0 WIDTH=40%>
+<TR><TD><b>Tag</b></TD>                                               <TD ALIGN=CENTER><b>Introduced in JDK/SDK</b></TD></TR>
+<TR><TD><a href="#@author"><code>@author</code></a> </TD>             <TD ALIGN=CENTER>1.0</TD></TR>
+<TR><TD><a href="#{@docRoot}"><code>{@docRoot}</code></a> </TD>       <TD ALIGN=CENTER>1.3</TD></TR>
+<TR><TD><a href="#@deprecated"><code>@deprecated</code></a> </TD>     <TD ALIGN=CENTER>1.0</TD></TR>
+<TR><TD><a href="#@exception"><code>@exception</code></a> </TD>       <TD ALIGN=CENTER>1.0</TD></TR>
+<TR><TD><a href="#{@inheritDoc}"><code>{@inheritDoc}</code></a> </TD> <TD ALIGN=CENTER>1.4</TD></TR>
+<TR><TD><a href="#{@link}"><code>{@link}</code></a> </TD>             <TD ALIGN=CENTER>1.2</TD></TR>
+<TR><TD><a href="#{@linkplain}"><code>{@linkplain}</code></a> </TD>   <TD ALIGN=CENTER>1.4</TD></TR>
+<TR><TD><a href="#@param"><code>@param</code></a> </TD>               <TD ALIGN=CENTER>1.0</TD></TR>
+<TR><TD><a href="#@return"><code>@return</code></a> </TD>             <TD ALIGN=CENTER>1.0</TD></TR>
+<TR><TD><a href="#@see"><code>@see</code></a></TD>                    <TD ALIGN=CENTER>1.0</TD></TR>
+<TR><TD><a href="#@serial"><code>@serial</code></a> </TD>             <TD ALIGN=CENTER>1.2</TD></TR>
+<TR><TD><a href="#@serialData"><code>@serialData</code></a> </TD>     <TD ALIGN=CENTER>1.2</TD></TR>
+<TR><TD><a href="#@serialField"><code>@serialField</code></a> </TD>   <TD ALIGN=CENTER>1.2</TD></TR>
+<TR><TD><a href="#@since"><code>@since</code></a> </TD>               <TD ALIGN=CENTER>1.1</TD></TR>
+<TR><TD><a href="#@throws"><code>@throws</code></a> </TD>             <TD ALIGN=CENTER>1.2</TD></TR>
+<TR><TD><a href="#{@value}"><code>{@value}</code></a> </TD>           <TD ALIGN=CENTER>1.4</TD></TR>
+<TR><TD><a href="#@version"><code>@version</code></a> </TD>           <TD ALIGN=CENTER>1.0</TD></TR>
+</TABLE>
+<p>
+
+For custom tags, see the <a href="#tag">-tag</a> option.
+
+</blockquote>
+
+<dl>
+
+<a name="@author"></a>
+<dt><b><code>@author</code></b>&nbsp; <var>name-text</var>
+<dd>Adds an "Author" entry with the specified <var>name-text</var>
+to the generated docs when the -author option is used. 
+A doc comment may contain multiple <code>@author</code> tags.
+You can specify one name per <code>@author</code> tag or multiple
+names per tag.  In the former case, the Javadoc tool inserts a comma (<code>,</code>) 
+and space between names.  In the latter case, the entire text is 
+simply copied to the generated document without being parsed.
+Therefore, you can use multiple names per line if you want a localized
+name separator other than comma.
+<p>
+
+For more details, see <a href="#wheretags">Where Tags Can Be Used</a> and
+<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#@author">writing @author tags</a>.
+<p>
+
+
+<a name="@deprecated"></a>
+<dt><b><code>@deprecated</code></b>&nbsp; <var>deprecated-text</var>
+<dd>Adds a comment indicating that this API should no longer
+be used (even though it may continue to work).  The Javadoc tool moves the 
+<var>deprecated-text</var> ahead of the 
+<a href="#maindescription">main description</a>, placing it in italics 
+and preceding it with a bold warning: "Deprecated". 
+This tag is valid in all doc comments: overview, package, class,
+interface, constructor, method and field.
+<p>
+
+The first sentence of <var>deprecated-text</var> should at least tell the 
+user when the API was deprecated and what to use as a replacement.  
+The Javadoc tool copies just the first sentence to the summary section and index.
+Subsequent sentences can also explain why it has been deprecated. 
+You should include a <code>{@link}</code> tag (for Javadoc 1.2 or 
+later) that points to the replacement API:
+<p>
+
+For more details, see
+<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#@deprecated">writing @deprecated tags</a>.
+<p>
+<ul type=disc>
+
+<li>For Javadoc 1.2 and later, use a <code>{@link}</code> tag.  This creates 
+    the link in-line, where you want it. For example: 
+<pre>
+/**
+ * @deprecated  As of JDK 1.1, replaced by {@link #setBounds(int,int,int,int)}
+ */
+</pre>
+
+  <li>For Javadoc 1.1, the standard format is to create a <code>@see</code> tag
+      (which cannot be in-line) for each <code>@deprecated</code> tag.
+</ul>
+<p>
+
+For more about deprecation, see 
+<a href="../../guide/misc/deprecation/index.html">The
+@deprecated tag</a>. 
+<p>
+
+
+<a name="{@docRoot}"></a>
+<dt><b><code>{@docRoot}</code></b>
+<dd>Represents the relative path to the generated document's (destination)
+root directory from any generated page.  It is useful when you want to 
+include a file, such as a copyright page or company logo, that you want 
+to reference from all generated pages.  Linking to the copyright page from
+the bottom of each page is common.
+<p>
+
+This <code>{@docRoot}</code> tag can be used both on the command line 
+and in a doc comment:
+This tag is valid in all doc comments: overview, package, class,
+interface, constructor, method and field, including the text portion 
+of any tag (such as @return, @param and @deprecated).
+<p>
+<ol>
+  <li> On the command line, where the header/footer/bottom are defined:
+<pre>
+   javadoc -bottom '&lt;a href="{@docRoot}/copyright.html"&gt;Copyright&lt;/a&gt;'
+</pre>
+
+NOTE - When using <code>{@docRoot}</code> this way in a make file, 
+some makefile programs require special escaping for the brace {} 
+characters.  For example, the Inprise MAKE version 5.2 running
+on Windows requires double braces: <code>{{@docRoot}}</code>.
+It also requires double (rather than single) quotes to enclose 
+arguments to options such as <code>-bottom</code> (with the quotes 
+around the <code>href</code> argument omitted).
+<p>
+
+  <li> In a doc comment:
+<pre>
+   /**
+    * See the &lt;a href="{@docRoot}/copyright.html"&gt;Copyright&lt;/a&gt;.
+    */
+</pre>
+
+</ol>
+
+The reason this tag is needed is because the generated docs
+are in hierarchical directories, as deep as the number of subpackages.
+This expression:
+<pre>
+  &lt;a href="{@docRoot}/copyright.html"&gt;
+</pre>
+would resolve to:
+<pre>
+  &lt;a href="../../copyright.html"&gt;      for java/lang/Object.java
+</pre>
+and
+<pre>
+  &lt;a href="../../../copyright.html"&gt;   for java/lang/ref/Reference.java
+</pre>
+
+<p>
+
+<a name="@exception"></a>
+<dt><b><code>@exception</code></b>&nbsp; <var>class-name</var>&nbsp; <var>description</var>
+<dd>The <code>@exception</code> tag is a synonym for <a href="#@throws"><code>@throws</code></a>.
+<p>
+
+
+<a name="{@inheritDoc}"></a>
+<dt><b><code>{@inheritDoc}</code></b>&nbsp;</b>
+
+<dd><B>Note: This feature is broken in 1.4.0, but fixed in 1.4.1</B><br>
+Inherits (copies) documentation from the 
+"<a href="#inheritingcomments">nearest</a>" inheritable class or
+implementable interface into the current doc comment at this tag's
+location.  This allows you to write more general comments higher 
+up the inheritance tree, and to write around the copied text. 
+<p>
+
+This tag is valid only in these places in a doc comment:
+<ul type="disc">
+   <li>In the <a href="#maindescription">main description</a> block
+       of a method.  In this case, the main description is copied 
+       from a class or interface up the hierarchy.
+   <li>In the text arguments of the @return, @param and @throws
+       tags of a method.  In this case, the tag 
+       text is copied from the corresponding tag up the hierarchy.
+</ul>
+<p>
+
+See <a href="#inheritingcomments">Automatic Copying of Method 
+Comments</a> for a more precise description of 
+how comments are found in the inheritance hierarchy.
+Note that if this tag is missing, the comment is or is not 
+automatically inherited according to rules described 
+in that section.
+<p>
+
+
+<a name="{@link}"></a>
+<dt><b><code>{@link</code></b>&nbsp; <var>package.class</var><code>#</code><var>member</var>&nbsp; <var>label</var><b><code>}</code></b>
+
+<dd>Inserts an in-line link with visible text <i>label</i> that points 
+to the documentation for the specified package, class or member 
+<a href="#name">name</a> of a referenced class.
+This tag is valid in all doc comments: overview, package, class, 
+interface, constructor, method and field, including the text portion 
+of any tag (such as @return, @param and @deprecated). 
+<p>
+
+This tag is very simliar to <a href="#@see"><code>@see</code></a> -- 
+both require the same references and accept exactly the same syntax for 
+<a href="#package.class"><var>package.class</var><code>#</code><var>member</var></a>
+and <var>label</var>.  The main difference is that <code>{@link}</code>
+generates an in-line link rather than placing the link in the 
+"See Also" section.   Also, the <code>{@link}</code> tag begins and ends with 
+curly braces to separate it from the rest of the in-line text.  If you need 
+to use "}" inside the label, use the HTML entity notation &amp;#125;
+<p>
+There is no limit to the number of <code>{@link}</code> tags allowed in a sentence.
+You can use this tag in the <a href="#maindescription">main description</a> 
+part of any documentation comment 
+or in the text portion of any tag (such as @deprecated, @return or @param).
+<p>
+For example, here is a comment that refers to the 
+<code>getComponentAt(int, int)</code> method:
+
+<pre>
+Use the {@link #getComponentAt(int, int) getComponentAt} method.
+</pre>
+
+From this, the standard doclet would generate the following HTML (assuming it
+refers to another class in the same package):
+
+<pre>
+Use the &lt;a href="Component.html#getComponentAt(int, int)"&gt;getComponentAt&lt;/a&gt; method.
+</pre>
+
+Which appears on the web page as:
+
+<pre>
+Use the <u>getComponentAt</u> method.
+</pre>
+
+You can extend <code>{@link}</code> to link to classes not
+being documented by using the 
+<a href="#link"><code>-link</code></a> option.
+<p>
+
+For more details, see
+<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#{@link}">writing {@link} tags</a>.
+<p>
+
+
+<a name="{@linkplain}"></a>
+<dt><b><code>{@linkplain</code></b>&nbsp; <var>package.class</var><code>#</code><var>member</var>&nbsp; <var>label</var><b><code>}</code></b>
+
+<dd>Identical to <code>{@link}</code>, except the link's label is
+displayed in plain text than code font.  Useful when the label 
+is plain text.  Example:
+<pre>
+     Refer to {@linkplain add() the overridden method}.
+</pre>
+This would display as:
+<blockquote>
+        Refer to <u>the overridden method</u>.
+</blockquote>
+
+<a name="@param"></a>
+<dt><b><code>@param</code></b>&nbsp; <var>parameter-name</var><code> </code><var>description</var>
+<dd>Adds a parameter to the "Parameters" section. The description may
+be continued on the next line.
+This tag is valid only in a doc comment for a method or constructor.
+<p>
+
+For more details, see 
+<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#@param">writing @param tags</a>.
+<p>
+
+<a name="@return"></a>
+<dt><b><code>@return</code></b>&nbsp; <var>description</var>
+<dd>Adds a "Returns" section with the <var>description</var> text. 
+This text should describe the return type and permissible range of values.
+This tag is valid only in a doc comment for a method.
+<p>
+
+For more details, see 
+<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#@return">writing @return tags</a>.
+<p>
+
+
+<a name="@see"></a>
+<dt><b><code>@see</code></b>&nbsp; <var>reference</var>
+<dd>Adds a "See Also" heading with a link or text entry that points to 
+<var>reference</var>.  A doc comment may contain any number of 
+<code>@see</code> tags, which are all grouped under the same heading.
+The <code>@see</code> tag has three variations; the third form below 
+is the most common.  
+This tag is valid in any doc comment: overview, package, class, 
+interface, constructor, method or field.
+For inserting an in-line link within a sentence 
+to a package, class or member, see 
+<a href="#{@link}"><code>{@link}</code></a>.
+<p>
+
+<dl>
+
+<dt><b><code>@see</code></b> <code>"</code><var>string</var>"
+
+<dd>Adds a text entry for <var>string</var>.
+    No link is generated. The <var>string</var> is a book or other reference 
+    to information not available by URL.  The Javadoc tool distinguishes
+    this from the previous cases by looking for a double-quote (<code>"</code>) 
+    as the first character. For example:
+<pre>
+     @see "The Java Programming Language"
+</pre>
+    This generates text such as:
+<blockquote>
+<dl>
+     <dt><b>See Also:</b> 
+        <dd>"The Java Programming Language"
+</dl>
+
+</blockquote>
+
+
+<dt><b><code>@see</code></b> <code>&lt;a href="</code><var>URL#value</var><code>"&gt;</code><var>label</var><code>&lt;/a&gt;</code>
+<dd>Adds a link as defined by <var>URL#value</var>.
+    The <var>URL#value</var> is a relative or absolute URL. The Javadoc tool distinguishes
+    this from other cases by looking for a less-than symbol 
+    (<code>&lt;</code>) as the first character.  For example:
+<pre>
+     @see &lt;a href="spec.html#section"&gt;Java Spec&lt;/a&gt;
+</pre>
+    This generates a link such as:
+<blockquote>
+<dl>
+     <dt><b>See Also:</b> 
+        <dd><u>Java Spec</u>
+</dl>
+</blockquote>
+
+<a name="package.class"></a>
+<dt><b><code>@see</code></b>&nbsp; <var>package.class</var><code>#</code><var>member</var>&nbsp; <var>label</var>
+<dd>Adds a link, with visible text <var>label</var>, that points to the documentation 
+    for the specified <a href="#name">name</a> in the Java Language that is 
+    <a href="#referencedclasses">referenced</a>.
+    The <var>label</var> is optional; if omitted, the name appears instead
+    as the visible text, suitably shortened -- see <a href="#shortened">How a name 
+    is displayed</a>.  Use <a href="#noqualifier">-noqualifier</a> 
+    to globally remove the package name from this visible text.
+    Use the label when you want the visible text to be different from 
+    the auto-generated visible text.  
+<p>
+    Only in version 1.2, just the name but not the label would automatically
+    appear in &lt;code&gt; HTML tags, Starting with 1.2.2, the &lt;code&gt;
+    is always included around the visible text, whether or not a label is used.
+<p>
+
+<a name="packageclassmember"><!-- --></a>
+<ul type="disc">
+  <li><b><var>package.class</var><code>#</code><var>member</var></b> is any valid
+      program element <a href="#name">name</a> that is  
+      <a href="#referencedclasses">referenced</a> -- a package, 
+      class, interface, constructor, method or field name
+      -- except that the character ahead of the member name
+      should be a hash character (<code>#</code>). 
+      The <var>class</var> represents any top-level or nested 
+      class or interface.  The <var>member</var> represents any
+      constructor, method or field (not a nested class or interface).
+      If this name is in the documented classes, the Javadoc tool will
+      automatically create a link to it.  To create links to 
+      <a href="#externalreferencedclasses">external referenced
+      classes</a>, use the <a href="#link"><code>-link</code></a> option.  
+      Use either of the other two <code>@see</code> forms for referring 
+      to documentation of a name that does not belong to a referenced class.
+      This argument is described at greater length below under 
+      <a href="#specifyingname">Specifying a Name</a>.
+<p>
+
+  <li><b><var>label</var></b> is optional text that is visible as the link's 
+      label.  The <var>label</var> can contain whitespace.  If <var>label</var> 
+      is omitted, then <i>package.class.member</i>
+      will appear, suitably shortened relative to the current class and package -- 
+      see <a href="#shortened">How a name is displayed</a>.
+<p>
+
+  <li>A space is the delimiter between
+      <var>package.class</var><code>#</code><var>member</var> and <var>label</var>.  
+      A space inside parentheses does not indicate the start of a label, so spaces 
+      may be used between parameters in a method.
+<p>
+</ul>
+<p>
+
+<b>Example</b> - In this example, an <code>@see</code> tag (in the <code>Character</code> 
+class) refers to the <code>equals</code> method in the <code>String</code> class.  
+The tag includes both arguments: the name "<code>String#equals(Object)</code>" 
+and the label "<code>equals</code>".  
+
+<blockquote>
+<pre>
+ /**
+  * @see String#equals(Object) equals
+  */
+</pre>
+</blockquote>
+
+The standard doclet produces HTML something like this:
+
+<blockquote>
+<pre>&lt;dl&gt;
+&lt;dt&gt;&lt;b&gt;See Also:&lt;/b&gt;
+&lt;dd&gt;&lt;a href="../../java/lang/String#equals(java.lang.Object)"&gt;&lt;code&gt;equals&lt;code&gt;&lt;/a&gt;
+&lt;/dl&gt;
+</pre>
+</blockquote>
+
+Which looks something like this in a browser, where the label is the visible link text:
+<blockquote>
+<p>
+
+<dl>
+<dt><b>See Also:</b>
+<dd><u>equals</u>
+</dl>
+
+</blockquote>
+
+<a name="specifyingname"></a>
+<p>
+      <b>Specifying a name</b> - This 
+      <var>package.class</var><code>#</code><var>member</var>
+      name can be either fully-qualified, such as
+      <code>java.lang.String#toUpperCase()</code> or not, 
+      such as <code>String#toUpperCase()</code> or <code>#toUpperCase()</code>. 
+      If less than fully-qualified, the Javadoc tool uses the 
+      normal Java compiler search order to find it, further 
+      described below in <a href="#seesearchorder">Search order for @see</a>.  
+      The name can contain whitespace within parentheses, such as 
+      between method arguments.  
+<p>
+
+Of course the advantage of providing shorter, "partially-qualified" names
+is that they are shorter to type and there is less clutter in the source code.
+The following table shows the different forms of the name, 
+where <var>Class</var> 
+can be a class or interface, <var>Type</var> can be a class, interface, 
+array, or primitive, and <var>method</var> can be a method or constructor.
+<p>
+
+<a name="typicalformsfor@see"></a>
+<table border=1 cellspacing=0 cellpadding=5 summary="Typical forms for the @see tag">
+
+<tr bgcolor="#cccccc">
+<td colspan=3>
+<b>Typical forms for <code>@see</code> <i>package.class#member</i></b>
+</td>
+</tr>
+
+<tr>
+<td valign=top>
+<b>Referencing a member of the current class</b><br>
+<code>@see</code>&nbsp; <code>#</code><var>field</var><br>
+<code>@see</code>&nbsp; <code>#</code><var>method(Type, Type,...)</var><br>
+<code>@see</code>&nbsp; <code>#</code><var>method(Type argname, Type argname,...)</var><br>
+<code>@see</code>&nbsp; <code>#</code><var>constructor(Type, Type,...)</var><br>
+<code>@see</code>&nbsp; <code>#</code><var>constructor(Type argname, Type argname,...)</var><br>
+<br>
+<b>Referencing another class in the current or imported packages</b><br>
+<code>@see</code>&nbsp; <var>Class</var><code>#</code><var>field</var><br>
+<code>@see</code>&nbsp; <var>Class</var><code>#</code><var>method(Type, Type,...)</var><br>
+<code>@see</code>&nbsp; <var>Class</var><code>#</code><var>method(Type argname, Type argname,...)</var><br>
+<code>@see</code>&nbsp; <var>Class</var><code>#</code><var>constructor(Type, Type,...)</var><br>
+<code>@see</code>&nbsp; <var>Class</var><code>#</code><var>constructor(Type argname, Type argname,...)</var><br>
+<code>@see</code>&nbsp; <var>Class.NestedClass</var><br>
+<code>@see</code>&nbsp; <var>Class</var><br>
+<br>
+<b>Referencing an element in another package</b> (fully qualified)<br>
+<code>@see</code>&nbsp; <var>package.Class</var><code>#</code><var>field</var><br>
+<code>@see</code>&nbsp; <var>package.Class</var><code>#</code><var>method(Type, Type,...)</var><br>
+<code>@see</code>&nbsp; <var>package.Class</var><code>#</code><var>method(Type argname, Type argname,...)</var><br>
+<code>@see</code>&nbsp; <var>package.Class</var><code>#</code><var>constructor(Type, Type,...)</var><br>
+<code>@see</code>&nbsp; <var>package.Class</var><code>#</code><var>constructor(Type argname, Type argname,...)</var><br>
+<code>@see</code>&nbsp; <var>package.Class.NestedClass</var><br>
+<code>@see</code>&nbsp; <var>package.Class</var><br>
+<code>@see</code>&nbsp; <var>package</var>
+</td>
+</tr>
+</table>
+<p>
+
+The following notes apply to the above table:
+<p>
+<ul type=circle>
+  <li>The first set of forms (with no class or package) will cause the Javadoc tool to
+      search only through the current class's hierarchy.  It will  
+      find a member of the current class or interface, one of its
+      superclasses or superinterfaces, or one of its enclosing classes 
+      or interfaces (<a href="#seesearchorder">search steps 1-3</a>).
+      It will not search the rest of the current package or other packages
+      (search steps 4-5).
+  <li>If any method or constructor is entered as a name with no parentheses, 
+      such as <code>getValue</code>, and if there is no field with the same name, 
+      the Javadoc tool will correctly create a link to it, but will print 
+      a warning message reminding you to add the parentheses and arguments.
+      If this method is overloaded, the Javadoc tool will link to the first method
+      its search encounters, which is unspecified.
+  <li>Nested classes must be specified as 
+      <var>outer</var><code>.</code><var>inner</var>,
+      not simply <var>inner</var>, for all forms.
+  <li>As stated, the hash character (<code>#</code>), rather than a dot 
+      (<code>.</code>) separates a member from its class.  This enables the Javadoc tool 
+      to resolve ambiguities, since the dot also separates classes, nested classes, 
+      packages, and subpackages.  However, the Javadoc tool is generally lenient and 
+      will properly parse a dot if you know there is no ambiguity, though it will 
+      print a warning.
+</ul>
+<p>
+
+
+<a name="seesearchorder"></a>
+<b>Search order for @see</b> - the Javadoc tool will process a 
+<code>@see</code> tag that appears in a source file (.java), 
+package file (package.html) or overview file (overview.html).
+In the latter two files, you must fully-qualify the name
+you supply with <code>@see</code>.  In a source file, you can 
+specify a name that is fully-qualified or partially-qualified.  
+<p>
+
+When the Javadoc tool encounters a <code>@see</code> tag in a 
+<code>.java</code> file that is <i>not</i> fully qualified,  it 
+searches for the specified name in the same order as the Java 
+compiler would (except the Javadoc tool will not detect certain namespace 
+ambiguities, since it assumes the source code is free of these 
+errors). This search order is formally defined in Chapter 6, "Names" 
+of the <i>Java Language Specification</i>, Second Edition.  The Javadoc tool 
+searches for that name through all related 
+and imported classes and packages.  In particular, it searches in this order:
+<p>
+
+<ol>
+  <li>the current class or interface
+  <li>any enclosing classes and interfaces, searching closest first
+  <li>any superclasses and superinterfaces, searching closest first
+  <li>the current package
+  <li>any imported packages, classes and interfaces, searching
+      in the order of the import statement
+</ol>
+<p>
+
+The Javadoc tool continues to search recursively through steps 1-3
+for each class it encounters until it finds a match.  That is, after 
+it searches through the current class and its enclosing class E, 
+it will search through E's superclasses before E's enclosing classes.
+
+<!-- The order of steps 2 and 3 above don't matter.
+A compiler error occurs if a member is both in an enclosing class
+and a superclass, according to Atul. -->
+
+In steps 4 and 5, the Javadoc tool does not search classes or interfaces
+within a package in any specified order (that order depends on 
+the particular compiler).  In step 5, the Javadoc tool looks in 
+java.lang, since that is automatically imported by all programs.
+<p>
+
+The Javadoc tool does not necessarily look in subclasses, nor will it look 
+in other packages even if their documentation is being generated 
+in the same run.  For example, if the <code>@see</code> tag is 
+in the <code>java.awt.event.KeyEvent</code> class and refers to a name 
+in the <code>java.awt</code> package, javadoc does not look in that 
+package unless that class imports it.
+<p>
+
+<a name="shortened"></a>
+<b>How a name is displayed</b> -
+If <var>label</var> is omitted, then <i>package.class.member</i>
+appears.  In general, it is suitably 
+shortened relative to the current class and package.  
+By "shortened", we mean the Javadoc tool displays
+only the minimum name necessary.  For example, if the 
+<code>String.toUpperCase()</code> method contains references
+to a member of the same class and to a member of a different
+class, the class name is displayed only in the latter case,
+as shown in the following table.
+<p>
+Use <a href="#noqualifier">-noqualifier</a> to globally remove 
+the package names.
+<p>
+
+<table border=1 cellspacing=0 cellpadding=5 summary="How a name is displayed">
+<tr bgcolor="#cccccc">
+<th>
+Type of Reference
+</th>
+<th>
+      <b>Example in <code>String.toUpperCase()</code></b>
+</th>
+<th>
+      <b>Displays As</b>
+</th>
+</tr>
+
+<tr valign=top>
+   <td>
+      <code>@see</code> tag refers to member of the same class, same package
+   </td>
+
+   <td>
+      <code>@see String#toLowerCase()</code> <br>
+   </td>
+
+   <td>
+      <code>toLowerCase()</code> <br>
+      <font size="-1">
+      (omits the package and class names)
+      </font>
+</tr>
+
+<tr valign=top>
+   <td>
+      <code>@see</code> tag refers to member of a different class, same package
+   </td>
+
+   <td>
+    <code>@see Character#toLowerCase(char)</code> <br>
+   </td>
+
+   <td>
+      <code>Character.toLowerCase(char)</code> <br>
+      <font size="-1">
+      (omits the package name, includes the class name)
+      </font>
+   </td>
+</tr>
+
+<tr valign=top>
+   <td>
+      <code>@see</code> tag refers to member of a different class, different package
+   </td>
+
+   <td>
+    <code>@see java.io.File#exists()</code> <br>
+   </td>
+
+   <td>
+      <code>java.io.File.exists()</code> <br>
+      <font size="-1">
+      (includes the package and class names)
+      </font>
+   </td>
+</tr>
+</table>
+
+<p>
+
+
+</ul>
+
+<a name="seeexamples"><!-- --></a>
+<b>Examples of @see</b><br>
+The comment to the right shows how the name would be displayed if the
+<code>@see</code> tag is in a class in another package, such as 
+<code>java.applet.Applet</code>.
+
+<pre>
+                                           See also: 
+@see java.lang.String                   //  <u>String</u>                          <!-- [1] --> 
+@see java.lang.String The String class  //  <u>The String class</u>                <!-- [2] --> 
+@see String                             //  <u>String</u>                          <!-- [3] --> 
+@see String#equals(Object)              //  <u>String.equals(Object)</u>           <!-- [4] --> 
+@see String#equals                      //  <u>String.equals(java.lang.Object)</u> <!-- [5] -->  
+@see java.lang.Object#wait(long)        //  <u>java.lang.Object.wait(long)</u>     <!-- [6] --> 
+@see Character#MAX_RADIX                //  <u>Character.MAX_RADIX</u>             <!-- [7] --> 
+@see &lt;a href="spec.html"&gt;Java Spec&lt;/a&gt;  //  <u>Java Spec</u>           <!-- [8] --> 
+@see "The Java Programming Language"    //  "The Java Programming Language"        <!-- [9] --> 
+</pre>
+
+<!--
+[1] Because <code>String</code> is in a package other than <code>java.applet</code>, 
+it is is displayed
+<p>
+
+[2] This example includes the label "The String class".
+<p>
+
+[3] Because <code>String</code> is
+<p>
+
+[4] Because the parentheses following <code>equals</code> are missing, 
+the Javadoc tool first looks for a field named <code>equals</code> in the <code>String</code> 
+class before looking for a method by that name.  Because the argument was not specified,
+and because it is in a different package, Because the parentheses are missing,
+this prints a warning.
+<p>
+-->
+
+You can extend <code>@see</code> to link to classes not
+being documented by using the 
+<a href="#link"><code>-link</code></a> option.
+<p>
+
+For more details, see 
+<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#@see">writing @see tags</a>.
+<p>
+
+
+<a name="@serial"></a>
+<dt><b><code>@serial</code></b>&nbsp; <var>field-description</var><code> | include | exclude</code>
+ <dd>Used in the doc comment for a default serializable field.
+<p>          
+
+     An optional <var>field-description</var> should explain the meaning 
+     of the field and list the acceptable values. If needed, the description 
+     can span multiple lines.  The standard doclet adds this information to 
+     the <a href="#serialized-form.html">serialized form page</a>.
+<p>    
+
+     If a serializable field was added to a class some time after the class 
+     was made serializable, a statement should be added to its 
+     <a href="#maindescription">main description</a>
+     to identify at which version it was added. 
+<p>
+
+     The <code>include</code> and <code>exclude</code> arguments identify
+     whether a class or package should be included or excluded from
+     the serialized form page.  They work as follows:
+<p>
+
+<ul type="disc">
+  <li>A public or protected class that implements <code>Serializable</code> 
+      is <i>included</i> unless that class (or its package) is marked 
+      <code>@serial exclude</code>.
+
+  <li>A private or package-private class that implements 
+      <code>Serializable</code> is <i>excluded</i> unless that 
+      class (or its package) is marked <code>@serial include</code>.
+</ul>
+<p>
+Examples:  The <code>javax.swing</code> package is marked 
+<code>@serial exclude</code> (in <code>package.html</code>). The public 
+class <code>java.security.BasicPermission</code> is marked 
+<code>@serial exclude</code>. The package-private class 
+<code>java.util.PropertyPermissionCollection</code> is marked 
+<code>@serial include</code>.
+<p>
+
+The tag @serial at a class level overrides @serial at a package level.
+<p>
+
+     For more information about how to use these tags, along with an example, 
+     see
+     "<a href="../../guide/serialization/spec/serial-arch.html">Documenting 
+     Serializable Fields and Data for a Class</a>,"
+     Section 1.6 of the <em>Java Object Serialization Specification</em>.
+     Also see the
+     <a href="http://java.sun.com/products/jdk/serialization/faq/#javadoc_warn_missing">
+     Serialization FAQ</a>, which covers common questions, such as
+     "Why do I see javadoc warnings stating that I am missing @serial 
+     tags for private fields if I am not running javadoc with the -private switch?".
+     Also see 
+     <a href="http://java.sun.com/j2se/javadoc/writingapispecs/serialized-criteria.html">Sun's 
+     criteria</a> for including classes in the serialized form specification. 
+<p>
+
+<a name="@serialField"></a>
+<dt><b><code>@serialField</code></b>&nbsp; <var>field-name</var>&nbsp; <var>field-type</var>&nbsp; <var>field-description</var> 
+ <dd>Documents an <code>ObjectStreamField</code> component of a 
+     <code>Serializable</code> class's <code>serialPersistentFields</code> 
+     member. One <code>@serialField</code> tag should be used for 
+     each <code>ObjectStreamField</code> component. 
+<p>
+
+<a name="@serialData"></a>
+<dt><b><code>@serialData</code></b>&nbsp; <var>data-description</var>
+ <dd>The <var>data-description</var> documents the types and order of data
+     in the serialized form.  Specifically, this data includes
+     the optional data written by the <code>writeObject</code>
+     method and all data (including base classes) written by the 
+     <code>Externalizable.writeExternal</code> method.
+<p>
+     
+     The <code>@serialData</code> tag can be used in the doc comment
+     for the <code>writeObject</code>, <code>readObject</code>, 
+     <code>writeExternal</code>, and <code>readExternal</code> methods.
+<p>
+
+
+<a name="@since"></a>
+<dt><b><code>@since</code></b>&nbsp; <var>since-text</var>
+<dd>Adds a "Since" heading with the specified <var>since-text</var>
+to the generated documentation. The text has no special internal structure.
+This tag is valid in any doc comment: overview, package, class, 
+interface, constructor, method or field. 
+This tag means that this change or feature has existed since the 
+software release specified by the <var>since-text</var>. For example:
+<pre>
+    @since 1.4
+</pre>
+For source code in the Java platform, this tag indicates the version 
+of the Java platform API specification (not necessarily when it was 
+added to the reference implementation).  Multiple @since tags are allowed
+and are treated like multiple <a href="#@author">@author</a> tags.
+You could use multiple tags if the prgram element is used by 
+more than one API.
+<p>
+
+
+<a name="@throws"></a>
+<dt><b><code>@throws</code></b>&nbsp; <var>class-name</var>&nbsp; <var>description</var>
+<dd>The <code>@throws</code> and <code>@exception</code> tags are synonyms.
+Adds a "Throws" subheading to the generated documentation, with 
+the <var>class-name</var> and <var>description</var> text.  
+The <var>class-name</var> is the name of the exception that may 
+be thrown by the method.  This tag is valid only in the doc comment
+for a method or constructor.  If this class is not fully-specified, 
+the Javadoc tool uses the <a href="#seesearchorder">search order</a> to 
+look up this class.  Multiple <code>@throws</code> tags can be
+used in a given doc comment for the same or different exceptions.
+<p>
+
+To ensure that all checked exceptions are documented, if a
+<code>@throws</code> tag does not exist for an exception in
+the throws clause, the Javadoc tool automatically adds that 
+exception to the HTML output (with no description) as if 
+it were documented with @throws tag.  
+<p>
+
+The <code>@throws</code> documentation is copied from an overridden method 
+to a subclass only when the exception is explicitly declared in the 
+overridden method.  The same is true for copying from an interface
+method to an implementing method.  You can use 
+<a href="#{@inheritDoc}">{@inheritDoc}</a> to force
+@throws to inherit documentation.
+<p>
+
+For more details, see 
+<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#@exception">writing @throws tags</a>.
+<p>
+
+<a name="{@value}"></a>
+<dt><b><code>{@value}</code></b>
+<dd>When used in the doc comment of a static field, displays the value 
+of the constant.  These are the values displayed on the 
+<a href="../../api/constant-values.html">Constant Field Values</a> page.
+This tag is valid only in doc comments for fields.
+<p>
+
+<a name="@version"></a>
+<dt><b><code>@version</code></b>&nbsp; <var>version-text</var>
+<dd>Adds a "Version" subheading with the specified <var>version-text</var>
+to the generated docs when the -version option is used. This tag
+is intended to hold the current version number of the software 
+that this code is part of (as opposed to <a href="#@since">@since</a>, 
+which holds the version number where this code was introduced).
+The <var>version-text</var> has no special internal structure. 
+To see where the version tag can be used, see 
+<a href="#wheretags">Where Tags Can Be Used</a>.
+<p>
+A doc comment may contain multiple <code>@version</code> tags.
+If it makes sense, you can specify one version number per 
+<code>@version</code> tag or multiple version numbers per tag.  
+In the former case, the Javadoc tool inserts a comma (<code>,</code>) 
+and space between names.  In the latter case, the entire text is 
+simply copied to the generated document without being parsed.
+Therefore, you can use multiple names per line if you want a localized
+name separator other than comma.
+<p>
+For more details, see <a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html#@version">writing @version tags</a>.
+<p>
+
+</dl>
+
+
+<br>
+<!-- ==================== WHERE TAGS CAN BE USED ===================== -->
+
+<a name="wheretags"></a>
+<h3>Where Tags Can Be Used</h3>
+
+
+The following sections describe where the tags can be used.  Note that
+these tags can be used in all doc comments: <code>@see</code>,
+<code>@since</code>, <code>@deprecated</code>, <code>{@link}</code>, 
+<code>{@linkplain}</code>, and <code>{@docroot}</code>.
+<p>
+
+<blockquote>
+
+<br>
+<a name="overviewtags"></a>
+<h3>Overview Documentation Tags</h3>
+
+Overview tags are tags that can appear in the documentation comment for 
+the overview page (which resides in the source file typically named
+<code>overview.html</code>). Like in any other documentation comments, 
+these tags must appear after the 
+<a href="#maindescription">main description</a>.
+<p>
+<b>NOTE</b> - The <code>{@link}</code> tag has a bug in overview documents 
+in version 1.2 -- the text appears properly but has no link.
+The <code>{@docRoot}</code> tag does not currently work in overview
+documents.
+<p>
+<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=3 summary="layout">
+<TR BGCOLOR="#CCCCCC">
+<th>
+<b>Overview Tags</b>
+</th>
+</TR>
+
+<!-- Nested tables are used here only because the spacing between javadoc tags
+     is wider and looks better -->
+<TR>
+<TD>
+<TABLE BORDER=0 summary="layout">
+<TR><TD><a href="#@see"><code>@see</code></a></TD></TR>
+<TR><TD><a href="#@since"><code>@since</code></a> </TD></TR>
+<TR><TD><a href="#@author"><code>@author</code></a></TD></TR>
+<TR><TD><a href="#@version"><code>@version</code></a></TD></TR>
+<TR><TD><a href="#{@link}"><code>{@link}</code></a> </TD></TR>
+<TR><TD><a href="#{@linkplain}"><code>{@linkplain}</code></a> </TD></TR>
+<TR><TD><a href="#{@docRoot}"><code>{@docRoot}</code></a> </TD></TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+
+<br>
+<a name="packagetags"></a>
+<h3>Package Documentation Tags</h3>
+
+Package tags are tags that can appear in the documentation comment for
+a package (which resides in the source file named
+<code>package.html</code>).
+The <code>@serial</code> tag can only be used here with the
+<code>include</code> or <code>exclude</code> argument.
+<p>
+
+<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=3 summary="layout">
+<TR BGCOLOR="#CCCCCC">
+<th>
+<b>Package Tags</b>
+</th>
+</tr>
+
+<TR>
+<TD>
+<TABLE BORDER=0 summary="layout">
+<TR><TD><a href="#@see"><code>@see</code></a></TD></TR>
+<TR><TD><a href="#@since"><code>@since</code></a> </TD></TR>
+<TR><TD><a href="#@serial"><code>@serial</code></a></TD></TR>
+<TR><TD><a href="#@author"><code>@author</code></a></TD></TR>
+<TR><TD><a href="#@version"><code>@version</code></a></TD></TR>
+<TR><TD><a href="#{@link}"><code>{@link}</code></a> </TD></TR>
+<TR><TD><a href="#{@linkplain}"><code>{@linkplain}</code></a> </TD></TR>
+<TR><TD><a href="#{@docRoot}"><code>{@docRoot}</code></a> </TD></TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+<br>
+<a name="classtags"></a>
+<h3>Class and Interface Documentation Tags</h3>
+
+The following are tags that can appear in the documentation comment for a
+class or interface. 
+The <code>@serial</code> tag can only be used here with the
+<code>include</code> or <code>exclude</code> argument.
+<p>
+
+<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=3 summary="layout">
+<TR BGCOLOR="#CCCCCC">
+<th>
+<b>Class/Interface Tags</b>
+</th>
+</tr>
+
+<TR>
+<TD>
+<TABLE BORDER=0 summary="layout">
+<TR><TD><a href="#@see"><code>@see</code></a></TD></TR>
+<TR><TD><a href="#@since"><code>@since</code></a> </TD></TR>
+<TR><TD><a href="#@deprecated"><code>@deprecated</code></a></TD></TR>
+<TR><TD><a href="#@serial"><code>@serial</code></a></TD></TR>
+<TR><TD><a href="#@author"><code>@author</code></a></TD></TR>
+<TR><TD><a href="#@version"><code>@version</code></a></TD></TR>
+<TR><TD><a href="#{@link}"><code>{@link}</code></a> </TD></TR>
+<TR><TD><a href="#{@linkplain}"><code>{@linkplain}</code></a> </TD></TR>
+<!-- <TR><TD><a href="#{@inheritDoc}"><code>{@inheritDoc}</code></a> </TD></TR> -->
+<TR><TD><a href="#{@docRoot}"><code>{@docRoot}</code></a> </TD></TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+
+<a name="classexample"></a>
+<h4>An example of a class comment:</h4>
+<pre>
+/**
+ * A class representing a window on the screen.
+ * For example:
+ * &lt;pre&gt;
+ *    Window win = new Window(parent);
+ *    win.show();
+ * &lt;/pre&gt;
+ *
+ * @author  Sami Shaio
+ * @version &#37;I%, &#37;G%
+ * @see     java.awt.BaseWindow
+ * @see     java.awt.Button
+ */
+class Window extends BaseWindow {
+   ...
+}
+</pre>
+
+
+<br>
+<a name="fieldtags"></a>
+<h3>Field Documentation Tags</h3>
+
+The following are the tags that can appear in the documentation
+comment for a field.
+<p>
+
+<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=3 summary="layout">
+<TR BGCOLOR="#CCCCCC">
+<th>
+<b>Field Tags</b>
+</th>
+</tr>
+
+<TR>
+<TD>
+<TABLE BORDER=0 summary="layout">
+<TR><TD><a href="#@see"><code>@see</code></a></TD></TR>
+<TR><TD><a href="#@since"><code>@since</code></a> </TD></TR>
+<TR><TD><a href="#@deprecated"><code>@deprecated</code></a></TD></TR>
+<TR><TD><a href="#@serial"><code>@serial</code></a></TD></TR>
+<TR><TD><a href="#@serialField"><code>@serialField</code></a></TD></TR>
+<TR><TD><a href="#{@link}"><code>{@link}</code></a> </TD></TR>
+<TR><TD><a href="#{@linkplain}"><code>{@linkplain}</code></a> </TD></TR>
+<TR><TD><a href="#{@docRoot}"><code>{@docRoot}</code></a> </TD></TR>
+<TR><TD><a href="#{@value}"><code>{@value}</code></a> </TD></TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+<a name="fieldexample"></a>
+<h4>An example of a field comment:</h4>
+<pre>
+    /**
+     * The X-coordinate of the component.
+     *
+     * @see #getLocation()
+     */
+    int x = 1263732;
+</pre>
+
+
+<br>
+<a name="methodtags"></a>
+<h3>Constructor and Method Documentation Tags</h3>
+
+The following are the tags that can appear in the documentation
+comment for a constructor or method, except for
+<code>@return</code>, which cannot appear in a constructor,
+and <code>{@inheritDoc}</code>, which has 
+<a href="#{@inheritDoc}">certain restrictions</a>.
+The <code>@serialData</code> tag can only be used in the doc 
+comment for <a href="#@serialData">certain serialization methods</a>.
+<p>
+
+<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=3 summary="layout">
+<TR BGCOLOR="#CCCCCC">
+<th>
+<b>Method/Constructor Tags</b>
+</th>
+</tr>
+
+<TR>
+<TD>
+<TABLE BORDER=0 summary="layout">
+<TR><TD><a href="#@see"><code>@see</code></a></TD></TR>
+<TR><TD><a href="#@since"><code>@since</code></a> </TD></TR>
+<TR><TD><a href="#@deprecated"><code>@deprecated</code></a></TD></TR>
+<TR><TD><a href="#@param"><code>@param</code></a></TD></TR>
+<TR><TD><a href="#@return"><code>@return</code></a></TD></TR>
+<TR><TD><a href="#@throws"><code>@throws</code></a> and <a href="#@exception"><code>@exception</code></a></TD></TR>
+<TR><TD><a href="#@serialData"><code>@serialData</code></a></TD></TR>
+<TR><TD><a href="#{@link}"><code>{@link}</code></a> </TD></TR>
+<TR><TD><a href="#{@linkplain}"><code>{@linkplain}</code></a> </TD></TR>
+<TR><TD><a href="#{@inheritDoc}"><code>{@inheritDoc}</code></a> </TD></TR>
+<TR><TD><a href="#{@docRoot}"><code>{@docRoot}</code></a> </TD></TR>
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+<a name="methodexample"></a>
+<h4>An example of a method doc comment:</h4>
+<pre>
+    /**
+     * Returns the character at the specified index. An index 
+     * ranges from &lt;code&gt;0&lt;/code&gt; to &lt;code&gt;length() - 1&lt;/code&gt;.
+     *
+     * @param     index  the index of the desired character.
+     * @return    the desired character.
+     * @exception StringIndexOutOfRangeException 
+     *              if the index is not in the range &lt;code&gt;0&lt;/code&gt; 
+     *              to &lt;code&gt;length()-1&lt;/code&gt;.
+     * @see       java.lang.Character#charValue()
+     */
+    public char charAt(int index) {
+       ...
+    }
+</pre>
+</blockquote>
+
+</blockquote>
+
+
+
+<br>
+<!-- ============== COMMAND-LINE OPTIONS ======================= -->
+
+<a name="options">
+<h2>OPTIONS</h2>
+</a>
+<blockquote>
+
+The javadoc tool uses <a href="#doclets">doclets</a> to 
+determine its output. The Javadoc tool uses the default standard doclet
+unless a custom doclet is specified with the -doclet option.
+The Javadoc tool provides a set of command-line 
+options that can be used with any doclet -- these options are described 
+below under the sub-heading <a href="#javadocflags">Javadoc Options</a>. 
+The standard doclet provides an additional set of command-line options 
+that are described below under the sub-heading 
+<a href="#standard">Options Provided by the Standard Doclet</a>.
+All option names are case-insensitive, though their arguments can be
+case-sensitive.
+<p>
+
+The options are:
+
+<blockquote>
+
+<table width="80%" summary="Javadoc command line options">
+<tr valign=top>
+<td>
+
+-<a href="#1.1"><i>1.1</i></a><br>
+-<a href="#author">author</a><br>
+-<a href="#bootclasspath"><i>bootclasspath</i></a><br>
+-<a href="#bottom">bottom</a><br>
+-<a href="#breakiterator"><i>breakiterator</i></a><br>
+-<a href="#charset">charset</a><br>
+-<a href="#classpath"><i>classpath</i></a><br>
+-<a href="#d">d</a><br>
+-<a href="#docencoding">docencoding</a><br>
+-<a href="#docfilessubdirs">docfilessubdirs</a><br>
+-<a href="#doclet"><i>doclet</i></a><br>
+-<a href="#docletpath"><i>docletpath</i></a><br>
+-<a href="#doctitle">doctitle</a><br>
+-<a href="#encoding"><i>encoding</i></a><br>
+-<a href="#exclude"><i>exclude</i></a><br>
+-<a href="#excludedocfilessubdir">excludedocfilessubdir</a><br>
+-<a href="#extdirs"><i>extdirs</i></a><br>
+-<a href="#footer">footer</a><br>
+-<a href="#group">group</a><br>
+</td>
+
+<td>
+-<a href="#header">header</a><br>
+-<a href="#help"><i>help</i></a><br>
+-<a href="#helpfile">helpfile</a><br>
+-<a href="#J"><i>J</i></a><br>
+-<a href="#link">link</a><br>
+-<a href="#linkoffline">linkoffline</a><br>
+-<a href="#linksource">linksource</a><br>
+-<a href="#locale"><i>locale</i></a><br>
+-<a href="#nocomment">nocomment</a><br>
+-<a href="#nodeprecated">nodeprecated</a><br>
+-<a href="#nodeprecatedlist">nodeprecatedlist</a><br>
+-<a href="#nohelp">nohelp</a><br>
+-<a href="#noindex">noindex </a><br>
+-<a href="#nonavbar">nonavbar</a><br>
+-<a href="#noqualifier">noqualifier</a><br>
+-<a href="#nosince">nosince</a><br>
+-<a href="#notree">notree </a><br>
+-<a href="#overview"><i>overview</i></a><br>
+-<a href="#package"><i>package</i></a><br>
+</td>
+
+<p>
+
+<td>
+-<a href="#private"><i>private</i></a><br>
+-<a href="#protected"><i>protected</i></a><br>
+-<a href="#public"><i>public</i></a><br>
+-<a href="#quiet">quiet</a><br>
+-<a href="#serialwarn">serialwarn</a><br>
+-<a href="#source"><i>source</i></a><br>
+-<a href="#sourcepath"><i>sourcepath</i></a><br>
+-<a href="#splitindex">splitindex</a><br>
+-<a href="#stylesheetfile">stylesheetfile</a><br>
+-<a href="#subpackages"><i>subpackages</i></a><br>
+-<a href="#tag">tag</a><br>
+-<a href="#taglet">taglet</a><br>
+-<a href="#tagletpath">tagletpath</a><br>
+-<a href="#title">title</a><br>
+-<a href="#use">use</a><br>
+-<a href="#verbose"><i>verbose</i></a><br>
+-<a href="#version">version</a><br>
+-<a href="#windowtitle">windowtitle</a><br>
+</td>
+</tr>
+</table>
+
+</blockquote>
+
+Options shown in <i>italic</i> are the Javadoc core options, 
+which are provided by the front end of the Javadoc tool 
+and are available to all doclets. The standard doclet itself 
+provides the non-italic options. 
+
+<!-- ============== JAVADOC OPTIONS ======================= -->
+
+<a name="javadocflags"><!-- --></a> 
+<p>
+<a name="javadocoptions"></a>
+<h3>Javadoc Options</h3>
+
+<dl>
+
+<a name="overview"><!-- --></a>
+<dt><b>-overview</b> &nbsp;<i>path\filename</i>
+<dd>
+Specifies that javadoc should retrieve the text for the overview
+documentation from the "source" file specified by <i>path/filename</i>
+and place it on the Overview page
+(<code>overview-summary.html</code>).  The <i>path/filename</i> is
+relative to the <code>-sourcepath</code>.
+<p>
+While you can use any name you want for <i>filename</i> and place it
+anywhere you want for <i>path</i>, a typical thing to do is to name it
+<code>overview.html</code> and place it in the source tree at the
+directory that contains the topmost package directories.  In this
+location, no <i>path</i> is needed when documenting packages, since
+<code>-sourcepath</code> will point to this file.  For example, if the
+source tree for the <code>java.lang</code> package is
+<code>C:\src\classes\java\lang\</code>, then you could place the
+overview file at <code>C:\src\classes\overview.html</code>.
+See <a href="#realworldexample">Real World Example</a>.
+<p>
+For information about the file specified by <i>path/filename</i>, see 
+<a href="#overviewcomment">overview comment file</a>.
+<p>
+Note that the overview page is created only if you pass into javadoc
+two or more package names.  For further explanation, see 
+<a href="#htmlframes">HTML Frames</a>.)
+<p>
+The title on the overview page is set by 
+<a href="#doctitle"><code>-doctitle</code></a>.
+<p>
+
+<a name="public"><!-- --></a>
+<dt><b>-public</b>
+<dd>
+Shows only public classes and members.
+<p>
+
+<a name="protected"><!-- --></a>
+<dt><b>-protected</b>
+<dd>
+Shows only protected and public classes and members. This is the default.
+<p>
+
+<a name="package"><!-- --></a>
+<dt><b>-package</b>
+<dd>
+Shows only package, protected, and public classes and members.
+<p>
+
+<a name="private"><!-- --></a>
+<dt><b>-private</b>
+<dd>
+Shows all classes and members.
+<p>
+
+<a name="help"><!-- --></a>
+<dt><b>-help</b>
+<dd>
+Displays the online help, which lists these javadoc and doclet 
+command line options.
+<p>
+
+<a name="doclet"><!-- --></a>
+<dt><b>-doclet</b>&nbsp; <var>class</var>
+<dd>
+Specifies the class file that starts the doclet used in generating the
+documentation.  Use the fully-qualified name.  This doclet defines the content 
+and formats the output.  If the <b><code>-doclet</code></b> option is not used,
+javadoc uses the standard doclet for generating the default HTML
+format. This class must contain the <code>start(Root)</code> method.
+The path to this starting class is defined by the
+<code>-docletpath</code> option.
+<p>
+
+For example, to call the MIF doclet, use:
+<PRE>
+    -doclet com.sun.tools.doclets.mif.MIFDoclet
+</PRE>
+<p>
+
+<a name="docletpath"><!-- --></a>
+<dt><b>-docletpath</b>&nbsp; <var>classpathlist</var>
+<dd>
+Specifies the path to the doclet starting class file (specified 
+with the <code>-doclet</code> option) and any jar 
+files it depends on.  If the starting class file is in a jar
+file, then this specifies the path to that jar file, as shown
+in the example below.  You can specify an absolute path or
+a path relative to the current directory.
+If <var>classpathlist</var> contains multiple 
+paths or jar files, they should be separated with a colon (:) on Solaris
+and a semi-colon (;) on Windows.  This option is not necessary if the 
+doclet starting class is already in the search path. 
+<p>
+Example of path to jar file that contains the starting doclet class file.  
+Notice the jar filename is included.
+<pre>
+   -docletpath C:\user\mifdoclet\lib\mifdoclet.jar
+</pre>
+Example of path to starting doclet class file.  Notice the class 
+filename is omitted.
+<pre>
+   -docletpath C:\user\mifdoclet\classes\com\sun\tools\doclets\mif\
+</pre>
+
+<a name="1.1"><!-- --></a>
+<dt><b>-1.1</b>
+<dd>
+<i>This feature has been removed from Javadoc 1.4.  There is no replacement
+for it.  This option created documentation with the appearance and functionality
+of documentation generated by Javadoc 1.1 (it never supported nested
+classes).  If you need this option, use Javadoc 1.2 or 1.3 instead.</i>
+<p>
+
+
+<a name="source"></a>
+<dt><b>-source</b>&nbsp;&nbsp;<b>1.4</b>
+<dd>
+Necessary to enable javadoc to handle assertions present in 
+J2SE v 1.4 source code.  This option documents code that compiles 
+using "<code>javac -source 1.4</code>", 
+<p>
+
+
+<a name="sourcepath"><!-- --></a>
+<dt><b>-sourcepath</b>&nbsp; <var>sourcepathlist</var>
+<dd>
+
+Specifies the search paths for finding source files (<code>.java</code>) 
+when passing package names or <code>-subpackages</code> into 
+the <code>javadoc</code> command.  
+The <i>sourcepathlist</i> can contain multiple paths by separating them 
+with a semicolon (<code>;</code>).  The Javadoc tool will search in all 
+subdirectories of the specified paths.  Note that this option is 
+not only used to locate the source files being documented, but 
+also to find source files that are not being documented but whose 
+comments are inherited by the source files being documented.
+<p>
+
+Note that you can use the <code>-sourcepath</code> option only when passing 
+package names into the javadoc command -- it will not locate
+<code>.java</code> files passed into the <code>javadoc</code> command. 
+(To locate <code>.java</code> files, cd to that directory or include the 
+path ahead of each file, as shown at <a href="#documentingclasses">Documenting 
+One or More Classes</a>.)
+If <code>-sourcepath</code> is omitted, javadoc uses the class path to
+find the source files (see -<a href="#classpath">classpath</a>).  
+Therefore, the default -sourcepath is the value of class path.
+If -classpath is omitted and you are passing package names into javadoc,
+it looks in the current directory (and subdirectories) for the source files.
+<p>
+
+Set <var>sourcepathlist</var> to the root directory of the source tree 
+for the package you are documenting.  For example, 
+suppose you want to document a package called <code>com.mypackage</code> 
+whose source files are located at:
+<pre>
+C:\user\src\com\mypackage\*.java
+</pre>
+In this case you would specify the <code>sourcepath</code> to 
+<code>C:\user\src</code>, the directory that contains 
+<code>com\mypackage</code>, and then supply the package name 
+<code>com.mypackage</code>:
+<pre>
+  C:&gt; <b>javadoc -sourcepath C:\user\src com.mypackage</b>
+</pre>
+
+This is easy to remember by noticing that if you concatenate 
+the value of sourcepath and the package name together and 
+change the dot to a backslash "\", you end up with the full path 
+to the package: <code>C:\user\src\com\mypackage</code>.
+<p>
+
+To point to two source paths:
+<pre>
+  C:&gt; <b>javadoc -sourcepath C:\user1\src;C:\user2\src com.mypackage</b>
+</pre>
+<p>
+
+
+<a name="classpath"><!-- --></a>
+<dt><b>-classpath</b>&nbsp; <var>classpathlist</var>
+<dd>
+Specifies the paths where javadoc will look for 
+<a href="#referencedclasses">referenced classes</a> (<code>.class</code> files) 
+-- these are the documented classes plus any classes referenced by those 
+classes.  
+The <i>classpathlist</i> can contain multiple paths by separating them 
+with a semicolon (<code>;</code>).  The Javadoc tool will search in all subdirectories 
+of the specified paths.  Follow the instructions in 
+<a href="classpath.html">class path</a> documentation for specifying 
+<var>classpathlist</var>.
+<p>
+
+If <code>-sourcepath</code> is omitted, the Javadoc tool uses 
+<code>-classpath</code> to find the source files as well as 
+class files (for backward compatibility).  Therefore, if you want
+to search for source and class files in separate paths, use both
+<code>-sourcepath</code> and <code>-classpath</code>.
+<p>
+
+For example, if you want to document <code>com.mypackage</code>, whose 
+source files reside in the directory <code>C:\user\src\com\mypackage</code>, 
+and if this package relies on a library in <code>C:\user\lib</code>, 
+you would specify:
+
+<pre>
+  C:&gt; <b>javadoc -classpath \user\lib -sourcepath \user\src com.mypackage</b>
+</pre>
+
+As with other tools, if you do not specify <code>-classpath</code>, 
+the Javadoc tool uses the CLASSPATH environment variable, if it is set.  
+If both are not set, the Javadoc tool searches for classes from the current 
+directory.
+<p>
+
+For an in-depth description of how the Javadoc tool uses <code>-classpath</code> to 
+find user classes as it relates to extension classes and bootstrap classes, 
+see <a href="../findingclasses.html">How Classes Are Found</a>.
+<p>
+
+
+<a name="bootclasspath"><!-- --></a>
+<dt><b>-bootclasspath</b>&nbsp; <var>classpathlist</var>
+<dd>
+Specifies the paths where the boot classes reside.  These are nominally
+the Java platform classes.  The bootclasspath is part of the search path 
+the Javadoc tool will use to look up source and class files.  See
+<a href="../findingclasses.html#srcfiles">How Classes Are Found</a>.
+for more details.  Separate directories in <var>classpathlist</var> with 
+semicolons (;).
+<p>
+
+<a name="extdirs"><!-- --></a>
+<dt><b>-extdirs</b>&nbsp; <var>dirlist</var>
+<dd>
+Specifies the directories where extension classes reside.  These are any classes 
+that use the Java Extension mechanism.  The extdirs is part of the search path 
+the Javadoc tool will use to look up source and class files.  See <code>-classpath</code> 
+(above) for more details.  Separate directories in <var>dirlist</var> with 
+semicolons (;).
+<p>
+
+<a name="verbose"><!-- --></a>
+<dt><b>-verbose</b>
+<dd>
+Provides more detailed messages while javadoc is running.
+Without the verbose option, messages appear for loading the source files, 
+generating the documentation (one message per source file), and sorting. 
+The verbose option causes the printing of additional messages specifying 
+the number of milliseconds to parse each java source file. 
+<p>
+
+<a name="quiet"></a>
+<dt><b>-quiet</b>
+<dd>
+Shuts off non-error and non-warning messages, leaving only the 
+warnings and errors appear, making them easier to view.
+Also suppresses the version string.
+<p>
+
+<a name="locale"><!-- --></a>
+<dt><b>-locale</b>&nbsp; <i>language_country_variant</i>
+<dd>
+<blockquote>
+<B>Important</B> - The <code>-locale</code> option must be placed
+<i>ahead</i> (to the left) of any <a href="#standard">options provided by 
+the standard doclet</a> or any other doclet.  Otherwise, the navigation 
+bars will appear in English.  This is the only command-line option that 
+is order-dependent.
+</blockquote>
+Specifies the locale that javadoc uses when generating documentation.
+The argument is the name of the locale, as described in java.util.Locale
+documentation, such as <code>en_US</code> (English, United States) 
+or <code>en_US_WIN</code> (Windows variant).
+<p>
+Specifying a locale causes javadoc to choose the resource files of that locale
+for messages (strings in the navigation bar, headings for lists and tables,
+help file contents, comments in stylesheet.css, and so forth).  It also specifies
+the sorting order for lists sorted alphabetically, and the sentence separator
+to determine the end of the first sentence.  It does not determine the
+locale of the doc comment text specified in the source files of the documented
+classes.
+<p>
+
+<a name="encoding"><!-- --></a>
+<dt><b>-encoding</b>&nbsp; <i>name</i>
+<dd>
+Specifies the encoding name of the source files, such as <code>EUCJIS/SJIS</code>. 
+If this option is not specified, the platform default converter is used.
+<p>
+Also see <a href="#docencoding">-docencoding</a> and 
+<a href="#charset">-charset</a>.
+<p>
+
+<a name="J"><!-- --></a>
+<dt><b>-J</b><i>flag</i>
+<dd>
+Passes <i>flag</i> directly to the runtime system 
+<a href="java.html#options">java</a> that runs javadoc.
+Notice there must be no space between the <code>J</code> and the <i>flag</i>.
+For example, if you need to ensure that the system sets aside 32 megabytes 
+of memory in which to process the generated documentation, then you would 
+call the <a href="java.html#Xms"><code>-Xmx</code></a> option of java as follows
+(<code>-Xms</code> is optional, as it only sets the size of initial memory,
+which is useful if you know the minimum amount of memory required):
+<pre>
+   C:&gt; <b>javadoc -J-Xmx32m -J-Xms32m</b> <b>com.mypackage</b>
+</pre>
+
+To tell what version of javadoc you are using, call the 
+"<code>-version</code>" option of java: 
+<p>
+<pre>
+   C:&gt; <b>javadoc -J-version</b>
+   java version "1.2"
+   Classic VM (build JDK-1.2-V, green threads, sunwjit)
+</pre>
+
+(The version number of the <a href="#versionnumbers">standard doclet</a>
+appears in its output stream.)
+</dl>
+
+<!-- ============== STANDARD OPTIONS ======================= -->
+
+
+<a name="standard"><!-- --></a>
+<h3>Options Provided by the Standard Doclet</h3>
+<dl>
+
+<a name="d"><!-- --></a>
+<dt><b>-d</b>&nbsp; <var>directory</var>
+<dd>
+Specifies the destination directory where javadoc saves the 
+generated HTML files. (The "d" means "destination.") Omitting this
+option causes the files to be saved to the current directory.  
+The value <var>directory</var> can be 
+absolute, or relative to the current working directory.  
+As of 1.4, the destination directory is automatically created
+when javadoc is run.
+<p>
+
+For example, the following generates the documentation for the package
+<code>com.mypackage</code> and saves the results in the 
+<code>C:\user\doc\</code> directory:
+
+<pre>
+  C:&gt; <b>javadoc -d \user\doc com.mypackage</b>
+</pre>
+<p>
+
+<a name="use"><!-- --></a>
+<dt><b>-use</b>
+<dd>
+Includes one "Use" page for each documented class and package.  The page
+describes what packages, classes, methods, constructors and fields use any 
+API of the given class or package.  Given class C, things that use 
+class C would include subclasses of C, fields declared as C, methods 
+that return C, and methods and constructors with parameters of type C. 
+<p>
+For example, let's look at what might appear on the "Use" page for
+String.  The <code>getName()</code> method in the 
+<code>java.awt.Font</code> class returns type <code>String</code>.  
+Therefore, <code>getName()</code> uses <code>String</code>, and 
+you will find that method on the "Use" page for <code>String</code>.
+<p>
+Note that this documents only uses of the API, not the implementation.
+If a method uses <code>String</code> in its implementation but does not
+take a string as an argument or return a string, that is not considered 
+a "use" of <code>String</code>.
+<p>
+You can access the generated "Use" page by first going to the class or package, 
+then clicking on the "Use" link in the navigation bar.
+
+<a name="version"><!-- --></a>
+<dt><b>-version</b>
+<dd>
+Includes the @version text in the generated docs. 
+This text is omitted by default.
+To tell what version of the Javadoc tool you are using, use the 
+<code><a href="#J">-J-version</a></code> option.
+<p>
+
+<a name="author"><!-- --></a>
+<dt><b>-author</b>
+<dd>
+Includes the @author text in the generated docs. 
+<p>
+
+<a name="splitindex"></a>
+<dt><b>-splitindex</b>
+<dd>
+Splits the index file into multiple files, alphabetically, one file 
+per letter, plus a file for any index entries that start with 
+non-alphabetical characters.
+<p>
+
+<a name="windowtitle"><!-- --></a>
+<dt><b>-windowtitle</b>&nbsp; <i>title</i>
+<dd>
+Specifies the title to be placed in the HTML &lt;title&gt; tag.
+This appears in the window title and in any browser bookmarks (favorite places) 
+that someone creates for this page. This title should not contain
+any HTML tags, as the browser will not properly interpret them.
+Any internal quotation marks within <i>title</i> may have to be escaped.  
+If -windowtitle is omitted, the Javadoc tool uses the value of -doctitle for this option.
+<p>
+<PRE>
+  C:&gt; <B>javadoc -windowtitle "Java&nbsp;2 Platform" com.mypackage</B>
+</PRE>
+
+<a name="doctitle"><!-- --></a>
+<dt><b>-doctitle</b>&nbsp; <i>title</i> 
+<dd>
+Specifies the title to be placed near the top of the overview summary file. 
+The title will be placed as a centered, level-one heading directly 
+beneath the upper navigation bar. The <i>title</i> may contain 
+html tags and white space, though if it does, it must be enclosed 
+in quotes.  Any internal quotation marks within <i>title</i> 
+may have to be escaped.  
+<p>
+<PRE>
+  C:&gt; <B>javadoc -doctitle "Java&lt;sup&gt;&lt;font size=\"-2\"&gt;TM&lt;/font&gt;&lt;/sup&gt;" com.mypackage</B>
+</PRE>
+
+<a name="title"><!-- --></a>
+<dt><b>-title</b>&nbsp; <i>title</i> 
+<dd>
+<b>This option no longer exists.</b>  It existed only in Beta versions
+of Javadoc 1.2.  It has been renamed to <a href="#doctitle"><code>-doctitle</code></a>.
+This option is being renamed to make it clear that it defines the 
+document title rather than the window title.
+<p>
+
+<a name="header"><!-- --></a>
+<dt><b>-header</b>&nbsp; <i>header</i>
+<dd>
+Specifies the header text to be placed at the top of each output file. 
+The header will be placed to the right of the upper navigation bar. 
+<i>header</i> may contain HTML tags and white space, though if it does, 
+it must be enclosed in quotes. Any internal quotation marks within 
+<i>header</i> may have to be escaped. 
+<p>
+<PRE>
+  C:&gt; <B>javadoc -header "&lt;b&gt;Java&nbsp;2 Platform&nbsp;&lt;/b&gt;&lt;br&gt;v1.4" com.mypackage</B>
+</PRE>
+<p>
+
+<a name="footer"><!-- --></a>
+<dt><b>-footer</b>&nbsp; <i>footer</i>
+<dd>
+Specifies the footer text to be placed at the bottom of each output file. 
+The footer will be placed to the right of the lower navigation bar. 
+<i>footer</i> may contain html tags and white space, though if it does, 
+it must be enclosed in quotes. Any internal quotation marks within 
+<i>footer</i> may have to be escaped.
+<p>
+
+<a name="bottom"><!-- --></a>
+<dt><b>-bottom</b>&nbsp; <i>text</i>
+<dd>
+Specifies the text to be placed at the bottom of each output file. The 
+text will be placed at the bottom of the page, below the lower  
+navigation bar. The <var>text</var> may contain 
+HTML tags and white space, though if it does, it must be enclosed 
+in quotes.  Any internal quotation marks within <var>text</var> 
+may have to be escaped.  
+<p>
+
+<a name="link"><!-- --></a>
+<dt><b>-link</b>&nbsp; <i>extdocURL</i> <br>
+
+<dd>
+Creates links to existing javadoc-generated 
+documentation of
+<a href="#externalreferencedclasses">external referenced classes</a>.
+It takes one argument:
+<p>
+<a name="extdocURL"></a>
+<ul type="disc">
+  <li><b><i>extdocURL</i></b> is the absolute or relative URL of 
+      the directory containing the external javadoc-generated documentation 
+      you want to link to.  <a href="#linkabsoluteexample">Examples</a>
+      are shown below.
+      The <a href="#linkpackagelist">package-list</a>
+      file must be found in this directory (otherwise, use
+      <a href="#linkoffline"><code>-linkoffline</code></a>).
+      The Javadoc tool reads the package names from the 
+      <code>package-list</code> file and then links to 
+      those packages at that URL.
+      When the Javadoc tool is run, the <i>extdocURL</i>
+      value is copied literally into the <code>&lt;A HREF&gt;</code>
+      links that are created.  Therefore, <i>extdocURL</i> must be 
+      the URL to the <i>directory</i>, not to a file.
+<p>
+      You can use an absolute link for <i>extdocURL</i>
+      to enable your docs to link to a document on any website, 
+      or can use a relative link to link only to a relative location.
+      If relative, the value you pass in should be the relative path 
+      from the destination directory (specified with <code>-d</code>)
+      to the directory containing the packages being linked to.
+<p>  
+      When specifying an absolute link you normally use an
+      <code>http:</code> link.  However, if you want to link to
+      a file system that has no web server, you can use a <code>file:</code> 
+      link -- however, do this only if everyone wanting to access
+      the generated documentation shares the same file system.
+<p>
+      In all cases, and on all operating systems, you should use 
+      a forward slash as the separator, whether the URL 
+      is absolute or relative, and "http:" or "file:" based
+      (as specified in the
+      <a href="http://www.ietf.org/rfc/rfc1738.txt">URL Memo</a>).
+<p>
+<dl>
+<dt>Absolute http: based link:
+   <dd><code>-link http://&lt;host&gt;/&lt;directory&gt;/&lt;directory&gt;/.../&lt;name&gt;</code>
+
+<dt>Absolute file: based link:
+   <dd><code>-link file://&lt;host&gt;/&lt;directory&gt;/&lt;directory&gt;/.../&lt;name&gt;</code>
+
+<dt>Relative link:
+   <dd><code>-link &lt;directory&gt;/&lt;directory&gt;/.../&lt;name&gt;</code>
+</dl>
+</ul>
+<p>
+
+You can specify <a href="#multiplelinks">multiple</a> <code>-link</code>
+options in a given javadoc run to link to multiple documents.
+<p>
+
+<b>Choosing between -linkoffline and -link</b>: <br>
+Use <code>-link</code>:
+<ul type="disc">
+  <li>when using a relative path to the external API document, or
+  <li>when using an absolute URL to the external API document,
+      if your shell allows a program to open a connection 
+      to that URL for reading.
+</ul>
+Use <code><a href="#linkoffline">-linkoffline</a></code>:
+<ul>
+  <li type="disc">when using an absolute URL to the external API document,
+      if your shell <i>does not allow</i> a program to 
+      open a connection to that URL for reading.  This can occur
+      if you are behind a firewall and the document you want to
+      link to is on the other side.
+</ul>
+<p>
+
+<a name="linkabsoluteexample"></a>
+<b>Example using absolute links to the external docs</b> -
+Let's say you want to link to the <code>java.lang</code>, 
+<code>java.io</code> and other Java 2 Platform packages at 
+<a href="http://java.sun.com/j2se/1.4.2/docs/api"><code>http://java.sun.com/j2se/1.4.2/docs/api</code></a>, 
+The following command generates documentation for the 
+package <code>com.mypackage</code> with links to the Java 
+2 Platform packages.  The generated documentation will 
+contain links to the <code>Object</code> class, for example, 
+in the class trees.  (Other options, such as 
+<code>-sourcepath</code> and <code>-d</code>, are not shown.)
+<p>
+
+<pre>
+  C:&gt; <b>javadoc -link http://java.sun.com/j2se/1.4.2/docs/api com.mypackage</b>
+</pre>
+
+<a name="linkrelativeexample"></a>
+<b>Example using relative links to the external docs</b> -
+Let's say you have two packages whose docs are generated in different runs 
+of the Javadoc tool, and those docs are separated by a relative 
+path.  In this example, the packages are <code>com.apipackage</code>,
+an API, and <code>com.spipackage</code>, an SPI (Service Provide 
+Interface).  You want the documentation to reside in 
+<code>docs/api/com/apipackage</code> and <code>docs/spi/com/spipackage</code>.
+Assuming the API package documentation is already generated, and that 
+<code>docs</code> is the current directory, you would document the 
+SPI package with links to the API documentation by running:
+
+<pre>
+  C:&gt; <b>javadoc -d ./spi -link ../api com.spipackage</b>
+</pre>
+<p>
+
+Notice the <code>-link</code> argument is relative to the destination 
+directory (<code>docs/spi</code>).
+<p>
+
+<b>Details</b> - 
+The <code>-link</code> option enables you to link to classes referenced 
+to by your code but <em>not</em> documented in the current javadoc 
+run.  For these links to go to valid pages, you must know where those 
+HTML pages are located, and specify that location with <i>extdocURL</i>.
+This allows, for instance, third party documentation to link 
+to <code>java.*</code> documentation on <code>http://java.sun.com</code>.  
+<p>
+Omit the <code>-link</code> option for javadoc to create links only to 
+      API within the documentation it is generating in 
+      the current run. (Without the <code>-link</code> option, the Javadoc tool 
+      does not create links to documentation for external references, 
+      because it does not know if or where that documentation exists.)
+<p>
+
+This option can create links in <a href="#links">several places</a> 
+in the generated documentation. 
+<p>
+
+Another use is for <a href="#cross-links">cross-links</a> between
+sets of packages:  Execute javadoc on one set of packages, 
+then run javadoc again on another set of packages, creating 
+links both ways between both sets. 
+<p>
+
+<a name="howaclassmustbereferenced"></a>
+<b>How a Class Must be Referenced</b> -
+For a link to an external referenced class to actually appear
+(and not just its text label), the class 
+must be referenced in the following way.  It is not sufficient for it
+to be referenced in the body of a method.  It must be referenced in 
+either an <code>import</code> statement or in a declaration.  Here
+are examples of how the class <code>java.io.File</code>
+can be referenced:
+<p>
+
+<ul type="disc">
+  <li>In any kind of <code>import</code> statement:
+      by wildcard import, import explicitly by name, or automatically 
+      import for <code>java.lang.*</code>.  For example, this would
+      suffice:<br>
+      <code>import java.io.*;</code><br>
+      In 1.3.x and 1.2.x, only an explicit import by name works 
+      -- a wildcard import statement does not work,
+      nor does the automatic import <code>java.lang.*</code>.
+<p>
+  <li>In a declaration:<br>
+      <code>void foo(File f) {}</code><br>
+      The reference and be in the return type or parameter type of a method,
+      constructor, field, class or interface, or in an 
+      <code>implements</code>, <code>extends</code> or <code>throws</code>
+      statement.
+</ul>
+<p>
+
+An important corollary is that when you use the <code>-link</code>
+option, there may be many links that unintentionally do not appear 
+due to this constraint.
+(The text would appear without a hypertext link.)  You can detect these
+by the warnings they emit.  The most innocuous way to properly 
+reference a class and thereby add the link would be to import that class, 
+as shown above.
+<p>
+
+<!--
+An <code>@see</code> or <code>{@link}</code> reference with 
+<code>-link</code> is now enough to load the referenced class 
+and enable a link to it.  You can remove any import statements 
+you had added as workarounds, which we had suggested you comment 
+as follows:
+
+<pre>
+   <code>import java.lang.SecurityManager; // workaround to force @see/@link hyperlink</code>
+</pre>
+<p>
+-->
+
+<a name="linkpackagelist"></a>
+<b>Package List</b> - The <code>-link</code> option requires that a file named 
+<code>package-list</code>, which is generated by the Javadoc tool, exist at the URL you 
+specify with <code>-link</code>.  The <code>package-list</code> file is a 
+simple text file that lists the names of packages documented at that location.
+In the earlier <a href="#linkabsoluteexample">example</a>, the Javadoc tool looks 
+for a file named <code>package-list</code> at the given URL, reads in 
+the package names and then links to those packages at that URL.
+<p>
+
+For example, the package list for the Java 2 Platform v1.4 API is located at
+<code><a href="http://java.sun.com/j2se/1.4.2/docs/api/package-list">http://java.sun.com/j2se/1.4.2/docs/api/package-list</a></code>.
+and starts out as follows:
+<pre>
+  java.applet  
+  java.awt
+  java.awt.color
+  java.awt.datatransfer
+  java.awt.dnd
+  java.awt.event
+  java.awt.font
+  etc.
+</pre>
+<p>
+
+When javadoc is run without the <code>-link</code> option, 
+when it encounters a name that belongs to an 
+<a href="#externalreferencedclasses">external referenced class</a>, 
+it prints the name with no link. However, when the <code>-link</code> 
+option is used, the Javadoc tool searches the <code>package-list</code> 
+file at the specified <i>extdocURL</i> location for that package name.  
+If it finds the package name, it prefixes the name with <i>extdocURL</i>.
+<p>
+
+In order for there to be no broken links, all of the documentation for the
+external references must exist at the specified URLs.  The Javadoc tool will not check
+that these pages exist -- only that the package-list exists.  
+<p>
+
+<a name="multiplelinks"></a>
+<b>Multiple Links</b> - You can supply multiple <code>-link</code> options to 
+link to any number of external generated documents. &nbsp; 
+Javadoc 1.2 has a known bug which prevents you from supplying more 
+than one <code>-link</code> command.  This was fixed in 1.2.2.
+<p>
+
+Specify a different link option for each external document to link to:
+<p>
+
+&nbsp;&nbsp;<code> C:&gt; <b>javadoc -link</b> </code><i>extdocURL1</i><code> <b>-link</b> </code><i>extdocURL2</i><code> ... <b>-link</b> </code><i>extdocURLn</i><code> <b>com.mypackage</b></code>
+<p>
+
+where <i>extdocURL1</i>,&nbsp; <i>extdocURL2</i>,&nbsp; ... <i>extdocURLn</i> point 
+respectively to the roots of external documents, each of which 
+contains a file named <code>package-list</code>. 
+<p>
+
+<a name="cross-links"></a>
+<b>Cross-links</b> - Note that "bootstrapping" may be required when cross-linking 
+two or more documents that have not previously been generated.  In other words, 
+if <code>package-list</code> does not exist for either document, when you run the Javadoc tool
+on the first document, the <code>package-list</code> will not yet exist for the 
+second document.  Therefore, to create the external links, you must re-generate 
+the first document after generating the second document.
+<p>
+
+In this case, the purpose of first generating a document is to create its 
+<code>package-list</code> (or you can create it by hand it if you're 
+certain of the package names).  Then generate the second document with its 
+external links.  The Javadoc tool prints a warning if a needed external 
+<code>package-list</code> file does not exist.
+<p>
+
+
+<a name="linkoffline"><!-- --></a>
+<dt><b>-linkoffline</b>&nbsp; <i>extdocURL</i>&nbsp; <i>packagelistLoc</i> <br>
+<dd>
+This option is a variation of <code>-link</code>; they both create 
+links to javadoc-generated documentation for  
+<a href="#externalreferencedclasses">external referenced classes</a>.
+Use the <code>-linkoffline</code> option when linking to a document
+on the web when the Javadoc tool itself is "offline" -- that is, it 
+cannot access the document through a web connection.
+<p>
+
+More specifically, use <code>-linkoffline</code> if the external document's 
+<code>package-list</code> file is not accessible or does not 
+exist at the <i>extdocURL</i> location but does exist at a different 
+location, which can be specified by <i>packageListLoc</i> (typically local).
+Thus, if <i>extdocURL</i> is accessible only on the World Wide Web, 
+<code>-linkoffline</code> removes the constraint that the Javadoc 
+tool have a web connection when generating the documentation.  
+<p>
+
+Another use is as a "hack" to <a href="#update">update docs</a>:  
+After you have run javadoc on a full set of packages, then you can 
+run javadoc again on onlya smaller set of changed packages, so 
+that the updated files can be inserted back into the original set. 
+Examples are given below.
+<p>
+
+The <code>-linkoffline</code> option takes two arguments -- the 
+first for the string to be embedded in the <code>&lt;a href&gt;</code>
+links, the second telling it where to find <code>package-list</code>:
+<p>
+<ul type="disc">
+  <li><b><i>extdocURL</i></b> is the absolute or relative URL of
+      the directory containing the external javadoc-generated documentation 
+      you want to link to.  If relative, the value should be the relative 
+      path from the destination directory (specified with <code>-d</code>)
+      to the root of the packages being linked to.  For more details, see 
+      <a href="#extdocURL"><i>extdocURL</i></a> in the <code>-link</code>
+      option.
+<p>
+  <li><b><i>packagelistLoc</i></b> is the path or URL to the directory 
+      containing the <code>package-list</code> file for the external 
+      documentation.  
+      This can be a URL (http: or file:) or file path, and can be absolute 
+      or relative.  If relative, make it relative to the <i>current</i>
+      directory from where javadoc was run.
+      Do not include the <code>package-list</code> filename.
+</ul>
+<p>
+
+You can specify <a href="#multiplelinkoffline">multiple</a> 
+<code>-linkoffline</code> options in a given
+javadoc run.  (Prior to 1.2.2, it could be specified only once.)
+<p>
+
+<a name="linkofflineabsoluteexample"></a>
+<b>Example using absolute links to the external docs</b> -
+Let's say you want to link to the <code>java.lang</code>,
+<code>java.io</code> and other Java 2 Platform packages at 
+<code>http://java.sun.com/j2se/1.4.2/docs/api</code>, but your
+shell does not have web access.  You could open the
+<code>package-list</code> file in a browser at
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/package-list"><code>http://java.sun.com/j2se/1.4.2/docs/api/package-list</code></a>, 
+save it to a local directory, and point to this local copy with 
+the second argument, <i>packagelistLoc</i>.  In this example, the 
+package list file has been saved to the current directory "<code>.</code>" .
+The following command generates documentation for the 
+package <code>com.mypackage</code> with links to the Java 
+2 Platform packages.  The generated documentation will 
+contain links to the <code>Object</code> class, for example, 
+in the class trees.  (Other necessary options, such as 
+<code>-sourcepath</code>, are not shown.)  
+<p>
+
+<pre>
+C:&gt; <b>javadoc -linkoffline http://java.sun.com/j2se/1.4.2/docs/api . com.mypackage</b>
+</pre>
+<p>
+
+<b>Example using relative links to the external docs</b> -
+It's not very common to use <code>-linkoffline</code>
+with relative paths, for the simple reason that <code>-link</code>
+usually suffices.  When using <code>-linkoffline</code>, the 
+<code>package-list</code> file is generally local, and when 
+using relative links, the file you are linking to is also generally local.
+So it is usually unnecessary to give a different path for 
+the two arguments to <code>-linkoffline</code>.  When the two
+arguments are identical, you can use <code>-link</code>.
+See <a href="#linkrelativeexample">the <code>-link</code> 
+relative example</a>.
+<p>
+
+<b>Manually Creating a <code>package-list</code> File</b> -
+If a <code>package-list</code> file does not yet exist, but you know 
+what package names your document will link to, you can create your 
+own copy of this file by hand and specify its path with <i>packagelistLoc</i>.  
+An example would be the previous case where the package list for
+<code>com.spipackage</code> did not exist when <code>com.apipackage</code> 
+was first generated.  
+This technique is useful when you need to generate documentation that links
+to new external documentation whose package names you know, but which is not 
+yet published.  This is also a way of creating <code>package-list</code>
+files for packages generated with Javadoc 1.0 or 1.1, where 
+<code>package-list</code> files were not generated. Likewise, 
+two companies can share their unpublished <code>package-list</code> files,
+enabling them to release their cross-linked documentation simultaneously.  
+<p>
+
+<a name="multiplelinkoffline"></a>
+<b>Linking to Multiple Documents</b> - 
+You can include <code>-linkoffline</code>
+once for each generated document you want to refer to (each option is shown 
+on a separate line for clarity):
+<p>
+
+<code>C:&gt; <b>javadoc -linkoffline</b> </code><i>extdocURL1</i><code> </code><i>packagelistLoc1</i><code> \<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>-linkoffline</b> </code><i>extdocURL2</i><code> </code><i>packagelistLoc2</i><code> \<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...</code>
+<p>
+
+
+<a name="update"></a>
+<b>Updating docs</b> - Another use for <code>-linkoffline</code> option is useful 
+if your project has dozens or hundreds of packages, if you have already run 
+javadoc on the entire tree, and now, in a separate run, you want to quickly 
+make some small changes and re-run javadoc on just a small portion of the 
+source tree.  This is somewhat of a hack in that it works properly only if 
+your changes are only to doc comments and not to declarations.  If you were 
+to add, remove or change any declarations from the source code, then 
+broken links could show up in the index, package tree, inherited member lists,
+use page, and other places.
+<p>
+
+First, you create a new destination directory (call it <code>update</code>)
+for this new small run.  Let's say the original destination directory
+was named <code>html</code>.  In the simplest example, cd to the 
+parent of <code>html</code>.  Set the first argument of <code>-linkoffline</code> 
+to the current directory "." and set the second argument to the
+relative path to <code>html</code>, where it can find 
+<code>package-list</code>, and pass in only the package names of 
+the packages you want to update:
+<pre>
+  C:&gt; <b>javadoc -d update -linkoffline . html com.mypackage</b>
+</pre>
+
+When the Javadoc tool is done, copy these generated class pages 
+in <code>update\com\package</code> (not the overview or index), 
+over the original files in <code>html\com\package</code>.
+<p>
+
+
+<a name="linksource"><!-- --></a>
+<dt><b>-linksource</b>&nbsp;
+<dd>
+Creates an HTML version of each source file (with line numbers) and adds 
+links to them from the standard HTML documentation.  Links are
+created for classes, interfaces, constructors, methods and fields
+whose declarations are in a source file.  Otherwise, links are not 
+created, such as for default constructors and generated classes.
+<p>
+
+<b>This option exposes <i>all</i> private implementation details
+in the included source files, 
+including private classes, private fields, and the bodies of private 
+methods, <i>regardless of the <code>-public</code>, 
+<code>-package</code>, <code>-protected</code> and 
+<code>-private</code> options.</i></b> 
+Unless you also use the <a href="#private"><code>-private</code></a> 
+option, not all private classes or interfaces will necessarily be 
+accessible via links.
+<p>
+
+Each link appears on the name of the identifier in its declaration.
+For example, the link to the source code of the <code>Button</code> 
+class would be on the word "Button":
+<pre>
+    public class <u>Button</u>
+    extends Component
+    implements Accessible
+</pre>
+and the link to the source code of the <code>getLabel()</code> 
+method in the Button class would be on the word "getLabel":
+<pre>
+    public String <u>getLabel</u>()
+</pre>
+<p>
+
+<a name="group"><!-- --></a>
+<dt><b>-group</b>&nbsp; <var>groupheading</var>&nbsp; <var>packagepattern</var><code>:</code><var>packagepattern</var><code>:</code></var>...</var>
+<dd>
+Separates packages on the overview page into whatever groups you specify, 
+one group per table.  You specify each group with a different 
+<code>-group</code> option.  The groups appear on the page in the order 
+specified on the command line; packages are alphabetized within a group. 
+For a given <code>-group</code> option, the packages matching the
+list of <var>packagepattern</var> expressions appear in a table 
+with the heading <var>groupheading</var>.  
+<p>
+<ul type="disc">
+  <li><b><var>groupheading</var></b> can be any text, and can include white space.
+   This text is placed in the table heading for the group.
+<p>
+  <li><b><var>packagepattern</var></b> can be any package name, 
+   or can be the start of any package name followed by an asterisk 
+   (<code>*</code>).  
+   The asterisk is a wildcard meaning "match any characters".  This is 
+   the only wildcard allowed. Multiple patterns can be included in  
+   a group by separating them with colons (<code>:</code>).
+</ul>
+<blockquote>
+   <b>NOTE: If using an asterisk in a pattern or pattern list, the
+   pattern list must be inside quotes, such as <code>"java.lang*:java.util"</code></b>
+</blockquote>
+<p>
+If you do not supply any <code>-group</code> option, all packages are 
+placed in one group with the heading "Packages".  If the all groups do 
+not include all documented packages, any leftover packages appear in a 
+separate group with the heading "Other Packages".
+<p>
+For example, the following option separates the four documented 
+packages into core, extension and other packages.  Notice the
+trailing "dot" does not appear in "java.lang*" -- including the
+dot, such as "java.lang.*" would omit the java.lang package.
+<pre>
+  C:&gt; <b>javadoc -group "Core Packages" "java.lang*:java.util"
+            -group "Extension Packages" "javax.*"
+            java.lang java.lang.reflect java.util javax.servlet java.new</b>
+</pre>
+This results in the groupings:
+<blockquote>
+<dl>
+   <dt><b>Core Packages</b>
+      <dd><code>java.lang</code>
+      <dd><code>java.lang.reflect</code>
+      <dd><code>java.util</code>
+   <dt><b>Extension Packages</b>
+      <dd><code>javax.servlet</code>
+   <dt><b>Other Packages</b>
+      <dd><code>java.new</code>
+</dl>
+</blockquote>
+<p>
+
+<a name="nodeprecated"><!-- --></a>
+<dt><b>-nodeprecated</b>
+<dd>
+Prevents the generation of any deprecated API at all 
+in the documentation.  This does what -nodeprecatedlist 
+does, plus it does not generate any deprecated API 
+throughout the rest of the documentation.  This is 
+useful when writing code and you don't want to 
+be distracted by the deprecated code.
+<p>
+
+<a name="nodeprecatedlist"><!-- --></a>
+<dt><b>-nodeprecatedlist</b>
+<dd>
+Prevents the generation of the file containing the list of 
+deprecated APIs (deprecated-list.html) and the link in the 
+navigation bar to that page.  (However, javadoc continues to generate 
+the deprecated API throughout the rest of the document.)  
+This is useful if your source code contains no deprecated API, 
+and you want to make the navigation bar cleaner.
+<p>
+
+<a name="nosince"><!-- --></a>
+<dt><b>-nosince </b>
+<dd>
+Omits from the generated docs the "Since" sections associated 
+with the <a href="#@since">@since</a> tags.
+<p>
+
+<a name="notree"><!-- --></a>
+<dt><b>-notree </b>
+<dd>
+Omits the class/interface hierarchy pages from the generated docs. 
+These are the pages you reach using the "Tree" button in the
+navigation bar.  The hierarchy is produced by default.
+<p>
+
+<a name="noindex"><!-- --></a>
+<dt><b>-noindex </b>
+<dd>
+Omits the index from the generated docs.  The index is produced by default.
+<p>
+
+<a name="nohelp"><!-- --></a>
+<dt><b>-nohelp</b>
+<dd>
+Omits the HELP link in the navigation bars at the top and 
+bottom of each page of output.
+<p>
+
+<a name="nonavbar"><!-- --></a>
+<dt><b>-nonavbar</b>
+<dd>
+Prevents the generation of the navigation bar, header and footer,
+otherwise found at the top and bottom of the generated pages.  
+Has no affect on the "bottom" option.  The <code>-nonavbar</code> option is 
+useful when you are interested only in the content and have no need for
+navigation, such as converting the files to PostScript or PDF for print only. 
+<p>
+
+<a name="helpfile"><!-- --></a>
+<dt><b>-helpfile</b>&nbsp; <i>path\filename</i>
+<dd>
+Specifies the path of an alternate help file <i>path\filename</i> 
+that the HELP link in the top and bottom navigation bars link to.  
+Without this option, the Javadoc tool automatically creates a help file 
+<code>help-doc.html</code> that is hard-coded in the Javadoc tool.  This 
+option enables you to override this default.  The <i>filename</i>
+can be any name and is not restricted to <code>help-doc.html</code> --
+the Javadoc tool will adjust the links in the navigation bar accordingly.
+For example:
+<pre>
+  C:&gt; <b>javadoc -helpfile C:\user\myhelp.html java.awt</b>
+</pre>
+
+<a name="stylesheetfile"><!-- --></a>
+<dt><b>-stylesheetfile</b>&nbsp; <i>path\filename</i>
+<dd>
+Specifies the path of an alternate HTML stylesheet file.
+Without this option, the Javadoc tool automatically creates a stylesheet
+file <code>stylesheet.css</code> that is hard-coded in the Javadoc tool.  
+This option enables you to override this default.
+The <i>filename</i> can be any name and is not restricted to 
+<code>stylesheet.css</code>.
+For example:
+<pre>
+  C:&gt; <b>javadoc -stylesheetfile C:\user\mystylesheet.css com.mypackage</b>
+</pre>
+
+<a name="serialwarn"><!-- --></a>
+<dt><b>-serialwarn</b>
+<dd>
+Generates compile-time warnings for missing @serial tags.
+By default, Javadoc 1.2.2 (and later versions) generates no serial 
+warnings.  (This is a reversal from earlier versions.)
+Use this option to display the serial warnings, which helps  
+to properly document default serializable fields and 
+<code>writeExternal</code> methods. 
+<p>
+
+<a name="charset"><!-- --></a>
+<dt><b>-charset</b>&nbsp; <i>name</i>
+<dd>
+Specifies the HTML character set for this document. The name should 
+be a preferred MIME name as given in the 
+<a href="http://www.iana.org/assignments/character-sets">IANA Registry</a>. 
+For example:
+<pre>
+  C:&gt; <b>javadoc -charset "iso-8859-1" mypackage</b>
+</pre>
+would insert the following line in the head of every generated page:
+<!-- NOTE: THE NEXT LINE USES "&#061;" TO PREVENT NIGHTLY CGI SCRIPT FROM FINDING charset ISO-8859-1 -->
+<pre>
+   &lt;META http-equiv="Content-Type" content="text/html; charset&#061;ISO-8859-1"&gt;
+</pre>
+This META tag is described in the 
+<a href="http://www.w3.org/TR/REC-html40/charset.html#h-5.2.2">HTML standard</a>.
+(4197265 and 4137321)
+<p>
+Also see <a href="#encoding">-encoding</a> and 
+<a href="#docencoding">-docencoding</a>.
+<p>
+
+<a name="docencoding"><!-- --></a>
+<dt><b>-docencoding</b>&nbsp; <i>name</i>
+<dd>
+Specifies the encoding of the generated HTML files. The name should 
+be a preferred MIME name as given in the 
+<a href="http://www.iana.org/assignments/character-sets">IANA Registry</a>. 
+If you omit this option but use <a href="#encoding">-encoding</a>, 
+then the encoding of the generated HTML files is determined by -encoding.  
+Example:
+<pre>
+  % <b>javadoc -docencoding "ISO-8859-1" mypackage</b>
+</pre>
+Also see <a href="#encoding">-encoding</a> and 
+<a href="#charset">-charset</a>.
+<p>
+
+
+<a name="tag"></a>
+<dt><b>-tag</b>&nbsp;&nbsp;<i>tagname</i><b><code>:Xaoptcmf:"</code></b><i>taghead</i><b>"</b>
+<dd>
+Enables the Javadoc tool to interpret a simple, one-argument custom 
+<a href="#blocktags">block</a> tag 
+<code>@</code><i>tagname</i> in doc comments.  So the Javadoc
+tool can "<a href="#spellcheckingtagnames">spell-check</a>"
+tag names, it is important to include 
+a <code>-tag</code> option for every custom tag
+that is present in the source code, 
+<a href="#spellcheckingtagnames">disabling</a> (with <code>X</code>) 
+those that are not being output in the current run.  
+<p>
+
+The colon (<code>:</code>) can be replaced with a dash 
+(<code>-</code>), which frees up the colon character to 
+appear in the <em>tagname</em>.  
+See the <a href="#colon">colon example</a>.
+<p>
+
+The <code>-tag</code> option outputs the tag's heading 
+<i>taghead</i>  in bold, followed on the next 
+line by the text from its single argument, as shown in the
+<a href="#tagexamples">example</a> below.
+Like any block tag, this argument's text can contain 
+inline tags, which are also interpreted.
+The output is similar to standard one-argument tags, such as 
+<code>@return</code> and <code>@author</code>.
+Omitting <em>taghead</em> causes <em>tagname</em> to appear 
+as the heading.
+<p>
+
+<b>Placement of tags</b> - 
+The <b><code>Xaoptcmf</code></b> part of the argument determines 
+where in the source code the tag is allowed to be placed, and
+whether the tag can be disabled (using <code>X</code>).
+You can supply either <b><code>a</code></b>, to allow the tag
+in all places, or any combination of the other letters:
+<p>
+<ul>
+  <b><code>X</code></b> (<a href="#spellcheckingtagnames">disable tag</a>)<br>
+  <b><code>a</code></b> (all)<br>
+  <b><code>o</code></b> (overview)<br>
+  <b><code>p</code></b> (packages)<br>
+  <b><code>t</code></b> (types, that is classes and interfaces)<br>
+  <b><code>c</code></b> (constructors)<br> 
+  <b><code>m</code></b> (methods)<br>
+  <b><code>f</code></b> (fields)
+</ul>
+<p>
+
+
+<a name="tagexamples"></a>
+<b>Examples of single tags</b> -
+An example of a tag option for a tag that that can be 
+used anywhere in the source code is:
+
+<pre>
+    -tag todo:a:"To Do:"
+</pre>
+
+If you wanted @todo to be used only with constructors, methods 
+and fields, you would use:
+
+<pre>
+    -tag todo:cmf:"To Do:"
+</pre>
+
+Notice the last colon (<code>:</code>) above is not a 
+parameter separator, but is part of the heading text 
+(as shown below).  You would use either tag option 
+for source code that contains the tag <code>@todo</code>, 
+such as:
+
+<pre>
+     @todo The documentation for this method needs work.
+</pre>
+
+This line would produce output something like:
+
+<blockquote>
+<dl>
+<dt><b>To Do:</b>
+   <dd>The documentation for this method needs work.
+</dl>
+</blockquote>
+
+
+<a name="colon"></a>
+<b>Use of Colon as Separator</b> -
+The colon separator can be replaced by the dash, making the 
+following two equivalent:
+
+<pre>
+    -tag todo:a:"To Do:"
+    -tag todo-a-"To Do:"
+</pre>
+
+This frees up the colon to be used in the tagname:
+
+<pre>
+    -tag ejb:bean-a-"EJB Bean:"
+</pre>
+
+<a name="spellcheckingtagnames"></a>
+<b>Spell-checking tag names (Disabling tags)</b> -
+Some developers put custom tags in the source code that
+they don't always want to output.  In these cases,
+it is important to list all tags that are present in the 
+source code, enabling the ones you want to output and
+disabling the ones you don't want to output.
+The presence of <code>X</code> disables the tag,
+while its absence enables the tag.
+This gives the Javadoc tool enough information to 
+know if a tag it encounters is unknown, probably the
+results of a typo or a misspelling.  It prints a warning
+in these cases.
+<p>
+
+You can add <code>X</code> to the placement values already
+present, so that when you want to enable the tag, you can  
+simply delete the <code>X</code>.
+For example, if @todo is a tag that you want to suppress 
+on output, you would use:
+
+<pre>
+    -tag todo:Xcmf:"To Do:"
+</pre>
+
+or, if you'd rather keep it simple:
+
+<pre>
+    -tag todo:X
+</pre>
+<p>
+
+The syntax <code>-tag todo:X</code> works even if 
+<code>@todo</code> is defined by a taglet.
+<p>
+
+<b>Order of tags</b> - 
+The order of the <code>-tag</code> (and 
+<a href="#taglet"><code>-taglet</code></a>) 
+options determine the order the tags are output.  You can 
+mix the custom tags with the standard tags to intersperse them.
+The tag options for standard tags are placeholders only for
+determining the order -- they take only the standard tag's name.
+(Subheadings for standard tags cannot be altered.) 
+This is illustrated in the following example.
+<p>
+
+If <code>-tag</code> is missing, then the position of 
+<code>-taglet</code> determines its order.  If they are 
+both present, then whichever appears last on the command 
+line determines its order.  (This happens because the tags 
+and taglets are processed in the order that they appear
+on the command line.  For example, if <code>-taglet</code> 
+and <code>-tag</code> both have the name "todo", the one
+that appears last on the command line will determine its 
+order.
+<p>
+
+<b>Example of a complete set of tags</b> -
+This example inserts "To Do" after "Parameters" and 
+before "Throws" in the output.  By using "X", it also specifies 
+that @example is a tag that might be encountered in the source code
+that should not be output during this run.
+Notice that if you use
+<a href="#argumentfiles">@argfile</a>, you can put the 
+tags on separate lines in an argument file like this
+(no line continuation characters needed):
+<pre>
+   -tag param
+   -tag return
+   -tag todo:a:"To Do:"
+   -tag throws
+   -tag see
+   -tag example:X
+</pre>
+<p>
+
+When javadoc parses the doc comments, any tag encountered that is
+neither a standard tag nor passed in with <code>-tag</code> 
+or <code>-taglet</code> is considered unknown, and a warning 
+is thrown.
+<p>
+
+The standard tags are initially stored internally in a list in 
+their default order.  Whenever <code>-tag</code> options are used, 
+those tags get appended to this list -- standard tags are moved from 
+their default position. Therefore, if a <code>-tag</code>
+option is omitted for a standard tag, it remains in its default
+position.
+<p>
+
+<b>Avoiding Conflicts</b> - If you want to slice out your
+own namespace, you can use a dot-separated naming convention 
+similar to that used for packages: <code>com.mycompany.todo</code>.
+Sun will continue to create standard tags whose names 
+do not contain dots.  Any tag you create will override 
+the behavior of a tag by the same name defined
+by Sun.  In other words, if you create a tag or taglet 
+<code>@todo</code>, it will always have the same behavior 
+you define, even if Sun later creates a standard tag of 
+the same name.
+<p>
+
+You can also create more complex block tags, or custom inline 
+tags with the <a href="#taglet">-taglet</a> option.
+<p>
+
+
+<a name="taglet"></a>
+<dt><b>-taglet</b>&nbsp;&nbsp;<i>class</i>
+<dd>
+Specifies the class file that starts the taglet used in generating 
+the documentation for that tag.  Use the fully-qualified
+name for <i>class</i>. This taglet also defines the number of
+text arguments that the custom tag has.  The taglet 
+accepts those arguments, processes them, and generates 
+the output.  For extensive documentation with example taglets, 
+see:
+<p>
+<ul type="disc">
+   <li><a href="../javadoc/taglet/overview.html">Taglet Overview</a>
+</ul>
+<p>
+Taglets are useful for block or inline tags. They can
+have any number of arguments and implement custom behavior, 
+such as making text bold, formatting bullets, writing out 
+the text to a file, or starting other processes.  
+<p>
+
+Taglets can only determine where a tag should appear and in 
+what form.  All other decisions are made by the doclet.  
+So a taglet cannot do things such as remove a class name from 
+the list of included classes.  However, it can execute side 
+effects, such as printing the tag's text to a file or 
+triggering another process.
+<p>
+
+Use the <a href="#tagletpath"><code>-tagletpath</code></a> 
+option to specify the path to the taglet.  Here is an example 
+that inserts the "To Do" taglet after "Parameters" and ahead 
+of "Throws" in the generated pages:
+
+<pre>
+    -taglet com.sun.tools.doclets.ToDoTaglet
+    -tagletpath /home/taglets 
+    -tag return
+    -tag param
+    -tag todo
+    -tag throws
+    -tag see
+</pre>
+<p>
+
+Alternatively, you can use the <code>-taglet</code> option 
+in place of its <code>-tag</code> option, but that may be
+harder to read.
+<p>
+
+<a name="tagletpath"></a>
+<dt><b>-tagletpath</b>&nbsp;&nbsp;<i>tagletpathlist</i>
+<dd>
+Specifies the search paths for finding <a href="#taglet">taglet</a> 
+class files (.class).  The <i>tagletpathlist</i> can contain multiple 
+paths by separating them with a colon (<code>:</code>).  The Javadoc tool will 
+search in all subdirectories of the specified paths. 
+<p>
+
+
+<a name="subpackages"></a>
+<dt><b>-subpackages</b>&nbsp;&nbsp;<i>package1</i><b>:</b><i>package2</i><b>:</b>...
+<dd>
+Generates documentation from source files in the specified 
+packages and recursively in their subpackages.  This option 
+is useful when adding new subpackages to the source code, as they are 
+automatically included.  Each <i>package</i> argument is any 
+top-level subpackage (such as <code>java</code>) or fully qualified package 
+(such as <code>javax.swing</code>) that does not need to contain 
+source files.  Arguments are separated by colons (on all operating
+systmes).  Wildcards are not needed or allowed.  Use 
+<a href="#sourcepath"><code>-sourcepath</code></a> to specify where
+to find the packages.  This option is smart about not processing source
+files that are in the source tree but do not belong to the packages,
+as described at <a href="#processingofsourcefiles">processing of 
+source files</a>.
+<p>
+For example:
+<pre>
+  C:&gt; <b>javadoc -d docs -sourcepath C:\user\src -subpackages java:javax.swing</b>
+</pre>
+This command generates documentation for packages named "java"
+and "javax.swing" and all their subpackages.
+<p>
+You can use <code>-subpackages</code> in conjunction with 
+<a href="#exclude"><code>-exclude</code></a> to exclude specific packages.
+<p>
+
+
+<a name="exclude"></a>
+<dt><b>-exclude</b>&nbsp;&nbsp;<i>packagename1</i><b>:</b><i>packagename2</i><b>:</b>...
+<dd>
+Unconditionally excludes the specified packages and their subpackages 
+from the list formed by 
+<a href="#subpackages"><code>-subpackages</code></a>.  It excludes those packages
+even if they would otherwise be included by some previous or later 
+<code>-subpackages</code> option.  For example:
+<pre>
+   C:&gt; <b>javadoc -sourcepath C:\user\src -subpackages java -exclude java.net:java.lang</b>
+</pre>
+would include <code>java.io</code>, <code>java.util</code>, 
+and <code>java.math</code> (among others), but would exclude packages 
+rooted at <code>java.net</code> and <code>java.lang</code>.  
+Notice this excludes <code>java.lang.ref</code>, a subpackage 
+of <code>java.lang</code>).
+<p>
+
+<a name="breakiterator"></a>
+<dt><b>-breakiterator</b>&nbsp;
+<dd>
+Uses the sentence break iterator to determine the end of the first sentence.
+We plan to change the algorithm for determining the end of the first 
+sentence in the next major feature release -- the 
+<code>-breakiterator</code> option uses this new algorithm.
+We recommend you use this option whenever running version 1.4
+so that your transition to the next major release will be seamless.
+<p>
+
+In 1.2 and 1.3, the java.text.BreakIterator class was used to determine
+the end of sentence for all languages but English.  Therefore, 
+the <code>-breakiterator</code> option has an effect only for English.
+English had its own algorithm, which looked for a period followed by a 
+space.  When <code>-breakiterator</code> is omitted, the end of the 
+first sentence is unchanged from 1.2 and 1.3, and warnings are emitted 
+displaying where there would be a difference. 
+<p>
+  
+Differences in the algorithms show up in English as follows:
+<p>
+
+<ul type="disc">
+    <li>Old algorithm - Stops at a period followed by a space or a 
+        paragraph-level HTML tag, such as <code>&lt;P&gt;</code>.  
+
+    <li>New algorithm - In general, stops at a period, question mark 
+        or exclamation
+        mark followed by a space if the next word starts with a capital 
+        letter. This is meant to handle most abbreviations (such as 
+        "Serial no. is valid", but won't handle "Mr. Smith"). 
+        Doesn't stop at HTML tags or sentences that begin with numbers
+        or symbols.  Stops at the last period in "../filename".
+</ul>
+<p>
+
+<a name="docfilessubdirs"></a>
+<dt><b>-docfilessubdirs</b>&nbsp;
+<dd>
+Enables deep copying of "<code>doc-files</code>" directories. 
+In other words, subdirectories and all contents are
+recursively copied to the destination.  For example, 
+the directory <code>doc-files/example/images</code> 
+and all its contents would now be copied.  There is also an option to 
+<a href="#excludedocfilessubdir">exclude subdirectories</a>.
+<p>
+
+<a name="excludedocfilessubdir"></a>
+<dt><b><code>-excludedocfilessubdir&nbsp;</code></b><i>name1</i><b>:</b><i>name2</i>... 
+<dd>
+Excludes any "<code>doc-files</code>" subdirectories with the given names. 
+This prevents the copying of SCCS and other source-code-control 
+subdirectories.  
+<p>
+
+<a name="noqualifier"></a>
+<dt><b>-noqualifier</b>&nbsp;&nbsp;<code>all</code>&nbsp; | &nbsp;<i>packagename1</i><b>:</b><i>packagename2</i><b>:</b>...
+<dd>
+Omits qualifying package name from ahead of class names in output.
+The argument to <code>-noqualifier</code> is either
+"<code>all</code>" (all package qualifiers are omitted) or a 
+colon-separate list of packages, with wildcards, to be removed 
+as qualifiers.  The package name is removed from places where 
+<a href="#links">class or interface names appear</a>.
+<p>
+
+The following example omits all package qualifiers:
+<p>
+<pre>
+    -noqualifier all
+</pre>
+
+The following example omits "java.lang" and "java.io" package qualifiers:
+<p>
+<pre>
+    -noqualifier java.lang:java.io
+</pre>
+
+The following example omits package qualifiers starting with "java", 
+and "com.sun" subpackages (but not "javax"):
+<p>
+<pre>
+    -noqualifier java.*:com.sun.*
+</pre>
+
+Where a package qualifier would appear due to the above behavior,
+the name can be suitably shortened -- see 
+<a href="#shortened">How a name is displayed</a>.
+This rule is in effect whether or not <code>-noqualifier</code> is
+used.
+<p>
+
+
+<a name="nocomment"></a>
+<dt><b>-nocomment</b>&nbsp;
+<dd>
+Suppress the entire comment body, including the 
+<a href="#maindescription">main description</a> and 
+all tags, generating only declarations.  This option enables re-using 
+source files originally intended for a different purpose,
+to produce skeleton HTML documentation at the early stages of a new project.
+<p>
+
+
+</dl>
+</blockquote>
+
+</blockquote>
+
+
+<br>
+<!-- ============== COMMAND LINE ARGUMENT FILE ======================= -->
+
+<a name="argumentfiles"></a>
+<h2>COMMAND LINE ARGUMENT FILES</h2>
+
+<blockquote>
+
+To shorten or simplify the javadoc command line, you can
+specify one or more files that themselves contain
+arguments to the <code>javadoc</code> command (except 
+<code>-J</code> options). This enables you to create 
+javadoc commands of any length on any operating
+system.
+<p>
+
+An argument file can include Javadoc options, source filenames and 
+package names in any combination, or just arguments to Javadoc options.
+The arguments within a file can be space-separated or newline-separated.
+Filenames within an argument file are relative to the current 
+directory, not the location of the argument file.  Wildcards (*) are 
+not allowed in these lists (such as for specifying <code>*.java</code>).  
+Use of the '<tt>@</tt>' character to recursively 
+interpret files is not supported.  The <code>-J</code> options are
+not supported because they are passed to the launcher, which 
+does not support argument files.
+<p>
+
+When executing javadoc, pass in the path and name of each argument 
+file with the '<tt>@</tt>' leading character.
+When javadoc encounters an argument beginning with 
+the character `<tt>@</tt>', it expands the contents of
+that file into the argument list.
+<p>
+
+<h3>Example - Single Arg File</h3>
+
+You could use a single argument file named "<code>argfile</code>" to hold 
+all Javadoc arguments:
+
+<pre>
+  C:&gt; <b>javadoc @argfile</b>
+</pre>
+
+This argument file could contain the contents of both files shown
+in the next example.
+
+<h3>Example - Two Arg Files</h3>
+
+You can create two argument files -- one for the Javadoc 
+options and the other for the package names or source filenames:
+(Notice the following lists have no line-continuation characters.)
+<p>
+
+Create a file named "<code>options</code>" containing:
+<pre>
+     -d docs-filelist 
+     -use 
+     -splitindex
+     -windowtitle 'Java 2 Platform v1.3 API Specification'
+     -doctitle 'Java&lt;sup&gt;&lt;font size="-2"&gt;TM&lt;/font&gt;&lt;/sup&gt; 2 Platform v1.4 API Specification'
+     -header '&lt;b&gt;Java 2 Platform &lt;/b&gt;&lt;br&gt;&lt;font size="-1"&gt;v1.4&lt;/font&gt;'
+     -bottom 'Copyright 1993-2000 Sun Microsystems, Inc. All Rights Reserved.'
+     -group "Core Packages" "java.*"
+     -overview \java\pubs\ws\1.3\src\share\classes\overview-core.html
+     -sourcepath \java\pubs\ws\1.3\src\share\classes
+</pre>
+<p>
+
+
+Create a file named "<code>packages</code>" containing:
+
+<pre>
+     com.mypackage1
+     com.mypackage2
+     com.mypackage3
+</pre>
+
+You would then run javadoc with:
+<pre>
+  C:&gt; <b>javadoc @options @packages</b>
+</pre>
+<p>
+
+<h3>Example - Arg Files with Paths</h3>
+
+The argument files can have paths, but any filenames inside
+the files are relative to the current working directory (not 
+<code>path1</code> or <code>path2</code>):
+<pre>
+  C:&gt; <b>javadoc @path1\options @path2\packages</b>
+</pre>
+
+<h3>Example - Option Arguments</h3>
+
+<p>
+Here's an example of saving just an argument to a javadoc option in
+an argument file.  We'll use the <code>-bottom</code> option, since it 
+can have a lengthy argument.  You could create a file named 
+"<code>bottom</code>" containing its text argument:
+
+<pre>
+'&lt;font size="-1"&gt;&lt;a href="http://java.sun.com/cgi-bin/bugreport.cgi"&gt;Submit a 
+bug or feature&lt;/a&gt;&lt;br&gt;&lt;br&gt;Java is a trademark or registered trademark of 
+Sun Microsystems, Inc. in the US and other countries.&lt;br&gt;Copyright 1993-2000 Sun 
+Microsystems, Inc. 901 San Antonio Road,&lt;br&gt;Palo Alto, California, 94303, U.S.A. 
+All Rights Reserved.&lt;/font&gt;'
+</pre>
+
+Then run the Javadoc tool with:
+<pre>
+  C:&gt; <b>javadoc -bottom @bottom @packages</b>
+</pre>
+
+Or you could include the <code>-bottom</code> option at the start of 
+the argument file, and then just run it as:
+<pre>
+  C:&gt; <b>javadoc @bottom @packages</b>
+</pre>
+
+
+
+</blockquote>
+
+<hr>
+<!-- ===================== RUNNING ======================= -->
+<a name="running"></a>
+<H1 align="center">Running</H1>
+
+<hr>
+
+<br>
+<!-- ===================== RUNNING JAVADOC ========================= -->
+
+<a name="runningjavadoc"></a>
+<h2>RUNNING JAVADOC</h2>
+<blockquote>
+
+<a name="versionnumbers"></a>
+<b>Version Numbers</b> - The version number of javadoc can 
+be determined using <a href="#J"><b>javadoc -J-version</b></a>.
+The version number of the standard doclet appears in its output
+stream.  It can be turned off with <code>-quiet</code>.
+<p>
+
+<b>Public programmatic interface</b> -  To invoke the Javadoc 
+tool from within programs written in the Java language.  This
+interface is in <code>com.sun.tools.javadoc.Main</code>
+(and javadoc is re-entrant).  For more details, see 
+<a href="../javadoc/standard-doclet.html#runningprogrammatically">Standard Doclet</a>.
+<p>
+
+</blockquote>
+
+
+<br>
+<!-- ===================== SIMPLE EXAMPLES ========================= -->
+
+<a name="examples"></a>
+<h2>SIMPLE EXAMPLES</h2>
+<blockquote>
+You can run javadoc on entire packages or individual source files.
+Each package name has a corresponding directory name. 
+In the following examples, the source files are located at 
+<code>C:\home\src\java\awt\*java</code>. The destination
+directory is <code>C:\home\html</code>.
+
+<a name="documentingpackages"></a>
+<h3>Documenting One or More Packages</h3>
+
+To document a package, the source files (<code>*.java</code>) for that package 
+must be located in a directory having the same name as the package.
+If a package name is made up of several identifiers (separated by
+dots, such as <code>java.awt.color</code>), each subsequent identifier must 
+correspond to a deeper subdirectory (such as <code>java/awt/color</code>).  
+You may split the source files for a single package among two such directory 
+trees located at different places, as long as <code>-sourcepath</code> points 
+to them both -- for example <code>src1\java\awt\color</code> and 
+<code>src2\java\awt\color</code>.
+<p>
+
+You can run javadoc either by changing directories (with <code>cd</code>) 
+or by using <code>-sourcepath</code> option. The examples below 
+illustrate both alternatives. 
+<p>
+
+<ul>
+  <li><b>Case 1 - Run recursively starting from one or more packages</b> - 
+       This example uses -sourcepath so javadoc can be run 
+       from any directory and -subpackages (a new 1.4 option) for recursion.  
+       It traverses the subpackages of the <code>java</code> directory
+       excluding packages rooted at <code>java.net</code> 
+       and <code>java.lang</code>.  Notice this excludes
+       <code>java.lang.ref</code>, a subpackage of <code>java.lang</code>).
+       
+<pre>
+  % <b>javadoc <a href="#d">-d</a> \home\html <a href="#sourcepath">-sourcepath</a> \home\src <a href="#subpackages">-subpackages</a> java <a href="#exclude">-exclude</a> java.net:java.lang</b>
+</pre>
+<p>
+      To also traverse down other package trees, append their names
+      to the <code>-subpackages</code> argument, such as
+      <code>java:javax:org.xml.sax</code>.
+
+<p>
+  <li><b>Case 2 - Run on explicit packages after changing to the "root" source directory</b> - 
+      Change to the parent directory of the fully-qualified package.
+      Then run javadoc, supplying names of one or more
+      packages you want to document:
+<pre>
+  C:&gt; <b>cd C:\home\src\</b>
+  C:&gt; <b>javadoc -d C:\home\html java.awt java.awt.event</b>
+</pre>
+
+  <li><b>Case 3 - Run from any directory on explicit packages in a single directory tree</b> -
+      In this case, it doesn't matter what the current directory is.
+      Run javadoc supplying <code>-sourcepath</code> with the parent directory
+      of the top-level package, and supplying names of one or 
+      more packages you want to document:
+<pre>
+  C:&gt; <b>javadoc -d C:\home\html -sourcepath C:\home\src java.awt java.awt.event</b>
+</pre>
+
+  <li><b>Case 4 - Run from any directory on explicit packages in multiple directory trees</b> -
+      This is the same as case 3, but for packages in separate directory
+      trees.  Run javadoc supplying <code>-sourcepath</code> with 
+      the path to each tree's root (colon-separated) and supply names of one or 
+      more packages you want to document.  All source files for a given
+      package do not need to be located under a single root directory --
+      they just need to be found somewhere along the sourcepath.
+<pre>
+  C:&gt; <b>javadoc -d C:\home\html -sourcepath C:\home\src1;C:\home\src2 java.awt java.awt.event</b>
+</pre>
+</ul>
+
+Result: All cases generate HTML-formatted documentation for the public and 
+protected classes and interfaces in packages <code>java.awt</code> and 
+<code>java.awt.event</code> and save the HTML files in the specified 
+destination directory (<code>C:\home\html</code>). Because two or more
+packages are being generated, the document has three HTML frames -- for the list of 
+packages, the list of classes, and the main class pages.
+
+
+<a name="documentingclasses"></a>
+<h3>Documenting One or More Classes</h3>
+
+The second way to run the Javadoc tool is by passing in one or more source files 
+(<code>.java</code>).  You can run javadoc either of the following two ways -- 
+by changing directories (with <code>cd</code>) or by fully-specifying
+the path to the <code>.java</code> files.  Relative paths are relative
+to the current directory.  The <code>-sourcepath</code>
+option is ignored when passing in source files. You can use command 
+line wildcards, such as asterisk (*), to specify groups of classes.
+<p>
+
+<ul>
+  <li><b>Case 1 - Changing to the source directory</b> - 
+      Change to the directory holding the <code>.java</code> files.
+      Then run javadoc, supplying names of one or more source files
+      you want to document. 
+
+<pre>
+  C:&gt; <b>cd C:\home\src\java\awt</b>
+  C:&gt; <b>javadoc -d C:\home\html Button.java Canvas.java Graphics*.java</b>
+</pre>
+
+      This example generates HTML-formatted documentation for the classes 
+      <code>Button</code>, <code>Canvas</code> and classes beginning with 
+      <code>Graphics</code>.  Because source files rather than package names 
+      were passed in as arguments to javadoc, the document has two frames --
+      for the list of classes and the main page.
+<p>
+
+  <li><b>Case 2 - Changing to the package root directory</b> - 
+      This is useful for documenting individual source files from different
+      subpackages off the same root. Change to the package root directory,
+      and supply the source files with paths from the root. 
+<pre>
+  C:&gt; <b>cd C:\home\src</b>
+  C:&gt; <b>javadoc -d \home\html java\awt\Button.java java\applet\Applet.java</b>
+</pre>
+
+      This example generates HTML-formatted documentation for the classes 
+      <code>Button</code> and <code>Applet</code>.
+<p>
+
+  <li><b>Case 3 - From any directory</b> -
+      In this case, it doesn't matter what the current directory is.
+      Run javadoc supplying the absolute path (or path relative to the 
+      current directory) to the <code>.java</code> files
+      you want to document.  
+<pre>
+  C:&gt; <b>javadoc -d C:\home\html C:\home\src\java\awt\Button.java C:\home\src\java\awt\Graphics*.java</b>
+</pre>
+
+      This example generates HTML-formatted documentation for the class
+      <code>Button</code> and classes beginning with <code>Graphics</code>.
+
+</ul>
+
+
+<a name="documentingboth"></a>
+<h3>Documenting Both Packages and Classes</h3>
+
+You can document entire packages and individual classes at the same time.
+Here's an example that mixes two of the previous examples. 
+You can use <code>-sourcepath</code> for the path to the packages but not
+for the path to the individual classes. 
+
+<pre>
+  C:&gt; <b>javadoc -d C:\home\html -sourcepath C:\home\src java.awt C:\home\src\java\applet\Applet.java</b>
+</pre>
+
+      This example generates HTML-formatted documentation for the package 
+      <code>java.awt</code> and class <code>Applet</code>.
+      (The Javadoc tool determines the package name for <code>Applet</code> from the
+      package declaration, if any, in the <code>Applet.java</code> source file.)
+
+</blockquote>
+
+
+<br>
+<!-- ================= REAL-WORLD EXAMPLE ========================= -->
+
+<a name="realworldexample"></a>
+<h2>REAL WORLD EXAMPLE</h2>
+
+<blockquote>
+The Javadoc tool has many useful options, some of which are more commonly used
+than others.  Here is effectively the command we use to run 
+the Javadoc tool on the Java platform API.  We use 180MB of memory to generate
+the documentation for the 1500 (approx.) public and protected classes 
+in the Java 2 Platform, Standard Edition, v1.2.
+<P>
+The same example is shown twice -- first as executed on the command line,
+then as executed from a makefile.  It uses absolute paths in the option
+arguments, which enables the same <code>javadoc</code> command to be run from any 
+directory.
+
+<a name="commandlineexample"></a>
+<h3>Command Line Example</h3>
+
+This command line example is over 900 characters, which is too long
+for some shells, such as DOS.  You can use a <a href="#argumentfiles">command 
+line argument file</a> (or write a shell script) to workaround this limitation.
+
+<PRE>
+C:&gt; javadoc -sourcepath \java\jdk\src\share\classes            ^
+    -overview \java\jdk\src\share\classes\overview.html      ^
+    -d \java\jdk\build\api                                   ^
+    -use                                                     ^
+    -splitIndex                                              ^
+    -windowtitle 'Java 2 Platform v1.2 API Specification'    ^
+    -doctitle 'Java&lt;sup&gt;&lt;font size="-2"&gt;TM&lt;/font&gt;&lt;/sup&gt; 2 Platform v1.2 API Specification' ^
+    -header '&lt;b&gt;Java 2 Platform &lt;/b&gt;&lt;br&gt;&lt;font size="-1"&gt;v1.2&lt;/font&gt;' ^
+    -bottom '&lt;font size="-1"&gt;&lt;a href="http://java.sun.com/cgi-bin/bugreport.cgi"&gt;Submit 
+a bug or feature&lt;/a&gt;&lt;br&gt;&lt;br&gt;Java is a trademark or registered trademark of Sun Microsystems, 
+Inc. in the US and other countries.&lt;br&gt;Copyright 1993-1999 Sun Microsystems, Inc. 
+901 San Antonio Road,&lt;br&gt;Palo Alto, California, 94303, U.S.A. All Rights Reserved.&lt;/font&gt;' ^  
+    -group "Core Packages" "java.*:com.sun.java.*:org.omg.*" ^
+    -group "Extension Packages" "javax.*"                    ^
+    -J-Xmx180m                                               ^  
+    @packages
+</PRE>
+where <code>packages</code> is the name of a file containing the packages 
+to process, such as <code>java.applet java.lang</code>.  None of the
+options should contain any newline characters between the single quotes.  
+(For example, if you copy and paste this example, delete the newline characters 
+from the <code>-bottom</code> option.)  See the other notes listed below.
+
+<a name="makefileexample"></a>
+<h3>Makefile Example</h3>
+
+This is an example of a GNU makefile.  For an example of a Windows makefile, 
+see <a href="http://java.sun.com/j2se/javadoc/faq/index.html#makefiles">creating
+a makefile for Windows</a>.  
+
+<pre>
+javadoc -<a href="#sourcepath">sourcepath</a> $(SRCDIR)              ^   /* Sets path for source files     */
+        -<a href="#overview">overview</a> $(SRCDIR)\overview.html  ^   /* Sets file for overview text    */
+        -<a href="#d">d</a> \java\jdk\build\api             ^   /* Sets destination directory     */
+        -<a href="#use">use</a>                               ^   /* Adds "Use" files               */
+        -<a href="#splitindex">splitIndex</a>                        ^   /* Splits index A-Z               */
+        -<a href="#windowtitle">windowtitle</a> $(WINDOWTITLE)        ^   /* Adds a window title            */
+        -<a href="#doctitle">doctitle</a> $(DOCTITLE)              ^   /* Adds a doc title               */
+        -<a href="#header">header</a> $(HEADER)                  ^   /* Adds running header text       */
+        -<a href="#bottom">bottom</a> $(BOTTOM)                  ^   /* Adds text at bottom            */
+        -<a href="#group">group</a> $(GROUPCORE)                ^   /* 1st subhead on overview page   */
+        -<a href="#group">group</a> $(GROUPEXT)                 ^   /* 2nd subhead on overview page   */
+        -<a href="#J">J</a>-Xmx180m                         ^   /* Sets memory to 180MB           */
+        java.lang java.lang.reflect        ^   /* Sets packages to document      */
+        java.util java.io java.net         ^
+        java.applet
+        
+WINDOWTITLE = 'Java 2 Platform v1.2 API Specification'
+DOCTITLE = 'Java&lt;sup&gt;&lt;font size="-2"&gt;TM&lt;/font&gt;&lt;/sup&gt; 2 Platform v1.2 API Specification'
+HEADER = '&lt;b&gt;Java&nbsp;2 Platform&nbsp;&lt;/b&gt;&lt;br&gt;&lt;font size="-1"&gt;v1.2&lt;/font&gt;'
+BOTTOM = '&lt;font size="-1"&gt;&lt;a href="http://java.sun.com/cgi-bin/bugreport.cgi"&gt;Submit
+    a bug or feature&lt;/a&gt;&lt;br&gt;&lt;br&gt;Java is a trademark or registered trademark 
+    of Sun Microsystems, Inc. in the US and other countries.&lt;br&gt;Copyright 1993-1999    
+    Sun Microsystems, Inc. 901 San Antonio Road,&lt;br&gt;Palo Alto, California, 94303, U.S.A.  
+    All Rights Reserved.&lt;/font&gt;'
+GROUPCORE = '"Core Packages" "java.*:com.sun.java.*:org.omg.*"'
+GROUPEXT  = '"Extension Packages" "javax.*"'
+SRCDIR = '/java/jdk/1.2/src/share/classes'
+</pre>
+<p>
+
+Single quotes are used to surround makefile arguments.
+<p>
+
+<B>NOTES</B> 
+<UL>
+   <LI>If you omit the <code>-windowtitle</code> option, the Javadoc tool copies the doc title 
+       to the window title.  The <code>-windowtitle</code> text is basically the same 
+       as the <code>-doctitle</code> but without HTML tags, to prevent those tags from 
+       appearing as raw text in the window title.
+<P>
+   <LI>If you omit the <code>-footer</code> option, as done here, the Javadoc tool copies the 
+       header text to the footer.
+<p>
+   <LI>Other important options you might want to use but not needed in this example are 
+       -<a href="#classpath"><code>classpath</code></a> and -<a href="#link"><code>link</code></a>.
+</UL>
+</blockquote>
+
+<br>
+<!-- ==================== TROUBLESHOOTING =========================== -->
+
+<a name="troubleshooting"></a> 
+<h2>TROUBLESHOOTING</h2>
+<blockquote>
+
+<a name="generaltroubleshooting"></a>
+<h3>General Troubleshooting</h3>
+
+<ul>
+    <li><b>Javadoc FAQ</b> - Commonly-encountered bugs and troubleshooting 
+        tips can be found on the 
+        <a href="http://java.sun.com/j2se/javadoc/faq/index.html#B">Javadoc FAQ</a>
+<p>
+
+    <li><b>Bugs and Limitations</b> - You can also see some bugs listed 
+        at <a href="http://java.sun.com/j2se/1.4.2/fixedbugs/index.html">Important 
+        Bug Fixes and Changes</a>.
+<p>
+    <li><b>Version number</b> - See <a href="#versionnumbers">version 
+        numbers</a>.
+<p>
+    <li><b>Documents only legal classes</b> - When documenting a package, 
+        javadoc only reads files whose names are composed of legal 
+        class names.  You can prevent javadoc from parsing a file 
+        by including, for example, a hyphen "-" in its filename.
+
+</ul>
+
+<a name="errorsandwarnings"></a>
+<h3>Errors and Warnings</h3>
+Error and warning messages contain the filename and line number
+to the declaration line rather than to the particular line 
+in the doc comment.
+
+<ul>
+    <li><code>"error: cannot read: Class1.java"</code>
+        the Javadoc tool is trying to load the class Class1.java 
+        in the current directory.  The class name is shown
+        with its path (absolute or relative), which in this 
+        case is the same as <code>./Class1.java</code>.
+
+</ul>
+
+</blockquote>
+
+<br>
+<!-- ==================== ENVIRONMENT =========================== -->
+
+<a name="environment"></a> 
+<h2>ENVIRONMENT</h2>
+<blockquote>
+
+<dl>
+
+<a name="classpathenvironment"></a> 
+<dt><code><b>CLASSPATH</b></code>
+<dd>Environment variable that provides the path which javadoc uses to 
+find user class files.  This environment variable is overridden by 
+the <code>-classpath</code> option. 
+Separate directories with a semicolon, for example:
+<pre>
+<dd>.;C:\classes;C:\home\java\classes
+</pre>
+</dl>
+</blockquote>
+
+
+<br>
+<!-- ==================== SEE ALSO =========================== -->
+
+<a name="seealso"></a> 
+<h2>SEE ALSO</h2>
+<blockquote>
+<ul>
+  <li><a href="javac.html">javac</a>
+  <li><a href="java.html">java</a>
+  <li><a href="jdb.html">jdb</a>
+  <li><a href="javah.html">javah</a>
+  <li><a href="javap.html">javap</a>
+  <li><a href="http://java.sun.com/j2se/javadoc/index.html">Javadoc Home Page</a>
+  <li><a href="http://java.sun.com/j2se/javadoc/writingdoccomments/index.html">How to Write Doc Comments for Javadoc</a>
+  <li><a href="classpath.html">Setting the Class Path</a>
+  <li><a href="../findingclasses.html#srcfiles">How Javac and Javadoc Find Classes</a> (tools.jar)
+</ul>
+</blockquote>
+
+<HR SIZE=3 NOSHADE>
+
+<FONT SIZE="-1">Please send comments to email address: <img src="../javadoc/javadoctool-email.gif" alt="javadoctool at sun.com">. 
+<P>
+
+<FONT SIZE="-1">Javadoc<SUP><FONT SIZE="-2">TM</FONT></SUP> is a trademark of 
+Sun Microsystems, Inc.  (The <code>javadoc</code> command itself does not require 
+the trademark symbol.)</FONT>
+<P>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<!-- Allows the contents to jump the last item -->
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+</body>
+</html>

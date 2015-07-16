@@ -1,0 +1,44 @@
+<HTML><HEAD><TITLE>Java Web Start AutoInstall</TITLE>
+<meta http-equiv="cache-control" content="no-cache, must-revalidate">
+<center>Java Web Start AutoInstall</center></head>
+<BODY>
+
+<!-- 
+
+CODEBASE is the location and version of autoinstall.cab, the ActiveX
+component which downloads and installs the Java Web Start component.
+
+CLASSID is the globally unique identifier for the control referred
+to by CODEBASE.  The CLASSID value should not be changed.
+
+PARAMS
+app: the location of the application to auto-execute after install.
+cfg: the location of the .cfg file with which to initialize the client.
+back: if this value is "false", the browser will not go "back" after
+AutoInstall completes.  The default behavior is to go back.
+
+All PARAMS are optional.
+
+The ActiveX component will only work in Internet Explorer.  For other
+browsers, the deployer may include HTML inside the OBJECT tag, which
+will be displayed by browsers which cannot render the object.
+
+The OBJECT tag should look something like this:
+
+-->
+
+<center>
+<OBJECT CODEBASE="http://java.sun.com/autoinstall/jinstall_javaws-1_2-rt.cab#Version=1,0,0,2"
+        CLASSID="clsid:5852F5ED-8BF4-11D4-A245-0080C6F74284"
+	HEIGHT=0 WIDTH=0>
+<PARAM name="app" value="http://myhost.some.com/myapp.jnlp">
+<PARAM name="cfg" value="http://myhost.some.com/myautoconfig.jar">
+<PARAM name="back" value="true">
+
+<!-- Alternate HTML for browsers which cannot instantiate the object -->
+<A HREF="http://java.sun.com/cgi-bin/javawebstart-platform.sh?">
+Click here to download Java Web Start</A>
+
+</OBJECT>
+</center>
+</BODY></HTML>

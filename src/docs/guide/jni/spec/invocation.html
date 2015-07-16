@@ -1,0 +1,411 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Tue Nov 12 11:55:48 2002" />
+    <title>The Invocation API</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="jniTOC.html" />
+    <link rel="Previous" href="functions.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="jniTOC.html">Contents</a> | 
+	<a accesskey="p" href="functions.html">Previous</a> 
+       </td>
+	   <td align="right"><i>Java Native Interface Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp9502"> </a><h2 class="pNewHTMLPage">
+The Invocation API
+</h2>
+<hr class="pHr"/>
+<a name="wp15899"> </a><h2 class="pChapNum">
+Chapter &#160; 5
+</h2>
+<a name="wp1057"> </a><p class="pBody">
+The Invocation API allows software vendors to load the Java VM into an arbitrary native application. Vendors can deliver Java-enabled applications without having to link with the Java VM source code.
+</p>
+<a name="wp499"> </a><p class="pBody">
+This chapter begins with an overview of the Invocation API. This is followed by reference pages for all Invocation API functions.
+</p>
+<a name="wp16589"> </a><p class="pBody">
+To enhance the embeddability of the Java VM, the Invocation API is extended in JDK 1.1.2 in a few minor ways.
+</p>
+<a name="wp15926"> </a><h2 class="pHeading1">
+Overview
+</h2>
+<a name="wp954"> </a><p class="pBody">
+The following code example illustrates how to use functions in the Invocation API. In this example, the C++ code creates a Java VM and invokes a static method, called <code class="cCode">Main.test</code>. For clarity, we omit error checking.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+    #include &lt;jni.h&gt;       /* where everything is defined */<a name="wp955"> </a>
+<a name="wp956"> </a>
+    ...<a name="wp957"> </a>
+<a name="wp958"> </a>
+    JavaVM *jvm;       /* denotes a Java VM */<a name="wp959"> </a>
+    JNIEnv *env;       /* pointer to native method interface */<a name="wp960"> </a>
+<a name="wp961"> </a>
+    JDK1_1InitArgs vm_args; /* JDK 1.1 VM initialization arguments */<a name="wp962"> </a>
+<a name="wp963"> </a>
+    vm_args.version = 0x00010001; /* New in 1.1.2: VM version */<a name="wp16590"> </a>
+    /* Get the default initialization arguments and set the class <a name="wp964"> </a>
+     * path */<a name="wp965"> </a>
+    JNI_GetDefaultJavaVMInitArgs(&amp;vm_args);<a name="wp966"> </a>
+    vm_args.classpath = ...;<a name="wp967"> </a>
+<a name="wp968"> </a>
+    /* load and initialize a Java VM, return a JNI interface <a name="wp969"> </a>
+     * pointer in env */<a name="wp970"> </a>
+    JNI_CreateJavaVM(&amp;jvm, &amp;env, &amp;vm_args);<a name="wp971"> </a>
+<a name="wp972"> </a>
+    /* invoke the Main.test method using the JNI */<a name="wp973"> </a>
+    jclass cls = env-&gt;FindClass(&quot;Main&quot;);<a name="wp974"> </a>
+    jmethodID mid = env-&gt;GetStaticMethodID(cls, &quot;test&quot;, &quot;(I)V&quot;);<a name="wp975"> </a>
+    env-&gt;CallStaticVoidMethod(cls, mid, 100);<a name="wp976"> </a>
+<a name="wp977"> </a>
+    /* We are done. */<a name="wp978"> </a>
+    jvm-&gt;DestroyJavaVM();<a name="wp979"> </a>
+</pre></div>
+<a name="wp980"> </a><p class="pBody">
+This example uses three functions in the API. The Invocation API allows a native application to use the JNI interface pointer to access VM features. The design is similar to Netscape&#8217;s JRI Embedding Interface.
+</p>
+<a name="wp15956"> </a><h3 class="pHeading2">
+		Creating the VM
+</h3>
+<a name="wp1045"> </a><p class="pBody">
+The <code class="cCode">JNI_CreateJavaVM()</code> function loads and initializes a Java VM and returns a pointer to the JNI interface pointer. The thread that called <code class="cCode">JNI_CreateJavaVM()</code> is considered to be the <em class="cEmphasis">main thread</em>.
+</p>
+<a name="wp1060"> </a><h3 class="pHeading2">
+		Attaching to the VM
+</h3>
+<a name="wp15965"> </a><p class="pBody">
+The JNI interface pointer (<code class="cCode">JNIEnv</code>) is valid only in the current thread. Should another thread need to access the Java VM, it must first call <code class="cCode">AttachCurrentThread()</code> to attach itself to the VM and obtain a JNI interface pointer. Once attached to the VM, a native thread works just like an ordinary Java thread running inside a native method. The native thread remains attached to the VM until it calls <code class="cCode">DetachCurrentThread()</code> to detach itself. 
+</p>
+<a name="wp16703"> </a><p class="pBody">
+The attached thread should have enough stack space to perform a reaonable amount of work. The allocation of stack space per thread is operating system-specific. For example, using pthreads, the stack size can be specified in the <code class="cCode">pthread_attr_t</code> argument to <code class="cCode">pthread_create</code>.
+</p>
+<a name="wp16553"> </a><h3 class="pHeading2">
+		Unloading the VM
+</h3>
+<a name="wp548"> </a><p class="pBody">
+The main thread cannot detach itself from the VM. Instead, it must call <code class="cCode">DestroyJavaVM()</code> to unload the entire VM. 
+</p>
+<a name="wp16636"> </a><p class="pBody">
+The VM waits until the main thread is the only user thread before it actually unloads. User threads include both Java threads and attached native threads. This restriction exists because a Java thread or attached native thread may be holding system resources, such as locks, windows, and so on. The <code class="cCode">VM</code> cannot automatically free these resources. By restricting the main thread to be the only running thread when the VM is unloaded, the burden of releasing system resources held by arbitrary threads is on the programmer.
+</p>
+<a name="wp16554"> </a><h2 class="pHeading1">
+Initialization Structures
+</h2>
+<a name="wp16529"> </a><p class="pBody">
+Different Java VM implementation will likely require different initialization arguments. It is difficult to come up with a standard initialization structure suitable for all present and future Java VMs. As a compromise, we reserve the first field (version) to identify the content of the initialization structure. Native applications embedding JDK 1.1.2 must set the version field to 0x00010001. VM implementations are encouraged to use the same initialization structure as JDK, although other implementations may choose to ignore some of the initialization arguments supported by JDK.
+</p>
+<a name="wp16668"> </a><p class="pBody">
+Version numbers 0x80000000 to 0xFFFFFFFF are reserved, and should not be recognized by any VM implementation.
+</p>
+<a name="wp15980"> </a><p class="pBody">
+The following code shows the structure used to initialize the Java VM in JDK 1.1.2.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+typedef struct JDK1_1InitArgs {<a name="wp608"> </a>
+   /* The first two fields were reserved in JDK 1.1, and<a name="wp780"> </a>
+      formally introduced in JDK 1.1.2. */<a name="wp16594"> </a>
+   /* Java VM version */<a name="wp16595"> </a>
+    jint version;<a name="wp781"> </a>
+<a name="wp16596"> </a>
+   /* System properties. */<a name="wp16597"> </a>
+    char **properties;<a name="wp782"> </a>
+<a name="wp783"> </a>
+   /* whether to check the Java source files are newer than <a name="wp628"> </a>
+    * compiled class files. */<a name="wp16555"> </a>
+    jint checkSource;<a name="wp634"> </a>
+<a name="wp814"> </a>
+   /* maximum native stack size of Java-created threads. */<a name="wp638"> </a>
+    jint nativeStackSize;<a name="wp642"> </a>
+<a name="wp644"> </a>
+   /* maximum Java stack size. */<a name="wp820"> </a>
+    jint javaStackSize;<a name="wp650"> </a>
+<a name="wp825"> </a>
+   /* initial heap size. */<a name="wp652"> </a>
+    jint minHeapSize;<a name="wp658"> </a>
+<a name="wp830"> </a>
+   /* maximum heap size. */<a name="wp660"> </a>
+    jint maxHeapSize;<a name="wp666"> </a>
+<a name="wp668"> </a>
+   /* controls whether Java byte code should be verified:<a name="wp843"> </a>
+    * 0 -- none, 1 -- remotely loaded code, 2 -- all code. */<a name="wp672"> </a>
+    jint verifyMode;<a name="wp676"> </a>
+<a name="wp848"> </a>
+   /* the local directory path for class loading. */<a name="wp678"> </a>
+    const char *classpath;<a name="wp684"> </a>
+<a name="wp802"> </a>
+   /* a hook for a function that redirects all VM messages. */<a name="wp854"> </a>
+    jint (*vfprintf)(FILE *fp, const char *format, <a name="wp853"> </a>
+                     va_list args);<a name="wp16558"> </a>
+<a name="wp803"> </a>
+   /* a VM exit hook. */<a name="wp855"> </a>
+    void (*exit)(jint code);<a name="wp856"> </a>
+<a name="wp860"> </a>
+   /* a VM abort hook. */<a name="wp861"> </a>
+    void (*abort)();<a name="wp804"> </a>
+<a name="wp887"> </a>
+   /* whether to enable class GC. */<a name="wp805"> </a>
+    jint enableClassGC;<a name="wp806"> </a>
+<a name="wp862"> </a>
+   /* whether GC messages will appear. */<a name="wp807"> </a>
+    jint enableVerboseGC;<a name="wp863"> </a>
+<a name="wp864"> </a>
+   /* whether asynchronous GC is allowed. */<a name="wp865"> </a>
+    jint disableAsyncGC;<a name="wp800"> </a>
+<a name="wp16578"> </a>
+   /* Three reserved fields. */ <a name="wp16681"> </a>
+    jint reserved0;<a name="wp16683"> </a>
+    jint reserved1;<a name="wp686"> </a>
+    jint reserved2;<a name="wp16688"> </a>
+} JDK1_1InitArgs;<a name="wp16687"> </a>
+</pre></div>
+<a name="wp738"> </a><p class="pBody">
+In JDK 1.1.2, the initialization structure provides hooks so that a native application can redirect VM messages and obtain control when the VM terminates.
+</p>
+<a name="wp886"> </a><p class="pBody">
+The structure below is passed as an argument when a native thread attaches to a Java VM in JDK 1.1.2. In actuality, no arguments are required for a native thread to attach to the JDK 1.1.2. The <code class="cCode">JDK1_1AttachArgs</code> structure consists only of a padding slot for those C compilers that do not permit empty structures.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+typedef struct JDK1_1AttachArgs {<a name="wp1017"> </a>
+   /*<a name="wp1019"> </a>
+    * JDK 1.1 does not need any arguments to attach a<a name="wp1021"> </a>
+    * native thread. The padding is here to satisfy the C<a name="wp1023"> </a>
+    * compiler which does not permit empty structures.<a name="wp1025"> </a>
+    */<a name="wp1038"> </a>
+    void *__padding;<a name="wp1031"> </a>
+} JDK1_1AttachArgs;<a name="wp1033"> </a>
+</pre></div>
+<a name="wp756"> </a><h2 class="pHeading1">
+Invocation API Functions
+</h2>
+<a name="wp16292"> </a><p class="pBody">
+The <code class="cCode">JavaVM</code> type is a pointer to the Invocation API function table. The following code example shows this function table.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+typedef const struct JNIInvokeInterface *JavaVM;<a name="wp834"> </a>
+<a name="wp836"> </a>
+const struct JNIInvokeInterface ... = {<a name="wp838"> </a>
+    NULL,<a name="wp840"> </a>
+    NULL,<a name="wp842"> </a>
+    NULL,<a name="wp844"> </a>
+<a name="wp846"> </a>
+    DestroyJavaVM,<a name="wp848"> </a>
+    AttachCurrentThread,<a name="wp850"> </a>
+    DetachCurrentThread,<a name="wp852"> </a>
+};<a name="wp854"> </a>
+</pre></div>
+<a name="wp16293"> </a><p class="pBody">
+Note that three Invocation API functions, <code class="cCode">JNI_GetDefaultJavaVMInitArgs()</code>, JNI_GetCreatedJavaVMs(), and <code class="cCode">JNI_CreateJavaVM()</code>, are not part of the JavaVM function table. These functions can be used without a preexisting <code class="cCode">JavaVM</code> structure.
+</p>
+<a name="wp16064"> </a><h3 class="pHeading2">
+		JNI_GetDefaultJavaVMInitArgs
+</h3>
+<a name="wp16312"> </a><p class="pBody">
+<code class="cCode">jint JNI_GetDefaultJavaVMInitArgs(void *vm_args);</code>
+</p>
+<a name="wp16317"> </a><p class="pBody">
+Returns a default configuration for the Java VM. Before calling this function, native code must<a href="#wp16624"><span class="Footnote">1</span></a> set the vm_args-&gt;version field to the JNI version it expects the VM to support. In JDK 1.1.2,  vm_args-&gt;version must be set to 0x00010001. After this function returns,  vm_args-&gt;version will be set to the actual JNI version the VM supports.
+</p>
+<a name="wp16646"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp16647"> </a><p class="pBody">
+<code class="cCode">vm_args</code>: a pointer to a <code class="cCode">VM-specific initialization</code> structure in to which the default arguments are filled.
+</p>
+<a name="wp16602"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp16603"> </a><p class="pBody">
+Returns &#8220;0&#8221; if the requested version is supported; returns a negative number if the requested version is not supported. 
+</p>
+<a name="wp633"> </a><h3 class="pHeading2">
+		JNI_GetCreatedJavaVMs
+</h3>
+<a name="wp634"> </a><p class="pBody">
+<code class="cCode">jint JNI_GetCreatedJavaVMs(JavaVM **vmBuf, jsize bufLen,<br />     jsize *nVMs);</code>
+</p>
+<a name="wp635"> </a><p class="pBody">
+Returns all Java VMs that have been created. Pointers to VMs are written in the buffer vmBuf in the order they are created. At most bufLen number of entries will be written. The total number of created VMs is returned in *nVMs.
+</p>
+<a name="wp636"> </a><p class="pBody">
+JDK 1.1.2 does not support creating more than one VM in a single process.
+</p>
+<a name="wp637"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp638"> </a><p class="pBody">
+<code class="cCode">vmBuf</code>: pointer to the buffer where the VM structures will be placed.
+</p>
+<a name="wp639"> </a><p class="pBody">
+<code class="cCode">bufLen</code>: the length of the buffer.
+</p>
+<a name="wp640"> </a><p class="pBody">
+<code class="cCode">nVMs</code>: a pointer to an integer.
+</p>
+<a name="wp641"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp642"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative number on failure.
+</p>
+<a name="wp16334"> </a><h3 class="pHeading2">
+		JNI_CreateJavaVM
+</h3>
+<a name="wp16331"> </a><p class="pBody">
+<code class="cCode">jint JNI_CreateJavaVM(JavaVM **p_vm, JNIEnv **p_env,<br />     void *vm_args);</code>
+</p>
+<a name="wp16339"> </a><p class="pBody">
+Loads and initializes a Java VM. The current thread becomes the main thread. Sets the <code class="cCode">env</code> argument to the JNI interface pointer of the main thread.
+</p>
+<a name="wp16345"> </a><p class="pBody">
+JDK 1.1 does not support creating more than one VM in a single process. The version field in vm_args must<a href="#wp16694"><span class="Footnote">2</span></a> be set to 0x00010001.
+</p>
+<a name="wp16351"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp16356"> </a><p class="pBody">
+<code class="cCode">p_vm</code>: pointer to the location where the resulting VM structure will be placed.
+</p>
+<a name="wp16358"> </a><p class="pBody">
+<code class="cCode">p_env</code>: pointer to the location where the JNI interface pointer for the main thread will be placed.
+</p>
+<a name="wp16360"> </a><p class="pBody">
+<code class="cCode">vm_args</code>: Java VM initialization arguments.
+</p>
+<a name="wp16085"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp711"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative number on failure.
+</p>
+<a name="wp16089"> </a><h3 class="pHeading2">
+		DestroyJavaVM
+</h3>
+<a name="wp16384"> </a><p class="pBody">
+<code class="cCode">jint DestroyJavaVM(JavaVM *vm);</code>
+</p>
+<a name="wp16381"> </a><p class="pBody">
+Unloads a Java VM and reclaims its resources. Only the main thread can unload the VM. The system waits until the main thread is only remaining user thread before it destroys the VM.
+</p>
+<a name="wp16386"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp16387"> </a><p class="pBody">
+<code class="cCode">vm</code>: the Java VM that will be destroyed.
+</p>
+<a name="wp16390"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp715"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative number on failure.
+</p>
+<a name="wp628"> </a><p class="pBody">
+JDK 1.1.2 does not support unloading the VM.
+</p>
+<a name="wp16436"> </a><h3 class="pHeading2">
+		AttachCurrentThread
+</h3>
+<a name="wp16433"> </a><p class="pBody">
+<code class="cCode">jint AttachCurrentThread(JavaVM *vm, JNIEnv **p_env,<br />     void *thr_args);</code>
+</p>
+<a name="wp16441"> </a><p class="pBody">
+Attaches the current thread to a Java VM. Returns a JNI interface pointer in the <code class="cCode">JNIEnv</code> argument.
+</p>
+<a name="wp987"> </a><p class="pBody">
+Trying to attach a thread that is already attached is a no-op.
+</p>
+<a name="wp988"> </a><p class="pBody">
+A native thread cannot be attached simultaneously to two Java VMs.
+</p>
+<a name="wp16702"> </a><p class="pBody">
+When a thread is attached to the VM, the context class loader is the bootstrap loader.
+</p>
+<a name="wp989"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp16456"> </a><p class="pBody">
+<code class="cCode">vm</code>: the VM to which the current thread will be attached.
+</p>
+<a name="wp16457"> </a><p class="pBody">
+<code class="cCode">p_env</code>: pointer to the location where the JNI interface pointer of the current thread will be placed.
+</p>
+<a name="wp16458"> </a><p class="pBody">
+<code class="cCode">thr_args</code>: VM-specific thread attachment arguments.
+</p>
+<a name="wp16459"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp721"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative number on failure.
+</p>
+<a name="wp16108"> </a><h3 class="pHeading2">
+		DetachCurrentThread
+</h3>
+<a name="wp16468"> </a><p class="pBody">
+<code class="cCode">jint DetachCurrentThread(JavaVM *vm);</code>
+</p>
+<a name="wp16111"> </a><p class="pBody">
+Detaches the current thread from a Java VM. All Java monitors held by this thread are released. All Java threads waiting for this thread to die are notified.
+</p>
+<a name="wp16115"> </a><p class="pBody">
+The main thread, which is the thread that created the Java VM, cannot be detached from the VM. Instead, the main thread must call <code class="cCode">JNI_DestroyJavaVM()</code> to unload the entire VM.
+</p>
+<a name="wp16491"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp16492"> </a><p class="pBody">
+<code class="cCode">vm</code>: the VM from which the current thread will be detached.
+</p>
+<a name="wp16495"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp725"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative number on failure.
+</p>
+<a name="wp15891"> </a><p class="pBody">
+
+</p>
+
+  <a name="wp16624"> </a><div class="pFootNote">
+<a href="#wp16317"><span class="Footnote">1</span></a>JDK 1.1 did not require the native code to set the version field. For  backward compatibility, JDK 1.1.2 assumes 
+that the requested version is 0x00010001 if the version field is not set. Future versions of JDK will require the 
+version field to be set to an appropriate value.
+
+</div>
+<a name="wp16694"> </a><div class="pFootNote">
+<a href="#wp16345"><span class="Footnote">2</span></a>JDK 1.1 did not require the native code to set the version field. For  backward compatibility, JDK 1.1.2 assumes 
+that the requested version is 0x00010001 if the version field is not set. Future versions of JDK will require the 
+version field to be set to an appropriate value.
+
+</div>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="jniTOC.html">Contents</a> | 
+	<a accesskey="p" href="functions.html">Previous</a> 
+       </td>
+        <td align="right">
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

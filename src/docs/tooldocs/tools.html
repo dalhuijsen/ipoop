@@ -1,0 +1,557 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<HEAD>
+	<TITLE>SDK Development Tools</TITLE>
+</HEAD>
+
+<BODY bgcolor="white">
+
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR>
+<TD>
+   <IMG SRC="../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+
+<TD>
+<center>
+           <h1>Java<sup><font size=-2>TM</font></sup> 2 SDK<br>
+Tools and Utilities</h1>
+</center>
+</TD>
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+<font size="-1"><a href="../index.html">Documentation Contents</a></font>
+</TD>
+</TR>
+</TABLE>
+
+<!-- ======================== Body text begins here ===================== -->
+
+<P>
+Each of the development tools comes in a Microsoft Windows version (<em>Windows</em>) 
+and a Solaris or Linux version. 
+There is virtually no difference in features between versions. 
+However, there are minor differences in configuration and usage to accommodate
+the special requirements of each operating system. (For example, the
+way you specify directory separators depends on the OS.)
+</P> 
+
+<P>
+The following documents contain important information you will need to
+know to get the most out of the SDK tools.
+</P>
+
+<blockquote>
+<TABLE BORDER="0" summary="SDK Overview Information">
+<TR>
+<td>
+<ul>
+<li>
+<B>SDK File Structure</B>
+</ul>
+</TD>
+<TD>
+[<A HREF="solaris/jdkfiles.html">Solaris</A>]
+[<A HREF="linux/jdkfiles.html">Linux</A>]
+[<A HREF="windows/jdkfiles.html">Windows</A>]
+</TD>
+</TR>
+
+<TR>
+<td>
+<ul>
+<li>
+<B>Setting the Classpath</B>
+</ul>
+</TD>
+<TD>
+[<A HREF="solaris/classpath.html">Solaris and Linux</A>] 
+[<A HREF="windows/classpath.html">Windows</A>]
+</TD>
+</TR>
+
+<TR>
+<td>
+<ul>
+<li>
+<B>How Classes are Found</B>
+</ul>
+</TD>
+<TD>
+[<A HREF="findingclasses.html">Solaris, Linux and Windows</A>] 
+</TD>
+</TR>
+
+<TR>
+<td>
+<ul>
+<li>
+<B>Tool Changes in Java 2 SDK, v1.4</B>
+</ul>
+</TD>
+<TD>
+[<A HREF="tools-changes.html">Solaris, Linux and Windows</a>]
+</TD>
+</TR>
+</TABLE>
+</blockquote>
+</ul>
+<P>
+
+The sections below provide a brief introduction to the tools in the Java 2 SDK,
+with links to their reference pages:
+<P>
+<blockquote>
+<UL>
+<LI><A HREF="#basic"><b>Basic Tools</b></A> (javac, java, javadoc, 
+appletviewer, jar, jdb, javah, javap, extcheck)
+<LI><A HREF="#rmi"><B>Remote Method Invocation (RMI) Tools</B></A> 
+(rmic, rmiregistry, rmid, serialver)
+<LI><A HREF="#intl"><B>Internationalization Tools</B></A> (native2ascii)
+<LI><A HREF="#security"><B>Security Tools</B></A> (keytool, jarsigner, 
+policytool, kinit, klist, ktab)
+<LI><A HREF="#idl"><B>Java IDL and RMI-IIOP Tools</B></A> (tnameserv, idlj, 
+orbd, servertool)
+<LI><a href="#plugin"><b>Java Plug-in<sup><font size="-2">TM</font></sup> 
+Tools</b></a>
+</UL>
+</blockquote>
+<p>
+
+<hr>
+<h2>
+<a name=basic>
+Basic Tools
+</a>
+</h2>
+
+These tools are the foundation of the Java 2 SDK. They are the tools you use 
+to create and build applications.
+<p>
+
+<TABLE BORDER="0" WIDTH="100%" summary="List of Basic SDK Tools with 
+Links to Reference Pages">
+<tr>
+<th align=left> 
+Tool Name
+</th>
+<th align=left>
+Brief Description
+</th>
+<th align=left>
+Links to Reference Pages
+</th>
+</tr>
+
+<TR>
+<TD width="13%" VALIGN="TOP"><B>javac</B></TD>
+<TD width="70%" VALIGN="TOP">The compiler for the Java programming language.</TD>
+<TD width="17%" VALIGN="TOP">[<A HREF="solaris/javac.html">Solaris&nbsp;and&nbsp;Linux</A>]&nbsp;[<A HREF="windows/javac.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>java</B></TD>
+<TD VALIGN="TOP">The launcher for Java applications. In this 
+release, a single launcher is used both for development and deployment.<BR>
+The old deployment launcher, <B>jre</B>, is no longer 
+provided.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/java.html">Solaris</A>] 
+[<A HREF="linux/java.html">Linux</A>] [<A HREF="windows/java.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>javadoc</B></TD>
+<TD VALIGN="TOP">API documentation generator.  
+For links to Javadoc enhancements, Doclet API, Taglet API, doclets
+and more, see the 
+<a href="javadoc/index.html"><b>Javadoc&nbsp;Tool&nbsp;Page</b></a></TD>
+<TD VALIGN="TOP">[<A HREF="solaris/javadoc.html">Solaris and 
+Linux</A>] [<A HREF="windows/javadoc.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>appletviewer</B></TD>
+<TD VALIGN="TOP">Run and debug applets without a web 
+browser.</TD>
+<TD VALIGN="TOP">[<A 
+HREF="solaris/appletviewer.html">Solaris and Linux</A>] [<A 
+HREF="windows/appletviewer.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>jar</B></TD>
+<TD VALIGN="TOP">Manage Java Archive (JAR) files.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/jar.html">Solaris and 
+Linux</A>] [<A HREF="windows/jar.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>jdb</B></TD>
+<TD VALIGN="TOP">The Java Debugger.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/jdb.html">Solaris and 
+Linux</A>] [<A HREF="windows/jdb.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>javah</B></TD>
+<TD VALIGN="TOP">C header and stub generator. Used to write 
+native methods.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/javah.html">Solaris and 
+Linux</A>] [<A HREF="windows/javah.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>javap</B></TD>
+<TD VALIGN="TOP">Class file disassembler</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/javap.html">Solaris and 
+Linux</A>] [<A HREF="windows/javap.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>extcheck</B></TD>
+<TD VALIGN="TOP">Utility to detect Jar conflicts.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/extcheck.html">Solaris 
+and Linux</A>] [<A HREF="windows/extcheck.html">Windows</A>]</TD>
+</TR>
+</table>
+
+
+<hr>
+<h2>
+<a name=rmi>
+Remote Method Invocation (RMI) Tools
+</a>
+</h2>
+
+These tools help to create apps that interact over the Web or other network.
+
+<p>
+<TABLE BORDER="0" WIDTH="100%" summary="List of Remote Method Invocation (RMI) 
+SDK Tools with Links to Reference Pages">
+<tr>
+<th align=left>
+Tool Name 
+</th>
+<th align=left>
+Brief Description
+</th>
+<th align=left>
+Links to Reference Pages
+</th>
+</tr>
+
+<TR>
+<TD width="13%"VALIGN="TOP"><B>rmic</B></TD>
+<TD width="70%"VALIGN="TOP">Generate stubs and skeletons for remote 
+objects.</TD>
+<TD width="17%"VALIGN="TOP">[<A HREF="solaris/rmic.html">Solaris and 
+Linux</A>] [<A HREF="windows/rmic.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>rmiregistry</B></TD>
+<TD VALIGN="TOP">Remote object registry service.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/rmiregistry.html">Solaris 
+and Linux</A>] [<A HREF="windows/rmiregistry.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>rmid</B></TD>
+<TD VALIGN="TOP">RMI activation system daemon.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/rmid.html">Solaris and 
+Linux</A>] [<A HREF="windows/rmid.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>serialver</B></TD>
+<TD VALIGN="TOP">Return class serialVersionUID.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/serialver.html">Solaris 
+and Linux</A>] [<A HREF="windows/serialver.html">Windows</A>]</TD>
+</TR>
+</table>
+
+<hr>
+<h2>
+<a name=intl>
+Internationalization Tool
+</a>
+</h2>
+
+This tool helps to create localizable apps.
+
+<p>
+<TABLE BORDER="0" WIDTH="100%" summary="Internationalization Tool with
+Links to Reference Pages">
+<tr>
+<th align=left>
+Tool Name
+</th>
+<th align=left>
+Brief Description
+</th>
+<th align=left>
+Links to Reference Pages
+</th>
+</tr>
+
+<TR>
+<TD width="13%" VALIGN="TOP"><B>native2ascii</B></TD>
+<TD width="70%" VALIGN="TOP">Convert text to Unicode Latin-1.</TD>
+<TD width="17%" VALIGN="TOP">[<A 
+HREF="solaris/native2ascii.html">Solaris and Linux</A>] [<A 
+HREF="windows/native2ascii.html">Windows</A>]</TD>
+</TR>
+</table>
+
+<hr>
+<h2>
+<a name=security>
+Security Tools
+</a>
+</h2>
+
+These security tools help you set security policies on your system and create
+apps that can work within the scope of security policies set at remote
+sites.
+
+<p>
+<TABLE BORDER="0" WIDTH="100%" summary="List of Security Tools with
+Links to Reference Pages">
+<tr>
+<th align=left>
+Tool Name
+</th>
+<th align=left>
+Brief Description
+</th>
+<th align=left>
+Links to Reference Pages
+</th>
+</tr>
+
+<TR>
+<TD width="13%" VALIGN="TOP"><B>keytool</B></TD>
+<TD width="70%" VALIGN="TOP">Manage keystores and certificates.</TD>
+<TD width="17%" VALIGN="TOP">[<A HREF="solaris/keytool.html">Solaris and 
+Linux</A>] [<A HREF="windows/keytool.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>jarsigner</B></TD>
+<TD VALIGN="TOP">Generate and verify JAR signatures.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/jarsigner.html">Solaris 
+and Linux</A>] [<A HREF="windows/jarsigner.html">Windows</A>]</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><B>policytool</B></TD>
+<TD VALIGN="TOP">GUI tool for managing policy files.</TD>
+<TD VALIGN="TOP">[<A HREF="solaris/policytool.html">Solaris 
+and Linux</A>] [<A HREF="windows/policytool.html">Windows</A>]</TD>
+</TR>
+</table>
+
+<tr>
+<td colspan=3>
+<pre>
+
+</pre>
+These security tools help you obtain, list, and manage Kerberos tickets.</TD>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+
+<p>
+<TABLE BORDER="0" WIDTH="100%" summary="List of Kerberos Related 
+Security Tools with Links to Reference Pages">
+<tr>
+<th align=left>
+Tool Name
+</th>
+<th align=left>
+Brief Description
+</th>
+<th align=left>
+Links to Reference Pages
+</th>
+</tr>
+
+<TR>
+<TD width="13%" VALIGN="TOP">
+<B>kinit</B></TD> 
+<TD width="70%" VALIGN="TOP">
+Tool for obtaining Kerberos v5 tickets. 
+Equivalent functionality is available on the Solaris 
+operating environment via the kinit tool. For example, for Solaris 8, 
+see the <a href="http://docs.sun.com/?q=kinit&p=/doc/806-0624/6j9vek58d&a=view">kinit reference page</a>.
+</TD> 
+<TD width="17%" VALIGN="TOP">
+[<A HREF="linux/kinit.html">Linux</A>] [<A HREF="windows/kinit.html">Windows</A>]</TD> 
+</TR>
+
+<TR>
+<TD VALIGN="TOP">
+<B>klist</B></TD> 
+<TD VALIGN="TOP">
+Command-line tool to list entries in credential cache and key tab. 
+Equivalent functionality is available on the Solaris operating environment 
+via the klist tool. For example, for Solaris 8, see the 
+<a href="http://docs.sun.com/?q=kinit&p=/doc/806-0624/6j9vek58e&a=view">klist reference page</a>.
+</TD> 
+<TD VALIGN="TOP">
+[<A HREF="linux/klist.html">Linux</A>] [<A HREF="windows/klist.html">Windows</A>]</TD> 
+</TR>
+
+<TR>
+<TD VALIGN="TOP">
+<B>ktab</B></TD> 
+<TD VALIGN="TOP">
+Command-line tool to help the user manage entires in the key
+table. Equivalent functionality is available on the Solaris operating 
+environment via the kadmin tool. For example, for Solaris 8, see the 
+<a href="http://docs.sun.com/?q=kadmin&p=/doc/816-0211/6m6nc66th&a=view">kadmin reference page</a>.</TD> 
+<TD VALIGN="TOP">
+[<A HREF="linux/ktab.html">Linux</A>] [<A HREF="windows/ktab.html">Windows</A>]</TD> 
+</TR>
+</table>
+
+<hr>
+<h2>
+<a name=idl>
+Java IDL and RMI-IIOP Tools
+</a>
+</h2>
+
+These tools are used when creating applications that use OMG-standard IDL and 
+CORBA/IIOP.
+
+<p>
+<TABLE BORDER="0" WIDTH="100%" summary="List of Java IDL and RMI-IIOP Tools with
+Links to Reference Pages">
+<tr>
+<th align=left>
+Tool Name with
+<br>
+Reference Links 
+</th>
+<th align=left>
+Brief Description 
+</th>
+</tr>
+
+<TR>
+<TD width="13%" VALIGN="TOP"><A 
+HREF="../guide/idl/jidlNaming.html"><B>tnameserv</B></A></TD>
+<TD width="87%" VALIGN="TOP">Provides access to the naming service.</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><a 
+href="../guide/rmi-iiop/toJavaPortableUG.html"><B>idlj</B></a></TD>
+<TD VALIGN="TOP">Generates .java files that map an OMG IDL 
+interface and enable an application written in the Java programming language
+to use CORBA functionality.</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><A 
+HREF="../guide/idl/orbd.html"><B>orbd</B></A></TD>
+<TD VALIGN="TOP">Provides support for clients to 
+transparently locate and invoke persistent objects on servers in the CORBA environment. 
+ORBD is used instead of the Transient Naming Service, <tt>tnameserv</tt>.  ORBD includes 
+both a Transient Naming Service and a Persistent Naming Service. 
+The <b>orbd</b> tool incorporates the functionality of a Server Manager, 
+an Interoperable Naming Service, and a Bootstrap Name Server.  
+When used in conjunction with the <tt>servertool</tt>, 
+the Server Manager locates, registers, and activates a 
+server when a client wants to access the server.   </TD>
+</TR>
+<TR>
+<TD VALIGN="TOP"><A 
+HREF="../guide/idl/servertool.html"><B>servertool</B></A></TD>
+<TD VALIGN="TOP">Provides ease-of-use interface for the 
+application programmers to register, unregister, startup, and shutdown a server.</TD>
+</TR>
+</table>
+ 
+<hr>
+<h2>
+<a name=plugin>
+Java Plug-in Tool
+</a>
+</h2>
+
+Utilities for use in conjunction with the Java 
+Plug-in<sup><font size="-2">TM</font></sup> product.
+
+<p>
+<TABLE BORDER="0" WIDTH="100%" summary="List of Java Plug-in Tools with
+Links to Reference Pages">
+<tr>
+<th align=left>
+Tool Name
+</th>
+<th align=left>
+Brief Description with Links to Reference Pages
+</th>
+</tr>
+
+<TR>
+<TD width=13%" VALIGN="TOP"><B>unregbean</B></TD>
+<TD width=87%" VALIGN="TOP">Unregisters a packaged JavaBeans 
+component over ActiveX. Unregbean is described on the <a 
+href="http://java.sun.com/products/plugin/1.3/docs/script.html">Java Plug-in 
+Scripting</a> document on the Java Software web site.</TD>
+</TR>
+</TABLE>
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</BODY>
+
+</HTML>
+

@@ -1,0 +1,3497 @@
+<HTML>
+<HEAD>
+  <TITLE>Permissions in the Java(TM) 2 SDK</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<H1><CENTER>Permissions in the Java<sup><FONT SIZE="-2">TM</FONT></sup>
+2 SDK</CENTER></H1>
+
+<P><BR>
+<BR>
+</P>
+
+  <P>A permission represents access to a system resource. In order
+  for a resource access to be allowed for an applet (or an application
+  running with a security manager), the corresponding permission
+  must be explicitly granted to the code attempting the access.</P>
+  <P>A permission typically has a name (often referred to as a
+  &quot;target name&quot;) and, in some cases, a comma-separated
+  list of one or more actions. For example, the following code
+  creates a FilePermission object representing read access to the
+  file named <CODE>abc</CODE> in the <CODE>/tmp</CODE> directory:</P>
+<BLOCKQUOTE>
+<PRE>
+perm = new java.io.FilePermission(&quot;/tmp/abc&quot;, &quot;read&quot;);</PRE>
+</PRE></BLOCKQUOTE>
+
+  <P>In this, the target name is &quot;<CODE>/tmp/abc</CODE>&quot; and the action
+  string is &quot;<CODE>read</CODE>&quot;.</P>
+
+  <blockquote>
+  <HR>
+  <B>Important Note:</B> The above statement creates a permission
+  object. A permission object represents, but does not grant access
+  to, a system resource. Permission objects are constructed and
+  assigned (&quot;granted&quot;) to code based on the policy in
+  effect. When a permission object is assigned to some code, that
+  code is granted the permission to access the system resource
+  specified in the permission object, in the specified manner.
+  A permission object may also be constructed by the current security
+  manager when making access decisions. In this case, the (target)
+  permission object is created based on the requested access, and
+  checked against the permission objects granted to and held by
+  the code making the request.
+  <HR></BLOCKQUOTE>
+  
+  <P>The policy for a Java application environment is represented
+  by a Policy object. In the Policy reference implementation, the
+  policy can be specified within one or more policy configuration
+  files. The policy file(s) specify what permissions are allowed
+  for code from specified code sources. A sample policy file entry
+  granting code from the <CODE>/home/sysadmin</CODE> directory
+  read access to the file <CODE>/tmp/abc</CODE> is</P>
+<BLOCKQUOTE>
+<PRE>
+grant codeBase &quot;file:/home/sysadmin/&quot; {
+    permission java.io.FilePermission &quot;/tmp/abc&quot;, &quot;read&quot;;
+};
+</PRE>
+</BLOCKQUOTE>
+  <P>For information about policy file locations and granting permissions
+  in policy files, see <A HREF="PolicyFiles.html">Default Policy
+  Implementation and Policy File Syntax</A>. For information about
+  using the <B>Policy Tool</B> to specify the permissions, see
+  the Policy Tool documentation (<A HREF="../../tooldocs/solaris/policytool.html">for
+  Solaris</A>) (<A HREF="../../tooldocs/windows/policytool.html">for
+  Windows</A>). Using the <B>Policy Tool </B>saves typing and eliminates
+  the need for you to know the required syntax of policy files.</P>
+  <P>Technically, whenever a resource access is attempted, <I>all</I>
+  code traversed by the execution thread up to that point must
+  have permission for that resource access, unless some code on
+  the thread has been marked as &quot;privileged.&quot; See <A
+  HREF="doprivileged.html">API for Privileged Blocks</A> for more
+  information about &quot;privileged&quot; code.</P>
+  <P>This document contains tables that describe the built-in Java
+  2 SDK permission types and discuss the risks of granting each
+  permission. It also contains tables showing the methods that
+  require permissions to be in effect in order to be successful,
+  and for each lists the required permission.</P>
+  <P>The tables are the following:</P>
+  <DL>
+    <DD><A HREF="#PermRisks"><B>Permission Descriptions and Risks</B></A>
+    <DL>
+      <DD><A HREF="#AllPermission"><CODE>java.security.<B>AllPermission</B></CODE></A>
+      <DD><A HREF="#SecurityPermission"><CODE>java.security.<B>SecurityPermission</B></CODE></A>
+      <DD><A HREF="#UnresolvedPermission"><CODE>java.security.<B>UnresolvedPermission</B></CODE></A>
+      <DD><A HREF="#AWTPermission"><CODE>java.awt.<B>AWTPermission</B></CODE></A>
+      <DD><A HREF="#FilePermission"><CODE>java.io.<B>FilePermission</B></CODE></A>
+      <DD><A HREF="#SerializablePermission"><CODE>java.io.<B>SerializablePermission</B></CODE></A>
+      <DD><A HREF="#ReflectPermission"><CODE>java.lang.reflect.<B>ReflectPermission</B></CODE></A>
+      <DD><A HREF="#RuntimePermission"><CODE>java.lang.<B>RuntimePermission</B></CODE></A>
+          <DL><DD><BL><LI><A HREF="#NIO"><FONT SIZE="-1">NIO-Related Targets</FONT></A></BL></DL> 
+      <DD><A HREF="#NetPermission"><CODE>java.net.<B>NetPermission</B></CODE></A>
+      <DD><A HREF="#SocketPermission"><CODE>java.net.<B>SocketPermission</B></CODE></A>
+      <DD><A HREF="#SQLPermission"><CODE>java.sql.<B>SQLPermission</B></CODE></A>
+      <DD><A HREF="#PropertyPermission"><CODE>java.util.<B>PropertyPermission</B></CODE></A>
+      <DD><A HREF="#LoggingPermission"><CODE>java.util.logging.<B>LoggingPermission</B></CODE></A>
+      <DD><A HREF="#SSLPermission"><CODE>javax.net.ssl.<B>SSLPermission</B></CODE></A>
+      <DD><A HREF="#AuthPermission"><CODE>javax.security.auth.<B>AuthPermission</B></CODE></A>
+      <DD><A HREF="#PrivateCredentialPermission"><CODE>javax.security.auth.<B>PrivateCredentialPermission</B></CODE></A>
+      <DD><A HREF="#DelegationPermission"><CODE>javax.security.auth.kerberos.<B>DelegationPermission</B></CODE></A>
+      <DD><A HREF="#ServicePermission"><CODE>javax.security.auth.kerberos.<B>ServicePermission</B></CODE></A>
+      <DD><A HREF="#AudioPermission"><CODE>javax.sound.sampled.<B>AudioPermission</B></CODE></A>
+    </DL>
+    <P><BR>
+    <DD><A HREF="#PermsAndMethods"><B>Methods and the Permissions
+    They Require</B></A> <BR>
+<BR>
+    <DD><A HREF="#SecMgrChecks"><B>java.lang.SecurityManager Method
+    Permission Checks</B></A>
+  </DL>
+  <P><BR>
+  </P>
+  <P>For more information about permissions, including the superclasses
+  <CODE>java.security.Permission</CODE> and <CODE>java.security.BasicPermission</CODE>,
+  and examples of creating permission objects and granting permissions,
+  see the <B><A HREF="spec/security-spec.doc.html">Security Architecture
+  Specification</A></B>.</P>
+  <P><HR ALIGN=LEFT></P>
+  <H1><A NAME="PermRisks"></A>Permission Descriptions and Risks</H1>
+  <BLOCKQUOTE>
+    <P>The following tables describe the built-in Java 2 SDK permission
+    types and discuss the risks of granting each permission.</P>
+    <H2><A NAME="AllPermission"></A><CODE>AllPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>The <CODE>java.security.AllPermission</CODE> is a permission
+      that implies all other permissions.</P>
+      <P><B>Note:</B> Granting <CODE>AllPermission</CODE> should be
+      done with extreme care, as it implies all other permissions.
+      Thus, it grants code the ability to run with security disabled.
+      Extreme caution should be taken before granting such a permission
+      to code. This permission should be used only during testing,
+      or in extremely rare cases where an application or applet is
+      completely trusted and adding the necessary permissions to the
+      policy is prohibitively cumbersome.</P>
+    </BLOCKQUOTE>
+
+    <H2><A NAME="SecurityPermission"></A><CODE>SecurityPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.security.SecurityPermission</CODE> is for security
+      permissions. A <CODE>SecurityPermission</CODE> contains a name
+      (also referred to as a &quot;target name&quot;) but no actions
+      list; you either have the named permission or you don't.</P>
+      <P>The target name is the name of a security configuration parameter
+      (see below). Currently the <CODE>SecurityPermission</CODE> object
+      is used to guard access to the <CODE>Policy</CODE>, <CODE>Security</CODE>, 
+	<CODE>Provider</CODE>, <CODE>Signer</CODE>,
+      and <CODE>Identity</CODE> objects.</P>
+      <P>The following table lists all the possible <CODE>SecurityPermission</CODE>
+      target names, and for each provides a description of what the
+      permission allows and a discussion of the risks of granting code
+      the permission.</P>
+      <P><TABLE <summary="SecurityPermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          <CODE>java.security.SecurityPermission </CODE><BR>
+          Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>createAccessControlContext</CODE></TD> 
+          <TD>
+          Creation of an <CODE>AccessControlContext</CODE></TD> 
+          <TD>
+          This allows someone to instantiate an <CODE>AccessControlContext</CODE>
+          with a <CODE>DomainCombiner</CODE>. Since <CODE>DomainCombiner</CODE>s
+          are given a reference to the <CODE>ProtectionDomain</CODE>s currently
+          on the stack, this could potentially lead to a privacy leak if
+          the <CODE>DomainCombiner</CODE> is malicious.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getDomainCombiner</CODE></TD> 
+          <TD>
+          Retrieval of an <CODE>AccessControlContext</CODE>'s <CODE>DomainCombiner</CODE></TD> 
+          <TD>
+          This allows someone to query the policy via the getPermissions
+          call, which discloses which permissions would be granted to a
+          given CodeSource. While revealing the policy does not compromise
+          the security of the system, it does provide malicious code with
+          additional information which it may use to better aim an attack.
+          It is wise not to divulge more information than necessary.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getPolicy</CODE></TD> 
+          <TD>
+          Retrieval of the system-wide security policy (specifically, of
+          the currently-installed Policy object)</TD> 
+          <TD>
+          This allows someone to query the policy via the <CODE>getPermissions</CODE>
+          call, which discloses which permissions would be granted to a
+          given <CODE>CodeSource</CODE>. While revealing the policy does
+          not compromise the security of the system, it does provide malicious
+          code with additional information which it may use to better aim
+          an attack. It is wise not to divulge more information than necessary.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setPolicy</CODE></TD> 
+          <TD>
+          Setting of the system-wide security policy (specifically, the
+          Policy object)</TD> 
+          <TD>
+          Granting this permission is extremely dangerous, as malicious
+          code may grant itself all the necessary permissions it needs
+          to successfully mount an attack on the system.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getProperty.{key}</CODE></TD> 
+          <TD>
+          Retrieval of the security property with the specified key</TD> 
+          <TD>
+          Depending on the particular key for which access has been granted,
+          the code may have access to the list of security providers, as
+          well as the location of the system-wide and user security policies.
+          while revealing this information does not compromise the security
+          of the system, it does provide malicious code with additional
+          information which it may use to better aim an attack.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setProperty.{key}</CODE></TD> 
+          <TD>
+          Setting of the security property with the specified key</TD> 
+          <TD>
+          This could include setting a security provider or defining the
+          location of the the system-wide security policy. Malicious code
+          that has permission to set a new security provider may set a
+          rogue provider that steals confidential information such as cryptographic
+          private keys. In addition, malicious code with permission to
+          set the location of the system-wide security policy may point
+          it to a security policy that grants the attacker all the necessary
+          permissions it requires to successfully mount an attack on the
+          system.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>insertProvider.{provider name}</CODE></TD> 
+          <TD>
+          Addition of a new provider, with the specified name</TD> 
+          <TD>
+          This would allow somebody to introduce a possibly malicious provider
+          (e.g., one that discloses the private keys passed to it) as the
+          highest-priority provider. This would be possible because the
+          Security object (which manages the installed providers) currently
+          does not check the integrity or authenticity of a provider before
+          attaching it.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>removeProvider.{provider name}</CODE></TD> 
+          <TD>
+          Removal of the specified provider</TD> 
+          <TD>
+          This may change the behavior or disable execution of other parts
+          of the program. If a provider subsequently requested by the program
+          has been removed, execution may fail. Also, if the removed provider
+          is not explicitly requested by the rest of the program, but it
+          would normally be the provider chosen when a cryptography service
+          is requested (due to its previous order in the list of providers),
+          a different provider will be chosen instead, or no suitable provider
+          will be found, thereby resulting in program failure.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setSystemScope</CODE></TD> 
+          <TD>
+          Setting of the system identity scope</TD> 
+          <TD>
+          This would allow an attacker to configure the system identity
+          scope with certificates that should not be trusted, thereby granting
+          applet or application code signed with those certificates privileges
+          that would have been denied by the system's original identity
+          scope</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setIdentityPublicKey</CODE></TD> 
+          <TD>
+          Setting of the public key for an Identity</TD> 
+          <TD>
+          If the identity is marked as &quot;trusted&quot;, this allows
+          an attacker to introduce a different public key (e.g., its own)
+          that is not trusted by the system's identity scope, thereby granting
+          applet or application code signed with that public key privileges
+          that would have been denied otherwise.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setIdentityInfo</CODE></TD> 
+          <TD>
+          Setting of a general information string for an Identity</TD> 
+          <TD>
+          This allows attackers to set the general description for an identity.
+          This may trick applications into using a different identity than
+          intended or may prevent applications from finding a particular
+          identity.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>addIdentityCertificate</CODE></TD> 
+          <TD>
+          Addition of a certificate for an Identity</TD> 
+          <TD>
+          This allows attackers to set a certificate for an identity's
+          public key. This is dangerous because it affects the trust relationship
+          across the system. This public key suddenly becomes trusted to
+          a wider audience than it otherwise would be.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>removeIdentityCertificate</CODE></TD> 
+          <TD>
+          Removal of a certificate for an Identity</TD> 
+          <TD>
+          This allows attackers to remove a certificate for an identity's
+          public key. This is dangerous because it affects the trust relationship
+          across the system. This public key suddenly becomes considered
+          less trustworthy than it otherwise would be.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>printIdentity</CODE></TD> 
+          <TD>
+          Viewing the name of a principal and optionally the scope in which
+          it is used, and whether or not it is considered &quot;trusted&quot;
+          in that scope.</TD> 
+          <TD>
+          The scope that is printed out may be a filename, in which case
+          it may convey local system information. For example, here's a
+          sample printout of an identity named &quot;carol&quot;, who is
+          marked not trusted in the user's identity database:<BR>
+          carol[/home/luehe/identitydb.obj][not trusted]</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>clearProviderProperties.{provider name}</CODE></TD> 
+          <TD>
+          &quot;Clearing&quot; of a Provider so that it no longer contains
+          the properties used to look up services implemented by the provider</TD> 
+          <TD>
+          This disables the lookup of services implemented by the provider.
+          This may thus change the behavior or disable execution of other
+          parts of the program that would normally utilize the Provider,
+          as described under the &quot;removeProvider.{provider name}&quot;
+          permission.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>putProviderProperty.{provider name}</CODE></TD> 
+          <TD>
+          Setting of properties for the specified Provider</TD> 
+          <TD>
+          The provider properties each specify the name and location of
+          a particular service implemented by the provider. By granting
+          this permission, you let code replace the service specification
+          with another one, thereby specifying a different implementation.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>removeProviderProperty.{provider name}</CODE></TD> 
+          <TD>
+          Removal of properties from the specified Provider</TD> 
+          <TD>
+          This disables the lookup of services implemented by the provider.
+          They are no longer accessible due to removal of the properties
+          specifying their names and locations. This may change the behavior
+          or disable execution of other parts of the program that would
+          normally utilize the Provider, as described under the &quot;removeProvider.{provider
+          name}&quot; permission.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getSignerPrivateKey</CODE></TD> 
+          <TD>
+          Retrieval of a Signer's private key</TD> 
+          <TD>
+          It is very dangerous to allow access to a private key; private
+          keys are supposed to be kept secret. Otherwise, code can use
+          the private key to sign various files and claim the signature
+          came from the Signer.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setSignerKeyPair</CODE></TD> 
+          <TD>
+          Setting of the key pair (public key and private key) for a Signer</TD> 
+          <TD>
+          This would allow an attacker to replace somebody else's (the
+          &quot;target's&quot;) keypair with a possibly weaker keypair
+          (e.g., a keypair of a smaller keysize). This also would allow
+          the attacker to listen in on encrypted communication between
+          the target and its peers. The target's peers might wrap an encryption
+          session key under the target's &quot;new&quot; public key, which
+          would allow the attacker (who possesses the corresponding private
+          key) to unwrap the session key and decipher the communication
+          data encrypted under that session key.</TD> 
+        </TR>
+      </TABLE></P>
+    </BLOCKQUOTE>
+
+    <H2><A NAME="UnresolvedPermission"></A><CODE>UnresolvedPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>The  
+	<A HREF="../../api/java/security/UnresolvedPermission.html"><CODE>java.security.UnresolvedPermission</CODE></A>  
+	class is used to hold <CODE>Permission</CODE>s that were "unresolved" 
+	when the <CODE>Policy</CODE> was initialized. An unresolved permission is one whose actual 
+	<CODE>Permission</CODE> class does not yet exist at the time the 
+	<CODE>Policy</CODE> is initialized (see below). 
+	<P>
+	The policy for a Java runtime (specifying which permissions are available for code 
+	from various principals) is represented by a <CODE>Policy</CODE> 
+	object. Whenever a <CODE>Policy</CODE> is 
+	initialized or refreshed, <CODE>Permission</CODE> objects of appropriate 
+	classes are created for all 
+	permissions allowed by the <CODE>Policy</CODE>. 
+	<P>
+	Many permission class types referenced by the policy configuration are ones that 
+	exist locally (i.e., ones that can be found on CLASSPATH). Objects for such 
+	permissions can be instantiated during <CODE>Policy</CODE> initialization. For example, it is always 
+	possible to instantiate a <CODE>java.io.FilePermission</CODE>, since the 
+	<CODE>FilePermission</CODE> class is 
+	found on the CLASSPATH. 
+	<P>
+	Other permission classes may not yet exist during <CODE>Policy</CODE> initialization. For example, 
+	a referenced permission class may be in a JAR file that will later be loaded. For 
+	each such class, an <CODE>UnresolvedPermission</CODE> is instantiated. Thus, an 
+	<CODE>UnresolvedPermission</CODE> is essentially a "placeholder" containing information about the 
+	permission. 
+	<P>
+	Later, when code calls <CODE>AccessController.checkPermission</CODE> on a permission of a 
+	type that was previously unresolved, but whose class has since been loaded, 
+	previously-unresolved permissions of that type are "resolved". That is, for each such 
+	<CODE>UnresolvedPermission</CODE>, a new object of the appropriate class type is instantiated, 
+	based on the information in the <CODE>UnresolvedPermission</CODE>. This new object replaces the 
+	<CODE>UnresolvedPermission</CODE>, which is removed.
+    </BLOCKQUOTE>
+
+    <H2><A NAME="AWTPermission"></A><CODE>AWTPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.awt.AWTPermission</CODE> is for AWT permissions.</P>
+      <P>The following table lists all the possible <CODE>AWTPermission</CODE>
+      target names, and for each provides a description of what the
+      permission allows and a discussion of the risks of granting code
+      the permission.</P>
+      <P><TABLE summary="AWTPermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          java.awt.AWTPermission<BR>
+          Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>accessClipboard</CODE></TD> 
+          <TD>
+          Posting and retrieval of information to and from the AWT clipboard</TD> 
+          <TD>
+          This would allow malfeasant code to share potentially sensitive
+          or confidential information.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>accessEventQueue</CODE></TD> 
+          <TD>
+          Access to the AWT event queue</TD> 
+          <TD>
+          After retrieving the AWT event queue, malicious code may peek
+          at and even remove existing events from the system, as well as
+          post bogus events which may purposefully cause the application
+          or applet to misbehave in an insecure manner.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>createRobot</CODE></TD> 
+          <TD>
+          Create <CODE>java.awt.Robot </CODE>objects</TD> 
+          <TD>
+          The <CODE>java.awt.Robot </CODE>object allows code to generate
+          native-level mouse and keyboard events as well as read the screen.
+          It could allow malicious code to control the system, run other
+          programs, read the display, and deny mouse and keyboard access
+          to the user.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>listenToAllAWTEvents</CODE></TD> 
+          <TD>
+          Listen to all AWT events, system-wide</TD> 
+          <TD>
+          After adding an AWT event listener, malicious code may scan all
+          AWT events dispatched in the system, allowing it to read all
+          user input (such as passwords). Each AWT event listener is called
+          from within the context of that event queue's <CODE>EventDispatchThread</CODE>,
+          so if the accessEventQueue permission is also enabled, malicious
+          code could modify the contents of AWT event queues system-wide,
+          causing the application or applet to misbehave in an insecure
+          manner.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>readDisplayPixels</CODE></TD> 
+          <TD>
+          Readback of pixels from the display screen</TD> 
+          <TD>
+          Interfaces such as the <CODE>java.awt.Composite</CODE> interface
+          which allow arbitrary code to examine pixels on the display enable
+          malicious code to snoop on the activities of the user.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>showWindowWithoutWarningBanner</CODE></TD> 
+          <TD>
+          Display of a window without also displaying a banner warning
+          that the window was created by an applet</TD> 
+          <TD>
+          Without this warning, an applet may pop up windows without the
+          user knowing that they belong to an applet. Since users may make
+          security-sensitive decisions based on whether or not the window
+          belongs to an applet (entering a username and password into a
+          dialog box, for example), disabling this warning banner may allow
+          applets to trick the user into entering such information.</TD> 
+        </TR>
+      </TABLE></P>
+    </BLOCKQUOTE>
+
+    <H2><A NAME="FilePermission"></A><CODE>FilePermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.io.FilePermission</CODE> represents access to
+      a file or directory. A <CODE>FilePermission</CODE> consists of
+      a pathname and a set of actions valid for that pathname.</P>
+      <P>Pathname is the pathname of the file or directory granted
+      the specified actions. A pathname that ends in &quot;/*&quot;
+      (where &quot;/&quot; is the file separator character, <CODE>File.separatorChar</CODE>)
+      indicates a directory and all the files contained in that directory.
+      A pathname that ends with &quot;/-&quot; indicates a directory
+      and (recursively) all files and subdirectories contained in that
+      directory. A pathname consisting of the special token &quot;&lt;&lt;ALL
+      FILES&gt;&gt;&quot; matches <bold>any</bold> file.</P>
+      <P>A pathname consisting of a single &quot;*&quot; indicates
+      all the files in the current directory, while a pathname consisting
+      of a single &quot;-&quot; indicates all the files in the current
+      directory and (recursively) all files and subdirectories contained
+      in the current directory.</P>
+      <P>The actions to be granted are passed to the constructor in
+      a string containing a list of zero or more comma-separated keywords.
+      The possible keywords are &quot;read&quot;, &quot;write&quot;,
+      &quot;execute&quot;, and &quot;delete&quot;. Their meaning is
+      defined as follows:</P>
+      <P><TABLE summary="layout" WIDTH="535" BORDER="0" CELLSPACING="2" CELLPADDING="2">
+        <TR>
+          <TD WIDTH="15%" VALIGN="TOP">
+          <CODE>read</CODE></TD>
+          <TD WIDTH="85%">
+          Permission to read.</TD>
+        </TR>
+        <TR>
+          <TD WIDTH="15%" VALIGN="TOP">
+          <CODE>write</CODE></TD>
+          <TD WIDTH="85%">
+          Permission to write (which includes permission to create).</TD>
+        </TR>
+        <TR>
+          <TD WIDTH="15%" VALIGN="TOP">
+          <CODE>execute</CODE></TD>
+          <TD WIDTH="85%">
+          Permission to execute. Allows <CODE>Runtime.exec</CODE> to be
+          called. Corresponds to <CODE>SecurityManager.checkExec</CODE>.</TD>
+        </TR>
+        <TR>
+          <TD WIDTH="15%" VALIGN="TOP">
+          <CODE>delete</CODE></TD>
+          <TD WIDTH="85%">
+          Permission to delete. Allows <CODE>File.delete</CODE> to be called.
+          Corresponds to <CODE>SecurityManager.checkDelete</CODE>.</TD>
+        </TR>
+      </TABLE></P>
+      <P>The actions string is converted to lowercase before processing.</P>
+      <P>Be careful when granting <CODE>FilePermission</CODE>s. Think
+      about the implications of granting read and especially write
+      access to various files and directories. The &quot;&lt;&lt;ALL
+      FILES&gt;&gt;&quot; permission with write action is especially
+      dangerous. This grants permission to write to the entire file
+      system. One thing this effectively allows is replacement of the
+      system binary, including the JVM runtime environment.</P>
+      <P><B>Note: </B>code can always read a file from the same directory
+      it's in (or a subdirectory of that directory); it does not need
+      explicit permission to do so.</P>
+    </BLOCKQUOTE>
+    <H2><A NAME="SerializablePermission"></A><CODE>SerializablePermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.io.SerializablePermission</CODE> is for serializable
+      permissions. A <CODE>SerializablePermission</CODE> contains a
+      name (also referred to as a &quot;target name&quot;) but no actions
+      list; you either have the named permission or you don't.</P>
+      <P>The target name is the name of the Serializable permission
+      (see below).</P>
+      <P>The following table lists all the possible <CODE>SerializablePermission</CODE>
+      target names, and for each provides a description of what the
+      permission allows and a discussion of the risks of granting code
+      the permission.</P>
+      <P><TABLE summary="SerializablePermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          <CODE>java.io.SerializablePermission</CODE> <BR>
+          Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>enableSubclassImplementation</CODE></TD> 
+          <TD>
+          Implementing a subclass of <CODE>ObjectOutputStream</CODE> or
+          <CODE>ObjectInputStream</CODE> to override the default serialization
+          or deserialization, respectively, of objects</TD> 
+          <TD>
+          Code can use this to serialize or deserialize classes in a purposefully
+          malfeasant manner. For example, during serialization, malicious
+          code can use this to purposefully store confidential private
+          field data in a way easily accessible to attackers. Or, during
+          deserializaiton it could, for example, deserialize a class with
+          all its private fields zeroed out.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>enableSubstitution</CODE></TD> 
+          <TD>
+          Substitution of one object for another during serialization or
+          deserialization</TD> 
+          <TD>
+          This is dangerous because malicious code can replace the actual
+          object with one which has incorrect or malignant data.</TD> 
+        </TR>
+      </TABLE></P>
+    </BLOCKQUOTE>
+
+    <H2><A NAME="ReflectPermission"></A><CODE>ReflectPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.lang.reflect.ReflectPermission</CODE> is for
+      reflective operations. A ReflectPermission is a <EM>named permission</EM>
+      and has no actions. The only name currently defined is <TT>suppressAccessChecks</TT>,
+      which allows suppressing the standard language access checks
+      -- for public, default (package) access, protected, and private
+      members -- performed by reflected objects at their point of use.</P>
+      <P>The following table provides a summary description of what
+      the permission allows, and discusses the risks of granting code
+      the permission.</P>
+      <P><TABLE summary="ReflectPermission description" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          java.lang.reflect.ReflectPermission <BR>
+          Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>suppressAccessChecks</CODE></TD> 
+          <TD>
+          <B>Warning:</B> <I>Extreme caution should be taken before granting
+          this permission to code</I>, for it provides the ability to access
+          fields and invoke methods in a class. This includes not only
+          public, but protected and private fields and methods as well.</TD> 
+          <TD>
+          This is dangerous in that information (possibly confidential)
+          and methods normally unavailable would be accessible to malicious
+          code.</TD> 
+        </TR>
+      </TABLE></P>
+    </BLOCKQUOTE>
+    <H2><A NAME="RuntimePermission"></A><CODE>RuntimePermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.lang.RuntimePermission</CODE> is for runtime
+      permissions. A <CODE>RuntimePermission</CODE> contains a name
+      (also referred to as a &quot;target name&quot;) but no actions
+      list; you either have the named permission or you don't.</P>
+
+      <P>The target name is the name of the runtime permission (see
+      below). The naming convention follows the hierarchical property
+      naming convention. Also, an asterisk may appear at the end of
+      the name, following a &quot;<CODE>.</CODE>&quot;, or by itself,
+      to signify a wildcard match. For example: &quot;<CODE>loadLibrary.*</CODE>&quot;
+      or &quot;<CODE>*</CODE>&quot; is valid, &quot;<CODE>*loadLibrary</CODE>&quot;
+      or &quot;<CODE>a*b</CODE>&quot; is not valid.</P>
+
+      <P>The following table lists all the possible <CODE>RuntimePermission</CODE>
+      target names, and for each provides a description of what the
+      permission allows and a discussion of the risks of granting code
+      the permission.</P>
+
+      <P><TABLE summary="RuntimePermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          java.lang.RuntimePermission <BR>
+          Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>createClassLoader</CODE></TD> 
+          <TD>
+          Creation of a class loader</TD> 
+          <TD>
+          This is an extremely dangerous permission to grant. Malicious
+          applications that can instantiate their own class loaders could
+          then load their own rogue classes into the system. These newly
+          loaded classes could be placed into any protection domain by
+          the class loader, thereby automatically granting the classes
+          the permissions for that domain.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getClassLoader</CODE></TD> 
+          <TD>
+          Retrieval of a class loader (e.g., the class loader for the calling
+          class)</TD> 
+          <TD>
+          This would grant an attacker permission to get the class loader
+          for a particular class. This is dangerous because having access
+          to a class's class loader allows the attacker to load other classes
+          available to that class loader. The attacker would typically
+          otherwise not have access to those classes.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setContextClassLoader</CODE></TD> 
+          <TD>
+          Setting of the context class loader used by a thread</TD> 
+          <TD>
+          The context class loader is used by system code and extensions
+          when they need to lookup resources that might not exist in the
+          system class loader. Granting setContextClassLoader permission
+          would allow code to change which context class loader is used
+          for a particular thread, including system threads.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setSecurityManager</CODE></TD> 
+          <TD>
+          Setting of the security manager (possibly replacing an existing
+          one)</TD>
+          <TD>
+          The security manager is a class that allows applications to implement
+          a security policy. Granting the setSecurityManager permission
+          would allow code to change which security manager is used by
+          installing a different, possibly less restrictive security manager,
+          thereby bypassing checks that would have been enforced by the
+          original security manager.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>createSecurityManager</CODE></TD> 
+          <TD>
+          Creation of a new security manager</TD> 
+          <TD>
+          This gives code access to protected, sensitive methods that may
+          disclose information about other classes or the execution stack.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>exitVM</CODE></TD> 
+          <TD>
+          Halting of the Java Virtual Machine</TD> 
+          <TD>
+          This allows an attacker to mount a denial-of-service attack by
+          automatically forcing the virtual machine to halt.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>shutdownHooks</CODE></TD> 
+          <TD>
+          Registration and cancellation of virtual-machine shutdown hooks</TD> 
+          <TD>
+          This allows an attacker to register a malicious shutdown hook
+          that interferes with the clean shutdown of the virtual machine.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setFactory</CODE></TD> 
+          <TD>
+          Setting of the socket factory used by ServerSocket or Socket,
+          or of the stream handler factory used by URL</TD> 
+          <TD>
+          This allows code to set the actual implementation for the socket,
+          server socket, stream handler, or RMI socket factory. An attacker
+          may set a faulty implementation which mangles the data stream.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setIO</CODE></TD> 
+          <TD>
+          Setting of System.out, System.in, and System.err</TD> 
+          <TD>
+          This allows changing the value of the standard system streams.
+          An attacker may change System.in to monitor and steal user input,
+          or may set System.err to a &quot;null&quot; OutputSteam, which
+          would hide any error messages sent to System.err.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>modifyThread</CODE></TD> 
+          <TD>
+          <odification of threads, e.g., via calls to Thread <code>stop,
+          <CODE>suspend</CODE>, <CODE>resume</CODE>, <CODE>setPriority</CODE>,
+          and <CODE>setName</CODE> methods</TD> 
+          <TD>
+          This allows an attacker to start or suspend any thread in the
+          system.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>stopThread</CODE></TD> 
+          <TD>
+          Stopping of threads via calls to the Thread <CODE>stop</CODE>
+          method</TD> 
+          <TD>
+          This allows code to stop any thread in the system provided that
+          it is already granted permission to access that thread. This
+          poses as a threat, because that code may corrupt the system by
+          killing existing threads.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>modifyThreadGroup</CODE></TD> 
+          <TD>
+          Creation or modification of thread groups (adding a thread to
+          a thread group during thread creation or calling the ThreadGroup
+          <CODE>destroy</CODE>, <CODE>resume</CODE>, <CODE>setDaemon</CODE>,
+          <CODE>setMaxPriority</CODE>, <CODE>stop</CODE>, and <CODE>suspend</CODE>
+          methods)</TD>
+          <TD>
+          This allows an attacker to create threads in thread groups or
+          to create and modify thread groups (setting their run priority,
+          for example).</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getProtectionDomain</CODE></TD> 
+          <TD>
+          Retrieval of the <CODE>ProtectionDomain</CODE> for a class</TD> 
+          <TD>
+          This allows code to obtain policy information for a particular
+          code source. While obtaining policy information does not compromise
+          the security of the system, it does give attackers additional
+          information, such as local file names for example, to better
+          aim an attack.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>readFileDescriptor</CODE></TD> 
+          <TD>
+          Reading of file descriptors</TD> 
+          <TD>
+          This would allow code to read the particular file associated
+          with the file descriptor read. This is dangerous if the file
+          contains confidential data.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>writeFileDescriptor</CODE></TD> 
+          <TD>
+          Writing to file descriptors</TD> 
+          <TD>
+          This allows code to write to a particular file associated with
+          the descriptor. This is dangerous because it may allow malicous
+          code to plant viruses or at the very least, fill up your entire
+          disk.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>loadLibrary.{library name}</CODE></TD> 
+          <TD>
+          Dynamic linking of the specified library</TD> 
+          <TD>
+          It is dangerous to allow an applet permission to load native
+          code libraries, because the Java security architecture is not
+          designed to and does not prevent malicious behavior at the level
+          of native code.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>accessClassInPackage.<BR>
+          {package name}</CODE></TD> 
+          <TD>
+          Access to the specified package via a class loader's <CODE>loadClass</CODE>
+          method when that class loader calls the SecurityManager <CODE>checkPackageAcesss</CODE>
+          method</TD> 
+          <TD>
+          This gives code access to classes in packages to which it normally
+          does not have access. Malicious code may use these classes to
+          help in its attempt to compromise security in the system.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>defineClassInPackage.<BR>
+          {package name}</CODE></TD> 
+          <TD>
+          Definition of classes in the specified package, via a class loader's
+          <CODE>defineClass</CODE> method when that class loader calls
+          the SecurityManager <CODE>checkPackageDefinition</CODE> method.</TD> 
+          <TD>
+          This grants code permission to define a class in a particular
+          package. This is dangerous because malicious code with this permission
+          may define rogue classes in trusted packages like <CODE>java.security</CODE>
+          or <CODE>java.lang</CODE>, for example.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>accessDeclaredMembers</CODE></TD> 
+          <TD>
+          <B>Warning</B>: <I>Extreme caution should be taken before granting
+          this permission to code</I>, for it provides access to the declared
+          members of a class.</TD> 
+          <TD>
+          This grants code permission to query a class for its public,
+          protected, default (package) access, and private fields and/or
+          methods. Although the code would have access to the private and
+          protected field and method names, it would not have access to
+          the private/protected field data and would not be able to invoke
+          any private methods. Nevertheless, malicious code may use this
+          information to better aim an attack. Additionally, it may invoke
+          any public methods and/or access public fields in the class.
+          This could be dangerous if the code would normally not be able
+          to invoke those methods and/or access the fields because it can't
+          cast the object to the class/interface with those methods and
+          fields.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>queuePrintJob</CODE></TD> 
+          <TD>
+          Initiation of a print job request</TD> 
+          <TD>
+          This could print sensitive information to a printer, or simply
+          waste paper.</TD> 
+        </TR>
+      </TABLE></P>
+
+    <H3><A NAME="NIO"></A>NIO-Related Targets</H3>
+    <BLOCKQUOTE>
+	Two NIO-related <code>RuntimePermission</code> targets were added in the 1.4 release of the Java 2 SDK:
+
+<blockquote>
+<pre>
+selectorProvider
+charsetProvider
+</pre>
+</BLOCKQUOTE>
+These <code>RuntimePermission</code>s are required to be granted to
+classes which subclass and implement <code>java.nio.channel.spi.SelectorProvider</code>
+or <code>java.nio.charset.spi.CharsetProvider</code>. The permission is checked
+during invocation of the abstract base class constructor. These
+permissions ensure trust in classes which implement these
+security-sensitive provider mechanisms.
+<P>
+See 
+<A HREF="../../api/java/nio/channels/spi/SelectorProvider.html"><code>java.nio.channels.spi.SelectorProvider</code></A> and 
+<A HREF="../../api/java/nio/charset/spi/CharsetProvider.html"><code>java.nio.channels.spi.CharsetProvider</code></A> for more information.
+
+    </BLOCKQUOTE>
+    </BLOCKQUOTE>
+
+    <H2><A NAME="NetPermission"></A><CODE>NetPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.net.NetPermission</CODE> is for various network
+      permissions. A <CODE>NetPermission</CODE> contains a name but
+      no actions list; you either have the named permission or you
+      don't.</P>
+      <P>The following table lists all the possible <CODE>NetPermission</CODE>
+      target names, and for each provides a description of what the
+      permission allows and a discussion of the risks of granting code
+      the permission.</P>
+      <P><TABLE summary="NetPermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          <CODE>java.net.NetPermission</CODE><BR>
+          Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setDefaultAuthenticator</CODE></TD> 
+          <TD>
+          The ability to set the way authentication information is retrieved
+          when a proxy or HTTP server asks for authentication</TD> 
+          <TD>
+          Malicious code can set an authenticator that monitors and steals
+          user authentication input as it retrieves the input from the
+          user.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>requestPasswordAuthentication</CODE></TD> 
+          <TD>
+          The ability to ask the authenticator registered with the system
+          for a password</TD> 
+          <TD>
+          Malicious code may steal this password.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>specifyStreamHandler</CODE></TD> 
+          <TD>
+          The ability to specify a stream handler when constructing a URL</TD> 
+          <TD>
+          Malicious code may create a URL with resources that it would
+          normally not have access to (like file:/foo/fum/), specifying
+          a stream handler that gets the actual bytes from someplace it
+          does have access to. Thus it might be able to trick the system
+          into creating a ProtectionDomain/CodeSource for a class even
+          though that class really didn't come from that location.</TD> 
+        </TR>
+      </TABLE></P>
+    </BLOCKQUOTE>
+
+    <H2><A NAME="SocketPermission"></A><CODE>SocketPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.net.SocketPermission</CODE> represents access
+      to a network via sockets. A SocketPermission consists of a host
+      specification and a set of &quot;actions&quot; specifying ways
+      to connect to that host. The host is specified as</P>
+<BLOCKQUOTE>
+<PRE>
+host = (hostname | IPaddress)[:portrange]
+portrange = portnumber | -portnumber | portnumber-[portnumber]
+</PRE>
+</BLOCKQUOTE>
+
+      <P>The host is expressed as a DNS name, as a numerical IP address,
+      or as &quot;localhost&quot; (for the local machine). The wildcard
+      &quot;*&quot; may be included once in a DNS name host specification.
+      If it is included, it must be in the leftmost position, as in
+      &quot;*.sun.com&quot;.</P>
+      <P>The port or portrange is optional. A port specification of
+      the form &quot;N-&quot;, where <I>N</I> is a port number, signifies
+      all ports numbered <I>N</I> and above, while a specification
+      of the form &quot;-N&quot; indicates all ports numbered <I>N</I>
+      and below.</P>
+      <P>The possible ways to connect to the host are</P>
+      <PRE>
+accept
+connect
+listen
+resolve</PRE>
+      <P>The &quot;listen&quot; action is only meaningful when used
+      with &quot;localhost&quot;. The &quot;resolve&quot; (resolve
+      host/ip name service lookups) action is implied when any of the
+      other actions are present.</P>
+      <P>As an example of the creation and meaning of SocketPermissions,
+      note that if you have the following entry in your policy file:</P>
+<BLOCKQUOTE>
+<PRE>
+grant signedBy &quot;mrm&quot; {
+    permission java.net.SocketPermission &quot;puffin.eng.sun.com:7777&quot;, &quot;connect, accept&quot;;
+};
+</PRE>
+</BLOCKQUOTE>
+      <P>this causes the following permission object to be generated
+      and granted to code signed by &quot;mrm.&quot;</P>
+<BLOCKQUOTE>
+<PRE>
+p1 = new SocketPermission(&quot;puffin.eng.sun.com:7777&quot;, &quot;connect,accept&quot;);</PRE>
+</PRE></BLOCKQUOTE>
+      <P><CODE>p1</CODE> represents a permission allowing connections
+      to port 7777 on <CODE>puffin.eng.sun.com</CODE>, and also accepting
+      connections on that port.</P>
+      <P>Similarly, if you have the following entry in your policy:</P>
+<BLOCKQUOTE>
+<PRE>
+grant signedBy &quot;paul&quot; {
+    permission java.net.SocketPermission &quot;localhost:1024-&quot;, &quot;accept, connect, listen&quot;;
+};
+</PRE>
+</BLOCKQUOTE>
+      <P>this causes the following permission object to be generated
+      and granted to code signed by &quot;paul.&quot;</P>
+<BLOCKQUOTE>
+<PRE>
+p2 = new SocketPermission(&quot;localhost:1024-&quot;, &quot;accept,connect,listen&quot;);
+</PRE>
+</BLOCKQUOTE>
+      <P><CODE>p2</CODE> represents a permission allowing accepting
+      connections on, connecting to, or listening on any port between
+      1024 and 65535 on the local host.</P>
+      <P><B>Note:</B> Granting code permission to accept or make connections
+      to remote hosts may be dangerous because malevolent code can
+      then more easily transfer and share confidential data among parties
+      who may not otherwise have access to the data.</P>
+    </BLOCKQUOTE>
+    <H2><A NAME="SQLPermission"></A><CODE>SQLPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>The permission for which the <CODE>SecurityManager</CODE>
+      will check when code that is running in an applet calls one of
+      the <CODE>setLogWriter</CODE> methods. These methods include
+      those in the following list.</P>
+      <UL>
+        <LI><CODE>DriverManager.setLogWriter</CODE> <BR>
+        <LI><CODE>DriverManager.setLogStream</CODE> (deprecated)<BR>
+        <LI><CODE>javax.sql.DataSource.setLogWriter<BR>
+        </CODE>
+        <LI><CODE>javax.sql.ConnectionPoolDataSource.setLogWriter<BR>
+        </CODE>
+        <LI><CODE>javax.sql.XADataSource.setLogWriter<BR>
+        </CODE>
+      </UL>
+      <P>If there is no <CODE>SQLPermission</CODE> object, this method
+      throws a <CODE>java.lang.SecurityException</CODE> as a runtime
+      exception.</P>
+      <P>A <CODE>SQLPermission</CODE> object contains a name (also
+      referred to as a &quot;target name&quot;) but no actions list;
+      there is either a named permission or there is not. The target
+      name is the name of the permission (see below). The naming convention
+      follows the hierarchical property naming convention. In addition,
+      an asterisk may appear at the end of the name, following a &quot;.&quot;,
+      or by itself, to signify a wildcard match. For example: <CODE>loadLibrary.*</CODE>
+      or <CODE>*</CODE> is valid, but <CODE>*loadLibrary</CODE> or
+      <CODE>a*b</CODE> is not valid.</P>
+      <P>The following table lists all the possible <CODE>SQLPermission</CODE>
+      target names. Currently, the only name allowed is <CODE>setLog</CODE>.
+      The table gives a description of what the permission allows and
+      a discussion of the risks of granting code the permission.</P>
+      <P><TABLE summary="SQLPermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          Permission Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setLog</CODE></TD> 
+          <TD>
+          Setting of the logging stream</TD> 
+          <TD>
+          This is a dangerous permission to grant. The contents of the
+          log may contain usernames and passwords, SQL statements, and
+          SQL data.</TD> 
+        </TR>
+      </TABLE></P>
+      <P>The person running an applet decides what permissions to allow
+      and will run the <CODE>Policy Tool</CODE> to create an <CODE>SQLPermission</CODE>
+      in a policy file. A programmer does not use a constructor directly
+      to create an instance of <CODE>SQLPermission</CODE> but rather
+      uses a tool.</P>
+    </BLOCKQUOTE>
+
+    <H2><A NAME="PropertyPermission"></A><code>PropertyPermission</code></H2>
+    <BLOCKQUOTE>
+      <P>A <CODE>java.util.PropertyPermission</CODE> is for property
+      permissions.</P>
+      <P>The name is the name of the property (&quot;java.home&quot;,
+      &quot;os.name&quot;, etc). The naming convention follows the
+      hierarchical property naming convention. Also, an asterisk may
+      appear at the end of the name, following a &quot;.&quot;, or
+      by itself, to signify a wildcard match. For example: &quot;java.*&quot;
+      or &quot;*&quot; is valid, &quot;*java&quot; or &quot;a*b&quot;
+      is not valid.</P>
+      <P>The actions to be granted are passed to the constructor in
+      a string containing a list of zero or more comma-separated keywords.
+      The possible keywords are &quot;read&quot; and &quot;write&quot;.
+      Their meaning is defined as follows:</P>
+      <P><TABLE summary="layout" WIDTH="535" BORDER="0" CELLSPACING="2" CELLPADDING="2">
+        <TR>
+          <TD WIDTH="15%" VALIGN="TOP">
+          <CODE>read</CODE></TD>
+          <TD WIDTH="85%">
+          Permission to read. Allows <CODE>System.getProperty</CODE> to
+          be called.</TD>
+        </TR>
+        <TR>
+          <TD WIDTH="15%" VALIGN="TOP">
+          <CODE>write</CODE></TD>
+          <TD WIDTH="85%">
+          Permission to write. Allows <CODE>System.setProperty</CODE> to
+          be called.</TD>
+        </TR>
+      </TABLE></P>
+      <P>The actions string is converted to lowercase before processing.</P>
+      <P>Care should be taken before granting code permission to access
+      certain system properties. For example, granting permission to
+      access the &quot;java.home&quot; system property gives potentially
+      malevolent code sensitive information about the system environment
+      (the location of the runtime environment's directory). Also,
+      granting permission to access the &quot;user.name&quot; and &quot;user.home&quot;
+      system properties gives potentially malevolent code sensitive
+      information about the user environment (the user's account name
+      and home directory).</P>
+    </BLOCKQUOTE>
+
+    <H2><A NAME="LoggingPermission"></A><code>LoggingPermission</code></H2>
+    <BLOCKQUOTE>
+     A <code>SecurityManager</code> will check the 
+     <A HREF="../../api/java/util/logging/LoggingPermission.html"><CODE>java.util.logging.LoggingPermission</CODE></A> 
+      object when code 
+	running with a <code>SecurityManager</code> calls one of the logging 
+	control methods (such as <code>Logger.setLevel</code>). 
+	<P>
+	Currently there is only one named <code>LoggingPermission</code>, "<code>control</code>". 
+	<code>control</code> grants the ability to control the logging configuration; for example by adding or
+	removing Handlers, by adding or removing Filters, or by changing logging levels. 
+	<P>
+	Normally you do not create <code>LoggingPermission</code> objects directly; 
+	instead they are created by the security policy code based on reading the security policy
+	file. 
+    </BLOCKQUOTE>
+
+    <H2><A NAME="SSLPermission"></A><code>SSLPermission</code></H2>
+    <BLOCKQUOTE>
+      <P>The  
+      <A HREF="../../api/javax/net/ssl/SSLPermission.html"><CODE>javax.net.ssl.SSLPermission</CODE></A> 
+      class is for various network permissions. 
+      An <CODE>SSLPermission</CODE> contains a name (also referred to as a "target name") 
+      but no actions list; you either have the named permission or you don't. 
+	<P>
+	The target name is the name of the network permission (see below). 
+	The naming convention follows the hierarchical property naming convention. 
+	Also, an asterisk may appear at the end of the name, following 
+	a "<CODE>.</CODE>", or by itself, to signify a wildcard match. 
+	For example: "<CODE>foo.*</CODE>" or "<CODE>*</CODE>" is valid, 
+	"<CODE>*foo</CODE>" or "<CODE>a*b</CODE>" is not valid. 
+	<P>
+	The following table lists all the possible SSLPermission 
+	target names, and for each provides a description of 
+	what the permission allows and a discussion of the 
+	risks of granting code the permission. 
+
+      <P><TABLE summary="SSLPermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          Permission Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setHostnameVerifier</CODE></TD> 
+          <TD>
+          The ability to set a callback which can decide whether 
+		to allow a mismatch between the
+		host being connected to by an <CODE>HttpsURLConnection</CODE> 
+		and the common name field in server
+            certificate. </TD> 
+          <TD>
+          Malicious code can set a verifier 
+		that monitors host names visited by
+		<code>HttpsURLConnection</code> requests or that 
+		allows server certificates with invalid
+            common names. </TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getSSLSessionContext</CODE></TD> 
+          <TD>
+		The ability to get the <CODE>SSLSessionContext</CODE> of an <CODE>SSLSession</CODE>.</TD> 
+          <TD>
+          Malicious code may monitor sessions which have been established with SSL
+		peers or might invalidate sessions to slow down performance.</TD>
+        </TR>
+       </TABLE>
+
+    </BLOCKQUOTE>
+
+    <H2><A NAME="AuthPermission"></A><code>AuthPermission</code></H2>
+    <BLOCKQUOTE>
+      <P>The  
+      <A HREF="../../api/javax/security/auth/AuthPermission.html"><CODE>javax.security.auth.AuthPermission</CODE></A> 
+      class is for authentication
+      permissions. An <CODE>AuthPermission</CODE> contains a name (also
+      referred to as a &quot;target name&quot;) but no actions list;
+      you either have the named permission or you don't.</P>
+      <P>Currently the <CODE>AuthPermission</CODE> object is used to
+      guard access to the <CODE>Subject</CODE>, <CODE>SubjectDomainCombiner</CODE>,
+      <CODE>LoginContext</CODE> and <CODE>Configuration</CODE> objects.</P>
+      <P>The following table lists all the possible <CODE>AuthPermission</CODE>
+      target names, and for each provides a description of what the
+      permission allows and a discussion of the risks of granting code
+      the permission.</P>
+      <P><TABLE summary="AuthPermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          Permission Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>doAs</CODE></TD> 
+          <TD>
+          Invocation of the <CODE>Subject.doAs</CODE> methods</TD> 
+          <TD>
+          This enables an application to invoke code (Actions) under the
+          identity of any <CODE>Subject</CODE> specified to the <CODE>doAs</CODE>
+          method.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>doAsPrivileged</CODE></TD> 
+          <TD>
+          Invocation of the <CODE>Subject.doAsPrivileged</CODE> methods</TD> 
+          <TD>
+          This enables an application to invoke code (Actions) under the
+          identity of any <CODE>Subject</CODE> specified to the <CODE>doAsPrivileged</CODE>
+          method. Additionally, the caller may remove itself from the call
+          stack (and hence from subsequent security decisions) if it passes
+          <CODE>null</CODE> as the <CODE>AccessControlContext</CODE>.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getSubject</CODE></TD> 
+          <TD>
+          Retrieving the <CODE>Subject</CODE> from the provided <CODE>AccessControlContext</CODE></TD>
+          <TD>
+          This permits an application to gain access to an authenticated
+          <CODE>Subject</CODE>. The application can then access the Subject's
+          authenticated Principals and public credentials.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getSubjectFromDomainCombiner</CODE></TD> 
+          <TD>
+          Retrieving the <CODE>Subject</CODE> from a <CODE>SubjectDomainCombiner</CODE></TD>
+          <TD>
+          This permits an application to gain access to the authenticated
+          <CODE>Subject</CODE> associated with a <CODE>SubjectDomainCombiner</CODE>.
+          The application can then access the Subject's authenticated Principals
+          and public credentials.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setReadOnly</CODE></TD> 
+          <TD>
+          Setting a <CODE>Subject</CODE> read-only</TD>
+          <TD>
+          This permits an application to set a Subject's <CODE>Principal</CODE>,
+          public credential and private credential sets to be read-only.
+          This can be potentially used as a type of denial of service attack.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>modifyPrincipals</CODE></TD> 
+          <TD>
+          Make modifications to a Subject's <CODE>Principal</CODE> set</TD>
+          <TD>
+          Access control decisions are based on the Principals associated
+          with a <CODE>Subject</CODE>. This permission permits an application
+          to make any modifications to a Subject's <CODE>Principal</CODE>
+          set, thereby affecting subsequent security decisions.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>modifyPublicCredentials</CODE></TD> 
+          <TD>
+          Make modifications to a Subject's public credential set</TD>
+          <TD>
+          This permission permits an application to add or remove public
+          credentials from a <CODE>Subject</CODE>. This may affect code
+          that relies on the proper set of private credentials to exist
+          in that <CODE>Subject</CODE>.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>modifyPrivateCredentials</CODE></TD> 
+          <TD>
+          Make modifications to a Subject's private credential set</TD>
+          <TD>
+          This permission permits an application to add or remove private
+          credentials from a <CODE>Subject</CODE>. This may affect code
+          that relies on the proper set of private credentials to exist
+          in that <CODE>Subject</CODE>.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>refreshCredential</CODE></TD> 
+          <TD>
+          Refresh a credential <CODE>Object</CODE> that implements the
+          <CODE>Refreshable</CODE> interface</TD>
+          <TD>
+          This permission permits an application to refresh a credential
+          that is intended to expire.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>destroyCredential</CODE></TD> 
+          <TD>
+          Destroy a credential <CODE>Object</CODE> that implements the
+          <CODE>Destroyable</CODE> interface</TD>
+          <TD>
+          This permission permits an application to potentially destroy
+          a credential as a denial of service attack.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>createLoginContext.{name}</CODE></TD> 
+          <TD>
+          Instantiate a <CODE>LoginContext</CODE> with the specified <I>name</I></TD>
+          <TD>
+          For security purposes, an administrator might not want an application
+          to be able to authenticate to any <CODE>LoginModule</CODE>. This
+          permission permits an application to authenticate to the LoginModules
+          configured for the specified <I>name</I>.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getLoginConfiguration</CODE></TD> 
+          <TD>
+          Retrieve the system-wide login <CODE>Configuration</CODE></TD>
+          <TD>
+          Allows an application to determine all the LoginModules that
+          are configured for every application in the system.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>getLoginConfiguration</CODE></TD> 
+          <TD>
+          Retrieve the system-wide login <CODE>Configuration</CODE></TD>
+          <TD>
+          Allows an application to determine all the LoginModules that
+          are configured for every application in the system.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>setLoginConfiguration</CODE></TD> 
+          <TD>
+          Set the system-wide login <CODE>Configuration</CODE></TD>
+          <TD>
+          Allows an application to configure the LoginModules for every
+          application in the system.</TD>
+        </TR>
+        <TR>
+          <TD>
+          <CODE>refreshLoginConfiguration</CODE></TD> 
+          <TD>
+          Refresh the system-wide login <CODE>Configuration</CODE></TD>
+          <TD>
+          Allows an application to refresh the login <CODE>Configuration</CODE>.</TD>
+        </TR>
+      </TABLE></P>
+    </BLOCKQUOTE>
+
+   <H2><A NAME="PrivateCredentialPermission"></A><CODE>PrivateCredentialPermission</CODE></H2>
+    <BLOCKQUOTE>
+	The 
+           <A HREF="../../api/javax/security/auth/PrivateCredentialPermission.html"><CODE>javax.security.auth.PrivateCredentialPermission</CODE></A>
+	class is used to protect access to private Credentials belonging to
+	a particular <tt>Subject</tt>. The <tt>Subject</tt> is represented by a
+	Set of Principals.
+	<p>The target name of this <tt>Permission</tt> specifies a <CODE>Credential</CODE> class
+	name, and a Set of Principals. The only valid value for this <CODE>Permission</CODE>'s
+	actions is, "read". The target name must abide by the following syntax:
+<BLOCKQUOTE>
+<pre>
+CredentialClass {PrincipalClass "PrincipalName"}*
+</pre>
+</BLOCKQUOTE>
+	For example, the following permission grants access to the 
+	<code>com.sun.PrivateCredential</code> 
+	owned by <code>Subject</code>s which have a <code>com.sun.Principal</code> 
+	with the name, "<code>duke</code>".
+<P>
+	<B>Note:</B> Although this example, as well as all the examples below, do
+	not contain <code>Codebase</code>, <code>SignedBy</code>, or <code>Principal</code> 
+	information in the grant statement (for simplicity reasons), actual policy 
+	configurations should specify that information when appropriate.
+<BLOCKQUOTE>
+<pre>
+grant {
+    permission javax.security.auth.PrivateCredentialPermission
+             "com.sun.PrivateCredential com.sun.Principal \"duke\"",
+             "read";
+};
+</pre>
+</BLOCKQUOTE>
+	If <code>CredentialClass</code> is "<code>*</code>", then access 
+	is granted to all private <code>Credential</code>s
+	belonging to the specified <tt>Subject</tt>. If "<code>PrincipalName</code>" is "<code>*</code>",
+	then access is granted to the specified <code>Credential</code> owned by any <tt>Subject</tt>
+	that has the specified <tt>Principal</tt> (the actual <code>PrincipalName</code> doesn't
+	matter). For example, the following grants access to the <code>a.b.Credential</code>
+	owned by any <tt>Subject</tt> that has an <code>a.b.Principal</code>.
+<BLOCKQUOTE>
+<pre>
+grant {
+    permission javax.security.auth.PrivateCredentialPermission
+             "a.b.Credential a.b.Principal "*"",
+             "read";
+};
+</pre>
+</BLOCKQUOTE>
+	If both the <code>PrincipalClass</code> and "<code>PrincipalName</code>" are 
+      "<code>*</code>", then access is
+	granted to the specified <code>Credential</code> owned by any <tt>Subject</tt>.
+	In addition, the <code>PrincipalClass</code>/<code>PrincipalName</code> 
+	pairing may be repeated:
+<BLOCKQUOTE>
+<pre>
+grant {
+    permission javax.security.auth.PrivateCredentialPermission
+             "a.b.Credential a.b.Principal "duke" c.d.Principal "dukette"",
+             "read";
+};
+</pre>
+</BLOCKQUOTE>
+	The above code grants access to the private <code>Credential</code>, "<code>a.b.Credential</code>", belonging
+	to a <tt>Subject</tt> with at least two associated <code>Principal</code>s: "<code>a.b.Principal</code>"
+	with the name, "<code>duke</code>", and "<code>c.d.Principal</code>", with the name, "<code>dukette</code>".
+
+    </BLOCKQUOTE>
+
+   <H2><A NAME="DelegationPermission"></A><CODE>DelegationPermission</CODE></H2>
+    <BLOCKQUOTE>
+           The <A HREF="../../api/javax/security/auth/kerberos/DelegationPermission.html"><CODE>javax.security.auth.kerberos.DelegationPermission</CODE></A>
+    class is used to restrict the usage of the Kerberos delegation model;
+    ie, forwardable and proxiable tickets. 
+    <P>
+    The target name of this Permission specifies a pair of kerberos service principals.  
+    The first is the subordinate service principal being entrusted to use the Ticket 
+    Granting Ticket (TGT). 
+    The second service principal designates the target service the subordinate service 
+    principal is to interact with on behalf of the initiating 
+    <code>KerberosPrincipal</code>. 
+    This latter service principal is specified to restrict the use of a proxiable ticket. 
+<P>
+For example, to specify the "host" service use of a forwardable TGT, the target permission 
+is specified as follows: 
+<blockquote>
+<pre>
+DelegationPermission("\"host/foo.example.com@EXAMPLE.COM\" \"krbtgt/EXAMPLE.COM@EXAMPLE.COM\"");
+</pre>
+</blockquote> 
+
+To give the "backup" service a proxiable NFS service ticket, the target permission 
+might be specified: 
+
+<blockquote>
+<pre>
+DelegationPermission("\"backup/bar.example.com@EXAMPLE.COM\" \"nfs/home.EXAMPLE.COM@EXAMPLE.COM\"");
+</pre>
+</blockquote>
+    </BLOCKQUOTE>
+
+   <H2><A NAME="ServicePermission"></A><CODE>ServicePermission</CODE></H2>
+    <BLOCKQUOTE>
+	The 
+           <A HREF="../../api/javax/security/auth/kerberos/ServicePermission.html"><CODE>javax.security.auth.kerberos.ServicePermission</CODE></A>
+	class is used to protect Kerberos services and the credentials necessary
+	to access those services. There is a one to one mapping of a service principal
+	and the credentials necessary to access the service. Therefore granting
+	access to a service principal implicitly grants access to the credential
+	necessary to establish a security context with the service principal. This
+	applies regardless of whether the credentials are in a cache or acquired
+	via an exchange with the KDC. The credential can be either a ticket granting
+	ticket, a service ticket or a secret key from a key table.
+
+	<p>A <code>ServicePermission</code> contains a service principal name and a list of
+	actions which specify the context the credential can be used within.
+	
+	<p>The service principal name is the canonical name of the <tt>KereberosPrincipal</tt>
+	supplying the service, that is the <code>KerberosPrincipal</code> represents a Kerberos
+	service principal. This name is treated in a case sensitive manner.
+
+	<p>Granting this permission implies that the caller can use a cached credential
+	(Ticket Granting Ticket, service ticket or secret key) within the context designated by the
+	action. In the case of the TGT, granting this permission also implies that
+	the TGT can be obtained by an <code>Authentication Service</code> exchange.
+
+<p>The possible actions are:
+<BLOCKQUOTE>
+<P><TABLE summary="layout" WIDTH="535" BORDER="0" CELLSPACING="2" CELLPADDING="2">
+        <TR>
+          <TD WIDTH="15%" VALIGN="TOP">
+          <CODE>initiate</CODE></TD>
+          <TD WIDTH="85%">
+		Allows the caller to use the credential to 
+		initiate a security context with a service principal. </TD>
+        </TR>
+        <TR>
+          <TD WIDTH="15%" VALIGN="TOP">
+          <CODE>accept</CODE></TD>
+          <TD WIDTH="85%">
+          Allows the caller to use the credential to	
+          accept security context as a particular principal.
+        </TD>
+        </TR>
+      </TABLE>
+</BLOCKQUOTE>
+
+For example, to specify the permission to access to the TGT to initiate
+a security context the permission is constructed as follows:
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ServicePermission("krbtgt/EXAMPLE.COM@EXAMPLE.COM", "initiate");
+</pre>
+
+To obtain a service ticket to initiate a context with the "host" service
+the permission is constructed as follows:
+<BLOCKQUOTE>
+<pre>
+ServicePermission("host/foo.example.com@EXAMPLE.COM", "initiate");
+</pre>
+</BLOCKQUOTE>  
+For a Kerberized server the action is "accept". For example, the permission
+necessary to access and use the secret key of the Kerberized "host" service
+(telnet and the likes) would be constructed as follows:
+<BLOCKQUOTE>
+<pre>
+ServicePermission("host/foo.example.com@EXAMPLE.COM", "accept");
+</pre>   
+</BLOCKQUOTE>      
+    </BLOCKQUOTE>
+
+   <H2><A NAME="AudioPermission"></A><CODE>AudioPermission</CODE></H2>
+    <BLOCKQUOTE>
+      <P>The <CODE>AudioPermission</CODE> class represents access rights
+      to the audio system resources. An <CODE>AudioPermission</CODE>
+      contains a target name but no actions list; you either have the
+      named permission or you don't.</P>
+      <P>The target name is the name of the audio permission (see the
+      table below). The names follow the hierarchical property-naming
+      convention. Also, an asterisk can be used to represent all the
+      audio permissions.</P>
+      <P>The following table lists the possible <CODE>AudioPermission</CODE>
+      target names. For each name, the table provides a description
+      of exactly what that permission allows, as well as a discussion
+      of the risks of granting code the permission.</P>
+      <P><TABLE summary="AudioPermission target names" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+        <TR>
+          <TH>
+          Permission Target Name</TH> 
+          <TH>
+          What the Permission Allows</TH> 
+          <TH>
+          Risks of Allowing this Permission</TH> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>play</CODE></TD> 
+          <TD>
+          Audio playback through the audio device or devices on the system.
+          Allows the application to obtain and manipulate lines and mixers
+          for audio playback (rendering).</TD> 
+          <TD>
+          In some cases use of this permission may affect other applications
+          because the audio from one line may be mixed with other audio
+          being played on the system, or because manipulation of a mixer
+          affects the audio for all lines using that mixer.</TD> 
+        </TR>
+        <TR>
+          <TD>
+          <CODE>record</CODE></TD> 
+          <TD>
+          Audio recording through the audio device or devices on the system.
+          Allows the application to obtain and manipulate lines and mixers
+          for audio recording (capture).</TD> 
+          <TD>
+          In some cases use of this permission may affect other applications
+          because manipulation of a mixer affects the audio for all lines
+          using that mixer. This permission can enable an applet or application
+          to eavesdrop on a user.</TD>
+        </TR>
+      </TABLE></P>
+    </BLOCKQUOTE>
+
+  </BLOCKQUOTE>
+  <HR ALIGN=LEFT>
+  <H1><A NAME="PermsAndMethods"></A>Methods and the Permissions
+  They Require</H1>
+  <BLOCKQUOTE>
+    <P>The following table contains a list of all the Java 2 SDK
+    methods that require permissions, and for each tells which <CODE>SecurityManager</CODE>
+    method it calls and which permission is checked for by the default
+    implementation of that <CODE>SecurityManager</CODE> method.</P>
+    <P>Thus, with the default <CODE>SecurityManager</CODE> method
+    implementations, a call to a method in the left-hand column can
+    only be successful if the permission specified in the corresponding
+    entry in the right-hand column is allowed by the policy currently
+    in effect. For example, the following row:
+    <P><TABLE summary="Java 2 SDK methods that require permissions" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+      <TR>
+        <TH>
+        Method</TH> 
+        <TH>
+        SecurityManager Method Called</TH> 
+        <TH>
+        Permission</TH> 
+      </TR>
+      <TR>
+        <TD>
+        <PRE>
+java.awt.Toolkit
+    getSystemEventQueue(); </PRE>
+</TD> 
+        <TD>
+        <CODE>checkAwtEventQueueAccess</CODE></TD>
+        <TD>
+        <CODE>java.awt.AWTPermission &quot;accessEventQueue&quot;;</CODE></TD> 
+      </TR>
+    </TABLE></P>
+    <P>specifies that a call to the <CODE>getSystemEventQueue</CODE>
+    method in the <CODE>java.awt.Toolkit</CODE> class results in
+    a call to the <CODE>checkAwtEventQueueAccess</CODE> SecurityManager
+    method, which can only be successful if the following permission
+    is granted to code on the call stack:</P>
+    <PRE>
+  java.awt.AWTPermission &quot;accessEventQueue&quot;;</PRE>
+    <P>The convention of:</P>
+    <P><TABLE summary="example convention" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+      <TR>
+        <TH>
+        Method</TH> 
+        <TH>
+        SecurityManager Method Called</TH> 
+        <TH>
+        Permission</TH> 
+      </TR>
+      <TR>
+        <TD>
+        <PRE>
+ some.package.class
+   public static void someMethod(String foo); </PRE>
+</TD>
+        <TD>
+        <CODE>checkXXX</CODE></TD>
+        <TD>
+        <CODE>SomePermission &quot;{foo}&quot;;</CODE></TD> 
+      </TR>
+    </TABLE></P>
+    <P>means the runtime value of <CODE>foo</CODE> replaces the string
+    <CODE>{foo}</CODE> in the permission name.</P>
+    <P>As an example, here is one table entry:</P>
+    <P><TABLE summary="example table entry" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+      <TR>
+        <TH>
+        Method</TH> 
+        <TH>
+        SecurityManager Method Called</TH> 
+        <TH>
+        Permission</TH> 
+      </TR>
+      <TR>
+        <TD>
+        <PRE>
+java.io.FileInputStream
+    FileInputStream(String name) </PRE>
+</TD>
+        <TD>
+        <CODE>checkRead(String)</CODE></TD>
+        <TD>
+        <CODE>java.io.FilePermission &quot;{name}&quot;, &quot;read&quot;;</CODE></TD> 
+      </TR>
+    </TABLE></P>
+    <P>If the <CODE>FileInputStream</CODE> method (in this case,
+    a constructor) is called with &quot;/test/MyTestFile&quot; as
+    the <CODE>name</CODE> argument, as in</P>
+    <PRE>
+  FileInputStream(&quot;/test/MyTestFile&quot;);</PRE>
+    <P>then in order for the call to succeed, the following permission
+    must be set in the current policy, allowing read access to the
+    file &quot;/test/MyTestFile&quot;:</P>
+    <PRE>
+  java.io.FilePermission &quot;/test/MyTestFile&quot;, &quot;read&quot;;</PRE>
+    <P>More specifically, the permission must either be explicitly
+    set, as above, or implied by another permission, such as the
+    following:</P>
+    <PRE>
+  java.io.FilePermission &quot;/test/*&quot;, &quot;read&quot;;</PRE>
+    <P>which allows read access to any files in the &quot;/test&quot;
+    directory.</P>
+    <P>In some cases, a term in braces is not exactly the same as
+    the name of a specific method argument but is meant to represent
+    the relevant value. Here is an example:</P>
+    <P><TABLE summary="example of relevant value" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+      <TR>
+        <TH>
+        Method</TH> 
+        <TH>
+        SecurityManager Method Called</TH> 
+        <TH>
+        Permission</TH> 
+      </TR>
+      <TR>
+        <TD>
+        <PRE>
+java.net.DatagramSocket
+  public synchronized void 
+      receive(DatagramPacket p);</PRE>
+</TD>
+        <TD>
+        <CODE>checkAccept({host}, {port})</CODE></TD>
+        <TD>
+        <CODE>java.net.SocketPermission &quot;{host}:{port}&quot;, &quot;accept&quot;;</CODE></TD> 
+      </TR>
+    </TABLE></P>
+    <P>Here, the appropriate host and port values are calculated
+    by the <CODE>receive</CODE> method and passed to <CODE>checkAccept</CODE>.</P>
+    <P>In most cases, just the name of the SecurityManager method
+    called is listed. Where the method is one of multiple methods
+    of the same name, the argument types are also listed, for example
+    for <CODE>checkRead(String)</CODE> and <CODE>checkRead(FileDescriptor)</CODE>.
+    In other cases where arguments may be relevant, they are also
+    listed.</P>
+    <P>The following table is ordered by package name. That is, the
+    methods in classes in the <CODE>java.awt</CODE> package are listed
+    first, followed by methods in classes in the <CODE>java.io</CODE>
+    package, and so on.</P>
+  </BLOCKQUOTE>
+
+  <P><b><font><center><TABLE summary="methods and the premissions they require" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+    Methods and the Permissions They Require</B></CENTER> 
+    <TR>
+      <TH>
+      Method</TH> 
+      <TH>
+      SecurityManager Method Called</TH> 
+      <TH>
+      Permission</TH> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.awt.Graphics2d
+  public abstract void 
+    setComposite(Composite comp)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.awt.AWTPermission &quot;readDisplayPixels&quot; if this
+      Graphics2D context is drawing to a Component on the display screen
+      and the Composite is a custom object rather than an instance
+      of the AlphaComposite class. Note: The setComposite method is
+      actually abstract and thus can't invoke security checks. Each
+      actual implementation of the method should call the java.lang.SecurityManager
+      checkPermission method with a java.awt.AWTPermission(&quot;readDisplayPixels&quot;)
+      permission under the conditions noted.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.awt.Robot
+  public Robot()
+  public Robot(GraphicsDevice screen)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.awt.AWTPermission &quot;createRobot&quot;</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.awt.Toolkit
+  public void addAWTEventListener(
+          AWTEventListener listener, 
+          long eventMask)
+  public void removeAWTEventListener(
+     AWTEventListener listener)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.awt.AWTPermission &quot;listenToAllAWTEvents&quot;</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.awt.Toolkit
+  public abstract PrintJob getPrintJob(
+           Frame frame, String jobtitle,
+           Properties props)</PRE>
+</TD>
+      <TD>
+      checkPrintJobAccess</TD>
+      <TD>
+      <P>java.lang.RuntimePermission &quot;queuePrintJob&quot;</P>
+
+      <P>Note: The getPrintJob method is actually abstract and thus
+      can't invoke security checks. Each actual implementation of the
+      method should call the java.lang.SecurityManager checkPrintJobAccess
+      method, which is successful only if the java.lang.RuntimePermission
+      &quot;queuePrintJob&quot; permission is currently allowed.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.awt.Toolkit
+  public abstract Clipboard 
+                    getSystemClipboard()</PRE>
+</TD>
+      <TD>
+      checkSystemClipboardAccess</TD>
+      <TD>
+      <P>java.awt.AWTPermission &quot;accessClipboard&quot;</P>
+
+      <P>Note: The getSystemClipboard method is actually abstract and
+      thus can't invoke security checks. Each actual implementation
+      of the method should call the java.lang.SecurityManager checkSystemClipboardAccess
+      method, which is successful only if the java.awt.AWTPermission
+      &quot;accessClipboard&quot; permission is currently allowed.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.awt.Toolkit
+  public final EventQueue 
+               getSystemEventQueue()</PRE>
+</TD>
+      <TD>
+      checkAwtEventQueueAccess</TD>
+      <TD>
+      java.awt.AWTPermission &quot;accessEventQueue&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.awt.Window
+  Window()</PRE>
+</TD>
+      <TD>
+      checkTopLevelWindow</TD>
+      <TD>
+      If java.awt.AWTPermission &quot;showWindowWithoutWarningBanner&quot;
+      is set, the window will be displayed without a banner warning
+      that the window was created by an applet. It it's not set, such
+      a banner will be displayed.</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.beans.Beans
+  public static void setDesignTime(
+                 boolean isDesignTime)
+  public static void setGuiAvailable(
+                 boolean isGuiAvailable)
+
+java.beans.Introspector
+  public static synchronized void 
+    setBeanInfoSearchPath(String path[])
+
+java.beans.PropertyEditorManager
+  public static void registerEditor(
+                 Class targetType, 
+                 Class editorClass)
+  public static synchronized void 
+    setEditorSearchPath(String path[])</PRE>
+</TD>
+      <TD>
+      checkPropertiesAccess</TD>
+      <TD>
+      java.util.PropertyPermission &quot;*&quot;, &quot;read,write&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.io.File
+  public boolean delete()
+  public void deleteOnExit()</PRE>
+</TD>
+      <TD>
+      checkDelete(String)</TD>
+      <TD>
+      java.io.FilePermission &quot;{name}&quot;, &quot;delete&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.io.FileInputStream
+  FileInputStream(FileDescriptor fdObj)</PRE>
+</TD>
+      <TD>
+      checkRead(FileDescriptor)</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;readFileDescriptor&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.io.FileInputStream
+  FileInputStream(String name)
+  FileInputStream(File file)
+
+java.io.File
+  public boolean exists()
+  public boolean canRead()
+  public boolean isFile()
+  public boolean isDirectory()
+  public boolean isHidden()
+  public long lastModified()
+  public long length()
+  public String[] list()
+  public String[] list(
+           FilenameFilter filter)
+  public File[] listFiles()
+  public File[] listFiles(
+           FilenameFilter filter)
+  public File[] listFiles(
+           FileFilter filter)
+      
+java.io.RandomAccessFile
+  RandomAccessFile(String name, String mode)
+  RandomAccessFile(File file, String mode)
+      (where mode is &quot;r&quot; in both of these)</PRE>
+</TD>
+      <TD>
+      checkRead(String)</TD>
+      <TD>
+      java.io.FilePermission &quot;{name}&quot;, &quot;read&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.io.FileOutputStream
+  FileOutputStream(FileDescriptor fdObj)</PRE>
+</TD>
+      <TD>
+      checkWrite(FileDescriptor)</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;writeFileDescriptor&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.io.FileOutputStream 
+  FileOutputStream(File file)
+  FileOutputStream(String name)
+  FileOutputStream(String name, 
+                   boolean append)
+
+java.io.File
+  public boolean canWrite()
+  public boolean createNewFile()
+  public static File createTempFile(
+          String prefix, String suffix)
+  public static File createTempFile(
+          String prefix,  String suffix, 
+          File directory)
+  public boolean mkdir()
+  public boolean mkdirs()
+  public boolean renameTo(File dest)
+  public boolean setLastModified(long time)
+  public boolean setReadOnly()</PRE>
+</TD>
+      <TD>
+      checkWrite(String)</TD>
+      <TD>
+      java.io.FilePermission &quot;{name}&quot;, &quot;write&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.io.ObjectInputStream
+  protected final boolean 
+    enableResolveObject(boolean enable);
+
+java.io.ObjectOutputStream
+  protected final boolean 
+    enableReplaceObject(boolean enable)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.io.SerializablePermission &quot;enableSubstitution&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.io.ObjectInputStream
+  protected ObjectInputStream()
+
+java.io.ObjectOutputStream
+  protected ObjectOutputStream()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.io.SerializablePermission &quot;enableSubclassImplementation&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.io.RandomAccessFile
+  RandomAccessFile(String name, String mode)
+      (where mode is &quot;rw&quot;)</PRE>
+</TD>
+      <TD>
+      checkRead(String) and checkWrite(String)</TD>
+      <TD>
+      java.io.FilePermission &quot;{name}&quot;, &quot;read,write&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Class
+  public static Class forName(
+     String name, boolean initialize, 
+     ClassLoader loader)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      If <CODE>loader</CODE> is null, and the caller's class loader
+      is not null, then java.lang.RuntimePermission(&quot;getClassLoader&quot;)</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Class
+  public Class[] getClasses()</PRE>
+</TD>
+      <TD>
+      For this class and each of its superclasses, checkMemberAccess(this,
+      Member.DECLARED) is called and, if the class is in a package,
+      checkPackageAccess({pkgName}) is called.</TD>
+      <TD>
+      Default checkMemberAccess does not require any permissions if
+      &quot;this&quot; class's classloader is the same as that of the
+      caller. Otherwise, it requires java.lang.RuntimePermission &quot;accessDeclaredMembers&quot;.
+      If the class is in a package, java.lang.RuntimePermission &quot;accessClassInPackage.{pkgName}&quot;
+      is also required.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Class
+  public ClassLoader getClassLoader()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      If the caller's class loader is null, or is the same as or an
+      ancestor of the class loader for the class whose class loader
+      is being requested, no permission is needed. Otherwise, <BR>
+      java.lang.RuntimePermission &quot;getClassLoader&quot; <BR>
+      is required.</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Class
+  public Class[] getDeclaredClasses()
+  public Field[] getDeclaredFields()
+  public Method[] getDeclaredMethods()
+  public Constructor[] 
+    getDeclaredConstructors()
+  public Field getDeclaredField(
+                       String name)
+  public Method getDeclaredMethod(...)
+  public Constructor 
+    getDeclaredConstructor(...)</PRE>
+</TD>
+      <TD>
+      checkMemberAccess(this, Member.DECLARED) and, if this class is
+      in a package, checkPackageAccess({pkgName})</TD>
+      <TD>
+      Default checkMemberAccess does not require any permissions if
+      &quot;this&quot; class's classloader is the same as that of the
+      caller. Otherwise, it requires java.lang.RuntimePermission &quot;accessDeclaredMembers&quot;.
+      If this class is in a package, java.lang.RuntimePermission &quot;accessClassInPackage.{pkgName}&quot;
+      is also required.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Class
+  public Field[] getFields()
+  public Method[] getMethods()
+  public Constructor[] getConstructors()
+  public Field getField(String name)
+  public Method getMethod(...)
+  public Constructor getConstructor(...)</PRE>
+</TD>
+      <TD>
+      checkMemberAccess(this, Member.PUBLIC) and, if class is in a
+      package, checkPackageAccess({pkgName})</TD>
+      <TD>
+      Default checkMemberAccess does not require any permissions when
+      the access type is Member.PUBLIC. If this class is in a package,
+      java.lang.RuntimePermission &quot;accessClassInPackage.{pkgName}&quot;
+      is required.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Class
+   public ProtectionDomain 
+            getProtectionDomain()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;getProtectionDomain&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.ClassLoader
+  ClassLoader()
+  ClassLoader(ClassLoader parent)</PRE>
+</TD>
+      <TD>
+      checkCreateClassLoader</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;createClassLoader&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.ClassLoader
+  public static ClassLoader 
+           getSystemClassLoader()
+  public ClassLoader getParent()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      If the caller's class loader is null, or is the same as or an
+      ancestor of the class loader for the class whose class loader
+      is being requested, no permission is needed. Otherwise, <BR>
+      java.lang.RuntimePermission &quot;getClassLoader&quot; <BR>
+      is required.</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Runtime
+  public Process exec(String command)
+  public Process exec(String command, 
+                      String envp[])
+  public Process exec(String cmdarray[])
+  public Process exec(String cmdarray[], 
+                      String envp[])</PRE>
+</TD>
+      <TD>
+      checkExec</TD>
+      <TD>
+      java.io.FilePermission &quot;{command}&quot;, &quot;execute&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Runtime
+  public void exit(int status)
+  public static void 
+      runFinalizersOnExit(boolean value)
+java.lang.System
+  public static void exit(int status)
+  public static void 
+      runFinalizersOnExit(boolean value)</PRE>
+</TD>
+      <TD>
+      checkExit(status) where status is 0 for runFinalizersOnExit</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;exitVM&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Runtime
+  public void addShutdownHook(Thread hook)
+  public boolean removeShutdownHook(Thread hook)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;shutdownHooks&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Runtime
+  public void load(String lib)
+  public void loadLibrary(String lib)
+java.lang.System
+  public static void load(String filename)
+  public static void loadLibrary(
+                          String libname)</PRE>
+</TD>
+      <TD>
+      checkLink({libName}) where {libName} is the lib, filename or
+      libname argument</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;loadLibrary.{libName}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.SecurityManager methods</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      See the <A HREF="#SecMgrChecks">next table</A>.</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.System
+  public static Properties 
+      getProperties()
+  public static void 
+      setProperties(Properties props)</PRE>
+</TD>
+      <TD>
+      checkPropertiesAccess</TD>
+      <TD>
+      java.util.PropertyPermission &quot;*&quot;, &quot;read,write&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.System
+  public static String 
+      getProperty(String key)
+  public static String 
+      getProperty(String key, String def)</PRE>
+</TD>
+      <TD>
+      checkPropertyAccess</TD>
+      <TD>
+      java.util.PropertyPermission &quot;{key}&quot;, &quot;read&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.System
+  public static void setIn(InputStream in)
+  public static void setOut(PrintStream out)
+  public static void setErr(PrintStream err)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;setIO&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.System
+  public static String 
+    setProperty(String key, String value)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.util.PropertyPermission &quot;{key}&quot;, &quot;write&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.System
+  public static synchronized void 
+    setSecurityManager(SecurityManager s)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;setSecurityManager&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Thread
+  public ClassLoader getContextClassLoader()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      If the caller's class loader is null, or is the same as or an
+      ancestor of the context class loader for the thread whose context
+      class loader is being requested, no permission is needed. Otherwise,
+<BR>
+      java.lang.RuntimePermission &quot;getClassLoader&quot; <BR>
+      is required.</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Thread
+  public void setContextClassLoader
+                      (ClassLoader cl)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;setContextClassLoader&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Thread
+  public final void checkAccess()
+  public void interrupt()
+  public final void suspend()
+  public final void resume()
+  public final void setPriority
+                     (int newPriority)
+  public final void setName(String name)
+  public final void setDaemon(boolean on)</PRE>
+</TD>
+      <TD>
+      checkAccess(this)</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;modifyThread&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Thread
+  public static int 
+      enumerate(Thread tarray[])</PRE>
+</TD>
+      <TD>
+      checkAccess({threadGroup})</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;modifyThreadGroup&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Thread
+  public final void stop()</PRE>
+</TD>
+      <TD>
+      checkAccess(this). Also checkPermission if the current thread
+      is trying to stop a thread other than itself.</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;modifyThread&quot;. <BR>
+      Also java.lang.RuntimePermission &quot;stopThread&quot; if the
+      current thread is trying to stop a thread other than itself.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Thread
+  public final synchronized void 
+                    stop(Throwable obj)</PRE>
+</TD>
+      <TD>
+      checkAccess(this). Also checkPermission if the current thread
+      is trying to stop a thread other than itself or obj is not an
+      instance of ThreadDeath.</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;modifyThread&quot;. <BR>
+      Also java.lang.RuntimePermission &quot;stopThread&quot; if the
+      current thread is trying to stop a thread other than itself or
+      obj is not an instance of ThreadDeath.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Thread
+  Thread()
+  Thread(Runnable target)
+  Thread(String name)
+  Thread(Runnable target, String name)
+
+java.lang.ThreadGroup
+  ThreadGroup(String name)
+  ThreadGroup(ThreadGroup parent, 
+              String name)</PRE>
+</TD>
+      <TD>
+      checkAccess({parentThreadGroup})</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;modifyThreadGroup&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.Thread
+  Thread(ThreadGroup group, ...)
+
+java.lang.ThreadGroup
+  public final void checkAccess()
+  public int enumerate(Thread list[])
+  public int enumerate(Thread list[],
+      boolean recurse)
+  public int enumerate(ThreadGroup list[])
+  public int enumerate(ThreadGroup list[],
+      boolean recurse)
+  public final ThreadGroup getParent()
+  public final void 
+      setDaemon(boolean daemon)
+  public final void setMaxPriority(int pri)
+  public final void suspend()
+  public final void resume()
+  public final void destroy()</PRE>
+</TD>
+      <TD>
+      checkAccess(this) for ThreadGroup methods, or checkAccess(group)
+      for Thread methods</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;modifyThreadGroup&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.ThreadGroup
+  public final void interrupt()</PRE>
+</TD>
+      <TD>
+      checkAccess(this)</TD>
+      <TD>
+      Requires java.lang.RuntimePermission &quot;modifyThreadGroup&quot;.<BR>
+      Also requires java.lang.RuntimePermission &quot;modifyThread&quot;,
+      since the java.lang.Thread interrupt() method is called for each
+      thread in the thread group and in all of its subgroups. See the
+      Thread interrupt() method.</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.ThreadGroup
+  public final void stop()</PRE>
+</TD>
+      <TD>
+      checkAccess(this)</TD>
+      <TD>
+      Requires java.lang.RuntimePermission &quot;modifyThreadGroup&quot;.<BR>
+      Also requires java.lang.RuntimePermission &quot;modifyThread&quot;
+      and possibly java.lang.RuntimePermission &quot;stopThread&quot;,
+      since the java.lang.Thread stop() method is called for each thread
+      in the thread group and in all of its subgroups. See the Thread
+      stop() method.</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.lang.reflect.AccessibleObject
+  public static void setAccessible(...)
+  public void setAccessible(...)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.lang.reflect.ReflectPermission &quot;suppressAccessChecks&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.Authenticator
+  public static PasswordAuthentication
+       requestPasswordAuthentication(
+             InetAddress addr,
+             int port,
+             String protocol,
+             String prompt,
+             String scheme)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.net.NetPermission &quot;requestPasswordAuthentication&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.Authenticator
+  public static void 
+      setDefault(Authenticator a)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.net.NetPermission &quot;setDefaultAuthenticator&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.MulticastSocket
+  public void 
+      joinGroup(InetAddress mcastaddr)
+  public void 
+      leaveGroup(InetAddress mcastaddr)</PRE>
+</TD>
+      <TD>
+      checkMulticast(InetAddress)</TD>
+      <TD>
+      java.net.SocketPermission( mcastaddr.getHostAddress(), &quot;accept,connect&quot;)</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.DatagramSocket
+  public void send(DatagramPacket p)</PRE>
+</TD>
+      <TD>
+      checkMulticast(p.getAddress()) or checkConnect(<BR>
+      p.getAddress().getHostAddress(), p.getPort())</TD>
+      <TD>
+      if (p.getAddress().isMulticastAddress()) {<BR>
+      java.net.SocketPermission(<BR>
+      (p.getAddress()).getHostAddress(), &quot;accept,connect&quot;)<BR>
+      }<BR>
+      else {<BR>
+      port = p.getPort();<BR>
+      host = p.getAddress().getHostAddress();<BR>
+      if (port == -1) java.net.SocketPermission &quot;{host}&quot;,&quot;resolve&quot;;<BR>
+      else java.net.SocketPermission &quot;{host}:{port}&quot;,&quot;connect&quot;<BR>
+      }</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.MulticastSocket
+  public synchronized void 
+      send(DatagramPacket p, byte ttl)</PRE>
+</TD>
+      <TD>
+      checkMulticast(p.getAddress(), ttl) or checkConnect(<BR>
+      p.getAddress().getHostAddress(), p.getPort())</TD>
+      <TD>
+      if (p.getAddress().isMulticastAddress()) {<BR>
+      java.net.SocketPermission(<BR>
+      (p.getAddress()).getHostAddress(), &quot;accept,connect&quot;)<BR>
+      }<BR>
+      else {<BR>
+      port = p.getPort();<BR>
+      host = p.getAddress().getHostAddress();<BR>
+      if (port == -1) java.net.SocketPermission &quot;{host}&quot;,&quot;resolve&quot;;<BR>
+      else java.net.SocketPermission &quot;{host}:{port}&quot;,&quot;connect&quot;<BR>
+      }</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.InetAddress
+  public String getHostName()
+  public static InetAddress[]
+                  getAllByName(String host)
+  public static InetAddress getLocalHost()
+
+java.net.DatagramSocket
+  public InetAddress getLocalAddress()</PRE>
+</TD>
+      <TD>
+      checkConnect({host}, -1)</TD>
+      <TD>
+      java.net.SocketPermission &quot;{host}&quot;, &quot;resolve&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.ServerSocket
+  ServerSocket(...)
+
+java.net.DatagramSocket
+  DatagramSocket(...)
+
+java.net.MulticastSocket
+  MulticastSocket(...)</PRE>
+</TD>
+      <TD>
+      checkListen({port})</TD>
+      <TD>
+      if (port == 0) java.net.SocketPermission &quot;localhost:1024-&quot;,&quot;listen&quot;;<BR>
+      else java.net.SocketPermission &quot;localhost:{port}&quot;,&quot;listen&quot;</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.ServerSocket
+  public Socket accept()
+  protected final void implAccept(Socket s)</PRE>
+</TD>
+      <TD>
+      checkAccept({host}, {port})</TD>
+      <TD>
+      java.net.SocketPermission &quot;{host}:{port}&quot;, &quot;accept&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.ServerSocket
+  public static synchronized void 
+      setSocketFactory(...)
+
+java.net.Socket
+  public static synchronized void
+      setSocketImplFactory(...)
+
+java.net.URL
+  public static synchronized void
+      setURLStreamHandlerFactory(...)
+
+ java.net.URLConnection
+   public static synchronized void
+      setContentHandlerFactory(...)
+   public static void 
+      setFileNameMap(FileNameMap map)
+
+java.net.HttpURLConnection
+   public static void 
+       setFollowRedirects(boolean set)
+
+java.rmi.activation.ActivationGroup
+  public static synchronized
+    	ActivationGroup createGroup(...)
+  public static synchronized void 
+      setSystem(ActivationSystem system)
+
+java.rmi.server.RMISocketFactory
+   public synchronized static void
+      setSocketFactory(...)</PRE>
+</TD>
+      <TD>
+      checkSetFactory</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;setFactory&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.Socket
+  Socket(...)</PRE>
+</TD>
+      <TD>
+      checkConnect({host}, {port})</TD>
+      <TD>
+      java.net.SocketPermission &quot;{host}:{port}&quot;, &quot;connect&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.DatagramSocket
+  public synchronized void 
+      receive(DatagramPacket p)</PRE>
+</TD>
+      <TD>
+      checkAccept({host}, {port})</TD>
+      <TD>
+      java.net.SocketPermission &quot;{host}:{port}&quot;, &quot;accept&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.URL
+  URL(...)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.net.NetPermission &quot;specifyStreamHandler&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.net.URLClassLoader
+  URLClassLoader(...)</PRE>
+</TD>
+      <TD>
+      checkCreateClassLoader</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;createClassLoader&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.AccessControlContext
+  public AccessControlContext(AccessControlContext acc,
+				DomainCombiner combiner)
+  public DomainCombiner getDomainCombiner()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.security.SecurityPermission &quot;createAccessControlContext&quot;</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Identity
+  public void addCertificate(...)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;addIdentityCertificate&quot;)</TD>
+      <TD>
+      java.security.SecurityPermission &quot;addIdentityCertificate&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Identity
+  public void removeCertificate(...)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;removeIdentityCertificate&quot;)</TD> 
+      <TD>
+      java.security.SecurityPermission &quot;removeIdentityCertificate&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Identity
+  public void setInfo(String info)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;setIdentityInfo&quot;)</TD> 
+      <TD>
+      java.security.SecurityPermission &quot;setIdentityInfo&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Identity
+  public void setPublicKey(PublicKey key)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;setIdentityPublicKey&quot;)</TD> 
+      <TD>
+      java.security.SecurityPermission &quot;setIdentityPublicKey&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Identity
+  public String toString(...)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;printIdentity&quot;)</TD> 
+      <TD>
+      java.security.SecurityPermission &quot;printIdentity&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.IdentityScope
+  protected static void setSystemScope()</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;setSystemScope&quot;)</TD> 
+      <TD>
+      java.security.SecurityPermission &quot;setSystemScope&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Permission
+  public void checkGuard(Object object) </PRE>
+</TD>
+      <TD>
+      checkPermission(this)</TD>
+      <TD>
+      this Permission object is the permission checked</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Policy
+  public static Policy getPolicy()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.security.SecurityPermission &quot;getPolicy&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Policy
+  public static void 
+      setPolicy(Policy policy);</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.security.SecurityPermission &quot;setPolicy&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Provider
+  public synchronized void clear()</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;clearProviderProperties.&quot;+{name})</TD>
+      <TD>
+      java.security.SecurityPermission &quot;clearProviderProperties.{name}&quot;
+      where <I>name</I> is the provider name.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Provider
+  public synchronized Object 
+      put(Object key, Object value)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;putProviderProperty.&quot;+{name})</TD>
+      <TD>
+      java.security.SecurityPermission &quot;putProviderProperty.{name}&quot;
+      where <I>name</I> is the provider name.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Provider
+  public synchronized Object 
+      remove(Object key)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;removeProviderProperty.&quot;+{name})</TD>
+      <TD>
+      java.security.SecurityPermission &quot;removeProviderProperty.{name}&quot;
+      where <I>name</I> is the provider name.</TD>
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.SecureClassLoader
+  SecureClassLoader(...)</PRE>
+</TD>
+      <TD>
+      checkCreateClassLoader</TD>
+      <TD>
+      java.lang.RuntimePermission &quot;createClassLoader&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Security
+  public static void getProperty(String key)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.security.SecurityPermission &quot;getProperty.{key}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Security
+  public static int 
+      addProvider(Provider provider)
+  public static int 
+      insertProviderAt(Provider provider,
+                       int position);</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;insertProvider.&quot;+provider.getName())</TD>
+      <TD>
+      java.security.SecurityPermission &quot;insertProvider.{name}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Security
+  public static void 
+      removeProvider(String name)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;removeProvider.&quot;+name)</TD>
+      <TD>
+      java.security.SecurityPermission &quot;removeProvider.{name}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Security
+  public static void 
+    setProperty(String key, String datum)</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;setProperty.&quot;+key)</TD>
+      <TD>
+      java.security.SecurityPermission &quot;setProperty.{key}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Signer
+  public PrivateKey getPrivateKey()</PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;getSignerPrivateKey&quot;)</TD>
+      <TD>
+      java.security.SecurityPermission &quot;getSignerPrivateKey&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.security.Signer
+  public final void 
+      setKeyPair(KeyPair pair) </PRE>
+</TD>
+      <TD>
+      checkSecurityAccess(<BR>
+      &quot;setSignerKeypair&quot;)</TD>
+      <TD>
+      java.security.SecurityPermission &quot;setSignerKeypair&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.sql.DriverManager
+  public static synchronized void 
+      setLogWriter(PrintWriter out) </PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.sql.SQLPermission &quot;setLog&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.sql.DriverManager
+  public static synchronized void 
+      setLogStream(PrintWriter out) </PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.sql.SQLPermission &quot;setLog&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.util.Locale
+  public static synchronized void 
+            setDefault(Locale newLocale)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      java.util.PropertyPermission &quot;user.language&quot;,&quot;write&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+java.util.zip.ZipFile
+  ZipFile(String name)</PRE>
+</TD>
+      <TD>
+      checkRead</TD>
+      <TD>
+      java.io.FilePermission &quot;{name}&quot;,&quot;read&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.Subject
+    public static Subject getSubject(final AccessControlContext acc)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;getSubject&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.Subject
+    public void setReadOnly()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;setReadOnly&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.Subject
+    public static Object doAs(final Subject subject,
+				final PrivilegedAction action)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;doAs&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.Subject
+    public static Object doAs(final Subject subject,
+				final PrivilegedExceptionAction action)
+	throws java.security.PrivilegedActionException</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;doAs&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.Subject
+    public static Object doAsPrivileged(final Subject subject,
+				final PrivilegedAction action,
+				final AccessControlContext acc)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;doAsPrivileged&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.Subject
+    public static Object doAsPrivileged(final Subject subject,
+				final PrivilegedExceptionAction action,
+				final AccessControlContext acc)
+	throws java.security.PrivilegedActionException</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;doAsPrivileged&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.SubjectDomainCombiner
+    public Subject getSubject()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;getSubjectFromDomainCombiner&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.SubjectDomainCombiner
+    public Subject getSubject()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;getSubjectFromDomainCombiner&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.login.LoginContext
+    public LoginContext(String name)
+	throws LoginException</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;createLoginContext.{name}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.login.LoginContext
+    public LoginContext(String name,
+			Subject subject)
+	 throws LoginException</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;createLoginContext.{name}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.login.LoginContext
+    public LoginContext(String name,
+			CallbackHandler callbackHandler)
+	 throws LoginException</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;createLoginContext.{name}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.login.LoginContext
+    public LoginContext(String name,
+			Subject subject,
+			CallbackHandler callbackHandler)
+	 throws LoginException</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;createLoginContext.{name}&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.login.Configuration
+    public static Configuration getConfiguration()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;getLoginConfiguration&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.login.Configuration
+    public static void setConfiguration(Configuration configuration)</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;setLoginConfiguration&quot;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      <PRE>
+javax.security.auth.login.Configuration
+    public static void refresh()</PRE>
+</TD>
+      <TD>
+      checkPermission</TD>
+      <TD>
+      javax.security.auth.AuthPermission &quot;refreshLoginConfiguration&quot;</TD> 
+    </TR>
+  </TABLE></P>
+  <P><BR>
+  <HR ALIGN=LEFT></P>
+  <H1><A NAME="SecMgrChecks"></A>java.lang.SecurityManager Method
+  Permission Checks</H1></B>
+  <P>This table shows which permissions are checked for by the
+  default implementations of the <CODE>java.lang.SecurityManager</CODE>
+  methods.</P>
+  <P>Each of the specified <CODE>check</CODE> methods calls the
+  <CODE>SecurityManager</CODE> <CODE>checkPermission</CODE> method
+  with the specified permission, except for the <CODE>checkConnect</CODE>
+  and <CODE>checkRead</CODE> methods that take a context argument.
+  Those methods expect the context to be an <CODE>AccessControlContext</CODE>
+  and they call the context's <CODE>checkPermission</CODE> method
+  with the specified permission. <BR>
+<BR>
+  <TABLE summary="checked permissions" BORDER="1" CELLPADDING="5" CELLSPACING="2">
+    <TR>
+      <TH>
+      Method</TH> 
+      <TH>
+      Permission</TH> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkAccept(String host, int port);</TD> 
+      <TD>
+      java.net.SocketPermission &quot;{host}:{port}&quot;, &quot;accept&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkAccess(Thread g);</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;modifyThread&quot;);</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkAccess(ThreadGroup g);</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;modifyThreadGroup&quot;);</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkAwtEventQueueAccess();</TD> 
+      <TD>
+      java.awt.AWTPermission &quot;accessEventQueue&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkConnect(String host, int port);</TD> 
+      <TD>
+      if (port == -1) java.net.SocketPermission &quot;{host}&quot;,&quot;resolve&quot;;
+<BR>
+      else java.net.SocketPermission &quot;{host}:{port}&quot;,&quot;connect&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkConnect(String host, int port, Object context);</TD> 
+      <TD>
+      if (port == -1) java.net.SocketPermission &quot;{host}&quot;,&quot;resolve&quot;;
+<BR>
+      else java.net.SocketPermission &quot;{host}:{port}&quot;,&quot;connect&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkCreateClassLoader();</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;createClassLoader&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkDelete(String file);</TD> 
+      <TD>
+      java.io.FilePermission &quot;{file}&quot;, &quot;delete&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkExec(String cmd);</TD> 
+      <TD>
+      if cmd is an absolute path: java.io.FilePermission &quot;{cmd}&quot;,
+      &quot;execute&quot;;<BR>
+      else java.io.FilePermission &quot;-&quot;, &quot;execute&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkExit(int status);</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;exitVM&quot;);</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkLink(String lib);</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;loadLibrary.{lib}&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkListen(int port);</TD> 
+      <TD>
+      if (port == 0) java.net.SocketPermission &quot;localhost:1024-&quot;,&quot;listen&quot;;<BR>
+      else java.net.SocketPermission &quot;localhost:{port}&quot;,&quot;listen&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkMemberAccess(Class clazz, int which);</TD> 
+      <TD>
+      <PRE>
+if (which != Member.PUBLIC) {
+  if (currentClassLoader() != clazz.getClassLoader()) {
+    checkPermission(
+      new java.lang.RuntimePermission(&quot;accessDeclaredMembers&quot;));
+  }
+}</PRE>
+</TD>
+    </TR>
+    <TR>
+      <TD>
+      public void checkMulticast(InetAddress maddr);</TD> 
+      <TD>
+      java.net.SocketPermission(maddr.getHostAddress(),&quot;accept,connect&quot;);</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkMulticast(InetAddress maddr, byte ttl);</TD> 
+      <TD>
+      java.net.SocketPermission(maddr.getHostAddress(),&quot;accept,connect&quot;);</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkPackageAccess(String pkg);</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;accessClassInPackage.{pkg}&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkPackageDefinition(String pkg);</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;defineClassInPackage.{pkg}&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkPrintJobAccess();</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;queuePrintJob&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkPropertiesAccess();</TD> 
+      <TD>
+      java.util.PropertyPermission &quot;*&quot;, &quot;read,write&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkPropertyAccess(String key);</TD> 
+      <TD>
+      java.util.PropertyPermission &quot;{key}&quot;, &quot;read,write&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkRead(FileDescriptor fd);</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;readFileDescriptor&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkRead(String file);</TD> 
+      <TD>
+      java.io.FilePermission &quot;{file}&quot;, &quot;read&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkRead(String file, Object context);</TD> 
+      <TD>
+      java.io.FilePermission &quot;{file}&quot;, &quot;read&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkSecurityAccess(String action);</TD> 
+      <TD>
+      java.security.SecurityPermission &quot;{action}&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkSetFactory();</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;setFactory&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkSystemClipboardAccess();</TD> 
+      <TD>
+      java.awt.AWTPermission &quot;accessClipboard&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public boolean checkTopLevelWindow(Object window);</TD> 
+      <TD>
+      java.awt.AWTPermission &quot;showWindowWithoutWarningBanner&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkWrite(FileDescriptor fd);</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;writeFileDescriptor&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public void checkWrite(String file);</TD> 
+      <TD>
+      java.io.FilePermission &quot;{file}&quot;, &quot;write&quot;;</TD> 
+    </TR>
+    <TR>
+      <TD>
+      public SecurityManager();</TD> 
+      <TD>
+      java.lang.RuntimePermission &quot;createSecurityManager&quot;;</TD> 
+    </TR>
+  </TABLE></P>
+
+
+<P>
+
+<!-- Body text ends here --><!-- ============================================================== -->
+<HR ALIGN=LEFT SIZE="3" NOSHADE><TABLE summary="layout" BORDER="0" WIDTH="100%" CELLSPACING="2"
+CELLPADDING="0">
+  <TR VALIGN="TOP">
+    <TD>
+    <P><FONT SIZE="-2"><A HREF="../../relnotes/SMICopyright.html">Copyright
+    &COPY;</A> 1997-2002 <A HREF="http://www.sun.com/">Sun Microsystems,
+    Inc.</A> All Rights Reserved.</FONT></P>
+
+    <P><FONT SIZE="-1">Please send comments to: <A HREF="mailto:java-security@sun.com">java-security@sun.com</A></FONT></TD>
+    <TD ALIGN="RIGHT">
+    <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER="0"
+    WIDTH="64" HEIGHT="30" NATURALSIZEFLAG="0" ALIGN="BOTTOM"> <BR>
+    <I><FONT SIZE="+1">Java Software</FONT></I></TD>
+  </TR>
+</TABLE>
+
+</BODY>
+</HTML>

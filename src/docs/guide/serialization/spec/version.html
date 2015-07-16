@@ -1,0 +1,191 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Mon Jan 27 15:23:34 2003" />
+    <title>Versioning of Serializable Objects</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="serialTOC.html" />
+    <link rel="Previous" href="class.html" />
+    <link rel="Next" href="protocol.html" />
+    <link rel="Index" href="examples.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="class.html">Previous</a> | 
+        <a accesskey="n" href="protocol.html">Next</a>
+       </td>
+	   <td align="right"><i>Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp9419"> </a><h2 class="pNewHTMLPage">
+Versioning of Serializable Objects
+</h2>
+<hr class="pHr"/>
+<a name="wp9420"> </a><h2 class="pChapNum">
+Chapter &#160; 5
+</h2>
+<a name="wp9041"> </a><p class="pBody">
+
+</p>
+<a name="wp8121"> </a><h4 class="pHeading3">
+		Topics:
+</h4>
+<ul>
+<a name="wp8120"> </a><div class="pBullet1Plus"><li><a  href="version.html#wp8130">Overview</a></li></div>
+<a name="wp8162"> </a><div class="pBullet1Plus"><li><a  href="version.html#wp4569">Goals</a></li></div>
+<a name="wp8132"> </a><div class="pBullet1Plus"><li><a  href="version.html#wp4595">Assumptions</a></li></div>
+<a name="wp8133"> </a><div class="pBullet1Plus"><li><a  href="version.html#wp4602">Who&#8217;s Responsible for Versioning of Streams</a></li></div>
+<a name="wp8288"> </a><div class="pBullet1Plus"><li><a  href="version.html#wp6519">Compatible Java&#8482; Type Evolution</a></li></div>
+<a name="wp8135"> </a><div class="pBullet1Plus"><li><a  href="version.html#wp6678">Type Changes Affecting Serialization</a></li></div>
+</ul>
+<a name="wp8130"> </a><h2 class="pHeading1">
+	5.1	Overview
+</h2>
+<a name="wp5722"> </a><p class="pBody">
+When Java&#8482; objects use serialization to save state in files, or as blobs in databases, the potential arises that the version of a class reading the data is different than the version that wrote the data.
+</p>
+<a name="wp5708"> </a><p class="pBody">
+Versioning raises some fundamental questions about the identity of a class, including what constitutes a compatible change. A <em class="cEmphasis">compatible change</em> is a change that does not affect the contract between the class and its callers.
+</p>
+<a name="wp5698"> </a><p class="pBody">
+This section describes the goals, assumptions, and a solution that attempts to address this problem by restricting the kinds of changes allowed and by carefully choosing the mechanisms.
+</p>
+<a name="wp7258"> </a><p class="pBody">
+The proposed solution provides a mechanism for &#8220;automatic&#8221; handling of classes that evolve by adding fields and adding 	classes. Serialization will handle versioning without class-specific methods to be implemented for each version. The stream format can be traversed without invoking class-specific methods.
+</p>
+<a name="wp4569"> </a><h2 class="pHeading1">
+	5.2	Goals
+</h2>
+<a name="wp4570"> </a><p class="pBody">
+The goals are to:
+</p>
+<ul>
+<a name="wp9359"> </a><div class="pBullet1Plus"><li>Support bidirectional communication between different versions of a class operating in different virtual machines by:</li></div>
+<a name="wp4835"> </a><div class="pBullet2Plus"><li>Defining a mechanism that allows Java&#8482; classes to read streams written by older versions of the same class.</li></div>
+<a name="wp4581"> </a><div class="pBullet2Plus"><li>Defining a mechanism that allows Java&#8482; classes to write streams intended to be read by older versions of the same class.</li></div>
+<a name="wp7270"> </a><div class="pBullet1Plus"><li>Provide default serialization for persistence and for RMI.</li></div>
+<a name="wp4579"> </a><div class="pBullet1Plus"><li>Perform well and produce compact streams in simple cases, so that RMI can use serialization.</li></div>
+<a name="wp4584"> </a><div class="pBullet1Plus"><li>Be able to identify and load classes that match the exact class used to write the stream.</li></div>
+<a name="wp4585"> </a><div class="pBullet1Plus"><li>Keep the overhead low for nonversioned classes.</li></div>
+<a name="wp4832"> </a><div class="pBullet1Plus"><li>Use a stream format that allows the traversal of the stream without having to invoke methods specific to the objects saved in the stream.</li></div>
+</ul>
+<a name="wp4595"> </a><h2 class="pHeading1">
+	5.3	Assumptions
+</h2>
+<a name="wp9369"> </a><p class="pBody">
+The assumptions are that:
+</p>
+<ul>
+<a name="wp4596"> </a><div class="pBullet1Plus"><li>Versioning will only apply to serializable classes since it must control the stream format to achieve it goals. Externalizable classes will be responsible for their own versioning which is tied to the external format.</li></div>
+<a name="wp8204"> </a><div class="pBullet1Plus"><li>All data and objects must be read from, or skipped in, the stream in the same order as they were written.</li></div>
+<a name="wp4597"> </a><div class="pBullet1Plus"><li>Classes evolve individually as well as in concert with supertypes and subtypes.</li></div>
+<a name="wp4601"> </a><div class="pBullet1Plus"><li>Classes are identified by name. Two classes with the same name may be different versions or completely different classes that can be distinguished only by comparing their interfaces or by comparing hashes of the interfaces.</li></div>
+<a name="wp4605"> </a><div class="pBullet1Plus"><li>Default serialization will not perform any type conversions.</li></div>
+<a name="wp4606"> </a><div class="pBullet1Plus"><li>The stream format only needs to support a linear sequence of type changes, not arbitrary branching of a type.</li></div>
+</ul>
+<a name="wp4602"> </a><h2 class="pHeading1">
+	5.4	Who&#8217;s Responsible for Versioning of Streams
+</h2>
+<a name="wp4550"> </a><p class="pBody">
+In the evolution of classes, it is the responsibility of the evolved (later version) class to maintain the contract established by the nonevolved class. This takes two forms. First, the evolved class must not break the existing assumptions about the interface provided by the original version, so that the evolved class can be used in place of the original. Secondly, when communicating with the original (or previous) versions, the evolved class must provide sufficient and equivalent information to allow the earlier version to continue to satisfy the nonevolved contract.
+</p>
+<a name="wp4613"> </a><p class="pBody">
+</p><div align="right"><img src="images/versiona.gif" alt="Graphical illustration of the contract described in the previous context" height="346" width="480" border="0" hspace="0" vspace="0"/></div><p class="pBody">
+</p>
+<a name="wp4845"> </a><p class="pBody">
+For the purposes of the discussion here, each class implements and extends the interface or contract defined by its supertype. New versions of a class, for example <code class="cCode">foo&#8217;</code>, must continue to satisfy the contract for <code class="cCode">foo</code> and may extend the interface or modify its implementation. 
+</p>
+<a name="wp4675"> </a><p class="pBody">
+Communication between objects via serialization is not part of the contract defined by these interfaces. Serialization is a private protocol between the implementations. It is the responsibility of the implementations to communicate sufficiently to allow each implementation to continue to satisfy the contract expected by its clients.
+</p>
+<a name="wp6519"> </a><h2 class="pHeading1">
+	5.5	Compatible Java&#8482; Type Evolution
+</h2>
+<a name="wp6520"> </a><p class="pBody">
+In the <em class="cEmphasis">Java&#8482; Language Specification</em>, Chapter 13 discusses binary compatibility of Java&#8482; classes as those classes evolve. Most of the flexibility of binary compatibility comes from the use of late binding of symbolic references for the names of classes, interfaces, fields, methods, and so on. 
+</p>
+<a name="wp6593"> </a><p class="pBody">
+The following are the principle aspects of the design for versioning of serialized object streams.
+</p>
+<ul>
+<a name="wp5549"> </a><div class="pBullet1Plus"><li>The default serialization mechanism will use a symbolic model for binding the fields in the stream to the fields in the corresponding class in the virtual machine.</li></div>
+<a name="wp5550"> </a><div class="pBullet1Plus"><li>Each class referenced in the stream will uniquely identify itself, its supertype, and the types and names of each serializable field written to the stream. The fields are ordered with the primitive types first sorted by field name, followed by the object fields sorted by field name.</li></div>
+<a name="wp7102"> </a><div class="pBullet1Plus"><li>Two types of data may occur in the stream for each class: required data (corresponding directly to the serializable fields of the object); and optional data (consisting of an arbitrary sequence of primitives and objects). The stream format defines how the required and optional data occur in the stream so that the whole class, the required, or the optional parts can be skipped if necessary.</li></div>
+<a name="wp7097"> </a><div class="pBullet2Plus"><li>The required data consists of the fields of the object in the order defined by the class descriptor. </li></div>
+<a name="wp7096"> </a><div class="pBullet2Plus"><li>The optional data is written to the stream and does not correspond directly to fields of the class. The class itself is responsible for the length, types, and versioning of this optional information.</li></div>
+<a name="wp7100"> </a><div class="pBullet1Plus"><li>If defined for a class, the <code class="cCode">writeObject</code>/<code class="cCode">readObject</code> methods supersede the default mechanism to write/read the state of the class. These methods write and read the optional data for a class. The required data is written by calling <code class="cCode">defaultWriteObject</code> and read by calling <code class="cCode">defaultReadObject</code>.</li></div>
+<a name="wp5552"> </a><div class="pBullet1Plus"><li>The stream format of each class is identified by the use of a Stream Unique Identifier (SUID). By default, this is the hash of the class. All later versions of the class must declare the Stream Unique Identifier (SUID) that they are compatible with. This guards against classes with the same name that might inadvertently be identified as being versions of a single class.</li></div>
+<a name="wp6676"> </a><div class="pBullet1Plus"><li>Subtypes of <code class="cCode">ObjectOutputStream</code> and <code class="cCode">ObjectInputStream</code> may include their own information identifying the class using the <code class="cCode">annotateClass</code> method; for example, <code class="cCode">MarshalOutputStream</code> embeds the URL of the class.</li></div>
+</ul>
+<a name="wp6678"> </a><h2 class="pHeading1">
+	5.6	Type Changes Affecting Serialization
+</h2>
+<a name="wp5366"> </a><p class="pBody">
+With these concepts, we can now describe how the design will cope with the different cases of an evolving class. The cases are described in terms of a stream written by some version of a class. When the stream is read back by the same version of the class, there is no loss of information or functionality. The stream is the only source of information about the original class. Its class descriptions, while a subset of the original class description, are sufficient to match up the data in the stream with the version of the class being reconstituted.
+</p>
+<a name="wp6723"> </a><p class="pBody">
+The descriptions are from the perspective of the stream being read in order to reconstitute either an earlier or later version of the class. In the parlance of RPC systems, this is a &#8220;receiver makes right&#8221; system. The writer writes its data in the most suitable form and the receiver must interpret that information to extract the parts it needs and to fill in the parts that are not available.
+</p>
+<a name="wp5172"> </a><h3 class="pHeading2">
+	5.6.1	Incompatible Changes
+</h3>
+<a name="wp6759"> </a><p class="pBody">
+Incompatible changes to classes are those changes for which the guarantee of interoperability cannot be maintained. The incompatible changes that may occur while evolving a class are:
+</p>
+<ul>
+<a name="wp6756"> </a><div class="pBullet1Plus"><li>Deleting fields - If a field is deleted in a class, the stream written will not contain its value. When the stream is read by an earlier class, the value of the field will be set to the default value because no value is available in the stream. However, this default value may adversely impair the ability of the earlier version to fulfill its contract.</li></div>
+<a name="wp6780"> </a><div class="pBullet1Plus"><li>Moving classes up or down the hierarchy - This cannot be allowed since the data in the stream appears in the wrong sequence.</li></div>
+<a name="wp6796"> </a><div class="pBullet1Plus"><li>Changing a nonstatic field to static or a nontransient field to transient - When relying on default serialization, this change is equivalent to deleting a field from the class. This version of the class will not write that data to the stream, so it will not be available to be read by earlier versions of the class. As when deleting a field, the field of the earlier version will be initialized to the default value, which can cause the class to fail in unexpected ways.</li></div>
+<a name="wp6821"> </a><div class="pBullet1Plus"><li>Changing the declared type of a primitive field - Each version of the class writes the data with its declared type. Earlier versions of the class attempting to read the field will fail because the type of the data in the stream does not match the type of the field.</li></div>
+<a name="wp8066"> </a><div class="pBullet1Plus"><li>Changing the <code class="cCode">writeObject</code> or <code class="cCode">readObject</code> method so that it no longer writes or reads the default field data or changing it so that it attempts to write it or read it when the previous version did not. The default field data must consistently either appear or not appear in the stream.</li></div>
+<a name="wp8209"> </a><div class="pBullet1Plus"><li>Changing a class from <code class="cCode">Serializable</code> to <code class="cCode">Externalizable</code> or visa-versa is an incompatible change since the stream will contain data that is incompatible with the implementation in the available class.</li></div>
+<a name="wp9352"> </a><div class="pBullet1Plus"><li>Removing either <code class="cCode">Serializable</code> or <code class="cCode">Externalizable</code> is an incompatible change since when written it will no longer supply the fields needed by older versions of the class.</li></div>
+<a name="wp9412"> </a><div class="pBullet1Plus"><li>Adding the <code class="cCode">writeReplace</code> or <code class="cCode">readResolve</code> method to a class is incompatible if the behavior would produce an object that is incompatible with any older version of the class.</li></div>
+</ul>
+<a name="wp6754"> </a><h3 class="pHeading2">
+	5.6.2	Compatible Changes
+</h3>
+<a name="wp6747"> </a><p class="pBody">
+The compatible changes to a class are handled as follows:
+</p>
+<ul>
+<a name="wp5174"> </a><div class="pBullet1Plus"><li>Adding fields - When the class being reconstituted has a field that does not occur in the stream, that field in the object will be initialized to the default value for its type. If class-specific initialization is needed, the class may provide a readObject method that can initialize the field to nondefault values.</li></div>
+<a name="wp5523"> </a><div class="pBullet1Plus"><li>Adding classes - The stream will contain the type hierarchy of each object in the stream. Comparing this hierarchy in the stream with the current class can detect additional classes. Since there is no information in the stream from which to initialize the object, the class&#8217;s fields will be initialized to the default values.</li></div>
+<a name="wp5524"> </a><div class="pBullet1Plus"><li>Removing classes - Comparing the class hierarchy in the stream with that of the current class can detect that a class has been deleted. In this case, the fields and objects corresponding to that class are read from the stream. Primitive fields are discarded, but the objects referenced by the deleted class are created, since they may be referred to later in the stream. They will be garbage-collected when the stream is garbage-collected or reset.</li></div>
+<a name="wp6785"> </a><div class="pBullet1Plus"><li>Adding <code class="cCode">writeObject</code>/<code class="cCode">readObject</code> methods - If the version reading the stream has these methods then <code class="cCode">readObject</code> is expected, as usual, to read the required data written to the stream by the default serialization. It should call <code class="cCode">defaultReadObject</code> first before reading any optional data. The <code class="cCode">writeObject</code> method is expected as usual to call <code class="cCode">defaultWriteObject</code> to write the required data and then may write optional data.</li></div>
+<a name="wp6786"> </a><div class="pBullet1Plus"><li>Removing <code class="cCode">writeObject</code>/<code class="cCode">readObject</code> methods - If the class reading the stream does not have these methods, the required data will be read by default serialization, and the optional data will be discarded.</li></div>
+<a name="wp5209"> </a><div class="pBullet1Plus"><li>Adding <code class="cCode">java.io.Serializable</code> - This is equivalent to adding types. There will be no values in the stream for this class so its fields will be initialized to default values. The support for subclassing nonserializable classes requires that the class&#8217;s supertype have a no-arg constructor and the class itself will be initialized to default values. If the no-arg constructor is not available, the <code class="cCode">InvalidClassException</code> is thrown.</li></div>
+<a name="wp6837"> </a><div class="pBullet1Plus"><li>Changing the access to a field - The access modifiers public, package, protected, and private have no effect on the ability of serialization to assign values to the fields.</li></div>
+<a name="wp6838"> </a><div class="pBullet1Plus"><li>Changing a field from static to nonstatic or transient to nontransient - When relying on default serialization to compute the serializable fields, this change is equivalent to adding a field to the class. The new field will be written to the stream but earlier classes will ignore the value since serialization will not assign values to static or transient fields. </li></div>
+</ul>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="class.html">Previous</a> | 
+        <a accesskey="n" href="protocol.html">Next</a>
+       </td>
+        <td align="right">
+          <span class="copyright">Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification  </span>
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

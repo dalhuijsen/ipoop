@@ -1,0 +1,305 @@
+<HTML>
+<HEAD>
+  <TITLE>8 Security Considerations</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="jndi.7.html">PREV</A>
+    | <A HREF="jndi.9.html">NEXT</A></TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<H2 CLASS="chapter"><A NAME="pgfId=998459"></A>8. Security Considerations</H2>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998460"></A>There are two main
+  settings in which JNDI is used: with and without a security manager
+  installed.</P>
+  <P CLASS="body"><A NAME="pgfId=998461"></A>In the case of Java
+  applications running with no security manager installed, the
+  code is trusted and the application can access service providers
+  from the local classpath. Furthermore, there is no restriction
+  if the service providers access local files, or make network
+  connections to naming or directory servers anywhere on the network.</P>
+  <P CLASS="body"><A NAME="pgfId=1002110"></A>In the case of an
+  applet or application running with a security manager installed,
+  there can be trusted code and untrusted code within the same
+  applet or application. The <EM>Sharing Context Handles</EM> and
+  <EM>Context Environment</EM> sections below are especially applicable
+  in such a scenario. The ability of an applet or an application
+  running with a security manager installed to access service providers,
+  especially service providers that require the use of restricted
+  resources (like the file system or network connections) may be
+  severely limited.</P>
+</BLOCKQUOTE>
+
+<DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998464"></A>8.1 JNDI Classes</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998465"></A>The classes in the
+  JNDI packages contain no native methods. They do not require
+  any special installation in order to run inside an applet or
+  an application.</P>
+  <P CLASS="body"><A NAME="pgfId=998466"></A>JNDI uses several
+  system properties (see <A HREF="jndi.6.html#21515" CLASS="XRef">
+  Application/Applet-scope Standard JNDI Properties</A> ). This
+  allows applets and applications to be configured easily without
+  much programming. However, an applet or application might have
+  restricted access to some or all system properties as a result
+  of the security manager installed on the platform on which it
+  is running. Consequently, JNDI also allows these same properties
+  to be specified as applet parameters, in resource files, or as
+  environment properties passed to a context.</P>
+  <P CLASS="body"><A NAME="pgfId=998467"></A>In the Java 2 Platform,
+  the JNDI classes use <CODE>doPrivileged</CODE> blocks when accessing
+  the system properties listed in <A HREF="jndi.6.html#21515"
+  CLASS="XRef">Application/Applet-scope Standard JNDI Properties</A>
+  .</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998468"></A>8.2 Security Model</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998469"></A>JNDI does not define
+  a security model or a common security interface for accessing
+  naming and directory servers. Security-related operations, such
+  as those required for authentication or access control to the
+  directory service, are dealt with by individual service providers.
+  JNDI provides the means by which an application or applet can
+  pass such security-related information to service providers in
+  order to establish a connection with the service, but does not
+  itself take part in such security-related activities.</P>
+  <P CLASS="body"><A NAME="pgfId=998470"></A>JNDI also provides
+  the means by which security-related problems can be indicated
+  to the client in the form of security-related exceptions.</P>
+  <P CLASS="body"><A NAME="pgfId=998471"></A>JNDI service providers
+  are controlled by the security manager in place when they try
+  to gain access to protected resources such as the file system
+  or network. Some service providers may control directory access
+  by making use of the Java 2 Platform security architecture (for
+  example, allowing access to special ports for administration-related
+  applets).</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998472"></A>8.3 Access To Servers</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998473"></A>Naming and directory
+  services typically have their own security system in place to
+  protect information stored therein. For example, one directory
+  might require that its users first &quot;login&quot; to the directory
+  before reading or updating information in the directory. Some
+  services might allow anonymous access to part of its namespace/directory.</P>
+  <P CLASS="body"><A NAME="pgfId=998474"></A>Once a user has logged
+  into a service, it is imperative for security reasons not to
+  share that privilege with untrusted code.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998475"></A>8.4 Sharing Context
+Handles</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998476"></A>In the following discussion,
+  we refer to a <EM>context handle</EM> as a reference to a <CODE>Context</CODE>
+  instance. This is analogous to how a reference to a <CODE>Reader</CODE>
+  /<CODE> Writer</CODE> /<CODE> InputStream</CODE> /<CODE> OutputStream</CODE>
+  instance is often referred to as a <EM>file handle</EM> .</P>
+  <P CLASS="body"><A NAME="pgfId=998477"></A>A context handle should
+  be treated like any other protected resource. If a piece of trusted
+  code obtains a context handle (possibly by authenticating its
+  access with the directory server), it should protect the use
+  of that context against unauthorized or untrusted code. This
+  is analogous to how application and/or applet code should protect
+  file handles. For example, if a piece of trusted code opens a
+  file for writing (and it was granted such privilege because of
+  its trusted nature), it should be careful about passing that
+  file handle to any other pieces of code, trusted or otherwise.</P>
+  <P CLASS="body"><A NAME="pgfId=998478"></A>Similarly, giving
+  access of a context handle to untrusted code may lead to its
+  misuse in accessing or updating information in the directory,
+  or accessing security-sensitive environment properties associated
+  with the context.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998480"></A>8.5 <A NAME="31601"></A>Context
+Environment</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998481"></A>JNDI allows the application/applet
+  to pass preferences and information to a context in the form
+  of an environment. The application/applet can also get the current
+  environment from a context. See <A HREF="jndi.6.html#30460"
+  CLASS="XRef">See Configuration</A> and Appendix A for more information
+  on a context's environment.</P>
+  <P CLASS="body"><A NAME="pgfId=998482"></A>The nature of the
+  information contained in a context's environment might be sensitive
+  and need protection from untrusted access. Specifically, the
+  environment properties <CODE>java.naming.security.principal</CODE>
+  and <CODE>java.naming.security.credentials</CODE> contain information
+  that should not be given out to untrusted code. Service providers
+  might take precaution to protect against accessing these properties
+  (see<EM> Responsibilities of Service Providers</EM> below). Client
+  applications and applets should take care not to pass context
+  handles with such sensitive environment properties to untrusted
+  code.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998483"></A>8.6 Class Loading</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998484"></A>JNDI allows the class
+  files to be loaded dynamically.</P>
+  <P CLASS="body"><A NAME="pgfId=1001331"></A>When JNDI is run
+  on the JDK 1.1.x platform, it uses the RMI class loader. The
+  classes can only be loaded if there is a security manager installed,
+  and if that security manager permits the class to be loaded.
+  When such classes are loaded, they run in the security context
+  dictated by the security manager.</P>
+  <P CLASS="body"><A NAME="pgfId=1001332"></A>When JNDI is run
+  on the Java 2 platform, it will attempt to load such classes
+  from the locations specified in the codebase using the <CODE>java.net.URLClassLoader</CODE>
+  . In order for the class loading to succeed, you must grant the
+  application and the JNDI and service provider classes the permissions
+  appropriate for the URLs named in the codebase. For example,
+  if the URL scheme is &quot;http&quot; or &quot;ftp&quot;, you
+  must grant the application the appropriate <CODE>java.net.SocketPermission</CODE>
+  ; if the URL scheme is &quot;file&quot;, you must grant the application
+  the appropriate <CODE>java.io.FilePermission</CODE> .</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998485"></A>8.7 Serializable
+Objects</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998486"></A>Several of the JNDI
+  classes are serializable. This allows the objects to be accessed
+  in the form of a byte stream, possibly outside of the environment
+  in which they were created. See the document at the following
+  URL regarding security issues related to serialized objects.</P>
+  <P CLASS="body"><A NAME="pgfId=998487"></A>http://java.sun.com/products/jdk/1.2/docs/guide/serialization/spec/security.doc.html</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998488"></A>8.8 Responsibilities
+of Service Providers</H3>
+
+<DIV>
+
+<H4 CLASS="subsection"><A NAME="pgfId=998489"></A>8.8.1 Context
+Environment</H4>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998490"></A>When a context handle
+  is created (either by getting the initial context or by looking
+  it up or by creating it from the directory), some environment
+  properties may be specified for it. Sometimes security-related
+  properties are required for the creation of the context handle
+  (such as user information that &quot;logs&quot; the user in with
+  the directory). The service provider should take care to protect
+  this security-sensitive information from untrusted code.</P>
+  <P CLASS="body"><A NAME="pgfId=998491"></A>The service provider
+  needs to protect the context's environment from being tampered
+  or otherwise modified by untrusted code. The service provider
+  needs to protect the security-sensitive environment properties
+  from being read by untrusted code. It might do this by disallowing
+  any thread whose execution context and/or trust level is different
+  than that originally held by the thread that created the context
+  handle to use the context handle. Or it might disallow certain
+  operations (such as accessing security-sensitive environment
+  properties). Or it might simply not return security-sensitive
+  environment properties, or only return them to trusted code.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H4 CLASS="subsection"><A NAME="pgfId=998492"></A>8.8.2 Network
+Security</H4>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998493"></A>Untrusted code (such
+  as those found in untrusted applets) have limited access to the
+  network. Untrusted applets, for example, can only create a network
+  connection to the host from which they were downloaded. With
+  finer-grain security models, it will be possible for the service
+  provider itself to be trusted code, and hence be allowed to connect
+  to hosts not allowed for untrusted applets. In such a scenario,
+  the service provider should be careful not to compromise the
+  security intended by the security manager. If the service provider
+  is sure that access by an untrusted applet to the directory will
+  cause no security problems, then it may proceed to offer such
+  a service to untrusted code. For example, allowing untrusted
+  code to access a directory &quot;anonymously&quot; would post
+  no security problems because the directory already allows any
+  anonymous client (written in the Java programming language or
+  otherwise) to access the same data.</P>
+  <P CLASS="body"><A NAME="pgfId=998494"></A>Most naming and directory
+  services are accessed over the network. Although the data requested
+  is protected by the server's authentication and access control
+  mechanisms, some protocols do not protect (encrypt) the data
+  being sent as replies. Again, this is not a problem particular
+  to a client using JNDI but a problem for any client accessing
+  the directory. The service provider should document the security
+  implications associated with using the associated directory over
+  a network.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H4 CLASS="subsection"><A NAME="pgfId=998495"></A>8.8.3 Accessing
+Local Files</H4>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998496"></A>Similar to network
+  access, untrusted code has limited access to the local file system.
+  If the service provider has special privileges for accessing
+  local files, it should do so with utmost precaution so as not
+  to compromise the security policies intended by the runtime/platform.</P>
+</BLOCKQUOTE>
+
+<H4></DIV><DIV></H4>
+
+<H4 CLASS="subsection"><A NAME="pgfId=998497"></A>8.8.4 Privileged
+Code, Native Methods</H4>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998498"></A>A service provider
+  that is written completely in the Java programming language with
+  no privileged sections is controlled by the same security policies
+  afforded other code written in the Java programming language.
+  All protected resources that it attempts to access go through
+  the same security manager and access controller.</P>
+  <P CLASS="body"><A NAME="pgfId=998499"></A>If a service provider
+  contains privileged code sections, or if it contains native methods,
+  then it needs to be especially careful to preserve the security
+  policies intended by the runtime/platform.</P>
+</BLOCKQUOTE>
+
+</DIV></DIV>
+
+<P><HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A> | <A 
+HREF="jndi.7.html">PREV</A> | <A HREF="jndi.9.html">NEXT</A><HR ALIGN=LEFT><I><FONT
+ SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

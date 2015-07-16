@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 5 - Server Interfaces
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-server28.html">PREV</a>
+ | <a href="rmi-server210.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<h2><a name="4175"><i>	5.8	</i> RMI Socket Factories
+</a></h2>
+
+<blockquote>
+<a name="7709"><!-- --></a>
+When the RMI runtime implementation needs instances of <code>java.net.Socket</code> and <code>java.net.ServerSocket</code> for its connections, instead of instantiating objects of those classes directly, it calls the <code>createSocket</code> and <code>createServerSocket</code> methods on the current <code>RMISocketFactory</code> object, returned by the static method <code>RMISocketFactory.getSocketFactory</code>. This allows the application to have a hook to customize the type of sockets used by the RMI transport, such as alternate subclasses of the <code>java.net.Socket</code> and <code>java.net.ServerSocket</code> classes. The instance of <code>RMISocketFactory</code> to be used can be set once by trusted system code. In JDK1.1, this customization was limited to relatively global decisions about socket type, because the only parameters supplied to the factory's methods were <code>host</code> and <code>port</code> (for <code>createSocket</code>) and just <code>port</code> (for <code>createServerSocket</code>).<p>
+<a name="7710"><!-- --></a>
+In the Java 2 platform, the new interfaces <code>RMIServerSocketFactory</code> and <code>RMIClientSocketFactory</code> have been introduced to provide more flexible customization of what protocols are used to communicate with remote objects. <p>
+<a name="7711"><!-- --></a>
+To allow applications using RMI to take advantage of these new socket factory interfaces, several new constructors and <code>exportObject</code> methods, that take the client and server socket factory as additional parameters, have been added to both <code>UnicastRemoteObject</code> and <code>java.rmi.activation.Activatable.</code><p>
+<a name="7712"><!-- --></a>
+Remote objects exported with either of the new constructors or <code>exportObject</code> methods (with <code>RMIClientSocketFactory</code> and <code>RMIServerSocketFactory</code> parameters) will be treated differently by the RMI runtime. For the lifetime of such a remote object, the runtime will use the custom <code>RMIServerSocketFactory</code> to create a <code>ServerSocket</code> to accept incoming calls to the remote object and use the custom <code>RMIClientSocketFactory</code> to create a <code>Socket</code> to connect clients to the remote object.<p>
+<a name="7713"><!-- --></a>
+The implementation of <code>RemoteRef</code> and <code>ServerRef</code> used in the stubs and skeletons for remote objects exported with custom socket factories is <code>UnicastRef2</code> and <code>UnicastServerRef2</code>, respectively. The wire representation of the <code>UnicastRef2</code> type contains a different representation of the &#34;endpoint&#34; to contact than the <code>UnicastRef</code> type has (which used just a host name string in UTF format, following by an integer port number). For <code>UnicastRef2</code>, the endpoint's wire representation consists of a format byte specifying the contents of the rest of the endpoint's representation (to allow for future expansion of the endpoint representation) followed by data in the indicated format. Currently, the data may consist of a hostname in UTF format, a port number, and optionally (as specified by the endpoint format byte) the serialized representation of an <code>RMIClientSocketFactory</code> object that is used by clients to generate socket connections to remote object at this endpoint. The endpoint representation does not contain the <code>RMIServerSocketFactory</code> object that was specified when the remote object was exported.<p>
+<a name="7714"><!-- --></a>
+When calls are made through references of the <code>UnicastRef2</code> type, the runtime uses the <code>createSocket</code> method of the <code>RMIClientSocketFactory</code> object in the endpoint when creating sockets for connections to the referent remote object. Also, when the runtime makes DGC &#34;dirty&#34; and &#34;clean&#34; calls for a particular remote object, it must call the DGC on the remote JVM using a connection generated from the same <code>RMIClientSocketFactory</code> object as specified in the remote reference, and the DGC implementation on the server side should verify that this was done correctly.<p>
+<a name="7715"><!-- --></a>
+Remote objects exported with the older constructor or method on <code>UnicastRemoteObject</code> that do not take custom socket factories as arguments will have <code>RemoteRef</code> and <code>ServerRef</code> of type <code>UnicastRef</code> and <code>UnicastServerRef</code> as before and use the old wire representation for their endpoints, i.e. a host string in UTF format followed by an integer specifying the port number. This is so that RMI servers that do not use new 1.2 features will interoperate with older RMI clients.<p>
+</blockquote>
+<br>
+<h3>
+<a name="7721"><!-- --></a>
+<i>	5.8.1	</i> The <code>RMISocketFactory</code> Class
+</h3>
+
+<blockquote>
+<a name="4186"><!-- --></a>
+The<code> java.rmi.server.RMISocketFactory </code>abstract class provides an interface for specifying how the transport should obtain sockets. Note that the class below uses <code>Socket</code> and <code>ServerSocket</code> from the <code>java.net</code> package.<p>
+</blockquote><blockquote><pre>package java.rmi.server;
+
+public abstract class RMISocketFactory 
+	implements RMIClientSocketFactory, RMIServerSocketFactory
+{
+
+	public abstract Socket createSocket(String host, int port)
+		throws IOException;
+&#160;	public abstract ServerSocket createServerSocket(int port)
+		throws IOException;
+	public static void setSocketFactory(RMISocketFactory fac)
+		throws IOException {...}
+	public static RMISocketFactory getSocketFactory() {...}
+	public static void setFailureHandler(RMIFailureHandler fh) {...}
+	public static RMIFailureHandler getFailureHandler() {...}
+}
+
+
+</pre></blockquote><blockquote>
+<a name="4368"><!-- --></a>
+The static method <code>setSocketFactory</code> is used to set the socket factory from which RMI obtains sockets. The application may invoke this method with its own <code>RMISocketFactory</code> instance only once. An application-defined implementation of <code>RMISocketFactory</code> could, for example, do preliminary filtering on the requested connection and throw exceptions, or return its own extension of the <code>java.net.Socket</code> or <code>java.net.ServerSocket</code> classes, such as ones that provide a secure communication channel. Note that the <code>RMISocketFactory</code> may only be set if the current security manager allows setting a socket factory; if setting the socket factory is disallowed, a <code>SecurityException</code> will be thrown.<p>
+<a name="4364"><!-- --></a>
+The static method <code>getSocketFactory</code> returns the socket factory used by RMI. The method returns <code>null</code> if the socket factory is not set.<p>
+<a name="4374"><!-- --></a>
+The transport layer invokes the <code>createSocket</code> and <code>createServerSocket</code> methods on the <code>RMISocketFactory</code> returned by the <code>getSocketFactory</code> method when the transport needs to create sockets. For example:<p>
+</blockquote><blockquote><pre>RMISocketFactory.getSocketFactory().createSocket(myhost, myport)
+
+
+</pre></blockquote><blockquote>
+<a name="4525"><!-- --></a>
+The method <code>createSocket</code> should create a client socket connected to the specified <em>host</em> and <em>port</em>. The method <code>createServerSocket</code> should create a server socket on the specified <em>port</em>. <p>
+<a name="7730"><!-- --></a>
+The default transport&#39;s implementation of <code>RMISocketFactory</code> provides for transparent RMI through firewalls using HTTP as follows:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="4375"><!-- --></a>
+On <code>createSocket</code>, the factory automatically attempts HTTP connections to hosts that cannot be contacted with a direct socket.
+</li>
+<li>
+<a name="4380"><!-- --></a>
+On <code>createServerSocket</code>, the factory returns a server socket that automatically detects if a newly accepted connection is an HTTP POST request. If so, it returns a socket that will transparently expose only the body of the request to the transport and format its output as an HTTP response.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="4226"><!-- --></a>
+The method <code>setFailureHandler</code> sets the failure handler to be called by the RMI runtime if the creation of a server socket fails. The failure handler returns a boolean to indicate if retry should occur. The default failure handler returns <code>false</code>, meaning that by default recreation of sockets is not attempted by the runtime.<p>
+<a name="4355"><!-- --></a>
+The method <code>getFailureHandler</code> returns the current handler for socket creation failure, or <code>null</code> if the failure handler is not set.<p>
+</blockquote>
+<br>
+<h3>
+<a name="7731"><!-- --></a>
+<i>	5.8.2	</i> The <code>RMIServerSocketFactory</code> Interface
+</h3>
+
+<blockquote>
+<a name="7767"><!-- --></a>
+See the <code>RMIServerSocketFactory</code> API documentation.<p>
+</blockquote>
+<br>
+<h3>
+<a name="7733"><!-- --></a>
+<i>	5.8.3	</i> The <code>RMIClientSocketFactory</code> Interface
+</h3>
+
+<blockquote>
+<a name="8695"><!-- --></a>
+See the <code>RMIClientSocketFactory</code> API documentation.<p>
+</blockquote>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-server28.html">PREV</a>
+ | <a href="rmi-server210.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

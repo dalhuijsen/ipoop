@@ -1,0 +1,142 @@
+<HTML>
+<HEAD>
+   <TITLE>Getting Started with Java IDL: Running the Hello World Application</TITLE>
+<!-- Changed by: desoto, 1/30/98 -->
+<!-- Changed by: carson, 4/2001 -->
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+
+<H1 ALIGN=CENTER>Getting Started with Java IDL<BR>Running the Hello World Application</H1>
+<HR>
+
+This topic
+walks you through running the server and client program that together make up the "Hello World" application.
+ 
+ <H2>Running the Hello World Application</H2>
+
+
+<P>Despite its simple design, the Hello World program lets you learn and
+experiment with all the tasks required to develop almost any CORBA program
+that uses <A href="../jidlGlossary.html#invocation">static invocation</A>.  
+
+<P>This example requires a naming service to make the servant object's operations available to clients.  The server
+needs an object reference to the naming service so that it can publish the references
+to the objects implementing various interfaces.  These object references are used by the
+clients for invoking methods. The two options for Naming Services shipped with J2SE v.1.4 are <tt><a href="../jidlNaming.html">tnameserv</a></tt>, a transient naming service,  and <tt><a href="../orbd.html">orbd</a></tt>, which is a daemon process containing a Bootstrap Service, a Transient Naming Service, a Persistent Naming Service, and a Server Manager. This example uses <tt>orbd</tt>.
+
+<P>When running this example, remember that, when using 
+Solaris software, you must become root to start a process on a port under 1024.  For this 
+reason, we recommend that you use a port number greater than or equal to 1024. The 
+<TT>-ORBInitialPort</TT> option is used to override the default port number in this 
+example.  The following instructions assume you can use port 1050
+for the Java&nbsp;IDL Object Request Broker Daemon, <tt>orbd</tt>. You can substitute a 
+different
+port if necessary.  When running these examples on a Windows machine, 
+subtitute a backslash (\) in path names.</P>
+
+
+<P>To run this client-server application on your development machine:
+<P>
+<OL>
+      
+   <LI>Start <tt>orbd</tt>.  
+<P>To start <tt>orbd</tt> from a UNIX command shell, enter:
+   <P>   
+<PRE>
+  orbd -ORBInitialPort 1050 -ORBInitialHost localhost&
+</PRE>
+<P>From an MS-DOS system prompt (Windows), enter:
+<PRE>
+  start orbd -ORBInitialPort 1050 -ORBInitialHost localhost
+</PRE>
+   
+<P>Note that <TT>1050</TT> is the port on which you want the name server to run.   
+<tt>-ORBInitialPort</tt> is a required command-line argument.  Note that when using 
+Solaris  software, you must become root to start a process on a port under 1024.  For this reason, 
+we recommend that you use a port number greater than or equal to 1024.
+
+<P>Note that <tt>-ORBInitialHost</tt> is also a required command-line argument. For this example, since both 
+client and server on running on the development machine,
+we have set the host to <tt>localhost</tt>.  When developing on more than one machine, you
+will replace this with the name of the host.  For an example of how to run this program on
+two machines, see <a href="jidl2machines.html">The Hello World Example on 
+Two Machines</a>.<P>
+ 
+<LI>Start the Hello server.
+<P>To start the Hello server from a UNIX command shell, enter:
+   <P>   
+<PRE>
+  java HelloServer -ORBInitialPort 1050 -ORBInitialHost localhost&
+</PRE>
+<P>From an MS-DOS system prompt (Windows), enter:
+<PRE>
+  start java HelloServer -ORBInitialPort 1050 -ORBInitialHost localhost
+</PRE>
+<P>For this example, you can omit <TT>-ORBInitialHost localhost</TT> since the 
+name server is  running on the same host as the Hello server.   If the name server is running 
+on a 
+different host, use  <TT>-ORBInitialHost</TT> <em>nameserverhost</em> to specify the host on 
+which 
+the IDL name server is running.
+
+<P>Specify the name server (<tt>orbd</tt>) port as done in the previous step, for example, 
+<TT>-ORBInitialPort  1050</TT>.  <P>
+
+   
+<LI>Run the client application:<P>
+<PRE>
+  java HelloClient -ORBInitialPort 1050 -ORBInitialHost localhost
+</PRE>
+
+<P>For this example, you can omit <TT>-ORBInitialHost localhost</TT> since the 
+name server is  running on the same host as the Hello client.  If the name server is running 
+on a 
+different host, use  <TT>-ORBInitialHost</TT> <em>nameserverhost</em> to specify the host on 
+which 
+the IDL name server is running.
+
+<P>Specify the name server (<tt>orbd</tt>) port as done in the previous step, for example, 
+<TT>-ORBInitialPort  1050</TT>.  <P>
+<P>
+  
+<LI>The client prints the string from the server to the command line:
+   <PRE>Hello world!!</PRE>
+   
+</OL>
+
+<P>The name server, like many CORBA servers, 
+runs until you explicitly
+stop it.  To avoid having many servers running, kill the name server process
+after the client application returns successfully.  To do this from a DOS prompt, select 
+the window 
+that is running the server and enter <TT>Ctrl+C</TT> to shut it down.  
+To do this from a Unix shell, find the process, and kill it. 
+
+
+
+
+
+
+<P><HR>
+<CENTER><A href="GSserver.html">Previous: Developing the Server</A><BR>
+<CENTER><A href="GSapp.html">Previous: Developing the Client Application</A><BR>
+<CENTER><A href="GSstring.html">Next: Using Stringified Object References</A><BR>
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="../index.html">
+Java IDL Home</A></TD>
+</TR></TABLE></CENTER>
+
+<HR>
+<FONT
+SIZE="-2"><A HREF="http://www.sun.com/share/text/SMICopyright.html">Copyright
+&copy;</A></FONT><FONT SIZE="-2"> 1996-2001 Sun Microsystems, Inc.,
+2550 Garcia Ave., Mtn. View, CA. 94043-1100 USA., All rights
+reserved.</FONT></P>
+
+</BODY>
+</HTML>
+
+

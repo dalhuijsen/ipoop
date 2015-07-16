@@ -1,0 +1,3800 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Tue Nov 12 11:54:08 2002" />
+    <title> JNI Functions</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="jniTOC.html" />
+    <link rel="Previous" href="types.html" />
+    <link rel="Next" href="invocation.html" />
+    <link rel="Index" href="backcover.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="jniTOC.html">Contents</a> | 
+	<a accesskey="p" href="types.html">Previous</a> | 
+        <a accesskey="n" href="invocation.html">Next</a>
+       </td>
+	   <td align="right"><i>Java Native Interface Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp9502"> </a><h2 class="pNewHTMLPage">
+ JNI Functions
+</h2>
+<hr class="pHr"/>
+<a name="wp15773"> </a><h2 class="pChapNum">
+Chapter &#160; 4
+</h2>
+<a name="wp15899"> </a><p class="pBody">
+This chapter serves as the reference section for the JNI functions. It provides a complete listing of all the JNI functions. It also presents the exact layout of the JNI function table.
+</p>
+<a name="wp5821"> </a><p class="pBody">
+Note the use of the term &#8220;must&#8221; to describe restrictions on JNI programmers. For example, when you see that a certain JNI function <em class="cEmphasis">must</em> receive a non-NULL object, it is your responsibility to ensure that NULL is not passed to that JNI function. As a result, a JNI implementation does not need to perform NULL pointer checks in that JNI function.
+</p>
+<a name="wp5310"> </a><p class="pBody">
+A portion of this chapter is adapted from Netscape&#8217;s JRI documentation.
+</p>
+<a name="wp3476"> </a><p class="pBody">
+The reference material groups functions by their usage. The reference section is organized by the following functional areas:
+</p>
+<ul class="pBullet1"><a name="wp3739"> </a><div class="pBullet1"><li><a  href="functions.html#wp23717">Version Information</a></li></div>
+<a name="wp3744"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp15982">Class Operations</a></li></div>
+<a name="wp3749"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp5234">Exceptions</a></li></div>
+<a name="wp3754"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp16270">Global and Local References</a></li></div>
+<a name="wp3759"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp16334">Object Operations</a></li></div>
+<a name="wp3764"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp16536">Accessing Fields of Objects</a></li></div>
+<a name="wp3769"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp16656">Calling Instance Methods</a></li></div>
+<a name="wp3774"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp5901">Accessing Static Fields</a></li></div>
+<a name="wp3779"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp20949">Calling Static Methods</a></li></div>
+<a name="wp3784"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp5386">String Operations</a></li></div>
+<a name="wp3789"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp17314">Array Operations</a></li></div>
+<a name="wp3794"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp5833">Registering Native Methods</a></li></div>
+<a name="wp3799"> </a><div class="pBullet1Plus"><li><a  href="functions.html#wp5256">Monitor Operations</a></li></div>
+<a name="wp3804"> </a><div class="pBullet1Last"><li><a  href="functions.html#wp5263">Java VM Interface</a></li></div>
+</ul>
+<a name="wp23720"> </a><h2 class="pHeading1">
+Interface Function Table
+</h2>
+<a name="wp23721"> </a><p class="pBody">
+Each function is accessible at a fixed offset through the <em class="cEmphasis">JNIEnv</em> argument. The <em class="cEmphasis">JNIEnv</em> type is a pointer to a structure storing all JNI function pointers. It is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+typedef const struct JNINativeInterface *JNIEnv;<a name="wp3813"> </a>
+</pre></div>
+<a name="wp23802"> </a><p class="pBody">
+The VM initializes the function table, as shown by <a  href="functions.html#wp2556">Code&#160;Example&#160;4-1</a>. Note that the first three entries are reserved for future compatibility with COM. In addition, we reserve a number of additional <code class="cCode">NULL</code> entries near the beginning of the function table, so that, for example, a future class-related JNI operation can be added after FindClass, rather than at the end of the table.
+</p>
+<a name="wp5267"> </a><p class="pBody">
+Note that the function table can be shared among all JNI interface pointers.
+</p>
+<a name="wp2556"> </a><div class="pCodeCaption">
+Code&#160;Example&#160;4-1	
+</div>
+<div class="pPreformatted"><pre class="pPreformatted">
+const struct JNINativeInterface ... = {<a name="wp2972"> </a>
+    <code class="cCode">NULL</code>,<a name="wp2974"> </a>
+    <code class="cCode">NULL</code>,<a name="wp2976"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5137"> </a>
+    <code class="cCode">NULL</code>,<a name="wp2978"> </a>
+    GetVersion,<a name="wp2980"> </a>
+<a name="wp2982"> </a>
+    DefineClass,<a name="wp2984"> </a>
+    FindClass,<a name="wp2986"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5139"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5141"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5143"> </a>
+    GetSuperclass,<a name="wp2988"> </a>
+    IsAssignableFrom,<a name="wp2990"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5145"> </a>
+<a name="wp2992"> </a>
+    Throw,<a name="wp2994"> </a>
+    ThrowNew,<a name="wp2996"> </a>
+    ExceptionOccurred,<a name="wp2998"> </a>
+    ExceptionDescribe,<a name="wp3000"> </a>
+    ExceptionClear,<a name="wp3002"> </a>
+    FatalError,<a name="wp3004"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5147"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5149"> </a>
+<a name="wp3006"> </a>
+    NewGlobalRef,<a name="wp3008"> </a>
+    DeleteGlobalRef,<a name="wp3010"> </a>
+    DeleteLocalRef,<a name="wp3012"> </a>
+    IsSameObject,<a name="wp3014"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5151"> </a>
+    <code class="cCode">NULL</code>,<a name="wp5153"> </a>
+<a name="wp3016"> </a>
+    AllocObject,<a name="wp3018"> </a>
+    NewObject,<a name="wp3020"> </a>
+    NewObjectV,<a name="wp3022"> </a>
+    NewObjectA,<a name="wp3024"> </a>
+<a name="wp3026"> </a>
+    GetObjectClass,<a name="wp3028"> </a>
+    IsInstanceOf,<a name="wp3030"> </a>
+<a name="wp3032"> </a>
+    GetMethodID,<a name="wp3034"> </a>
+<a name="wp3036"> </a>
+    CallObjectMethod,<a name="wp3038"> </a>
+    CallObjectMethodV,<a name="wp3040"> </a>
+    CallObjectMethodA,<a name="wp3042"> </a>
+    CallBooleanMethod,<a name="wp3044"> </a>
+    CallBooleanMethodV,<a name="wp3046"> </a>
+    CallBooleanMethodA,<a name="wp3048"> </a>
+    CallByteMethod,<a name="wp3050"> </a>
+    CallByteMethodV,<a name="wp3052"> </a>
+    CallByteMethodA,<a name="wp3054"> </a>
+    CallCharMethod,<a name="wp3056"> </a>
+    CallCharMethodV,<a name="wp3058"> </a>
+    CallCharMethodA,<a name="wp3060"> </a>
+    CallShortMethod,<a name="wp3062"> </a>
+    CallShortMethodV,<a name="wp3064"> </a>
+    CallShortMethodA,<a name="wp3066"> </a>
+    CallIntMethod,<a name="wp3068"> </a>
+    CallIntMethodV,<a name="wp3070"> </a>
+    CallIntMethodA,<a name="wp3072"> </a>
+    CallLongMethod,<a name="wp3074"> </a>
+    CallLongMethodV,<a name="wp3076"> </a>
+    CallLongMethodA,<a name="wp3078"> </a>
+    CallFloatMethod,<a name="wp3080"> </a>
+    CallFloatMethodV,<a name="wp3082"> </a>
+    CallFloatMethodA,<a name="wp3084"> </a>
+    CallDoubleMethod,<a name="wp3086"> </a>
+    CallDoubleMethodV,<a name="wp3088"> </a>
+    CallDoubleMethodA,<a name="wp3090"> </a>
+    CallVoidMethod,<a name="wp3092"> </a>
+    CallVoidMethodV,<a name="wp3094"> </a>
+    CallVoidMethodA,<a name="wp3096"> </a>
+<a name="wp3098"> </a>
+    CallNonvirtualObjectMethod,<a name="wp3100"> </a>
+    CallNonvirtualObjectMethodV,<a name="wp3102"> </a>
+    CallNonvirtualObjectMethodA,<a name="wp3104"> </a>
+    CallNonvirtualBooleanMethod,<a name="wp3106"> </a>
+    CallNonvirtualBooleanMethodV,<a name="wp3108"> </a>
+    CallNonvirtualBooleanMethodA,<a name="wp3110"> </a>
+    CallNonvirtualByteMethod,<a name="wp3112"> </a>
+    CallNonvirtualByteMethodV,<a name="wp3114"> </a>
+    CallNonvirtualByteMethodA,<a name="wp3116"> </a>
+    CallNonvirtualCharMethod,<a name="wp3118"> </a>
+    CallNonvirtualCharMethodV,<a name="wp3120"> </a>
+    CallNonvirtualCharMethodA,<a name="wp3122"> </a>
+    CallNonvirtualShortMethod,<a name="wp3124"> </a>
+    CallNonvirtualShortMethodV,<a name="wp3126"> </a>
+    CallNonvirtualShortMethodA,<a name="wp3128"> </a>
+    CallNonvirtualIntMethod,<a name="wp3130"> </a>
+    CallNonvirtualIntMethodV,<a name="wp3132"> </a>
+    CallNonvirtualIntMethodA,<a name="wp3134"> </a>
+    CallNonvirtualLongMethod,<a name="wp3136"> </a>
+    CallNonvirtualLongMethodV,<a name="wp3138"> </a>
+    CallNonvirtualLongMethodA,<a name="wp3140"> </a>
+    CallNonvirtualFloatMethod,<a name="wp3142"> </a>
+    CallNonvirtualFloatMethodV,<a name="wp3144"> </a>
+    CallNonvirtualFloatMethodA,<a name="wp3146"> </a>
+    CallNonvirtualDoubleMethod,<a name="wp3148"> </a>
+    CallNonvirtualDoubleMethodV,<a name="wp3150"> </a>
+    CallNonvirtualDoubleMethodA,<a name="wp3152"> </a>
+    CallNonvirtualVoidMethod,<a name="wp3154"> </a>
+    CallNonvirtualVoidMethodV,<a name="wp3156"> </a>
+    CallNonvirtualVoidMethodA,<a name="wp3158"> </a>
+<a name="wp3160"> </a>
+    GetFieldID,<a name="wp3162"> </a>
+<a name="wp3164"> </a>
+    GetObjectField,<a name="wp3166"> </a>
+    GetBooleanField,<a name="wp3168"> </a>
+    GetByteField,<a name="wp3170"> </a>
+    GetCharField,<a name="wp3172"> </a>
+    GetShortField,<a name="wp3174"> </a>
+    GetIntField,<a name="wp3176"> </a>
+    GetLongField,<a name="wp3178"> </a>
+    GetFloatField,<a name="wp3180"> </a>
+    GetDoubleField,<a name="wp3182"> </a>
+    SetObjectField,<a name="wp3184"> </a>
+    SetBooleanField,<a name="wp3186"> </a>
+    SetByteField,<a name="wp3188"> </a>
+    SetCharField,<a name="wp3190"> </a>
+    SetShortField,<a name="wp3192"> </a>
+    SetIntField,<a name="wp3194"> </a>
+    SetLongField,<a name="wp3196"> </a>
+    SetFloatField,<a name="wp3198"> </a>
+    SetDoubleField,<a name="wp3200"> </a>
+<a name="wp3202"> </a>
+    GetStaticMethodID,<a name="wp3204"> </a>
+<a name="wp3206"> </a>
+    CallStaticObjectMethod,<a name="wp3208"> </a>
+    CallStaticObjectMethodV,<a name="wp3210"> </a>
+    CallStaticObjectMethodA,<a name="wp3212"> </a>
+    CallStaticBooleanMethod,<a name="wp3214"> </a>
+    CallStaticBooleanMethodV,<a name="wp3216"> </a>
+    CallStaticBooleanMethodA,<a name="wp3218"> </a>
+    CallStaticByteMethod,<a name="wp3220"> </a>
+    CallStaticByteMethodV,<a name="wp3222"> </a>
+    CallStaticByteMethodA,<a name="wp3224"> </a>
+    CallStaticCharMethod,<a name="wp3226"> </a>
+    CallStaticCharMethodV,<a name="wp3228"> </a>
+    CallStaticCharMethodA,<a name="wp3230"> </a>
+    CallStaticShortMethod,<a name="wp3232"> </a>
+    CallStaticShortMethodV,<a name="wp3234"> </a>
+    CallStaticShortMethodA,<a name="wp3236"> </a>
+    CallStaticIntMethod,<a name="wp3238"> </a>
+    CallStaticIntMethodV,<a name="wp3240"> </a>
+    CallStaticIntMethodA,<a name="wp3242"> </a>
+    CallStaticLongMethod,<a name="wp3244"> </a>
+    CallStaticLongMethodV,<a name="wp3246"> </a>
+    CallStaticLongMethodA,<a name="wp3248"> </a>
+    CallStaticFloatMethod,<a name="wp3250"> </a>
+    CallStaticFloatMethodV,<a name="wp3252"> </a>
+    CallStaticFloatMethodA,<a name="wp3254"> </a>
+    CallStaticDoubleMethod,<a name="wp3256"> </a>
+    CallStaticDoubleMethodV,<a name="wp3258"> </a>
+    CallStaticDoubleMethodA,<a name="wp3260"> </a>
+    CallStaticVoidMethod,<a name="wp3262"> </a>
+    CallStaticVoidMethodV,<a name="wp3264"> </a>
+    CallStaticVoidMethodA,<a name="wp3266"> </a>
+<a name="wp3268"> </a>
+    GetStaticFieldID,<a name="wp3270"> </a>
+<a name="wp3272"> </a>
+    GetStaticObjectField,<a name="wp3274"> </a>
+    GetStaticBooleanField,<a name="wp3276"> </a>
+    GetStaticByteField,<a name="wp3278"> </a>
+    GetStaticCharField,<a name="wp3280"> </a>
+    GetStaticShortField,<a name="wp3282"> </a>
+    GetStaticIntField,<a name="wp3284"> </a>
+    GetStaticLongField,<a name="wp3286"> </a>
+    GetStaticFloatField,<a name="wp3288"> </a>
+    GetStaticDoubleField,<a name="wp3290"> </a>
+<a name="wp3292"> </a>
+    SetStaticObjectField,<a name="wp3294"> </a>
+    SetStaticBooleanField,<a name="wp3296"> </a>
+    SetStaticByteField,<a name="wp3298"> </a>
+    SetStaticCharField,<a name="wp3300"> </a>
+    SetStaticShortField,<a name="wp3302"> </a>
+    SetStaticIntField,<a name="wp3304"> </a>
+    SetStaticLongField,<a name="wp3306"> </a>
+    SetStaticFloatField,<a name="wp3308"> </a>
+    SetStaticDoubleField,<a name="wp3310"> </a>
+<a name="wp3312"> </a>
+    NewString,<a name="wp3314"> </a>
+    GetStringLength,<a name="wp3316"> </a>
+    GetStringChars,<a name="wp3318"> </a>
+    ReleaseStringChars,<a name="wp3320"> </a>
+<a name="wp3322"> </a>
+    NewStringUTF,<a name="wp3324"> </a>
+    GetStringUTFLength,<a name="wp3326"> </a>
+    GetStringUTFChars,<a name="wp3328"> </a>
+    ReleaseStringUTFChars,<a name="wp3330"> </a>
+<a name="wp3332"> </a>
+    GetArrayLength,<a name="wp3334"> </a>
+ <a name="wp3336"> </a>
+    NewObjectArray,<a name="wp3338"> </a>
+    GetObjectArrayElement,<a name="wp3340"> </a>
+    SetObjectArrayElement,<a name="wp3342"> </a>
+<a name="wp3344"> </a>
+    NewBooleanArray,<a name="wp3346"> </a>
+    NewByteArray,<a name="wp3348"> </a>
+    NewCharArray,<a name="wp3350"> </a>
+    NewShortArray,<a name="wp3352"> </a>
+    NewIntArray,<a name="wp3354"> </a>
+    NewLongArray,<a name="wp3356"> </a>
+    NewFloatArray,<a name="wp3358"> </a>
+    NewDoubleArray,<a name="wp3360"> </a>
+<a name="wp3362"> </a>
+    GetBooleanArrayElements,<a name="wp3364"> </a>
+    GetByteArrayElements,<a name="wp3366"> </a>
+    GetCharArrayElements,<a name="wp3368"> </a>
+    GetShortArrayElements,<a name="wp3370"> </a>
+    GetIntArrayElements,<a name="wp3372"> </a>
+    GetLongArrayElements,<a name="wp3374"> </a>
+    GetFloatArrayElements,<a name="wp3376"> </a>
+    GetDoubleArrayElements,<a name="wp3378"> </a>
+<a name="wp3380"> </a>
+    ReleaseBooleanArrayElements,<a name="wp3382"> </a>
+    ReleaseByteArrayElements,<a name="wp3384"> </a>
+    ReleaseCharArrayElements,<a name="wp3386"> </a>
+    ReleaseShortArrayElements,<a name="wp3388"> </a>
+    ReleaseIntArrayElements,<a name="wp3390"> </a>
+    ReleaseLongArrayElements,<a name="wp3392"> </a>
+    ReleaseFloatArrayElements,<a name="wp3394"> </a>
+    ReleaseDoubleArrayElements,<a name="wp3396"> </a>
+<a name="wp3398"> </a>
+    GetBooleanArrayRegion,<a name="wp3400"> </a>
+    GetByteArrayRegion,<a name="wp3402"> </a>
+    GetCharArrayRegion,<a name="wp3404"> </a>
+    GetShortArrayRegion,<a name="wp3406"> </a>
+    GetIntArrayRegion,<a name="wp3408"> </a>
+    GetLongArrayRegion,<a name="wp3410"> </a>
+    GetFloatArrayRegion,<a name="wp3412"> </a>
+    GetDoubleArrayRegion,<a name="wp3414"> </a>
+    SetBooleanArrayRegion,<a name="wp3416"> </a>
+    SetByteArrayRegion,<a name="wp3418"> </a>
+    SetCharArrayRegion,<a name="wp3420"> </a>
+    SetShortArrayRegion,<a name="wp3422"> </a>
+    SetIntArrayRegion,<a name="wp3424"> </a>
+    SetLongArrayRegion,<a name="wp3426"> </a>
+    SetFloatArrayRegion,<a name="wp3428"> </a>
+    SetDoubleArrayRegion,<a name="wp3430"> </a>
+<a name="wp3432"> </a>
+    RegisterNatives,<a name="wp3434"> </a>
+    UnregisterNatives,<a name="wp3436"> </a>
+<a name="wp3438"> </a>
+    MonitorEnter,<a name="wp3440"> </a>
+    MonitorExit,<a name="wp3442"> </a>
+<a name="wp3444"> </a>
+    GetJavaVM,<a name="wp3446"> </a>
+};<a name="wp3448"> </a>
+</pre></div>
+<a name="wp3818"> </a><p class="pBody">
+
+</p>
+<a name="wp23717"> </a><h2 class="pHeading1">
+Version Information
+</h2>
+<a name="wp15951"> </a><h3 class="pHeading2">
+		GetVersion
+</h3>
+<a name="wp15956"> </a><p class="pBody">
+<code class="cCode">jint GetVersion(JNIEnv *env);</code>
+</p>
+<a name="wp3616"> </a><p class="pBody">
+Returns the version of the native method interface. 
+</p>
+<a name="wp3623"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18147"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18146"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18122"> </a><p class="pBody">
+Returns the major version number in the higher 16 bits and the minor version number in the lower 16 bits.
+</p>
+<a name="wp23205"> </a><p class="pBody">
+In JDK1.1, <code class="cCode">GetVersion()</code> returns 0x00010001. 
+</p>
+<a name="wp15982"> </a><h2 class="pHeading1">
+Class Operations
+</h2>
+<a name="wp15986"> </a><h3 class="pHeading2">
+		DefineClass
+</h3>
+<a name="wp15990"> </a><p class="pBody">
+<code class="cCode">jclass DefineClass(JNIEnv *env, jobject loader, <br />     const jbyte *buf, jsize bufLen);</code>
+</p>
+<a name="wp6281"> </a><p class="pBody">
+Loads a class from a buffer of raw class data. The buffer containing the raw class data is not referenced by the VM after the DefineClass call returns, and it may be discarded if desired.
+</p>
+<a name="wp18144"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18148"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18152"> </a><p class="pBody">
+<code class="cCode">loader</code>: a class loader assigned to the defined class.
+</p>
+<a name="wp18153"> </a><p class="pBody">
+<code class="cCode">buf</code>: buffer containing the <code class="cCode">.class</code> file data.
+</p>
+<a name="wp18151"> </a><p class="pBody">
+<code class="cCode">bufLen</code>: buffer length.
+</p>
+<a name="wp18157"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18156"> </a><p class="pBody">
+Returns a Java class object or <code class="cCode">NULL</code> if an error occurs.
+</p>
+<a name="wp16013"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp16015"> </a><p class="pBody">
+<code class="cCode">ClassFormatError</code>: if the class data does not specify a valid class.
+</p>
+<a name="wp5936"> </a><p class="pBody">
+<code class="cCode">ClassCircularityError</code>: if a class or interface would be its own superclass or superinterface.
+</p>
+<a name="wp5935"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp16027"> </a><h3 class="pHeading2">
+		FindClass
+</h3>
+<a name="wp16031"> </a><p class="pBody">
+<code class="cCode">jclass FindClass(JNIEnv *env, const char *name);</code>
+</p>
+<a name="wp18197"> </a><p class="pBody">
+This function loads a locally-defined class. It searches the directories and zip files specified by the <code class="cCode">CLASSPATH</code> environment variable for the class with the specified name.
+</p>
+<a name="wp18187"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18188"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18189"> </a><p class="pBody">
+<code class="cCode">name</code>: a fully-qualified class name (that is, a package name, delimited by &#8220;<code class="cCode">/</code>&#8221;, followed by the class name). If the name begins with &#8220;<code class="cCode">[</code>&#8220; (the array signature character), it returns an array class.
+</p>
+<a name="wp18213"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18214"> </a><p class="pBody">
+Returns a class object from a fully-qualified name, or <code class="cCode">NULL</code> if the class cannot be found.
+</p>
+<a name="wp5939"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp5940"> </a><p class="pBody">
+<code class="cCode">ClassFormatError</code>: if the class data does not specify a valid class.
+</p>
+<a name="wp5950"> </a><p class="pBody">
+<code class="cCode">ClassCircularityError</code>: if a class or interface would be its own superclass or superinterface.
+</p>
+<a name="wp5952"> </a><p class="pBody">
+<code class="cCode">NoClassDefFoundError</code>: if no definition for a requested class or interface can be found.
+</p>
+<a name="wp5942"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp18292"> </a><h3 class="pHeading2">
+		GetSuperclass
+</h3>
+<a name="wp18301"> </a><p class="pBody">
+<code class="cCode">jclass GetSuperclass(JNIEnv *env, jclass clazz);</code>
+</p>
+<a name="wp18290"> </a><p class="pBody">
+If <code class="cCode">clazz</code> represents any class other than the class <code class="cCode">Object</code>, then this function returns the object that represents the superclass of the class specified by <code class="cCode">clazz</code>. 
+</p>
+<a name="wp18304"> </a><p class="pBody">
+If <code class="cCode">clazz</code> specifies the class <code class="cCode">Object</code>, or <code class="cCode">clazz</code> represents an interface, this function returns <code class="cCode">NULL</code>.
+</p>
+<a name="wp3627"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18312"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18313"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp3634"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18315"> </a><p class="pBody">
+Returns the superclass of the class represented by <code class="cCode">clazz</code>, or <code class="cCode">NULL</code>.
+</p>
+<a name="wp16061"> </a><h3 class="pHeading2">
+		IsAssignableFrom
+</h3>
+<a name="wp16065"> </a><p class="pBody">
+<code class="cCode">jboolean IsAssignableFrom(JNIEnv *env, jclass clazz1, <br />     jclass clazz2);</code>
+</p>
+<a name="wp16069"> </a><p class="pBody">
+Determines whether an object of <code class="cCode">clazz1</code> can be safely cast to <code class="cCode">clazz2</code>.
+</p>
+<a name="wp16071"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18243"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18244"> </a><p class="pBody">
+<code class="cCode">clazz1</code>: the first class argument.
+</p>
+<a name="wp18245"> </a><p class="pBody">
+<code class="cCode">clazz2</code>: the second class argument.
+</p>
+<a name="wp18246"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18254"> </a><p class="pBody">
+Returns <code class="cCode">JNI_TRUE</code> if either of the following is true:
+</p>
+<ul class="pBullet1"><a name="wp5311"> </a><div class="pBullet1"><li>The first and second class arguments refer to the same Java class.</li></div>
+<a name="wp5316"> </a><div class="pBullet1Plus"><li>The first class is a subclass of the second class.</li></div>
+<a name="wp5319"> </a><div class="pBullet1Last"><li>The first class has the second class as one of its interfaces.</li></div>
+</ul>
+<a name="wp5234"> </a><h2 class="pHeading1">
+Exceptions
+</h2>
+<a name="wp16086"> </a><h3 class="pHeading2">
+		Throw
+</h3>
+<a name="wp16090"> </a><p class="pBody">
+<code class="cCode">jint Throw(JNIEnv *env, jthrowable obj);</code>
+</p>
+<a name="wp16094"> </a><p class="pBody">
+Causes a <code class="cCode">java.lang.Throwable</code> object to be thrown.
+</p>
+<a name="wp16095"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18340"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18341"> </a><p class="pBody">
+<code class="cCode">obj</code>: a <code class="cCode">java.lang.Throwable</code> object.
+</p>
+<a name="wp18344"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18345"> </a><p class="pBody">
+Returns 0 on success; a negative value on failure.
+</p>
+<a name="wp5963"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp5964"> </a><p class="pBody">
+the<code class="cCode"> </code><code class="cCode">java.lang.Throwable</code><code class="cCode"> object </code><code class="cCode">obj</code><code class="cCode">.</code>
+</p>
+<a name="wp16104"> </a><h3 class="pHeading2">
+		ThrowNew
+</h3>
+<a name="wp16108"> </a><p class="pBody">
+<code class="cCode">jint ThrowNew(JNIEnv *env, jclass clazz, <br />     const char *message);</code>
+</p>
+<a name="wp16112"> </a><p class="pBody">
+Constructs an exception object from the specified class with the message specified by <code class="cCode">message</code> and causes that exception to be thrown.
+</p>
+<a name="wp18365"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18366"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18367"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a subclass of <code class="cCode">java.lang.Throwable</code>.
+</p>
+<a name="wp18371"> </a><p class="pBody">
+<code class="cCode">message</code>: the message used to construct the <code class="cCode">java.lang.Throwable</code> object.
+</p>
+<a name="wp18370"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18369"> </a><p class="pBody">
+Returns 0 on success; a negative value on failure.
+</p>
+<a name="wp5974"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp5975"> </a><p class="pBody">
+the newly constructed<code class="cCode"> </code><code class="cCode">java.lang.Throwable</code><code class="cCode"> </code>object.
+</p>
+<a name="wp16124"> </a><h3 class="pHeading2">
+		ExceptionOccurred
+</h3>
+<a name="wp16128"> </a><p class="pBody">
+<code class="cCode">jthrowable ExceptionOccurred(JNIEnv *env);</code>
+</p>
+<a name="wp3661"> </a><p class="pBody">
+Determines if an exception is being thrown. The exception stays being thrown until either the native code calls <code class="cCode">ExceptionClear()</code>, or the Java code handles the exception.
+</p>
+<a name="wp18387"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18388"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18391"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18385"> </a><p class="pBody">
+Returns the exception object that is currently in the process of being thrown, or <code class="cCode">NULL</code> if no exception is currently being thrown. 
+</p>
+<a name="wp16146"> </a><h3 class="pHeading2">
+		ExceptionDescribe
+</h3>
+<a name="wp16150"> </a><p class="pBody">
+<code class="cCode">void ExceptionDescribe(JNIEnv *env);</code>
+</p>
+<a name="wp16154"> </a><p class="pBody">
+Prints an exception and a backtrace of the stack to a system error-reporting channel, such as <code class="cCode">stderr</code>. This is a convenience routine provided for debugging.
+</p>
+<a name="wp18460"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18461"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp16166"> </a><h3 class="pHeading2">
+		ExceptionClear
+</h3>
+<a name="wp16170"> </a><p class="pBody">
+<code class="cCode">void ExceptionClear(JNIEnv *env);</code>
+</p>
+<a name="wp16174"> </a><p class="pBody">
+Clears any exception that is currently being thrown. If no exception is currently being thrown, this routine has no effect.
+</p>
+<a name="wp18549"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18550"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp16186"> </a><h3 class="pHeading2">
+		FatalError
+</h3>
+<a name="wp16190"> </a><p class="pBody">
+<code class="cCode">void FatalError(JNIEnv *env, const char *msg);</code>
+</p>
+<a name="wp16194"> </a><p class="pBody">
+Raises a fatal error and does not expect the VM to recover. This function does not return.
+</p>
+<a name="wp18552"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18553"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18543"> </a><p class="pBody">
+<code class="cCode">msg</code>: an error message.
+</p>
+<a name="wp16270"> </a><h2 class="pHeading1">
+Global and Local References
+</h2>
+<a name="wp16274"> </a><h3 class="pHeading2">
+		NewGlobalRef
+</h3>
+<a name="wp16278"> </a><p class="pBody">
+<code class="cCode">jobject NewGlobalRef(JNIEnv *env, jobject obj);</code>
+</p>
+<a name="wp16282"> </a><p class="pBody">
+Creates a new global reference to the object referred to by the <code class="cCode">obj</code> argument. The <code class="cCode">obj</code> argument may be a global or local reference. Global references must be explicitly disposed of by calling <code class="cCode">DeleteGlobalRef()</code>.
+</p>
+<a name="wp18585"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18586"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18587"> </a><p class="pBody">
+<code class="cCode">obj</code>: a global or local reference.
+</p>
+<a name="wp18589"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18590"> </a><p class="pBody">
+Returns a global reference, or <code class="cCode">NULL</code> if the system runs out of memory.
+</p>
+<a name="wp16294"> </a><h3 class="pHeading2">
+		DeleteGlobalRef
+</h3>
+<a name="wp16298"> </a><p class="pBody">
+<code class="cCode">void DeleteGlobalRef(JNIEnv *env, jobject globalRef);</code>
+</p>
+<a name="wp16302"> </a><p class="pBody">
+Deletes the global reference pointed to by <code class="cCode">globalRef</code>. 
+</p>
+<a name="wp23724"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18651"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18652"> </a><p class="pBody">
+<code class="cCode">globalRef</code>: a global reference.
+</p>
+<a name="wp18654"> </a><h3 class="pHeading2">
+		DeleteLocalRef
+</h3>
+<a name="wp18655"> </a><p class="pBody">
+<code class="cCode">void DeleteLocalRef(JNIEnv *env, jobject localRef);</code>
+</p>
+<a name="wp18656"> </a><p class="pBody">
+Deletes the local reference pointed to by <code class="cCode">localRef</code>.
+</p>
+<a name="wp18657"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18658"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18659"> </a><p class="pBody">
+<code class="cCode">localRef</code>: a local reference.
+</p>
+<a name="wp16334"> </a><h2 class="pHeading1">
+Object Operations
+</h2>
+<a name="wp16337"> </a><h3 class="pHeading2">
+		AllocObject
+</h3>
+<a name="wp16341"> </a><p class="pBody">
+<code class="cCode">jobject AllocObject(JNIEnv *env, jclass clazz);</code>
+</p>
+<a name="wp16345"> </a><p class="pBody">
+Allocates a new Java object without invoking any of the constructors for the object. Returns a reference to the object.
+</p>
+<a name="wp5280"> </a><p class="pBody">
+The clazz argument must not refer to an array class.
+</p>
+<a name="wp18680"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18681"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18682"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp18683"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18684"> </a><p class="pBody">
+Returns a Java object, or <code class="cCode">NULL</code> if the object cannot be constructed.
+</p>
+<a name="wp18678"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp16353"> </a><p class="pBody">
+<code class="cCode">InstantiationException</code>: if the class is an interface or an abstract class.
+</p>
+<a name="wp5982"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp4517"> </a><h3 class="pHeading2">
+		NewObject<br />NewObjectA<br />NewObjectV
+</h3>
+<a name="wp16368"> </a><p class="pBody">
+<code class="cCode">jobject NewObject(JNIEnv *env, jclass clazz, <br />     jmethodID methodID, ...);</code>
+</p>
+<a name="wp4522"> </a><p class="pBody">
+<code class="cCode">jobject NewObjectA(JNIEnv *env, jclass clazz, <br />     jmethodID methodID, jvalue *args);</code>
+</p>
+<a name="wp4528"> </a><p class="pBody">
+<code class="cCode">jobject NewObjectV(JNIEnv *env, jclass clazz, <br />     jmethodID methodID, va_list args);</code>
+</p>
+<a name="wp5335"> </a><p class="pBody">
+Constructs a new Java object. The method ID indicates which constructor method to invoke. This ID must be obtained by calling <code class="cCode">GetMethodID()</code> with <code class="cCode">&lt;init&gt;</code> as the method name and <code class="cCode">void</code> (<code class="cCode">V</code>) as the return type.
+</p>
+<a name="wp5774"> </a><p class="pBody">
+The <code class="cCode">clazz</code> argument must not refer to an array class.
+</p>
+<a name="wp5336"> </a><h5 class="pHeading4">
+NewObject
+</h5>
+<a name="wp4529"> </a><p class="pBody">
+Programmers place all arguments that are to be passed to the constructor immediately following the <code class="cCode">methodID</code> argument. <code class="cCode">NewObject()</code> accepts these arguments and passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4531"> </a><h5 class="pHeading4">
+NewObjectA
+</h5>
+<a name="wp4536"> </a><p class="pBody">
+Programmers place all arguments that are to be passed to the constructor in an <code class="cCode">args</code> array of <code class="cCode">jvalues</code> that immediately follows the <code class="cCode">methodID</code> argument. <code class="cCode">NewObjectA()</code> accepts the arguments in this array, and, in turn, passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4534"> </a><h5 class="pHeading4">
+NewObjectV
+</h5>
+<a name="wp4538"> </a><p class="pBody">
+Programmers place all arguments that are to be passed to the constructor in an <code class="cCode">args</code> argument of type <code class="cCode">va_list</code> that immediately follows the <code class="cCode">methodID</code> argument. <code class="cCode">NewObjectV()</code> accepts these arguments, and, in turn, passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp18736"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18724"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18725"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp18730"> </a><p class="pBody">
+<code class="cCode">methodID</code>: the method ID of the constructor.
+</p>
+<a name="wp5076"> </a><h5 class="pHeading4">
+Additional Parameter for NewObject:
+</h5>
+<a name="wp5077"> </a><p class="pBody">
+arguments to the constructor.
+</p>
+<a name="wp4541"> </a><h5 class="pHeading4">
+Additional Parameter for NewObjectA:
+</h5>
+<a name="wp4546"> </a><p class="pBody">
+<code class="cCode">args</code>: an array of arguments to the constructor.
+</p>
+<a name="wp4544"> </a><h5 class="pHeading4">
+Additional Parameter for NewObjectV:
+</h5>
+<a name="wp4550"> </a><p class="pBody">
+<code class="cCode">args</code>: a va_list of arguments to the constructor.
+</p>
+<a name="wp18726"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18727"> </a><p class="pBody">
+Returns a Java object, or <code class="cCode">NULL</code> if the object cannot be constructed.
+</p>
+<a name="wp18728"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp18729"> </a><p class="pBody">
+<code class="cCode">InstantiationException</code>: if the class is an interface or an abstract class.
+</p>
+<a name="wp5987"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp5990"> </a><p class="pBody">
+Any exceptions thrown by the constructor.
+</p>
+<a name="wp16454"> </a><h3 class="pHeading2">
+		GetObjectClass
+</h3>
+<a name="wp16458"> </a><p class="pBody">
+<code class="cCode">jclass GetObjectClass(JNIEnv *env, jobject obj);</code>
+</p>
+<a name="wp16462"> </a><p class="pBody">
+Returns the class of an object.
+</p>
+<a name="wp18795"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18796"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18797"> </a><p class="pBody">
+<code class="cCode">obj</code>: a Java object (must not be <code class="cCode">NULL</code>).
+</p>
+<a name="wp18800"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18801"> </a><p class="pBody">
+Returns a Java class object.
+</p>
+<a name="wp16472"> </a><h3 class="pHeading2">
+		IsInstanceOf
+</h3>
+<a name="wp16476"> </a><p class="pBody">
+<code class="cCode">jboolean IsInstanceOf(JNIEnv *env, jobject obj, <br />     jclass clazz);</code>
+</p>
+<a name="wp16480"> </a><p class="pBody">
+Tests whether an object is an instance of a class.
+</p>
+<a name="wp18855"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18856"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18861"> </a><p class="pBody">
+<code class="cCode">obj</code>: a Java object.
+</p>
+<a name="wp18863"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp18858"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp16481"> </a><p class="pBody">
+Returns <code class="cCode">JNI_TRUE</code> if <code class="cCode">obj</code> can be cast to <code class="cCode">clazz</code>; otherwise, returns <code class="cCode">JNI_FALSE</code>. A <code class="cCode">NULL</code> object can be cast to any class.
+</p>
+<a name="wp16514"> </a><h3 class="pHeading2">
+		IsSameObject
+</h3>
+<a name="wp16518"> </a><p class="pBody">
+<code class="cCode">jboolean IsSameObject(JNIEnv *env, jobject ref1, <br />     jobject ref2);</code>
+</p>
+<a name="wp16522"> </a><p class="pBody">
+Tests whether two references refer to the same Java object.
+</p>
+<a name="wp18896"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18897"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18898"> </a><p class="pBody">
+<code class="cCode">ref1</code>: a Java object.
+</p>
+<a name="wp18899"> </a><p class="pBody">
+<code class="cCode">ref2</code>: a Java object.
+</p>
+<a name="wp18900"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp18901"> </a><p class="pBody">
+Returns <code class="cCode">JNI_TRUE</code> if <code class="cCode">ref1</code> and <code class="cCode">ref2</code> refer to the same Java object, or are both <code class="cCode">NULL</code>; otherwise, returns <code class="cCode">JNI_FALSE</code>.
+</p>
+<a name="wp16536"> </a><h2 class="pHeading1">
+Accessing Fields of Objects
+</h2>
+<a name="wp16540"> </a><h3 class="pHeading2">
+		GetFieldID
+</h3>
+<a name="wp18916"> </a><p class="pBody">
+<code class="cCode">jfieldID GetFieldID(JNIEnv *env, jclass clazz, <br />     const char *name, const char *sig);</code>
+</p>
+<a name="wp4199"> </a><p class="pBody">
+Returns the field ID for an instance (nonstatic) field of a class. The field is specified by its name and signature. The <em class="cEmphasis">Get&lt;type&gt;Field</em> and <em class="cEmphasis">Set&lt;type&gt;Field</em> families of accessor functions use field IDs to retrieve object fields. 
+</p>
+<a name="wp5991"> </a><p class="pBody">
+<code class="cCode">GetFieldID()</code> causes an uninitialized class to be initialized.
+</p>
+<a name="wp5783"> </a><p class="pBody">
+<code class="cCode">GetFieldID()</code> cannot be used to obtain the length field of an array. Use <code class="cCode">GetArrayLength()</code> instead.
+</p>
+<a name="wp18928"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp18929"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp18930"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp18935"> </a><p class="pBody">
+<code class="cCode">name</code>: the field name in a 0-terminated UTF-8 string.
+</p>
+<a name="wp18937"> </a><p class="pBody">
+<code class="cCode">sig</code>: the field signature in a 0-terminated UTF-8 string.
+</p>
+<a name="wp18932"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp16552"> </a><p class="pBody">
+Returns a field ID, or <code class="cCode">NULL</code> if the operation fails.
+</p>
+<a name="wp16560"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp18944"> </a><p class="pBody">
+<code class="cCode">NoSuchFieldError</code>: if the specified field cannot be found.
+</p>
+<a name="wp5992"> </a><p class="pBody">
+<code class="cCode">ExceptionInInitializerError</code>: if the class initializer fails due to an exception.
+</p>
+<a name="wp5998"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp16572"> </a><h3 class="pHeading2">
+		Get&lt;type&gt;Field Routines
+</h3>
+<a name="wp16576"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">Get&lt;type&gt;Field</em><code class="cCode">(JNIEnv *env, jobject obj, <br />     jfieldID fieldID);</code>
+</p>
+<a name="wp3691"> </a><p class="pBody">
+This family of accessor routines returns the value of an instance (nonstatic) field of an object. The field to access is specified by a field ID obtained by calling <code class="cCode">GetFieldID()</code>.
+</p>
+<a name="wp3766"> </a><p class="pBody">
+The following table describes the Get&lt;type&gt;Field routine name and result type. You should replace <em class="cEmphasis">type</em> in <em class="cEmphasis">Get&lt;type&gt;Field</em> with the Java type of the field, or use one of the actual routine names from the table, and replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.
+</p>
+<a name="wp4033"> </a><p class="pBody">
+ </p><div align="left">
+<table border="0" cellpadding="7" summary="Get &lt;type&gt;Field Family of Accessor Routine" id="wp5526">
+  <caption><a name="wp5526"> </a><div class="pTableCaption">
+Table&#160;4-1	Get&lt;type&gt;Field Family of Accessor Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp5530"> </a><div style="text-align: left" class="pTableHead">
+Get&lt;type&gt;Field Routine Name
+</div>
+
+</th>
+    <th><a name="wp5532"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5534"> </a><div class="pTableText">
+<code class="cCode">GetObjectField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5536"> </a><div class="pTableText">
+jobject
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5538"> </a><div class="pTableText">
+<code class="cCode">GetBooleanField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5540"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5542"> </a><div class="pTableText">
+<code class="cCode">GetByteField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5544"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5546"> </a><div class="pTableText">
+<code class="cCode">GetCharField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5548"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5550"> </a><div class="pTableText">
+<code class="cCode">GetShortField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5552"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5554"> </a><div class="pTableText">
+<code class="cCode">GetIntField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5556"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5558"> </a><div class="pTableText">
+<code class="cCode">GetLongField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5560"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5562"> </a><div class="pTableText">
+<code class="cCode">GetFloatField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5564"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5566"> </a><div class="pTableText">
+<code class="cCode">GetDoubleField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5568"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp3767"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp19123"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp19124"> </a><p class="pBody">
+<code class="cCode">obj</code>: a Java object (must not be <code class="cCode">NULL</code>).
+</p>
+<a name="wp19125"> </a><p class="pBody">
+<code class="cCode">fieldID</code>: a valid field ID.
+</p>
+<a name="wp19127"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp19130"> </a><p class="pBody">
+Returns the content of the field.
+</p>
+<a name="wp16613"> </a><h3 class="pHeading2">
+		Set&lt;type&gt;Field Routines
+</h3>
+<a name="wp16617"> </a><p class="pBody">
+<code class="cCode">void </code><em class="cEmphasis">Set&lt;type&gt;Field</em><code class="cCode">(JNIEnv *env, jobject obj, jfieldID fieldID,<br />     </code><em class="cEmphasis">NativeType</em><code class="cCode"> value);</code>
+</p>
+<a name="wp16622"> </a><p class="pBody">
+This family of accessor routines sets the value of an instance (nonstatic) field of an object. The field to access is specified by a field ID obtained by calling <code class="cCode">GetFieldID()</code>.
+</p>
+<a name="wp16626"> </a><p class="pBody">
+The following table describes the Set&lt;type&gt;Field routine name and value type. You should replace <em class="cEmphasis">type</em> in <em class="cEmphasis">Set&lt;type&gt;Field</em> with the Java type of the field, or use one of the actual routine names from the table, and replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.
+</p>
+<a name="wp4050"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="Set &lt;type&gt;Fielf Family of Accessor Routine" id="wp5570">
+  <caption><a name="wp5570"> </a><div class="pTableCaption">
+Table&#160;4-2	Set&lt;type&gt;Field Family of Accessor Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp5574"> </a><div style="text-align: left" class="pTableHead">
+Set&lt;type&gt;Field Routine
+</div>
+
+</th>
+    <th><a name="wp5576"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5578"> </a><div class="pTableText">
+<code class="cCode">SetObjectField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5580"> </a><div class="pTableText">
+jobject
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5582"> </a><div class="pTableText">
+S<code class="cCode">etBooleanField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5584"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5586"> </a><div class="pTableText">
+<code class="cCode">SetByteField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5588"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5590"> </a><div class="pTableText">
+<code class="cCode">SetCharField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5592"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5594"> </a><div class="pTableText">
+<code class="cCode">SetShortField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5596"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5598"> </a><div class="pTableText">
+<code class="cCode">SetIntField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5600"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5602"> </a><div class="pTableText">
+<code class="cCode">SetLongField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5604"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5606"> </a><div class="pTableText">
+<code class="cCode">SetFloatField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5608"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5610"> </a><div class="pTableText">
+<code class="cCode">SetDoubleField()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5612"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp19440"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp19441"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp19442"> </a><p class="pBody">
+<code class="cCode">obj</code>: a Java object (must not be <code class="cCode">NULL</code>).
+</p>
+<a name="wp19454"> </a><p class="pBody">
+<code class="cCode">fieldID</code>: a valid field ID.
+</p>
+<a name="wp19457"> </a><p class="pBody">
+<code class="cCode">value</code>: the new value of the field.
+</p>
+<a name="wp16656"> </a><h2 class="pHeading1">
+Calling Instance Methods
+</h2>
+<a name="wp16660"> </a><h3 class="pHeading2">
+		GetMethodID
+</h3>
+<a name="wp16664"> </a><p class="pBody">
+<code class="cCode">jmethodID GetMethodID(JNIEnv *env, jclass clazz, <br />     const char *name, const char *sig);</code>
+</p>
+<a name="wp16668"> </a><p class="pBody">
+Returns the method ID for an instance (nonstatic) method of a class or interface. The method may be defined in one of the <code class="cCode">clazz</code>&#8217;s superclasses and inherited by <code class="cCode">clazz</code>. The method is determined by its name and signature.
+</p>
+<a name="wp6004"> </a><p class="pBody">
+<code class="cCode">GetMethodID()</code> causes an uninitialized class to be initialized.
+</p>
+<a name="wp23206"> </a><p class="pBody">
+To obtain the method ID of a constructor, supply <code class="cCode">&lt;init&gt;</code> as the method name and <code class="cCode">void</code> (<code class="cCode">V</code>) as the return type.
+</p>
+<a name="wp19485"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp19486"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp3783"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp3784"> </a><p class="pBody">
+<code class="cCode">name</code>: the method name in a 0-terminated UTF-8 string.
+</p>
+<a name="wp3785"> </a><p class="pBody">
+<code class="cCode">sig</code>: the method signature in 0-terminated UTF-8 string.
+</p>
+<a name="wp19490"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp19491"> </a><p class="pBody">
+Returns a method ID, or <code class="cCode">NULL</code> if the specified method cannot be found.
+</p>
+<a name="wp19492"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp19493"> </a><p class="pBody">
+<code class="cCode">NoSuchMethodError</code>: if the specified method cannot be found.
+</p>
+<a name="wp6021"> </a><p class="pBody">
+<code class="cCode">ExceptionInInitializerError</code>: if the class initializer fails due to an exception.
+</p>
+<a name="wp6022"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp4256"> </a><h3 class="pHeading2">
+		Call&lt;type&gt;Method Routines<br />Call&lt;type&gt;MethodA Routines<br />Call&lt;type&gt;MethodV Routines
+</h3>
+<a name="wp5337"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">Call&lt;type&gt;Method</em><code class="cCode">(JNIEnv *env, jobject obj, <br />     jmethodID methodID, ...);</code>
+</p>
+<a name="wp4277"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">Call&lt;type&gt;MethodA</em><code class="cCode">(JNIEnv *env, jobject obj, <br />     jmethodID methodID, jvalue *args);</code>
+</p>
+<a name="wp4279"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">Call&lt;type&gt;MethodV</em><code class="cCode">(JNIEnv *env, jobject obj, <br />     jmethodID methodID, va_list args);</code>
+</p>
+<a name="wp19682"> </a><p class="pBody">
+Methods from these three families of operations are used to call a Java instance method from a native method.They only differ in their mechanism for passing parameters to the methods that they call. 
+</p>
+<a name="wp4302"> </a><p class="pBody">
+These families of operations invoke an instance (nonstatic) method on a Java object, according to the specified method ID. The <code class="cCode">methodID</code> argument must be obtained by calling <code class="cCode">GetMethodID</code><code class="cCode">()</code>.
+</p>
+<a name="wp23729"> </a><p class="pBody">
+When these functions are used to call private methods and constructors, the method ID must be derived from the real class of <code class="cCode">obj</code>, not from one of its superclasses.
+</p>
+<a name="wp4317"> </a><h5 class="pHeading4">
+Call&lt;type&gt;Method Routines
+</h5>
+<a name="wp4305"> </a><p class="pBody">
+Programmers place all arguments that are to be passed to the method immediately following the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">Call&lt;type&gt;Method</em> routine accepts these arguments and passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4307"> </a><h5 class="pHeading4">
+Call&lt;type&gt;MethodA Routines
+</h5>
+<a name="wp4312"> </a><p class="pBody">
+Programmers place all arguments to the method in an <code class="cCode">args</code> array of <code class="cCode">jvalues</code> that immediately follows the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">Call&lt;type&gt;MethodA</em> routine accepts the arguments in this array, and, in turn, passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4309"> </a><h5 class="pHeading4">
+Call&lt;type&gt;MethodV Routines
+</h5>
+<a name="wp4314"> </a><p class="pBody">
+Programmers place all arguments to the method in an <code class="cCode">args</code> argument of type <code class="cCode">va_list</code> that immediately follows the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">Call&lt;type&gt;MethodV </em>routine accepts the arguments, and, in turn, passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp3830"> </a><p class="pBody">
+The following table describes each of the method calling routines according to their result type. You should replace <em class="cEmphasis">type</em> in <em class="cEmphasis">Call&lt;type&gt;Method </em>with the Java type of the method you are calling (or use one of the actual method calling routine names from the table) and replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.
+</p>
+<a name="wp4049"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="Instance Method Calling Routines" id="wp5390">
+  <caption><a name="wp5390"> </a><div class="pTableCaption">
+Table&#160;4-3	Instance Method Calling Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp5394"> </a><div style="text-align: left" class="pTableHead">
+Call&lt;type&gt;Method Routine Name
+</div>
+
+</th>
+    <th><a name="wp5396"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5398"> </a><div class="pTableText">
+<code class="cCode">CallVoidMethod()</code>
+</div>
+<a name="wp5399"> </a><div class="pTableText">
+<code class="cCode">CallVoidMethodA()</code>
+</div>
+<a name="wp5400"> </a><div class="pTableText">
+<code class="cCode">CallVoidMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5402"> </a><div class="pTableText">
+void
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5404"> </a><div class="pTableText">
+<code class="cCode">CallObjectMethod()</code>
+</div>
+<a name="wp5405"> </a><div class="pTableText">
+<code class="cCode">CallObjectMethodA()</code>
+</div>
+<a name="wp5406"> </a><div class="pTableText">
+<code class="cCode">CallObjectMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5408"> </a><div class="pTableText">
+jobject
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5410"> </a><div class="pTableText">
+<code class="cCode">CallBooleanMethod()</code>
+</div>
+<a name="wp5411"> </a><div class="pTableText">
+<code class="cCode">CallBooleanMethodA()</code>
+</div>
+<a name="wp5412"> </a><div class="pTableText">
+<code class="cCode">CallBooleanMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5414"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5416"> </a><div class="pTableText">
+<code class="cCode">CallByteMethod()</code>
+</div>
+<a name="wp5417"> </a><div class="pTableText">
+<code class="cCode">CallByteMethodA()</code>
+</div>
+<a name="wp5418"> </a><div class="pTableText">
+<code class="cCode">CallByteMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5420"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5422"> </a><div class="pTableText">
+<code class="cCode">CallCharMethod()</code>
+</div>
+<a name="wp5423"> </a><div class="pTableText">
+<code class="cCode">CallCharMethodA()</code>
+</div>
+<a name="wp5424"> </a><div class="pTableText">
+<code class="cCode">CallCharMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5426"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5428"> </a><div class="pTableText">
+<code class="cCode">CallShortMethod()</code>
+</div>
+<a name="wp5429"> </a><div class="pTableText">
+<code class="cCode">CallShortMethodA()</code>
+</div>
+<a name="wp5430"> </a><div class="pTableText">
+<code class="cCode">CallShortMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5432"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5434"> </a><div class="pTableText">
+<code class="cCode">CallIntMethod()</code>
+</div>
+<a name="wp5435"> </a><div class="pTableText">
+<code class="cCode">CallIntMethodA()</code>
+</div>
+<a name="wp5436"> </a><div class="pTableText">
+<code class="cCode">CallIntMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5438"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5440"> </a><div class="pTableText">
+<code class="cCode">CallLongMethod()</code>
+</div>
+<a name="wp5441"> </a><div class="pTableText">
+<code class="cCode">CallLongMethodA()</code>
+</div>
+<a name="wp5442"> </a><div class="pTableText">
+<code class="cCode">CallLongMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5444"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5446"> </a><div class="pTableText">
+<code class="cCode">CallFloatMethod()</code>
+</div>
+<a name="wp5447"> </a><div class="pTableText">
+<code class="cCode">CallFloatMethodA()</code>
+</div>
+<a name="wp5448"> </a><div class="pTableText">
+<code class="cCode">CallFloatMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5450"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5452"> </a><div class="pTableText">
+<code class="cCode">CallDoubleMethod()</code>
+</div>
+<a name="wp5453"> </a><div class="pTableText">
+<code class="cCode">CallDoubleMethodA()</code>
+</div>
+<a name="wp5454"> </a><div class="pTableText">
+<code class="cCode">CallDoubleMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5456"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp4356"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp4337"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp4338"> </a><p class="pBody">
+<code class="cCode">obj</code>: a Java object.
+</p>
+<a name="wp4339"> </a><p class="pBody">
+<code class="cCode">methodID</code>: a method ID.
+</p>
+<a name="wp5083"> </a><h5 class="pHeading4">
+Additional Parameter for Call&lt;type&gt;Method Routines:
+</h5>
+<a name="wp5084"> </a><p class="pBody">
+arguments to the Java method.
+</p>
+<a name="wp5098"> </a><h5 class="pHeading4">
+Additional Parameter for Call&lt;type&gt;MethodA Routines:
+</h5>
+<a name="wp4340"> </a><p class="pBody">
+<code class="cCode">args</code>: an array of arguments.
+</p>
+<a name="wp4348"> </a><h5 class="pHeading4">
+Additional Parameter for Call&lt;type&gt;MethodV Routines:
+</h5>
+<a name="wp4350"> </a><p class="pBody">
+<code class="cCode">args</code>: a va_list of arguments.
+</p>
+<a name="wp19867"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp19868"> </a><p class="pBody">
+Returns the result of calling the Java method.
+</p>
+<a name="wp5870"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp5871"> </a><p class="pBody">
+<code class="cCode">Exceptions raised during the execution of the Java method.</code>
+</p>
+<a name="wp4581"> </a><h3 class="pHeading2">
+		CallNonvirtual&lt;type&gt;Method Routines<br />CallNonvirtual&lt;type&gt;MethodA Routines<br />CallNonvirtual&lt;type&gt;MethodV Routines
+</h3>
+<a name="wp20106"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">CallNonvirtual&lt;type&gt;Method</em><code class="cCode">(JNIEnv *env, jobject obj, <br />     jclass clazz, jmethodID methodID, ...);</code>
+</p>
+<a name="wp4605"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">CallNonvirtual&lt;type&gt;MethodA</em><code class="cCode">(JNIEnv *env, jobject obj, <br />     jclass clazz, jmethodID methodID, jvalue *args);</code>
+</p>
+<a name="wp4607"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">CallNonvirtual&lt;type&gt;MethodV</em><code class="cCode">(JNIEnv *env, jobject obj,<br />     jclass clazz, jmethodID methodID, va_list args);</code>
+</p>
+<a name="wp3988"> </a><p class="pBody">
+These families of operations invoke an instance (nonstatic) method on a Java object, according to the specified class and method ID. The <code class="cCode">methodID</code> argument must be obtained by calling <code class="cCode">GetMethodID</code><code class="cCode">()</code> on the class <code class="cCode">clazz</code>.
+</p>
+<a name="wp5110"> </a><p class="pBody">
+The <em class="cEmphasis">CallNonvirtual&lt;type&gt;Method</em> families of routines and the <em class="cEmphasis">Call&lt;type&gt;Method</em> families of routines are different. <em class="cEmphasis">Call&lt;type&gt;Method</em> routines invoke the method based on the class of the object, while <em class="cEmphasis">CallNonvirtual&lt;type&gt;Method</em> routines invoke the method based on the class, designated by the <code class="cCode">clazz</code> parameter, from which the method ID is obtained. The method ID must be obtained from the real class of the object or from one of its superclasses.
+</p>
+<a name="wp4599"> </a><h5 class="pHeading4">
+CallNonvirtual&lt;type&gt;Method Routines
+</h5>
+<a name="wp5103"> </a><p class="pBody">
+Programmers place all arguments that are to be passed to the method immediately following the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">CallNonvirtual&lt;type&gt;Method</em> routine accepts these arguments and passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp5104"> </a><h5 class="pHeading4">
+CallNonvirtual&lt;type&gt;MethodA Routines
+</h5>
+<a name="wp5106"> </a><p class="pBody">
+Programmers place all arguments to the method in an <code class="cCode">args</code> array of <code class="cCode">jvalues</code> that immediately follows the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">CallNonvirtual&lt;type&gt;MethodA</em> routine accepts the arguments in this array, and, in turn, passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4614"> </a><h5 class="pHeading4">
+CallNonvirtual&lt;type&gt;MethodV Routines
+</h5>
+<a name="wp4620"> </a><p class="pBody">
+Programmers place all arguments to the method in an <code class="cCode">args</code> argument of type <code class="cCode">va_list</code> that immediately follows the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">CallNonvirtualMethodV</em> routine accepts the arguments, and, in turn, passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4613"> </a><p class="pBody">
+The following table describes each of the method calling routines according to their result type. You should replace <em class="cEmphasis">type</em> in <em class="cEmphasis">CallNonvirtual&lt;type&gt;Method </em>with the Java type of the method, or use one of the actual method calling routine names from the table, and replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.
+</p>
+<a name="wp4061"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="CallNonvirtual&lt;type&gt; Method Routines" id="wp5458">
+  <caption><a name="wp5458"> </a><div class="pTableCaption">
+Table&#160;4-4	CallNonvirtual&lt;type&gt;Method Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp5462"> </a><div style="text-align: left" class="pTableHead">
+CallNonvirtual&lt;type&gt;Method Routine Name
+</div>
+
+</th>
+    <th><a name="wp5464"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5466"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualVoidMethod()</code>
+</div>
+<a name="wp5467"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualVoidMethodA()</code>
+</div>
+<a name="wp5468"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualVoidMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5470"> </a><div class="pTableText">
+void
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5472"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualObjectMethod()</code>
+</div>
+<a name="wp5473"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualObjectMethodA()</code>
+</div>
+<a name="wp5474"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualObjectMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5476"> </a><div class="pTableText">
+jobject
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5478"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualBooleanMethod()</code>
+</div>
+<a name="wp5479"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualBooleanMethodA()</code>
+</div>
+<a name="wp5480"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualBooleanMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5482"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5484"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualByteMethod()</code>
+</div>
+<a name="wp5485"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualByteMethodA()</code>
+</div>
+<a name="wp5486"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualByteMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5488"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5490"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualCharMethod()</code>
+</div>
+<a name="wp5491"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualCharMethodA()</code>
+</div>
+<a name="wp5492"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualCharMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5494"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5496"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualShortMethod()</code>
+</div>
+<a name="wp5497"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualShortMethodA()</code>
+</div>
+<a name="wp5498"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualShortMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5500"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5502"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualIntMethod()</code>
+</div>
+<a name="wp5503"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualIntMethodA()</code>
+</div>
+<a name="wp5504"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualIntMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5506"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5508"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualLongMethod()</code>
+</div>
+<a name="wp5509"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualLongMethodA()</code>
+</div>
+<a name="wp5510"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualLongMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5512"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5514"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualFloatMethod()</code>
+</div>
+<a name="wp5515"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualFloatMethodA()</code>
+</div>
+<a name="wp5516"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualFloatMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5518"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5520"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualDoubleMethod()</code>
+</div>
+<a name="wp5521"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualDoubleMethodA()</code>
+</div>
+<a name="wp5522"> </a><div class="pTableText">
+<code class="cCode">CallNonvirtualDoubleMethodV()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5524"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp4086"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp20184"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp4836"> </a><p class="pBody">
+<code class="cCode">clazz:</code><code class="cCode"> a</code> Java class.
+</p>
+<a name="wp20185"> </a><p class="pBody">
+<code class="cCode">obj</code>: a Java object.
+</p>
+<a name="wp20186"> </a><p class="pBody">
+<code class="cCode">methodID</code>: a method ID.
+</p>
+<a name="wp5385"> </a><h5 class="pHeading4">
+Additional Parameter for CallNonvirtual&lt;type&gt;Method Routines:
+</h5>
+<a name="wp5386"> </a><p class="pBody">
+arguments to the Java method.
+</p>
+<a name="wp4622"> </a><h5 class="pHeading4">
+Additional Parameter for CallNonvirtual&lt;type&gt;MethodA Routines:
+</h5>
+<a name="wp4626"> </a><p class="pBody">
+<code class="cCode">args</code>: an array of arguments.
+</p>
+<a name="wp4624"> </a><h5 class="pHeading4">
+Additional Parameter for CallNonvirtual&lt;type&gt;MethodV Routines:
+</h5>
+<a name="wp4628"> </a><p class="pBody">
+<code class="cCode">args</code>: a <code class="cCode">va_list</code> of arguments.
+</p>
+<a name="wp5898"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp5899"> </a><h5 class="pHeading4">
+Returns the result of calling the Java method.
+</h5>
+<a name="wp5904"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp5905"> </a><p class="pBody">
+<code class="cCode">Exceptions raised during the execution of the Java method.</code>
+</p>
+<a name="wp5901"> </a><h2 class="pHeading1">
+Accessing Static Fields
+</h2>
+<a name="wp16823"> </a><h3 class="pHeading2">
+		GetStaticFieldID
+</h3>
+<a name="wp16827"> </a><p class="pBody">
+<code class="cCode">jfieldID GetStaticFieldID(JNIEnv *env, jclass clazz, <br />     const char *name, const char *sig);</code>
+</p>
+<a name="wp16831"> </a><p class="pBody">
+Returns the field ID for a static field of a class. The field is specified by its name and signature. The <em class="cEmphasis">GetStatic&lt;type&gt;Field</em> and <em class="cEmphasis">SetStatic&lt;type&gt;Field</em> families of accessor functions use field IDs to retrieve static fields.
+</p>
+<a name="wp6009"> </a><p class="pBody">
+<code class="cCode">GetStaticFieldID()</code> causes an uninitialized class to be initialized.
+</p>
+<a name="wp20734"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp20735"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp20736"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp20737"> </a><p class="pBody">
+<code class="cCode">name</code>: the static field name in a 0-terminated UTF-8 string.
+</p>
+<a name="wp20738"> </a><p class="pBody">
+<code class="cCode">sig</code>: the field signature in a 0-terminated UTF-8 string.
+</p>
+<a name="wp20739"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp20740"> </a><p class="pBody">
+Returns a field ID, or <code class="cCode">NULL</code> if the specified static field cannot be found.
+</p>
+<a name="wp20741"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp20742"> </a><p class="pBody">
+<code class="cCode">NoSuchFieldError</code>: if the specified static field cannot be found.
+</p>
+<a name="wp6027"> </a><p class="pBody">
+<code class="cCode">ExceptionInInitializerError</code>: if the class initializer fails due to an exception.
+</p>
+<a name="wp6028"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp20752"> </a><h3 class="pHeading2">
+		GetStatic&lt;type&gt;Field Routines
+</h3>
+<a name="wp20753"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">GetStatic&lt;type&gt;Field</em><code class="cCode">(JNIEnv *env, jclass clazz,<br />     jfieldID fieldID);</code>
+</p>
+<a name="wp20754"> </a><p class="pBody">
+This family of accessor routines returns the value of a static field of an object. The field to access is specified by a field ID, which is obtained by calling <code class="cCode">GetStaticFieldID()</code>.
+</p>
+<a name="wp20822"> </a><p class="pBody">
+The following table describes the family of get routine names and result types. You should replace <em class="cEmphasis">type</em> in <em class="cEmphasis">GetStatic&lt;type&gt;Field </em>with the Java type of the field, or one of the actual static field accessor routine names from the table, and replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.
+</p>
+<a name="wp4077"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="GetStatic&lt;type&gt;Field Family of Accessor Routines" id="wp5614">
+  <caption><a name="wp5614"> </a><div class="pTableCaption">
+Table&#160;4-5	GetStatic&lt;type&gt;Field Family of Accessor Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp5618"> </a><div style="text-align: left" class="pTableHead">
+GetStatic&lt;type&gt;Field Routine Name
+</div>
+
+</th>
+    <th><a name="wp5620"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5622"> </a><div class="pTableText">
+<code class="cCode">GetStaticObjectField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5624"> </a><div class="pTableText">
+jobject
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5626"> </a><div class="pTableText">
+<code class="cCode">GetStaticBooleanField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5628"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5630"> </a><div class="pTableText">
+<code class="cCode">GetStaticByteField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5632"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5634"> </a><div class="pTableText">
+<code class="cCode">GetStaticCharField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5636"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5638"> </a><div class="pTableText">
+<code class="cCode">GetStaticShortField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5640"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5642"> </a><div class="pTableText">
+<code class="cCode">GetStaticIntField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5644"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5646"> </a><div class="pTableText">
+<code class="cCode">GetStaticLongField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5648"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5650"> </a><div class="pTableText">
+<code class="cCode">GetStaticFloatField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5652"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5654"> </a><div class="pTableText">
+<code class="cCode">GetStaticDoubleField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5656"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp20823"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp20824"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp20825"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp20826"> </a><p class="pBody">
+<code class="cCode">fieldID</code>: a static field ID.
+</p>
+<a name="wp20827"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp20828"> </a><p class="pBody">
+Returns the content of the static field.
+</p>
+<a name="wp20829"> </a><h3 class="pHeading2">
+		SetStatic&lt;type&gt;Field Routines
+</h3>
+<a name="wp20830"> </a><p class="pBody">
+<code class="cCode">void </code><em class="cEmphasis">SetStatic&lt;type&gt;Field</em><code class="cCode">(JNIEnv *env, jclass clazz, <br />     jfieldID fieldID, </code><em class="cEmphasis">NativeType</em><code class="cCode"> value);</code>
+</p>
+<a name="wp20831"> </a><p class="pBody">
+This family of accessor routines sets the value of a static field of an object. The field to access is specified by a field ID, which is obtained by calling <code class="cCode">GetStaticFieldID()</code>.
+</p>
+<a name="wp20899"> </a><p class="pBody">
+The following table describes the set routine name and value types. You should replace <em class="cEmphasis">type</em> in <em class="cEmphasis">SetStatic&lt;type&gt;Field </em>with the Java type of the field, or one of the actual set static field routine names from the table, and replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.</p><div align="left">
+<table border="0" cellpadding="7" summary="SetStatic&lt;type&gt;Field Family of Accessor Routines" id="wp5658">
+  <caption><a name="wp5658"> </a><div class="pTableCaption">
+Table&#160;4-6	SetStatic&lt;type&gt;Field Family of Accessor Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp5662"> </a><div style="text-align: left" class="pTableHead">
+SetStatic&lt;type&gt;Field Routine Name
+</div>
+
+</th>
+    <th><a name="wp5664"> </a><div style="text-align: left" class="pTableHead">
+NativeType
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5666"> </a><div class="pTableText">
+<code class="cCode">SetStaticObjectField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5668"> </a><div class="pTableText">
+jobject
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5670"> </a><div class="pTableText">
+<code class="cCode">SetStaticBooleanField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5672"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5674"> </a><div class="pTableText">
+<code class="cCode">SetStaticByteField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5676"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5678"> </a><div class="pTableText">
+<code class="cCode">SetStaticCharField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5680"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5682"> </a><div class="pTableText">
+<code class="cCode">SetStaticShortField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5684"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5686"> </a><div class="pTableText">
+<code class="cCode">SetStaticIntField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5688"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5690"> </a><div class="pTableText">
+<code class="cCode">SetStaticLongField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5692"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5694"> </a><div class="pTableText">
+<code class="cCode">SetStaticFloatField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5696"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5698"> </a><div class="pTableText">
+<code class="cCode">SetStaticDoubleField</code><code class="cCode">()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5700"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp20900"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp20901"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp20902"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp20903"> </a><p class="pBody">
+<code class="cCode">fieldID</code>: a static field ID.
+</p>
+<a name="wp20904"> </a><p class="pBody">
+<code class="cCode">value</code>: the new value of the field.
+</p>
+<a name="wp20949"> </a><h2 class="pHeading1">
+Calling Static Methods
+</h2>
+<a name="wp20950"> </a><h3 class="pHeading2">
+		GetStaticMethodID
+</h3>
+<a name="wp20951"> </a><p class="pBody">
+<code class="cCode">jmethodID GetStaticMethodID(JNIEnv *env, jclass clazz,<br />     const char *name, const char *sig);</code>
+</p>
+<a name="wp20952"> </a><p class="pBody">
+Returns the method ID for a static method of a class. The method is specified by its name and signature.
+</p>
+<a name="wp6014"> </a><p class="pBody">
+<code class="cCode">GetStaticMethodID()</code> causes an uninitialized class to be initialized.
+</p>
+<a name="wp20953"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp20954"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp20955"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp20956"> </a><p class="pBody">
+<code class="cCode">name</code>: the static method name in a 0-terminated UTF-8 string.
+</p>
+<a name="wp20957"> </a><p class="pBody">
+<code class="cCode">sig</code>: the method signature in a 0-terminated UTF-8 string.
+</p>
+<a name="wp20958"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp20959"> </a><p class="pBody">
+Returns a method ID, or <code class="cCode">NULL</code> if the operation fails.
+</p>
+<a name="wp20960"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp20961"> </a><p class="pBody">
+<code class="cCode">NoSuchMethodError</code>: if the specified static method cannot be found.
+</p>
+<a name="wp6033"> </a><p class="pBody">
+<code class="cCode">ExceptionInInitializerError</code>: if the class initializer fails due to an exception.
+</p>
+<a name="wp6034"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp4796"> </a><h3 class="pHeading2">
+		CallStatic&lt;type&gt;Method Routines<br />CallStatic&lt;type&gt;MethodA Routines<br />CallStatic&lt;type&gt;MethodV Routines
+</h3>
+<a name="wp20963"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">CallStatic&lt;type&gt;Method</em><code class="cCode">(JNIEnv *env, jclass clazz,<br />     jmethodID methodID, ...);</code>
+</p>
+<a name="wp4821"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">CallStatic&lt;type&gt;MethodA</em><code class="cCode">(JNIEnv *env, jclass clazz,<br />     jmethodID methodID, jvalue *args);</code>
+</p>
+<a name="wp4823"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> </code><em class="cEmphasis">CallStatic&lt;type&gt;MethodV</em><code class="cCode">(JNIEnv *env, jclass clazz,<br />     jmethodID methodID, va_list args);</code>
+</p>
+<a name="wp20964"> </a><p class="pBody">
+This family of operations invokes a static method on a Java object, according to the specified method ID. The <code class="cCode">methodID</code> argument must be obtained by calling <code class="cCode">GetStaticMethodID</code><code class="cCode">()</code>.
+</p>
+<a name="wp4496"> </a><p class="pBody">
+The method ID must be derived from <code class="cCode">clazz</code>, not from one of its superclasses.
+</p>
+<a name="wp4360"> </a><h5 class="pHeading4">
+CallStatic&lt;type&gt;Method Routines
+</h5>
+<a name="wp4808"> </a><p class="pBody">
+Programmers should place all arguments that are to be passed to the method immediately following the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">CallStatic&lt;type&gt;Method</em> routine accepts these arguments and passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4809"> </a><h5 class="pHeading4">
+CallStatic&lt;type&gt;MethodA Routines
+</h5>
+<a name="wp4825"> </a><p class="pBody">
+Programmers should place all arguments to the method in an <code class="cCode">args</code> array of <code class="cCode">jvalues</code> that immediately follows the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">CallStaticMethodA</em> routine accepts the arguments in this array, and, in turn, passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4815"> </a><h5 class="pHeading4">
+CallStatic&lt;type&gt;MethodV Routines
+</h5>
+<a name="wp4827"> </a><p class="pBody">
+Programmers should place all arguments to the method in an <code class="cCode">args</code> argument of type <code class="cCode">va_list</code> that immediately follows the <code class="cCode">methodID</code> argument. The <em class="cEmphasis">CallStaticMethodV</em> routine accepts the arguments, and, in turn, passes them to the Java method that the programmer wishes to invoke.
+</p>
+<a name="wp4813"> </a><p class="pBody">
+The following table describes each of the method calling routines according to their result types. You should replace <em class="cEmphasis">type</em> in <em class="cEmphasis">CallStatic&lt;type&gt;Method </em>with the Java type of the method, or one of the actual method calling routine names from the table, and replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.
+</p>
+<a name="wp4094"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="CallStatic&lt;type&gt;Method Calling Routines" id="wp5702">
+  <caption><a name="wp5702"> </a><div class="pTableCaption">
+Table&#160;4-7	CallStatic&lt;type&gt;Method Calling Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp5706"> </a><div style="text-align: left" class="pTableHead">
+CallStatic&lt;type&gt;Method Routine Name
+</div>
+
+</th>
+    <th><a name="wp5708"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5710"> </a><div class="pTableText">
+<code class="cCode">CallStaticVoidMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5711"> </a><div class="pTableText">
+<code class="cCode">CallStaticVoidMethodA</code><code class="cCode">()</code>
+</div>
+<a name="wp5712"> </a><div class="pTableText">
+<code class="cCode">CallStaticVoidMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5714"> </a><div class="pTableText">
+void
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5716"> </a><div class="pTableText">
+<code class="cCode">CallStaticObjectMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5717"> </a><div class="pTableText">
+<code class="cCode">CallStaticObjectMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5718"> </a><div class="pTableText">
+<code class="cCode">CallStaticObjectMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5720"> </a><div class="pTableText">
+jobject
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5722"> </a><div class="pTableText">
+<code class="cCode">CallStaticBooleanMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5723"> </a><div class="pTableText">
+<code class="cCode">CallStaticBooleanMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5724"> </a><div class="pTableText">
+<code class="cCode">CallStaticBooleanMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5726"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5728"> </a><div class="pTableText">
+<code class="cCode">CallStaticByteMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5729"> </a><div class="pTableText">
+<code class="cCode">CallStaticByteMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5730"> </a><div class="pTableText">
+<code class="cCode">CallStaticByteMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5732"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5734"> </a><div class="pTableText">
+<code class="cCode">CallStaticCharMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5735"> </a><div class="pTableText">
+<code class="cCode">CallStaticCharMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5736"> </a><div class="pTableText">
+<code class="cCode">CallStaticCharMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5738"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5740"> </a><div class="pTableText">
+<code class="cCode">CallStaticShortMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5741"> </a><div class="pTableText">
+<code class="cCode">CallStaticShortMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5742"> </a><div class="pTableText">
+<code class="cCode">CallStaticShortMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5744"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5746"> </a><div class="pTableText">
+<code class="cCode">CallStaticIntMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5747"> </a><div class="pTableText">
+<code class="cCode">CallStaticIntMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5748"> </a><div class="pTableText">
+<code class="cCode">CallStaticIntMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5750"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5752"> </a><div class="pTableText">
+<code class="cCode">CallStaticLongMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5753"> </a><div class="pTableText">
+<code class="cCode">CallStaticLongMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5754"> </a><div class="pTableText">
+<code class="cCode">CallStaticLongMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5756"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5758"> </a><div class="pTableText">
+<code class="cCode">CallStaticFloatMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5759"> </a><div class="pTableText">
+<code class="cCode">CallStaticFloatMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5760"> </a><div class="pTableText">
+<code class="cCode">CallStaticFloatMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5762"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5764"> </a><div class="pTableText">
+<code class="cCode">CallStaticDoubleMethod</code><code class="cCode">()</code>
+</div>
+<a name="wp5765"> </a><div class="pTableText">
+<code class="cCode">CallStaticDoubleMethod</code><code class="cCode">A()</code>
+</div>
+<a name="wp5766"> </a><div class="pTableText">
+<code class="cCode">CallStaticDoubleMethod</code><code class="cCode">V()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5768"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp21040"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21041"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21042"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp21043"> </a><p class="pBody">
+<code class="cCode">methodID</code>: a static method ID.
+</p>
+<a name="wp5380"> </a><h5 class="pHeading4">
+Additional Parameter for CallStatic&lt;type&gt;Method Routines:
+</h5>
+<a name="wp5381"> </a><p class="pBody">
+arguments to the static method.
+</p>
+<a name="wp4900"> </a><h5 class="pHeading4">
+Additional Parameter for CallStatic&lt;type&gt;MethodA Routines:
+</h5>
+<a name="wp4906"> </a><p class="pBody">
+<code class="cCode">args</code>: an array of arguments.
+</p>
+<a name="wp4904"> </a><h5 class="pHeading4">
+Additional Parameter for CallStatic&lt;type&gt;MethodV Routines:
+</h5>
+<a name="wp4912"> </a><p class="pBody">
+<code class="cCode">args</code>: a <code class="cCode">va_list</code> of arguments.
+</p>
+<a name="wp5373"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp5374"> </a><p class="pBody">
+Returns the result of calling the static Java method.
+</p>
+<a name="wp5910"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp5911"> </a><p class="pBody">
+<code class="cCode">Exceptions raised during the execution of the Java method.</code>
+</p>
+<a name="wp5386"> </a><h2 class="pHeading1">
+String Operations
+</h2>
+<a name="wp4925"> </a><h3 class="pHeading2">
+		NewString
+</h3>
+<a name="wp4926"> </a><p class="pBody">
+<code class="cCode">jstring NewString(JNIEnv *env, const jchar *unicodeChars,<br />     jsize len);</code>
+</p>
+<a name="wp17121"> </a><p class="pBody">
+Constructs a new <code class="cCode">java.lang.String</code> object from an array of Unicode characters.
+</p>
+<a name="wp21294"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21295"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21296"> </a><p class="pBody">
+<code class="cCode">unicodeChars</code>: pointer to a Unicode string.
+</p>
+<a name="wp21297"> </a><p class="pBody">
+<code class="cCode">len</code>: length of the Unicode string.
+</p>
+<a name="wp21299"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp21300"> </a><p class="pBody">
+Returns a Java string object, or <code class="cCode">NULL</code> if the string cannot be constructed.
+</p>
+<a name="wp6039"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp6042"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp17132"> </a><h3 class="pHeading2">
+		GetStringLength
+</h3>
+<a name="wp17136"> </a><p class="pBody">
+<code class="cCode">jsize GetStringLength(JNIEnv *env, jstring string);</code>
+</p>
+<a name="wp17140"> </a><p class="pBody">
+Returns the length (the count of Unicode characters) of a Java string.
+</p>
+<a name="wp21326"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21327"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21328"> </a><p class="pBody">
+<code class="cCode">string</code>: a Java string object.
+</p>
+<a name="wp21330"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp21331"> </a><p class="pBody">
+Returns the length of the Java string.
+</p>
+<a name="wp17158"> </a><h3 class="pHeading2">
+		GetStringChars
+</h3>
+<a name="wp17162"> </a><p class="pBody">
+<code class="cCode">const jchar * GetStringChars(JNIEnv *env, jstring string,<br />     jboolean *isCopy);</code>
+</p>
+<a name="wp17166"> </a><p class="pBody">
+Returns a pointer to the array of Unicode characters of the string. This pointer is valid until <code class="cCode">ReleaseStringchars()</code> is called.
+</p>
+<a name="wp21360"> </a><p class="pBody">
+If <code class="cCode">isCopy</code> is not <code class="cCode">NULL</code>, then <code class="cCode">*isCopy</code> is set to <code class="cCode">JNI_TRUE</code> if a copy is made; or it is set to <code class="cCode">JNI_FALSE</code> if no copy is made.
+</p>
+<a name="wp21364"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21365"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21366"> </a><p class="pBody">
+<code class="cCode">string</code>: a Java string object.
+</p>
+<a name="wp21374"> </a><p class="pBody">
+<code class="cCode">isCopy</code>: a pointer to a boolean.
+</p>
+<a name="wp21367"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp21368"> </a><p class="pBody">
+Returns a pointer to a Unicode string, or <code class="cCode">NULL</code> if the operation fails.
+</p>
+<a name="wp17188"> </a><h3 class="pHeading2">
+		ReleaseStringChars
+</h3>
+<a name="wp17192"> </a><p class="pBody">
+<code class="cCode">void ReleaseStringChars(JNIEnv *env, jstring string, <br />     const jchar *chars);</code>
+</p>
+<a name="wp17196"> </a><p class="pBody">
+Informs the VM that the native code no longer needs access to <code class="cCode">chars</code>. The <code class="cCode">chars</code> argument is a pointer obtained from <code class="cCode">string</code> using <code class="cCode">GetStringChars()</code>.
+</p>
+<a name="wp21416"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21417"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21418"> </a><p class="pBody">
+<code class="cCode">string</code>: a Java string object.
+</p>
+<a name="wp21419"> </a><p class="pBody">
+<code class="cCode">chars</code>: a pointer to a Unicode string.
+</p>
+<a name="wp17220"> </a><h3 class="pHeading2">
+		NewStringUTF
+</h3>
+<a name="wp17224"> </a><p class="pBody">
+<code class="cCode">jstring NewStringUTF(JNIEnv *env, const char *bytes);</code>
+</p>
+<a name="wp17228"> </a><p class="pBody">
+Constructs a new <code class="cCode">java.lang.String</code> object from an array of UTF-8 characters. 
+</p>
+<a name="wp21516"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21517"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21518"> </a><p class="pBody">
+<code class="cCode">bytes</code>: the pointer to a UTF-8 string.
+</p>
+<a name="wp23869"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp23870"> </a><p class="pBody">
+Returns a Java string object, or <code class="cCode">NULL</code> if the string cannot be constructed.
+</p>
+<a name="wp6053"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp6054"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp23871"> </a><h3 class="pHeading2">
+		GetStringUTFLength
+</h3>
+<a name="wp17243"> </a><p class="pBody">
+<code class="cCode">jsize GetStringUTFLength(JNIEnv *env, jstring string);</code>
+</p>
+<a name="wp17247"> </a><p class="pBody">
+Returns the UTF-8 length in bytes of a string. 
+</p>
+<a name="wp21535"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21536"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21537"> </a><p class="pBody">
+<code class="cCode">string</code>: a Java string object.
+</p>
+<a name="wp21538"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp21539"> </a><p class="pBody">
+Returns the UTF-8 length of the string.
+</p>
+<a name="wp17265"> </a><h3 class="pHeading2">
+		GetStringUTFChars
+</h3>
+<a name="wp17269"> </a><p class="pBody">
+<code class="cCode">const jbyte* GetStringUTFChars(JNIEnv *env, jstring string, <br />     jboolean *isCopy);</code>
+</p>
+<a name="wp17273"> </a><p class="pBody">
+Returns a pointer to an array of UTF-8 characters of the string. This array is valid until it is released by <code class="cCode">ReleaseStringUTFChars()</code>.
+</p>
+<a name="wp4116"> </a><p class="pBody">
+If <code class="cCode">isCopy</code> is not <code class="cCode">NULL</code>, then <code class="cCode">*isCopy</code> is set to <code class="cCode">JNI_TRUE</code> if a copy is made; or it is set to <code class="cCode">JNI_FALSE</code> if no copy is made.
+</p>
+<a name="wp21562"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21563"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21564"> </a><p class="pBody">
+<code class="cCode">string</code>: a Java string object.
+</p>
+<a name="wp21565"> </a><p class="pBody">
+<code class="cCode">isCopy</code>: a pointer to a boolean.
+</p>
+<a name="wp21566"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp21567"> </a><p class="pBody">
+Returns a pointer to a UTF-8 string, or <code class="cCode">NULL</code> if the operation fails.
+</p>
+<a name="wp17294"> </a><h3 class="pHeading2">
+		ReleaseStringUTFChars
+</h3>
+<a name="wp17298"> </a><p class="pBody">
+<code class="cCode">void ReleaseStringUTFChars(JNIEnv *env, jstring string,<br />     const char *utf);</code>
+</p>
+<a name="wp17302"> </a><p class="pBody">
+Informs the VM that the native code no longer needs access to <code class="cCode">utf</code>. The <code class="cCode">utf</code> argument is a pointer derived from <code class="cCode">string</code> using <code class="cCode">GetStringUTFChars()</code>.
+</p>
+<a name="wp21577"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21578"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21579"> </a><p class="pBody">
+<code class="cCode">string</code>: a Java string object.
+</p>
+<a name="wp21580"> </a><p class="pBody">
+<code class="cCode">utf</code>: a pointer to a UTF-8 string.
+</p>
+<a name="wp17314"> </a><h2 class="pHeading1">
+Array Operations
+</h2>
+<a name="wp21732"> </a><h3 class="pHeading2">
+		GetArrayLength
+</h3>
+<a name="wp21736"> </a><p class="pBody">
+<code class="cCode">jsize GetArrayLength(JNIEnv *env, jarray array);</code>
+</p>
+<a name="wp21740"> </a><p class="pBody">
+Returns the number of elements in the array. 
+</p>
+<a name="wp21766"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21767"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21768"> </a><p class="pBody">
+<code class="cCode">array</code>: a Java array object.
+</p>
+<a name="wp21770"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp21771"> </a><p class="pBody">
+Returns the length of the array.
+</p>
+<a name="wp21619"> </a><h3 class="pHeading2">
+		NewObjectArray
+</h3>
+<a name="wp21623"> </a><p class="pBody">
+<code class="cCode">jobjectArray NewObjectArray(JNIEnv *env, jsize length, <br />     jclass elementClass, jobject initialElement);</code>
+</p>
+<a name="wp21628"> </a><p class="pBody">
+Constructs a new array holding objects in class <code class="cCode">elementClass</code>. All elements are initially set to <code class="cCode">initialElement</code>.
+</p>
+<a name="wp21868"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21869"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21885"> </a><p class="pBody">
+<code class="cCode">length</code>: array size.
+</p>
+<a name="wp21888"> </a><p class="pBody">
+<code class="cCode">elementClass</code>: array element class.
+</p>
+<a name="wp21899"> </a><p class="pBody">
+<code class="cCode">initialElement</code>: initialization value.
+</p>
+<a name="wp21871"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp21872"> </a><p class="pBody">
+Returns a Java array object, or <code class="cCode">NULL</code> if the array cannot be constructed.
+</p>
+<a name="wp6114"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp6115"> </a><p class="pBody">
+<code class="cCode">OutOfMemoryError</code>: if the system runs out of memory.
+</p>
+<a name="wp21671"> </a><h3 class="pHeading2">
+		GetObjectArrayElement
+</h3>
+<a name="wp21675"> </a><p class="pBody">
+<code class="cCode">jobject GetObjectArrayElement(JNIEnv *env, <br />     jobjectArray array, jsize index);</code>
+</p>
+<a name="wp21679"> </a><p class="pBody">
+Returns an element of an <code class="cCode">Object</code> array.
+</p>
+<a name="wp21922"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21923"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21924"> </a><p class="pBody">
+<code class="cCode">array</code>: a Java array.
+</p>
+<a name="wp21925"> </a><p class="pBody">
+<code class="cCode">index</code>: array index.
+</p>
+<a name="wp21927"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp21928"> </a><p class="pBody">
+Returns a Java object.
+</p>
+<a name="wp21680"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp21686"> </a><p class="pBody">
+<code class="cCode">ArrayIndexOutOfBoundsException</code>: if <code class="cCode">index</code> does not specify a valid index in the array.
+</p>
+<a name="wp21699"> </a><h3 class="pHeading2">
+		SetObjectArrayElement
+</h3>
+<a name="wp21703"> </a><p class="pBody">
+<code class="cCode">void SetObjectArrayElement(JNIEnv *env, jobjectArray array, <br />     jsize index, jobject value);</code>
+</p>
+<a name="wp21707"> </a><p class="pBody">
+Sets an element of an <code class="cCode">Object</code> array.
+</p>
+<a name="wp21972"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp21973"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp21974"> </a><p class="pBody">
+<code class="cCode">array</code>: a Java array.
+</p>
+<a name="wp21975"> </a><p class="pBody">
+<code class="cCode">index</code>: array index.
+</p>
+<a name="wp21985"> </a><p class="pBody">
+<code class="cCode">value</code>: the new value.
+</p>
+<a name="wp21978"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp21980"> </a><p class="pBody">
+<code class="cCode">ArrayIndexOutOfBoundsException</code>: if <code class="cCode">index</code> does not specify a valid index in the array.
+</p>
+<a name="wp21717"> </a><p class="pBody">
+<code class="cCode">ArrayStoreException</code>: if the class of <code class="cCode">value</code> is not a subclass of the element class of the array.
+</p>
+<a name="wp17318"> </a><h3 class="pHeading2">
+		New&lt;PrimitiveType&gt;Array Routines
+</h3>
+<a name="wp17322"> </a><p class="pBody">
+<em class="cEmphasis">ArrayType</em><code class="cCode"> </code><em class="cEmphasis">New&lt;PrimitiveType&gt;Array</em><code class="cCode">(JNIEnv *env, jsize length);</code>
+</p>
+<a name="wp17326"> </a><p class="pBody">
+A family of operations used to construct a new primitive array object. <a  href="functions.html#wp5339">Table&#160;4-8</a> describes the specific primitive array constructors. You should replace <em class="cEmphasis">New&lt;PrimitiveType&gt;Array </em>with one of the actual primitive array constructor routine names from the following table, and replace ArrayType with the corresponding array type for that routine.
+</p>
+<a name="wp4122"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="New&lt;PrimitiveType&gt;Array Family of Array Constructors" id="wp5339">
+  <caption><a name="wp5339"> </a><div class="pTableCaption">
+Table&#160;4-8	New&lt;PrimitiveType&gt;Array Family of Array Constructors
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp5343"> </a><div style="text-align: left" class="pTableHead">
+New&lt;PrimitiveType&gt;Array Routines
+</div>
+
+</th>
+    <th><a name="wp5345"> </a><div style="text-align: left" class="pTableHead">
+Array Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5347"> </a><div class="pTableText">
+<code class="cCode">NewBooleanArray()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5349"> </a><div class="pTableText">
+jbooleanArray
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5351"> </a><div class="pTableText">
+<code class="cCode">NewByteArray()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5353"> </a><div class="pTableText">
+jbyteArray
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5355"> </a><div class="pTableText">
+<code class="cCode">NewCharArray()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5357"> </a><div class="pTableText">
+jcharArray
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5359"> </a><div class="pTableText">
+<code class="cCode">NewShortArray()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5361"> </a><div class="pTableText">
+jshortArray
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5363"> </a><div class="pTableText">
+<code class="cCode">NewIntArray()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5365"> </a><div class="pTableText">
+jintArray
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5367"> </a><div class="pTableText">
+<code class="cCode">NewLongArray()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5369"> </a><div class="pTableText">
+jlongArray
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5371"> </a><div class="pTableText">
+<code class="cCode">NewFloatArray()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5373"> </a><div class="pTableText">
+jfloatArray
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp5375"> </a><div class="pTableText">
+<code class="cCode">NewDoubleArray()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp5377"> </a><div class="pTableText">
+jdoubleArray
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp5092"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp22207"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp22208"> </a><p class="pBody">
+<code class="cCode">length</code>: the array length.
+</p>
+<a name="wp22210"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp22211"> </a><p class="pBody">
+Returns a Java array, or <code class="cCode">NULL</code> if the array cannot be constructed.
+</p>
+<a name="wp17382"> </a><h3 class="pHeading2">
+		Get&lt;PrimitiveType&gt;ArrayElements Routines
+</h3>
+<a name="wp17386"> </a><p class="pBody">
+<em class="cEmphasis">NativeType</em><code class="cCode"> *</code><em class="cEmphasis">Get&lt;PrimitiveType&gt;ArrayElements</em><code style="font-style: normal" class="cCode">(JNIEnv *env, <br />     </code><code style="font-style: italic" class="cCode">ArrayType</code><code class="cCode"> array, jboolean *isCopy);</code>
+</p>
+<a name="wp17390"> </a><p class="pBody">
+A family of functions that returns the body of the primitive array. The result is valid until the corresponding <em style="font-style: italic" class="cEmphasis">Release</em><code style="font-style: italic" class="cCode">&lt;</code><em style="font-style: italic" class="cEmphasis">PrimitiveType</em><code style="font-style: italic" class="cCode">&gt;</code><em class="cEmphasis">ArrayElements()</em> function is called. S<em class="cEmphasis">ince the returned array may be a copy of the Java array, changes made to the returned array will not necessarily be reflected in the original </em><code style="font-style: normal" class="cCode">array</code> <em style="font-style: italic" class="cEmphasis">until</em> <code style="font-style: italic" class="cCode">Release&lt;PrimitiveType&gt;ArrayElements()</code> <em class="cEmphasis">is called.</em>
+</p>
+<a name="wp4127"> </a><p class="pBody">
+If <code class="cCode">isCopy</code> is not <code class="cCode">NULL</code>, then <code class="cCode">*isCopy</code> is set to <code class="cCode">JNI_TRUE</code> if a copy is made; or it is set to <code class="cCode">JNI_FALSE</code> if no copy is made.
+</p>
+<a name="wp4637"> </a><p class="pBody">
+The following table describes the specific primitive array element accessors. You should make the following substitutions:
+</p>
+<ul class="pBullet1"><a name="wp6198"> </a><div class="pBullet1"><li>Replace <em class="cEmphasis">Get&lt;PrimitiveType&gt;ArrayElements </em>with one of the actual primitive element accessor routine names from the table.</li></div>
+<a name="wp6201"> </a><div class="pBullet1Plus"><li>Replace ArrayType with the corresponding array type. </li></div>
+<a name="wp6204"> </a><div class="pBullet1Last"><li>Replace <em class="cEmphasis">NativeType </em>with the corresponding native type for that routine.</li></div>
+</ul>
+<a name="wp4590"> </a><p class="pBody">
+Regardless of how boolean arrays are represented in the Java VM, <code class="cCode">GetBooleanArrayElements()</code> always returns a pointer to <code class="cCode">jbooleans</code>, with each byte denoting an element (the unpacked representation). All arrays of other types are guaranteed to be contiguous in memory.
+</p>
+<a name="wp4136"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="Get&lt;PrimitiveType&gt;ArrayElements Family of Accessor Routines" id="wp4963">
+  <caption><a name="wp4963"> </a><div class="pTableCaption">
+Table&#160;4-9	Get&lt;PrimitiveType&gt;ArrayElements Family of Accessor Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp4649"> </a><div style="text-align: left" class="pTableHead">
+Get&lt;PrimitiveType&gt;ArrayElements Routines
+</div>
+
+</th>
+    <th><a name="wp4651"> </a><div style="text-align: left" class="pTableHead">
+Array Type
+</div>
+
+</th>
+    <th><a name="wp4653"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4655"> </a><div class="pTableText">
+<code class="cCode">GetBooleanArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4657"> </a><div class="pTableText">
+jbooleanArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4659"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4661"> </a><div class="pTableText">
+<code class="cCode">GetByteArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4663"> </a><div class="pTableText">
+jbyteArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4665"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4667"> </a><div class="pTableText">
+<code class="cCode">GetCharArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4669"> </a><div class="pTableText">
+jcharArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4671"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4673"> </a><div class="pTableText">
+<code class="cCode">GetShortArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4675"> </a><div class="pTableText">
+jshortArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4677"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4679"> </a><div class="pTableText">
+<code class="cCode">GetIntArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4681"> </a><div class="pTableText">
+jintArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4683"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4685"> </a><div class="pTableText">
+<code class="cCode">GetLongArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4687"> </a><div class="pTableText">
+jlongArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4689"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4691"> </a><div class="pTableText">
+<code class="cCode">GetFloatArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4693"> </a><div class="pTableText">
+jfloatArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4695"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp4697"> </a><div class="pTableText">
+<code class="cCode">GetDoubleArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4699"> </a><div class="pTableText">
+jdoubleArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp4701"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp22652"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp22281"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp22282"> </a><p class="pBody">
+<code class="cCode">array</code>: a Java string object.
+</p>
+<a name="wp22283"> </a><p class="pBody">
+<code class="cCode">isCopy</code>: a pointer to a boolean.
+</p>
+<a name="wp22284"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp22285"> </a><p class="pBody">
+Returns a pointer to the array elements, or <code class="cCode">NULL</code> if the operation fails.
+</p>
+<a name="wp17440"> </a><h3 class="pHeading2">
+		Release&lt;PrimitiveType&gt;ArrayElements Routines
+</h3>
+<a name="wp17444"> </a><p class="pBody">
+<code class="cCode">void </code><em class="cEmphasis">Release&lt;PrimitiveType&gt;ArrayElements</em><code style="font-style: normal" class="cCode">(JNIEnv *env, <br />     </code><code style="font-style: italic" class="cCode">ArrayType</code><code class="cCode"> array, </code><em class="cEmphasis">NativeType</em><code class="cCode"> *elems, jint mode);</code>
+</p>
+<a name="wp5114"> </a><p class="pBody">
+A family of functions that informs the VM that the native code no longer needs access to <code class="cCode">elems</code>. The <code class="cCode">elems</code> argument is a pointer derived from <code class="cCode">array</code> using the corresponding <em class="cEmphasis">Get</em><code class="cCode">&lt;</code><em class="cEmphasis">PrimitiveType</em><code class="cCode">&gt;</code><em class="cEmphasis">ArrayElements()</em> function. If necessary, this function copies back all changes made to <code class="cCode">elems</code> to the original array.
+</p>
+<a name="wp17454"> </a><p class="pBody">
+The <code class="cCode">mode</code> argument provides information on how the array buffer should be released. <code class="cCode">mode</code> has no effect if <code class="cCode">elems</code> is not a copy of the elements in <code class="cCode">array</code>. Otherwise, <code class="cCode">mode</code> has the following impact, as shown in the following table:
+</p>
+<a name="wp4137"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="Primitive Array Release Modes" id="wp1544">
+  <caption><a name="wp1544"> </a><div class="pTableCaption">
+Table&#160;4-10	Primitive Array Release Modes
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp22549"> </a><div style="text-align: left" class="pTableHead">
+mode
+</div>
+
+</th>
+    <th><a name="wp22551"> </a><div style="text-align: left" class="pTableHead">
+actions
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22553"> </a><div class="pTableText">
+<code class="cCode">0</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22555"> </a><div class="pTableText">
+copy back the content and free the <code class="cCode">elems</code> buffer
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22557"> </a><div class="pTableText">
+<code class="cCode">JNI_COMMIT</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22559"> </a><div class="pTableText">
+copy back the content but do not free the <code class="cCode">elems</code> buffer
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22561"> </a><div class="pTableText">
+<code class="cCode">JNI_ABORT</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22563"> </a><div class="pTableText">
+free the buffer without copying back the possible changes
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp17470"> </a><p class="pBody">
+In most cases, programmers pass &#8220;0&#8221; to the <code class="cCode">mode</code> argument to ensure consistent behavior for both pinned and copied arrays. The other options give the programmer more control over memory management and should be used with extreme care.
+</p>
+<a name="wp17475"> </a><p class="pBody">
+The next table describes the specific routines that comprise the family of primitive array disposers. You should make the following substitutions:
+</p>
+<ul class="pBullet1"><a name="wp6205"> </a><div class="pBullet1"><li>Replace <em class="cEmphasis">Release&lt;PrimitiveType&gt;ArrayElements </em>with one of the actual primitive array disposer routine names from <a  href="functions.html#wp1629">Table&#160;4-11</a>.</li></div>
+<a name="wp6206"> </a><div class="pBullet1Plus"><li>Replace ArrayType with the corresponding array type.</li></div>
+<a name="wp6209"> </a><div class="pBullet1Last"><li>Replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.</li></div>
+</ul>
+<a name="wp4140"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="Release&lt;PrimitiveType&gt;ArrayElements Family of Array Routines" id="wp1629">
+  <caption><a name="wp1629"> </a><div class="pTableCaption">
+Table&#160;4-11	Release&lt;PrimitiveType&gt;ArrayElements Family of Array Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp22662"> </a><div style="text-align: left" class="pTableHead">
+Release&lt;PrimitiveType&gt;ArrayElements Routines
+</div>
+
+</th>
+    <th><a name="wp22664"> </a><div style="text-align: left" class="pTableHead">
+Array Type
+</div>
+
+</th>
+    <th><a name="wp22666"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22668"> </a><div class="pTableText">
+<code class="cCode">ReleaseBooleanArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22670"> </a><div class="pTableText">
+jbooleanArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22672"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22674"> </a><div class="pTableText">
+<code class="cCode">ReleaseByteArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22676"> </a><div class="pTableText">
+jbyteArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22678"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22680"> </a><div class="pTableText">
+<code class="cCode">ReleaseCharArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22682"> </a><div class="pTableText">
+jcharArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22684"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22686"> </a><div class="pTableText">
+<code class="cCode">ReleaseShortArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22688"> </a><div class="pTableText">
+jshortArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22690"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22692"> </a><div class="pTableText">
+<code class="cCode">ReleaseIntArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22694"> </a><div class="pTableText">
+jintArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22696"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22698"> </a><div class="pTableText">
+<code class="cCode">ReleaseLongArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22700"> </a><div class="pTableText">
+jlongArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22702"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22704"> </a><div class="pTableText">
+<code class="cCode">ReleaseFloatArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22706"> </a><div class="pTableText">
+jfloatArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22708"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22710"> </a><div class="pTableText">
+<code class="cCode">ReleaseDoubleArrayElements()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22712"> </a><div class="pTableText">
+jdoubleArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22714"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp22735"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp22736"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp22737"> </a><p class="pBody">
+<code class="cCode">array</code>: a Java array object.
+</p>
+<a name="wp4797"> </a><p class="pBody">
+<code class="cCode">elems</code>: a pointer to array elements.
+</p>
+<a name="wp4798"> </a><p class="pBody">
+<code class="cCode">mode</code>: the release mode.
+</p>
+<a name="wp6212"> </a><h3 class="pHeading2">
+		Get&lt;PrimitiveType&gt;ArrayRegion Routines
+</h3>
+<a name="wp6213"> </a><p class="pBody">
+<em class="cEmphasis">void</em><code class="cCode"> </code><em class="cEmphasis">Get&lt;PrimitiveType&gt;ArrayRegion</em><code class="cCode">(JNIEnv *env, </code><em class="cEmphasis">ArrayType</em><code class="cCode"> array,<br />     jsize start, jsize len, </code><em class="cEmphasis">NativeType</em><code class="cCode"> *buf);</code>
+</p>
+<a name="wp17518"> </a><p class="pBody">
+A family of functions that copies a region of a primitive array into a buffer.
+</p>
+<a name="wp17521"> </a><p class="pBody">
+The following table describes the specific primitive array element accessors. You should do the following substitutions:
+</p>
+<ul class="pBullet1"><a name="wp6214"> </a><div class="pBullet1"><li>Replace <em class="cEmphasis">Get&lt;PrimitiveType&gt;ArrayRegion </em>with one of the actual primitive element accessor routine names from <a  href="functions.html#wp1716">Table&#160;4-12</a>.</li></div>
+<a name="wp6217"> </a><div class="pBullet1Plus"><li>Replace <em class="cEmphasis">ArrayType</em> with the corresponding array type.</li></div>
+<a name="wp6220"> </a><div class="pBullet1Last"><li>Replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.</li></div>
+</ul>
+<a name="wp4143"> </a><p class="pBody">
+</p><div align="left">
+<table border="0" cellpadding="7" summary="Get&lt;PrimitiveType&gt;ArrayRegion Family of Array Accessor Routines" id="wp1716">
+  <caption><a name="wp1716"> </a><div class="pTableCaption">
+Table&#160;4-12	Get&lt;PrimitiveType&gt;ArrayRegion Family of Array Accessor Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp22777"> </a><div style="text-align: left" class="pTableHead">
+Get&lt;PrimitiveType&gt;ArrayRegion Routine
+</div>
+
+</th>
+    <th><a name="wp22779"> </a><div style="text-align: left" class="pTableHead">
+Array Type
+</div>
+
+</th>
+    <th><a name="wp22781"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22783"> </a><div class="pTableText">
+<code class="cCode">GetBooleanArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22785"> </a><div class="pTableText">
+jbooleanArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22787"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22789"> </a><div class="pTableText">
+<code class="cCode">GetByteArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22791"> </a><div class="pTableText">
+jbyteArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22793"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22795"> </a><div class="pTableText">
+<code class="cCode">GetCharArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22797"> </a><div class="pTableText">
+jcharArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22799"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22801"> </a><div class="pTableText">
+<code class="cCode">GetShortArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22803"> </a><div class="pTableText">
+jshortArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22805"> </a><div class="pTableText">
+jhort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22807"> </a><div class="pTableText">
+<code class="cCode">GetIntArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22809"> </a><div class="pTableText">
+jintArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22811"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22813"> </a><div class="pTableText">
+<code class="cCode">GetLongArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22815"> </a><div class="pTableText">
+jlongArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22817"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22819"> </a><div class="pTableText">
+<code class="cCode">GetFloatArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22821"> </a><div class="pTableText">
+jfloatArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22823"> </a><div class="pTableText">
+jloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22825"> </a><div class="pTableText">
+<code class="cCode">GetDoubleArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22827"> </a><div class="pTableText">
+jdoubleArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22829"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="pBody">
+
+</p>
+<a name="wp22935"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp22936"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp22937"> </a><p class="pBody">
+<code class="cCode">array</code>: a Java array.
+</p>
+<a name="wp5199"> </a><p class="pBody">
+<code class="cCode">start</code>: the starting index.
+</p>
+<a name="wp5205"> </a><p class="pBody">
+<code class="cCode">len</code>: the number of elements to be copied.
+</p>
+<a name="wp5207"> </a><p class="pBody">
+<code class="cCode">buf</code>: the destination buffer.
+</p>
+<a name="wp22941"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp22943"> </a><p class="pBody">
+<code class="cCode">ArrayIndexOutOfBoundsException</code>: if one of the indexes in the region is not valid.
+</p>
+<a name="wp22933"> </a><h3 class="pHeading2">
+		Set&lt;PrimitiveType&gt;ArrayRegion Routines
+</h3>
+<a name="wp17563"> </a><p class="pBody">
+<code class="cCode">void </code><em class="cEmphasis">Set&lt;PrimitiveType&gt;ArrayRegion</em><code class="cCode">(JNIEnv *env, </code><em class="cEmphasis">ArrayType</em><code class="cCode"> array, <br />     jsize start, jsize len, </code><em class="cEmphasis">NativeType</em><code class="cCode"> *buf);</code>
+</p>
+<a name="wp17568"> </a><p class="pBody">
+A family of functions that copies back a region of a primitive array from a buffer.
+</p>
+<a name="wp22912"> </a><p class="pBody">
+The following table describes the specific primitive array element accessors. You should make the following replacements:
+</p>
+<ul class="pBullet1"><a name="wp6221"> </a><div class="pBullet1"><li>Replace <em class="cEmphasis">Set&lt;PrimitiveType&gt;ArrayRegion </em>with one of the actual primitive element accessor routine names from the table.</li></div>
+<a name="wp6224"> </a><div class="pBullet1Plus"><li>Replace ArrayType with the corresponding array type. </li></div>
+<a name="wp6227"> </a><div class="pBullet1Last"><li>Replace <em class="cEmphasis">NativeType</em> with the corresponding native type for that routine.<div align="left">
+<table border="0" cellpadding="7" summary="Set&lt;PrimitiveType&gt;ArrayRegion Family of Array Accessor Routines" id="wp1803">
+  <caption><a name="wp1803"> </a><div class="pTableCaption">
+Table&#160;4-13	Set&lt;PrimitiveType&gt;ArrayRegion Family of Array Accessor Routines
+</div>
+</caption>
+<thead>
+<tr  align="center">    <th><a name="wp22859"> </a><div style="text-align: left" class="pTableHead">
+Set&lt;PrimitiveType&gt;ArrayRegion Routine
+</div>
+
+</th>
+    <th><a name="wp22861"> </a><div style="text-align: left" class="pTableHead">
+Array Type
+</div>
+
+</th>
+    <th><a name="wp22863"> </a><div style="text-align: left" class="pTableHead">
+Native Type
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22865"> </a><div class="pTableText">
+<code class="cCode">SetBooleanArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22867"> </a><div class="pTableText">
+jbooleanArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22869"> </a><div class="pTableText">
+jboolean
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22871"> </a><div class="pTableText">
+<code class="cCode">SetByteArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22873"> </a><div class="pTableText">
+jbyteArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22875"> </a><div class="pTableText">
+jbyte
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22877"> </a><div class="pTableText">
+<code class="cCode">SetCharArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22879"> </a><div class="pTableText">
+jcharArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22881"> </a><div class="pTableText">
+jchar
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22883"> </a><div class="pTableText">
+<code class="cCode">SetShortArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22885"> </a><div class="pTableText">
+jshortArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22887"> </a><div class="pTableText">
+jshort
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22889"> </a><div class="pTableText">
+<code class="cCode">SetIntArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22891"> </a><div class="pTableText">
+jintArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22893"> </a><div class="pTableText">
+jint
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22895"> </a><div class="pTableText">
+<code class="cCode">SetLongArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22897"> </a><div class="pTableText">
+jlongArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22899"> </a><div class="pTableText">
+jlong
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22901"> </a><div class="pTableText">
+<code class="cCode">SetFloatArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22903"> </a><div class="pTableText">
+jfloatArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22905"> </a><div class="pTableText">
+jfloat
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp22907"> </a><div class="pTableText">
+<code class="cCode">SetDoubleArrayRegion()</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22909"> </a><div class="pTableText">
+jdoubleArray
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp22911"> </a><div class="pTableText">
+jdouble
+</div>
+</td>
+</tr>
+</table>
+</div>
+
+</li></div>
+</ul>
+<a name="wp22951"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp22952"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp5232"> </a><p class="pBody">
+<code class="cCode">array</code>: a Java array.
+</p>
+<a name="wp5233"> </a><p class="pBody">
+<code class="cCode">start</code>: the starting index.
+</p>
+<a name="wp5234"> </a><p class="pBody">
+<code class="cCode">len</code>: the number of elements to be copied.
+</p>
+<a name="wp5235"> </a><p class="pBody">
+<code class="cCode">buf</code>: the source buffer.
+</p>
+<a name="wp5830"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp5835"> </a><p class="pBody">
+<code class="cCode">ArrayIndexOutOfBoundsException</code>: if one of the indexes in the region is not valid.
+</p>
+<a name="wp5833"> </a><h2 class="pHeading1">
+Registering Native Methods
+</h2>
+<a name="wp17734"> </a><h3 class="pHeading2">
+		RegisterNatives
+</h3>
+<a name="wp17738"> </a><p class="pBody">
+<code class="cCode">jint RegisterNatives(JNIEnv *env, jclass clazz, <br />     const JNINativeMethod *methods, jint nMethods);</code>
+</p>
+<a name="wp4894"> </a><p class="pBody">
+Registers native methods with the class specified by the <code class="cCode">clazz</code> argument. The <code class="cCode">methods</code> parameter specifies an array of <code class="cCode">JNINativeMethod</code> structures that contain the names, signatures, and function pointers of the native methods. The <code class="cCode">nMethods</code> parameter specifies the number of native methods in the array. The <code class="cCode">JNINativeMethod</code> structure is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+typedef struct {<a name="wp5845"> </a>
+    char *name;<a name="wp5846"> </a>
+    char *signature;<a name="wp5847"> </a>
+    void *fnPtr;<a name="wp5848"> </a>
+} JNINativeMethod;<a name="wp4883"> </a>
+</pre></div>
+<a name="wp5854"> </a><p class="pBody">
+The function pointers nominally must have the following signature:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+<code class="cCode">ReturnType (*fnPtr)(JNIEnv *env, jobject objectOrClass, ...);</code><a name="wp4152"> </a>
+</pre></div>
+<a name="wp23061"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp23062"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp23063"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp23064"> </a><p class="pBody">
+<code class="cCode">methods</code>: the native methods in the class.
+</p>
+<a name="wp4889"> </a><p class="pBody">
+<code class="cCode">nMethods</code>: the number of native methods in the class.
+</p>
+<a name="wp23113"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp23114"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative value on failure.
+</p>
+<a name="wp17760"> </a><h5 class="pHeading4">
+THROWS:
+</h5>
+<a name="wp17763"> </a><p class="pBody">
+<code class="cCode">NoSuchMethodError</code>: if a specified method cannot be found or if the method is not native.
+</p>
+<a name="wp17775"> </a><h3 class="pHeading2">
+		UnregisterNatives
+</h3>
+<a name="wp5119"> </a><p class="pBody">
+<code class="cCode">jint UnregisterNatives(JNIEnv *env, jclass clazz);</code>
+</p>
+<a name="wp5120"> </a><p class="pBody">
+Unregisters native methods of a class. The class goes back to the state before it was linked or registered with its native method functions.
+</p>
+<a name="wp5130"> </a><p class="pBody">
+This function should not be used in normal native code. Instead, it provides special programs a way to reload and relink native libraries.
+</p>
+<a name="wp5121"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp23076"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp23077"> </a><p class="pBody">
+<code class="cCode">clazz</code>: a Java class object.
+</p>
+<a name="wp23120"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp4160"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative value on failure.
+</p>
+<a name="wp5256"> </a><h2 class="pHeading1">
+Monitor Operations
+</h2>
+<a name="wp23124"> </a><h3 class="pHeading2">
+		MonitorEnter
+</h3>
+<a name="wp23125"> </a><p class="pBody">
+<code class="cCode">jint MonitorEnter(JNIEnv *env, jobject obj);</code>
+</p>
+<a name="wp23126"> </a><p class="pBody">
+Enters the monitor associated with the underlying Java object referred to by <code class="cCode">obj</code>. 
+</p>
+<a name="wp5310"> </a><p class="pBody">
+Each Java object has a monitor associated with it. If the current thread already owns the monitor associated with <code class="cCode">obj</code>, it increments a counter in the monitor indicating the number of times this thread has entered the monitor.  If the monitor associated with <code class="cCode">obj</code> is not owned by any thread, the current thread becomes the owner of the monitor, setting the entry count of this monitor to 1. If another thread already owns the monitor associated with <code class="cCode">obj</code>, the current thread waits until the monitor is released, then tries again to gain ownership.
+</p>
+<a name="wp23127"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp23128"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp23129"> </a><p class="pBody">
+<code class="cCode">obj</code>: a normal Java object or class object.
+</p>
+<a name="wp23130"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp5251"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative value on failure.
+</p>
+<a name="wp5252"> </a><h3 class="pHeading2">
+		MonitorExit
+</h3>
+<a name="wp5253"> </a><p class="pBody">
+<code class="cCode">jint MonitorExit(JNIEnv *env, jobject obj);</code>
+</p>
+<a name="wp23139"> </a><p class="pBody">
+The current thread must be the owner of the monitor associated with the underlying Java object referred to by <code class="cCode">obj</code>. The thread decrements the counter indicating the number of times it has entered this monitor. If the value of the counter becomes zero, the current thread releases the monitor.
+</p>
+<a name="wp23140"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp23141"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp23142"> </a><p class="pBody">
+<code class="cCode">obj</code>: a normal Java object or class object.
+</p>
+<a name="wp23143"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp4180"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative value on failure.
+</p>
+<a name="wp5263"> </a><h2 class="pHeading1">
+Java VM Interface
+</h2>
+<a name="wp23168"> </a><h3 class="pHeading2">
+		GetJavaVM
+</h3>
+<a name="wp23169"> </a><p class="pBody">
+<code class="cCode">jint GetJavaVM(JNIEnv *env, JavaVM **vm);</code>
+</p>
+<a name="wp23170"> </a><p class="pBody">
+Returns the Java VM interface (used in the Invocation API) associated with the current thread. The result is placed at the location pointed to by the second argument, <code class="cCode">vm</code>.
+</p>
+<a name="wp23171"> </a><h5 class="pHeading4">
+PARAMETERS:
+</h5>
+<a name="wp23172"> </a><p class="pBody">
+<code class="cCode">env</code>: the JNI interface pointer.
+</p>
+<a name="wp23173"> </a><p class="pBody">
+<code class="cCode">vm</code>: a pointer to where the result should be placed.
+</p>
+<a name="wp23174"> </a><h5 class="pHeading4">
+RETURNS:
+</h5>
+<a name="wp4184"> </a><p class="pBody">
+Returns &#8220;0&#8221; on success; returns a negative value on failure.
+</p>
+<a name="wp4850"> </a><p class="pBody">
+
+</p>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="jniTOC.html">Contents</a> | 
+	<a accesskey="p" href="types.html">Previous</a> | 
+        <a accesskey="n" href="invocation.html">Next</a>
+       </td>
+        <td align="right">
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

@@ -1,0 +1,147 @@
+<HTML>
+<HEAD>
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.02 [en] (X11; U; SunOS 5.5.1 sun4u) [Netscape]">
+   <TITLE>Java(tm) Platform Debugger Architecture</TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+&nbsp;
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR>
+<TD WIDTH="60"><IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>&nbsp;</TD>
+
+<TD>
+<CENTER>
+<H1>Java<sup><font size="-2">TM</font></sup> Platform Debugger Architecture</H1></CENTER>
+</TD>
+
+<TD ALIGN=RIGHT VALIGN=TOP WIDTH="60">
+   <font size="-1"><a href="../../index.html">Documentation
+Contents</a></font>
+</TD>
+
+</TR>
+</TABLE>
+<!-- Body text begins here -->
+<BLOCKQUOTE>The Java Platform Debugger Architecture (JPDA) consists of 
+three interfaces designed for use by debuggers in development environments 
+for desktop systems. The Java Virtual Machine Debugger Interface defines 
+the services a VM must provide for debugging.  The Java Debug Wire 
+Protocol defines the format of information and requests transferred 
+between the process being debugged and the debugger front end, which 
+implements the Java Debug Interface.  The Java Debug Interface defines 
+information and requests at the user code level.</BLOCKQUOTE>
+
+<B><FONT SIZE=+2>Enhancements in the Java 2 SDK, v1.4</FONT></B>
+<ul>
+<li><a href=enhancements.html>Enhancements in the Java 2 SDK, v1.4</a>
+</ul>
+
+<B><FONT SIZE=+2>Design</FONT></B>
+<UL>
+<li><b><a href="jpda.html">JPDA Overview</a></b></li>
+<ul>
+<b><li><a href="jpda.html#modularity">Modularity</a>
+<li><a href="jpda.html#walk-through">Walk-through</a>
+<li><a href="jpda.html#porting">Porting</a>
+</b>
+</ul>
+
+
+<LI>
+<B><A HREF="architecture.html">Architecture</A></B></LI>
+
+<UL>
+<LI>
+
+
+<B><A HREF="architecture.html">Architecture Overview</A></B></LI>
+
+<LI>
+<B><A HREF="architecture.html#interfaces">Debugger Interfaces</A></B></LI>
+</UL>
+
+<UL>
+<UL>
+
+<LI>
+<B><A HREF="architecture.html#jvmdi">Java<sup><font size="-2">TM</font></sup> Virtual Machine Debug Interface</A></B></LI>
+</UL>
+
+<UL>
+<LI>
+<B><A HREF="architecture.html#jdwp">Java<sup><font size="-2">TM</font></sup> Debugger Wire Protocol</A></B></LI>
+
+<LI>
+<B><A HREF="architecture.html#jdi">Java<sup><font size="-2">TM</font></sup> Debug Interface</A></B></LI>
+</UL>
+</UL>
+</UL>
+<B><FONT SIZE=+2>Interface Reference</FONT></B>
+<UL>
+<LI>
+<B>Java Virtual Machine Debug Interface (JVMDI)</B></LI>
+
+<UL>
+<LI>
+<B><A HREF="jvmdi-spec.html">Specification</A></B><BR>
+<BR></LI>
+</UL>
+
+<LI>
+<B>Java Debug Wire Protocol (JDWP)</B></LI>
+
+<UL>
+<LI>
+<B><A HREF="jdwp-spec.html">Specification</A></B><BR>
+<BR></LI>
+</UL>
+
+<LI>
+<B>Java Debug Interface (JDI)</B></LI>
+
+<UL>
+<LI>
+<B><A HREF="jdi/index.html">Specification</A></B></LI>
+</UL>
+</UL>
+
+<P>
+<B><FONT SIZE=+2>Implementation</FONT></B>
+<UL>
+<LI>
+<B><A HREF="conninv.html">Connection and Invocation Details</A></B></LI>
+</UL>
+<P>
+
+<P>
+<B><FONT SIZE=+2>More Information</FONT></B>
+<UL>
+<LI>
+<B><A HREF="http://java.sun.com/products/jpda">JPDA Home Page</A></B></LI>
+</UL>
+<P>
+
+<B><FONT SIZE=+2>Examples</FONT></B>
+<blockquote>
+The <tt>demo/jpda/examples.jar</tt> file in the SDK software contains 
+JPDA examples, including source code 
+for the <tt>jdb</tt> Java Debugger and the prototype <tt>javadt</tt> 
+GUI debugger. 
+</blockquote>
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2>Copyright &copy; 2002 <A HREF="http://www.sun.com/">Sun
+Microsystems, Inc.</A> All Rights Reserved.</FONT>&nbsp;
+
+<P><FONT SIZE=-1>Please send comments to: <A HREF="mailto:java-debugger@sun.com">java-debugger@sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30></TD>
+</TR>
+</TABLE>
+&nbsp;
+</BODY>
+</HTML>

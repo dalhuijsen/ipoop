@@ -1,0 +1,334 @@
+INDEXER SETTINGS:
+ Minimum term length: 2
+ Maximum term length: 20
+ Index files with extensions: htm html 
+ Ignore files and directories: 
+
+Starting indexer at "H:\Dreamweaver\Projects\plugin14\docs\developer_guide"
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\rsa_deploying.html"
+  Last updated: 
+  File Size: 7 KB
+  Title: How to Deploy RSA-Signed Applets in Java Plug-in KB
+  Description: ... Java Plug-in This section covers the following topics: Introduction &nbsp; How to create RSA KB
+  Total terms in file: 241
+  Total terms indexed: 184
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\contents.html"
+  Last updated: 
+  File Size: 4 KB
+  Title: Java Plug-in 1.4 Developer Guide Contents KB
+  Description: ... Chapter 1: Overview&#151;What Is Java Plug-in? What Does It Support? Chapter 2: Using the KB
+  Total terms in file: 137
+  Total terms indexed: 111
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\console.html"
+  Last updated: 
+  File Size: 7 KB
+  Title: Java Plug-in Console KB
+  Description: ... the following topics: What is Java Console? Debugging Options Task-Bar Integration Startup Behavior What KB
+  Total terms in file: 231
+  Total terms indexed: 162
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\tracing_logging.html"
+  Last updated: 
+  File Size: 4 KB
+  Title: Tracing and Logging KB
+  Description: ... the following topics: Tracing Logging Other Options Tracing Tracing is a facility to redirect KB
+  Total terms in file: 160
+  Total terms indexed: 105
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\overview.html"
+  Last updated: 
+  File Size: 4 KB
+  Title: Overview - What Is Java Plug-in KB
+  Description: ... It Support? This chapter includes the following topics: What Is Java Plug-in? Supported Operating KB
+  Total terms in file: 219
+  Total terms indexed: 158
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\html_converter.html"
+  Last updated: 
+  File Size: 2 KB
+  Title: HTML Converter KB
+  Description: ... Applet Tags for Java Plug-in The Java Plug-in HTML Converter is a utility for KB
+  Total terms in file: 79
+  Total terms indexed: 52
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\html_converter_more.html"
+  Last updated: 
+  File Size: 21 KB
+  Title: More About HTML Converter KB
+  Description: ... includes the following topics: Running the GUI Version of the HTML Converter Choosing files KB
+  Total terms in file: 387
+  Total terms indexed: 298
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\proxie_config.html"
+  Last updated: 
+  File Size: 9 KB
+  Title: Proxy Configuration KB
+  Description: ... following topics: Introduction &nbsp; How Java Plug-in Obtains Proxy Information &nbsp; Direct Connection &nbsp; KB
+  Total terms in file: 282
+  Total terms indexed: 205
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\jsp.html"
+  Last updated: 
+  File Size: 4 KB
+  Title: JavaServer Pages KB
+  Description: ... following topics: JSP Java Plug-in Action Element: &lt;jsp:plugin&gt; Deploying Java Plug-in through JSP JavaServer KB
+  Total terms in file: 148
+  Total terms indexed: 108
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\cookie_support.html"
+  Last updated: 
+  File Size: 5 KB
+  Title: Cookie Support KB
+  Description: ... following topics: Introduction &nbsp; How Java Plug-in supports cookies Cookie policy support in Java KB
+  Total terms in file: 204
+  Total terms indexed: 134
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\control_panel.html"
+  Last updated: 
+  File Size: 11 KB
+  Title: Java Plug-in Control Panel KB
+  Description: ... to Set Plug-in Behavior/Options This section covers the following topics: Overview Starting the Java KB
+  Total terms in file: 324
+  Total terms indexed: 247
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\applet_caching.html"
+  Last updated: 
+  File Size: 9 KB
+  Title: Applet Caching and Installation in Java Plug-in KB
+  Description: ... Plug-in This section covers the following topics: Caching Option cache_archive cache_version cache_archive_ex Cache Update KB
+  Total terms in file: 268
+  Total terms indexed: 189
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\intranet.html"
+  Last updated: 
+  File Size: 7 KB
+  Title: Deployment: Intranet KB
+  Description: ... includes the following topics: Introduction Deploying Java Plug-in with Internet Explorer Deploying Java Plug-in KB
+  Total terms in file: 221
+  Total terms indexed: 155
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\silent.html"
+  Last updated: 
+  File Size: 5 KB
+  Title: Silent Installation KB
+  Description: ... following topics: Introduction How Silent Installations Work More Information &nbsp; Note: This chapter is KB
+  Total terms in file: 237
+  Total terms indexed: 172
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\version.html"
+  Last updated: 
+  File Size: 10 KB
+  Title: Multi-Version Support KB
+  Description: ... following topics: Unique CLSID Unique MIME Type and dll Unique Java Plug-in Registry Key KB
+  Total terms in file: 212
+  Total terms indexed: 154
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\index.html"
+  Last updated: 
+  File Size: 0 KB
+  Title: Java Plug-in 1.4 Developer Guide Home KB
+  Description: ... Developer Guide for J2SE 1.4 KB
+  Total terms in file: 8
+  Total terms indexed: 7
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\security.html"
+  Last updated: 
+  File Size: 1 KB
+  Title: Overview -- Applet Security Model KB
+  Description: ... Java TM Plug-in supports the standard Java 2 SDK, Standard Edition v 1.3 security KB
+  Total terms in file: 55
+  Total terms indexed: 39
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\oji.html"
+  Last updated: 
+  File Size: 4 KB
+  Title: OJI Fetures KB
+  Description: ... primary features of the Java runtime in Netscape 6, which is enabled by Java KB
+  Total terms in file: 145
+  Total terms indexed: 99
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\rsa_how.html"
+  Last updated: 
+  File Size: 6 KB
+  Title: How RSA Signed Applet Verification Works in Java Plug-in KB
+  Description: ... in Java Plug-in This section covers the following topics: Introduction &nbsp; Support for RSA KB
+  Total terms in file: 244
+  Total terms indexed: 182
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\using_tags.html"
+  Last updated: 
+  File Size: 64 KB
+  Title: Using OBJECT, EMBED and APPLET Tags in Java Plug-in KB
+  Description: ... Tags in Java Plug-in &nbsp; This chapter includes the following topics: Introduction Java TM KB
+  Total terms in file: 655
+  Total terms indexed: 514
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\rsa_signing.html"
+  Last updated: 
+  File Size: 15 KB
+  Title: How to Sign Applets Using RSA Signed Certificates KB
+  Description: ... Certificates RSA-signed applets are supported to make deployment of signed applets easier. However, signing KB
+  Total terms in file: 510
+  Total terms indexed: 384
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\special_tags.html"
+  Last updated: 
+  File Size: 3 KB
+  Title: Special Applet Window and Progress Bar Color Tags KB
+  Description: ... four special tags related to the applet window and progress bar colors and the KB
+  Total terms in file: 94
+  Total terms indexed: 61
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\internet.html"
+  Last updated: 
+  File Size: 1 KB
+  Title: Deployment: Internet KB
+  Description: ... Plug-in with Internet Explorer (IE) Recommendations The following is recommeded for long-term reliability: For KB
+  Total terms in file: 62
+  Total terms indexed: 38
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\java_js.html"
+  Last updated: 
+  File Size: 37 KB
+  Title:  KB
+  Description: ... following topics: Introduction JSObject How JSObject Works Degree of JSObject support in Java Plug-in KB
+  Total terms in file: 567
+  Total terms indexed: 442
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\js_java.html"
+  Last updated: 
+  File Size: 7 KB
+  Title: JavaScript to Java KB
+  Description: ... section includes the following topics: How to Script Applets Using Scripts to Invoke a KB
+  Total terms in file: 219
+  Total terms indexed: 153
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\extensions.html"
+  Last updated: 
+  File Size: 15 KB
+  Title: Deploying Java Extensions KB
+  Description: ... are also referred to as Optional Packages . This section covers the following topics: KB
+  Total terms in file: 353
+  Total terms indexed: 246
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\persistence.html"
+  Last updated: 
+  File Size: 1 KB
+  Title: Applet Persistence API KB
+  Description: ... SKD, Standard Edition, v 1.4, two new methods have been added to interface AppletContext.java KB
+  Total terms in file: 77
+  Total terms indexed: 45
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\compatibility.html"
+  Last updated: 
+  File Size: 15 KB
+  Title: Appendix 4: Microsoft VM and Java 2 Applet Compatibility Issues KB
+  Description: ... Applet Compatibility Issues This appendix documents the known applet compatibility issues between the Microsoft KB
+  Total terms in file: 460
+  Total terms indexed: 363
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\applet_tag.html"
+  Last updated: 
+  File Size: 9 KB
+  Title: Using the Conventional Applet Tag KB
+  Description: ... section includes the following topics: Support for the APPLET Tag Compatibility with the OBJECT KB
+  Total terms in file: 416
+  Total terms indexed: 324
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\autodownload.html"
+  Last updated: 
+  File Size: 6 KB
+  Title: Autodownload for Conventional Applets KB
+  Description: ... covers the following topics: The Autodownload Script The Download Servlet Linking to the Download KB
+  Total terms in file: 225
+  Total terms indexed: 161
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\installation.html"
+  Last updated: 
+  File Size: 3 KB
+  Title: Installation for Conventional Applets KB
+  Description: ... covers the following topics: Enabling APPLET Tag Support Silent Installation Options Enabling APPLET Tag KB
+  Total terms in file: 122
+  Total terms indexed: 78
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\protocol_support.html"
+  Last updated: 
+  File Size: 3 KB
+  Title: Protocol Support KB
+  Description: ... Java Plug-in supports HTTP, FTP, and GOPHER protocols, including built-in proxy configuration support. HTTPS KB
+  Total terms in file: 161
+  Total terms indexed: 115
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\jar_indexing.html"
+  Last updated: 
+  File Size: 1 KB
+  Title: Jar Indexing KB
+  Description: ... an applet uses multiple .jar files, more efficient downloading can be achieved by indexing KB
+  Total terms in file: 29
+  Total terms indexed: 17
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\debugger.html"
+  Last updated: 
+  File Size: 13 KB
+  Title: Java Debugger Support KB
+  Description: ... following topics: How to Debug Applets in Java Plug-in Java Plug-in Console Java Plug-in KB
+  Total terms in file: 444
+  Total terms indexed: 340
+
+Enter directory: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\_notes"
+Enter directory: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaConfig"
+Enter directory: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaConfig\_notes"
+Enter directory: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\Library"
+Enter directory: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaSearch"
+Enter directory: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\images"
+Enter directory: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\faq"
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\faq\applet_support.html"
+  Last updated: 
+  File Size: 8 KB
+  Title: About Applet Tag Support in Java Plug-in KB
+  Description: ... TM Plug-in &nbsp; Q: Why should I encourage people to use the Java 2 KB
+  Total terms in file: 347
+  Total terms indexed: 258
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\faq\basics.html"
+  Last updated: 
+  File Size: 9 KB
+  Title: Basics KB
+  Description: ... following topics: Basic Information Supported Features Version Information Basic Information Q: What is Java KB
+  Total terms in file: 338
+  Total terms indexed: 257
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\faq\developer.html"
+  Last updated: 
+  File Size: 12 KB
+  Title: Developer Information KB
+  Description: ... following topics: Information for Web-Page Authors Information for Applet Developers Information for System Administrators KB
+  Total terms in file: 428
+  Total terms indexed: 322
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\faq\index.html"
+  Last updated: 
+  File Size: 1 KB
+  Title: Frequently Asked Questions KB
+  Description: ... FAQ Questions and answers for people unfamiliar with Java Plug-in Software. Includes information about KB
+  Total terms in file: 47
+  Total terms indexed: 37
+
+Indexed "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\faq\troubleshooting.html"
+  Last updated: 
+  File Size: 19 KB
+  Title: Troubleshooting KB
+  Description: ... topics: General Troubleshooting Issues Troubleshooting Installation Issues Troubleshooting Security Issues General Troubleshooting Issues Q: KB
+  Total terms in file: 674
+  Total terms indexed: 535
+
+Saved index file: H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaSearch\devasearch.js (92KB)
+Write output file: "searchtopframe.html".
+Write output file: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaSearch\help.html".
+Write output file: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaSearch\search.html".
+Write output file: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaSearch\searchalt.html".
+Write output file: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaSearch\searchresults.html".
+Write output file: "H:\Dreamweaver\Projects\plugin14\docs\developer_guide\DevaSearch\style.css".
+Finished: Indexed 2733 terms from 39 files (360KB) with 10030 total terms.

@@ -1,0 +1,775 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>JNI Enhancements in the Java 2 SDK</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+
+<TD>
+<center>
+           <h1>JNI Enhancements<br>Introduced in version 1.2 of the 
+Java<sup><font size=-2>TM</font></sup> 2 SDK</h1>
+</center>
+</TD>
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+   <font size="-1"><a href="index.html">JNI Documentation</a></font>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<p>
+JNI has been enhanced in the Java 2 SDK to:
+<ul>
+<li>incorporate new features in the evolving Java platform,
+<li>ensure an efficient and stable interface for Java/native code
+    integration.
+</ul>
+
+<p>
+Changes to the JNI are made based on feedback from users . Please continue
+to send your comments, suggestions, and concerns to <a
+href="mailto:jni@java.sun.com">jni@java.sun.com</a>.
+
+<h2>New Constants</h2>
+<blockquote>
+<pre>
+#define JNI_VERSION_1_1 0x00010001
+#define JNI_VERSION_1_2 0x00010002
+
+/* Error codes */
+#define JNI_EDETACHED    (-2)              /* thread detached from the VM */
+#define JNI_EVERSION     (-3)              /* JNI version error */
+</pre>
+</blockquote>
+
+<h2>Enhancements to the Existing API</h2>
+<ul>
+<li><a href="#classops"><strong>Class Operations</strong></a>
+<ul>
+<li><a href="#FindClass"><code>FindClass</code></a>
+</ul>
+<li><a href="#invo"><strong>Invocation API</strong></a>
+<ul>
+<li><a href="#JNI_CreateJavaVM"><code>JNI_CreateJavaVM</code></a>
+<li><a href="#AttachCurrentThread"><code>AttachCurrentThread</code></a>
+<li><a href="#DetachCurrentThread"><code>DetachCurrentThread</code></a>
+<li><a href="#DestroyJavaVM"><code>DestroyJavaVM</code></a>
+</ul>
+</ul>
+
+<h2>New Functions</h2>
+
+<ul>
+
+<li><a href="#libmanage"><strong>Library and Version Management</strong></a>
+<ul>
+<li><a href="#JNI_OnLoad"><code>JNI_OnLoad</code></a>
+<li><a href="#JNI_OnUnload"><code>JNI_OnUnload</code></a>
+</ul>
+
+<li><a href="#localrefs"><strong>Local Reference Management</strong></a>
+<ul>
+<li><a href="#EnsureLocalCapacity"><code>EnsureLocalCapacity</code></a>
+<li><a href="#PushLocalFrame"><code>PushLocalFrame</code></a>
+<li><a href="#PopLocalFrame"><code>PopLocalFrame</code></a>
+<li><a href="#NewLocalRef"><code>NewLocalRef</code></a>
+</ul>
+<li><a href="#excep"><strong>Exceptions</strong></a>
+<ul>
+<li><a href="#ExceptionCheck"><code>ExceptionCheck</code></a>
+</ul>
+<li><a href="#weakrefs"><strong>Weak Global References</strong></a>
+<ul>
+<li><a href="#NewWeakGlobalRef"><code>NewWeakGlobalRef</code></a>
+<li><a href="#DeleteWeakGlobalRef"><code>DeleteWeakGlobalRef</code></a>
+</ul>
+
+<li><a href="#arrayops"><strong>Array Operations</strong></a>
+<ul>
+<li><a href="#GetPrimitiveArrayCritical"><code>GetPrimitiveArrayCritical</code></a>
+<li><a href="#ReleasePrimitiveArrayCritical"><code>ReleasePrimitiveArrayCritical</code></a>
+</ul>
+
+<li><a href="#stringops"><strong>String Operations</strong></a>
+<ul>
+<li><a href="#GetStringRegion"><code>GetStringRegion</code></a>
+<li><a href="#GetStringUTFRegion"><code>GetStringUTFRegion</code></a>
+<li><a href="#GetStringCritical"><code>GetStringCritical</code></a>
+<li><a href="#ReleaseStringCritical"><code>ReleaseStringCritical</code></a>
+</ul>
+
+<li><a href="#reflection"><strong>Reflection Support</strong></a>
+<ul>
+<li><a href="#FromReflectedMethod"><code>FromReflectedMethod</code></a>
+<li><a href="#FromReflectedField"><code>FromReflectedField</code></a>
+<li><a href="#ToReflectedMethod"><code>ToReflectedMethod</code></a>
+<li><a href="#ToReflectedField"><code>ToReflectedField</code></a>
+</ul>
+
+<li><a href="#invo"><strong>Invocation API</strong></a>
+<ul>
+<li><a href="#GetEnv"><code>GetEnv</code></a>
+</ul>
+
+</ul>
+
+
+<a name="classops"></a>
+<h2>Class Operations</h2>
+
+In the enhanced Java security model, non-system classes can load
+native code. The JNI function <code>FindClass</code> has been extended
+so that it finds classes loaded with a class loader.
+
+<a name="FindClass"></a>
+<p>
+<code>jclass FindClass(JNIEnv *env, const char *name);</code>
+<blockquote>
+
+<p>In JDK 1.1, <code>FindClass</code> searched only local classes in
+<code>CLASSPATH</code>. The resulting classes did not have a class
+loader.
+
+<p>The Java security model has been extended to allow non-system
+classes to load and call native methods. In the Java 2 Platform,
+<code>FindClass</code> locates the class loader associated with the
+current native method. If the native code belongs to a system class,
+no class loader will be involved. Otherwise, the proper class loader
+will be invoked to load and link the named class.
+
+<p>When <code>FindClass</code> is called through the Invocation
+Interface, there is no current native method or its associated
+class loader. In that case, the result of 
+<code>ClassLoader.getBaseClassLoader</code> is used.
+This is the class loader the virtual machine creates for
+applications, and is able to locate classes listed in the
+<code>java.class.path</code> property.
+
+</blockquote>
+
+<a name="libmanage"></a>
+<h2>Library and Version Management</h2>
+
+In JDK 1.1, once a native library is loaded, it is visible from all
+class loaders. Therefore two classes in different class loaders may
+link with the same native method. This leads to two problems:
+
+<ul>
+<li>A class may mistakenly link with native libraries loaded by a
+class with the same name in a different class loader.
+
+<li>Native methods can easily mix classes from different class
+loaders. This breaks the name space separation offered by class
+loaders, and leads to type safety problems.
+</ul>
+
+<p>
+In the Java 2 SDK, each class loader manages its own set of native libraries.
+<strong>The same JNI native library cannot be loaded into more than
+one class loader.</strong> Doing so causes <code>UnsatisfiedLinkError</code>
+to be thrown. For example, <code>System.loadLibrary</code> throws an
+<code>UnsatisfiedLinkError</code> when used to load a native library
+into two class loaders. The benefits of the new approach are:
+<ul>
+<li>Name space separation based on class loaders is preserved in
+native libraries. A native library cannot easily mix classes from
+different class loaders.  
+
+<li>In addition, native libraries can be unloaded when their
+corresponding class loaders are garbage collected.
+</ul>
+
+<p>
+To facilitate versioning control and resource management, JNI
+libraries in the Java 2 Platform may optionally export the following two functions:
+
+<p><a name="JNI_OnLoad"></a>
+<code>jint JNI_OnLoad(JavaVM *vm, void *reserved);</code>
+<blockquote>
+The VM calls <code>JNI_OnLoad</code> when the native library is loaded
+(for example, through
+<code>System.loadLibrary</code>). <code>JNI_OnLoad</code> must return
+the JNI version needed by the native library.
+
+<p> In order to use any of the new JNI functions, a native library
+must export a <code>JNI_OnLoad</code> function that returns
+<code>JNI_VERSION_1_2</code>. If the native library does not export a
+<code>JNI_OnLoad</code> function, the VM assumes that the library only
+requires JNI version <code>JNI_VERSION_1_1</code>.  If the VM does not
+recognize the version number returned by <code>JNI_OnLoad</code>,
+the native library cannot be loaded.
+</blockquote>
+
+<p> <a name="JNI_OnUnload"></a>
+<code>void JNI_OnUnload(JavaVM *vm, void *reserved);</code>
+<blockquote>
+The VM calls <code>JNI_OnUnload</code> when the class loader
+containing the native library is garbage collected. This function can
+be used to perform cleanup operations. Because this function is called
+in an unknown context (such as from a finalizer), the programmer
+should be conservative on using Java VM services, and refrain from
+arbitrary Java call-backs.
+
+</blockquote>
+
+<p>
+Note that <code>JNI_OnLoad</code> and <code>JNI_OnUnload</code> are
+two functions optionally supplied by JNI libraries, not exported from
+the VM.
+ 
+<a name="localrefs"></a> <h2>Local Reference Management</h2>
+
+Local references are valid for the duration of a native method
+call. They are freed automatically after the native method
+returns. Each local reference costs some amount of Java Virtual
+Machine resource. Programmers need to make sure that native methods do
+not excessively allocate local references. Although local references
+are automatically freed after the native method returns to Java,
+excessive allocation of local references may cause the VM to run out
+of memory during the execution of a native method.
+
+<p>
+JDK 1.1 provides a <code>DeleteLocalRef</code> function so that
+programmers can manually delete local references. For example, if
+native code iterates through a potentially large array of objects and
+uses one element in each iteration, it is a good practice to delete
+the local reference to the no-longer-used array element before a new
+local reference is created in the next iteration.
+
+<p>
+The Java 2 SDK provides an additional set of functions for local reference
+lifetime management.
+
+<p>
+<a name="EnsureLocalCapacity"></a>
+<code>jint EnsureLocalCapacity(JNIEnv *env, jint capacity);</code>
+<blockquote>
+<p>Ensures that <em>at least</em> a given number of local references
+can be created in the current thread. Returns 0 on success; otherwise
+returns a negative number and throws an <code>OutOfMemoryError</code>.
+
+<p>Before it enters a native method, the VM automatically ensures that
+at least <strong>16</strong> local references can be created.
+
+<p>For backward compatibility, the VM allocates local references
+beyond the ensured capacity. (As a debugging support, the VM may give
+the user warnings that too many local references are being created.
+In the Java 2 SDK, the programmer can supply the <code>-verbose:jni</code>
+command line option to turn on these messages.) The VM calls
+<code>FatalError</code> if no more local references can be created
+beyond the ensured capacity.
+</blockquote>
+
+<p>
+<a name="PushLocalFrame"></a>
+<code>jint PushLocalFrame(JNIEnv *env, jint capacity);</code>
+<blockquote>
+<p>Creates a new local reference frame, in which at least a given number
+of local references can be created. Returns 0 on success, a negative
+number and a pending <code>OutOfMemoryError</code> on failure.
+
+<p>
+Note that local references already created in previous local
+frames are still valid in the current local frame.
+</blockquote>
+
+<p><a name="PopLocalFrame"></a>
+<code>jobject PopLocalFrame(JNIEnv *env, jobject result);</code>
+<blockquote>
+<p>Pops off the current local reference frame, frees all the local
+references, and returns a local reference in the previous local
+reference frame for the given <code>result</code> object.
+
+<p>Pass <code>NULL</code> as <code>result</code> if you do not need to
+return a reference to the previous frame.
+</blockquote>
+
+<p>
+<a name="NewLocalRef"></a>
+<code>jobject NewLocalRef(JNIEnv *env, jobject ref);</code>
+<blockquote>
+Creates a new local reference that refers to the same object as
+<code>ref</code>. The given <code>ref</code> may be a global or local
+reference. Returns <code>NULL</code> if <code>ref</code> refers to
+<code>null</code>.
+
+</blockquote>
+<a name="excep"></a>
+<h2>Exceptions</h2>
+
+We introduce a convenience function to check for pending exceptions
+without creating a local reference to the exception object.
+
+<p><a name="ExceptionCheck"></a>
+<code>jboolean ExceptionCheck(JNIEnv *env);</code>
+<blockquote>
+
+Returns <code>JNI_TRUE</code> when there is a pending exception;
+otherwise, returns <code>JNI_FALSE</code>.
+
+</blockquote>
+<a name="weakrefs"></a>
+<h2>Weak Global References</h2>
+
+Weak global references are a special kind of global reference. Unlike
+normal global references, a weak global reference allows the
+underlying Java object to be garbage collected.  Weak global
+references may be used in any situation where global or local
+references are used. When the garbage collector runs, it frees the
+underlying object if the object is only referred to by weak
+references.  A weak global reference pointing to a freed object is
+functionally equivalent to <code>NULL</code>. Programmers can detect
+whether a weak global reference points to a freed object by using
+<code>IsSameObject</code> to compare the weak reference against
+<code>NULL</code>.
+
+<p>Weak global references in JNI are a simplified version of the Java
+Weak References, available as part of the Java 2 Platform API (
+<code>java.lang.ref</code> package and its classes).
+
+<a name="weakrefs clarification"></a>
+
+<p><strong>Clarification</strong> &nbsp&nbsp&nbsp<i>(added June 2001)</i>
+
+<blockquote><i>
+
+<p>Since garbage collection may occur while native methods are running,
+objects referred to by weak global references can be freed at any time.
+While weak global references can be used where global references are
+used, it is generally inappropriate to do so, as they may become
+functionally equivalent to </i><code>NULL</code><i> without notice.
+
+<p>While </i><code>IsSameObject</code><i> can be used to determine
+whether a weak global reference refers to a freed object, it does not
+prevent the object from being freed immediately thereafter.
+Consequently, programmers may not rely on this check to determine
+whether a weak global reference may used (as a
+non-</i><code>NULL</code><i> reference) in any future JNI function call.
+
+<p>To overcome this inherent limitation, it is recommended that a
+standard (strong) local or global reference to the same object be
+acquired using the JNI functions </i><code>NewLocalRef</code><i> or
+</i><code>NewGlobalRef</code><i>, and that this strong reference be used
+to access the intended object.  These functions will return
+</i><code>NULL</code><i> if the object has been freed, and otherwise
+will return a strong reference (which will prevent the object from being
+freed).  The new reference should be explicitly deleted when immediate
+access to the object is no longer required, allowing the object to be
+freed.
+
+<p>The weak global reference is weaker than other types of weak
+references (Java objects of the SoftReference or WeakReference classes).
+A weak global reference to a specific object will not become
+functionally equivalent to </i><code>NULL</code><i> until after
+SoftReference or WeakReference objects referring to that same specific
+object have had their references cleared.
+
+<p>The weak global reference is weaker than Java's internal references
+to objects requiring finalization.  A weak global reference will not
+become functionally equivalent to </i><code>NULL</code><i> until after
+the completion of the the finalizer for the referenced object, if
+present.
+
+<p>Interactions between weak global references and PhantomReferences are
+undefined.  In particular, implementations of a Java VM may (or may not)
+process weak global references after PhantomReferences, and it may (or
+may not) be possible to use weak global references to hold on to objects
+which are also referred to by PhantomReference objects.  This undefined
+use of weak global references should be avoided.
+
+</i></blockquote>
+
+<p>
+
+<p><a name="NewWeakGlobalRef"></a>
+<code>jweak NewWeakGlobalRef(JNIEnv *env, jobject obj);</code>
+<blockquote>
+
+Creates a new weak global reference. Returns <code>NULL</code> if
+<code>obj</code> refers to <code>null</code>, or if the VM runs out of
+memory. If the VM runs out of memory, an <code>OutOfMemoryError</code>
+will be thrown.
+
+</blockquote>
+
+<p><a name="DeleteWeakGlobalRef"></a>
+<code>void DeleteWeakGlobalRef(JNIEnv *env, jweak obj);</code>
+<blockquote>
+
+Delete the VM resources needed for the given weak global reference.
+
+</blockquote>
+
+<a name="arrayops"></a>
+<h2>Array Operations</h2>
+
+<p>In JDK 1.1, programmers can use
+<code>Get/Release<PrimitiveType>ArrayElements</code> functions to
+obtain a pointer to primitive array elements. If the VM supports
+pinning, the pointer to the original data is returned; otherwise, a
+copy is made.
+
+<p>New functions allow native code to obtain a direct pointer to
+array elements even if the VM does not support pinning.
+
+<p><a name="GetPrimitiveArrayCritical"></a>
+<code>void * GetPrimitiveArrayCritical(JNIEnv *env, jarray array, jboolean *isCopy);<br>
+<a name="ReleasePrimitiveArrayCritical"></a>
+void ReleasePrimitiveArrayCritical(JNIEnv *env, jarray array, void *carray, jint mode);</code>
+
+<blockquote>
+The semantics of these two functions are very similar to the existing
+<code>Get/Release<PrimitiveType>ArrayElements</code> functions. If
+possible, the VM returns a pointer to the primitive array; otherwise,
+a copy is made. <strong>However, there are significant restrictions on
+how these functions can be used.</strong>
+
+<p>
+After calling <code>GetPrimitiveArrayCritical</code>, the native code
+should not run for an extended period of time before it calls
+<code>ReleasePrimitiveArrayCritical</code>. We must treat the code
+inside this pair of functions as running in a "critical region."
+Inside a critical region, native code must not call other JNI
+functions, or any system call that may cause the current thread to
+block and wait for another Java thread. (For example, the current
+thread must not call <code>read</code> on a stream being written
+by another Java thread.)
+
+<p><strong>These restrictions make it more likely that the native code
+will obtain an uncopied version of the array, even if the VM does not
+support pinning.</strong> For example, a VM may temporarily disable
+garbage collection when the native code is holding a pointer to
+an array obtained via <code>GetPrimitiveArrayCritical</code>.
+
+<p>Multiple pairs of <code>GetPrimtiveArrayCritical</code> and
+<code>ReleasePrimitiveArrayCritical</code> may be nested. For example:
+<pre>
+  jint len = (*env)->GetArrayLength(env, arr1); 
+  jbyte *a1 = (*env)->GetPrimitiveArrayCritical(env, arr1, 0);
+  jbyte *a2 = (*env)->GetPrimitiveArrayCritical(env, arr2, 0);
+  /* We need to check in case the VM tried to make a copy. */
+  if (a1 == NULL || a2 == NULL) {
+    ... /* out of memory exception thrown */
+  }
+  memcpy(a1, a2, len);
+  (*env)->ReleasePrimitiveArrayCritical(env, arr2, a2, 0);
+  (*env)->ReleasePrimitiveArrayCritical(env, arr1, a1, 0);
+</pre>
+</blockquote>
+
+<p>
+Note that <code>GetPrimitiveArrayCritical</code> might still make a copy
+of the array if the VM internally represents arrays in a different format.
+Therefore we need to check its return value against <code>NULL</code> for
+possible out of memory situations.
+
+<a name="stringops"></a>
+<h2>String Operations</h2>
+
+In JDK 1.1, programmers can get primitive array elements in a user-supplied
+buffer. The Java 2 SDK allows native code to obtain Unicode or UTF-8 characters
+in a user-supplied buffer.
+
+<p><a name="GetStringRegion"></a>
+<code>void GetStringRegion(JNIEnv *env, jstring str, jsize start, jsize len, jchar *buf);</code>
+<blockquote>
+Copies <code>len</code> number of Unicode characters beginning at
+offset <code>start</code> to the given buffer <code>buf</code>.
+
+<p>Throws <code>StringIndexOutOfBoundsException</code> on index overflow.
+</blockquote>
+
+<p><a name="GetStringUTFRegion"></a><
+<code>void GetStringUTFRegion(JNIEnv *env, jstring str, jsize start, jsize len, char *buf);</code>
+<blockquote>
+Translates <code>len</code> number of Unicode characters beginning at
+offset <code>start</code> into UTF-8 format and place the result in
+the given buffer <code>buf</code>.
+
+<p>Throws <code>StringIndexOutOfBoundsException</code> on index overflow.
+</blockquote>
+
+<p><a name="GetStringCritical"></a>
+<code>const jchar * GetStringCritical(JNIEnv *env, jstring string, jboolean *isCopy);<br>
+<a name="ReleaseStringCritical"></a>
+void ReleaseStringCritical(JNIEnv *env, jstring string, const jchar *carray);</code>
+
+<blockquote>
+The semantics of these two functions are similar to the existing
+<code>Get/ReleaseStringChars</code> functions. If possible, the VM
+returns a pointer to string elements; otherwise, a copy is
+made. <strong>However, there are significant restrictions on how these
+functions can be used.</strong> In a code segment enclosed by
+<code>Get/ReleaseStringCritical</code> calls, the native code must not
+issue arbitrary JNI calls, or cause the current thread to block.
+<p>
+The restrictions on <code>Get/ReleaseStringCritical</code> are similar to
+those on <code>Get/ReleasePrimitiveArrayCritical</code>.
+</blockquote>
+
+<a name="reflection"></a> <h2>Reflection Support</h2> 
+
+<p>Programmers can use the JNI to call Java methods or access Java
+fields if they know the name and type of the methods or fields. The
+Java Core Reflection API allows programmers to introspect Java classes
+at runtime. JNI provides a set of conversion functions between field
+and method IDs used in the JNI to field and method objects used in the
+Java Core Reflection API.
+
+<p><a name="FromReflectedMethod"></a>
+<code>jmethodID FromReflectedMethod(JNIEnv *env, jobject method);</code>
+<blockquote>
+Converts a <code>java.lang.reflect.Method</code> or
+<code>java.lang.reflect.Constructor</code> object to a method ID.
+</blockquote>
+<p>
+<a name="FromReflectedField"></a>
+<code>jfieldID FromReflectedField(JNIEnv *env, jobject field);</code>
+<blockquote>
+Converts a <code>java.lang.reflect.Field</code>
+to a field ID.
+</blockquote>
+
+<p><a name="ToReflectedMethod"></a>
+<code>
+jobject ToReflectedMethod(JNIEnv *env, jclass cls,<br>
+&nbsp;&nbsp; jmethodID methodID);</code>
+<blockquote>
+Converts a method ID derived from <code>cls</code> to a
+<code>java.lang.reflect.Method</code> or
+<code>java.lang.reflect.Constructor</code> object.
+
+<p>Throws <code>OutOfMemoryError</code> and returns 0 if fails.
+</blockquote>
+<p><a name="ToReflectedField"></a>
+<code>
+jobject ToReflectedField(JNIEnv *env, jclass cls,<br>
+&nbsp;&nbsp; jfieldID fieldID);</code>
+<blockquote>
+Converts a field ID derived from <code>cls</code> to a
+<code>java.lang.reflect.Field</code> object.
+
+<p>Throws <code>OutOfMemoryError</code> and returns 0 if fails.
+</blockquote>
+
+<a name="invo"></a>
+<h2>Invocation API</h2>
+
+<a name="JNI_CreateJavaVM"></a>
+<p><code>jint JNI_CreateJavaVM(JavaVM **pvm, void **penv, void *args);</code>
+<blockquote>
+In JDK 1.1, the second argument to <code>JNI_CreateJavaVM</code> is
+always a pointer to <code>JNIEnv *</code>. The third argument is a pointer
+to a JDK 1.1 specific structure (<code>JDK1_1InitArgs</code>).
+The <code>JDK1_1InitArgs</code> structure is clearly not designed
+to be portable on all VMs.
+
+<p>In the Java 2 SDK, we introduce a standard VM initialization
+structure. Backward compatibility is preserved. If the VM
+initialization argument points to a <code>JDK1_1InitArgs</code>
+structure, <code>JNI_CreateJavaVM</code> still returns the 1.1 version
+of JNI interface pointer. The VM returns the 1.2 version of JNI
+interface pointer if the third argument points to a
+<code>JavaVMInitArgs</code> structure. Unlike
+<code>JDK1_1InitArgs</code>, which contains a fixed set of options,
+<code>JavaVMInitArgs</code> uses option strings to encode arbitrary VM
+start up options.
+
+<pre>
+typedef struct JavaVMInitArgs {
+    jint version;
+
+    jint nOptions;
+    JavaVMOption *options;
+    jboolean ignoreUnrecognized;
+} JavaVMInitArgs;
+</pre>
+
+The <code>version</code> field must be set to <code>JNI_VERSION_1_2</code>. (In
+contrast, the version field in <code>JDK1_1InitArgs</code> must be set
+to <code>JNI_VERSION_1_1</code>.) The <code>options</code> field is an array of
+the following type:
+
+<pre>
+typedef struct JavaVMOption {
+    char *optionString;
+    void *extraInfo;
+} JavaVMOption;
+</pre>
+
+The size of the array is denoted by the nOptions field in
+<code>JavaVMInitArgs</code>.  If <code>ignoreUnrecognized</code> is
+<code>JNI_TRUE</code>, <code>JNI_CreateJavaVM</code> ignore all
+unrecognized option strings that begin with "<code>-X</code>" or
+"<code>_</code>". If <code>ignoreUnrecognized</code> is
+<code>JNI_FALSE</code>, <code>JNI_CreateJavaVM</code> returns
+<code>JNI_ERR</code> as soon as it encounters any unrecognized option
+strings.  All Java VMs must recognize the following set of standard
+options:
+
+<p>
+<center>
+<table summary="standard options" border=1>
+<thead>
+<tr><th><bf>optionString</bf>
+	<th> meaning
+	</thead>
+<tr><td><code>-D&lt;name&gt;=&lt;value&gt;</code>
+	<td> Set a system property
+<tr><td><code>-verbose[:class|gc|jni]</code>
+	<td> Enable verbose output. The options can be followed by
+a comma-separated list of names 
+indicating what kind of messages will be printed by the VM.
+For example, "<code>-verbose:gc,class</code>" instructs the VM 
+to print GC and
+class loading related messages. Standard names include:
+<code>gc</code>, <code>class</code>, and <code>jni</code>. 
+All nonstandard (VM-specific) names must begin with "<code>X</code>".
+<tr><td><code>vfprintf</code>
+        <td> <code>extraInfo</code> is a pointer to the <code>vfprintf</code> hook.
+<tr><td><code>exit</code>
+        <td> <code>extraInfo</code> is a pointer to the <code>exit</code> hook.
+<tr><td><code>abort</code>
+        <td> <code>extraInfo</code> is a pointer to the <code>abort</code> hook.
+</table>
+</center>
+
+<p>
+In addition, each VM implementation may support its own set of
+non-standard option strings.  Non-standard option names must begin
+with "<code>-X</code>" or an underscore ("<code>_</code>"). For example, 
+the Java 2 SDK
+supports <code>-Xms</code> and <code>-Xmx</code> options to allow
+programmers specify the initial and maximum heap size. Options that
+begin with "<code>-X</code>" are accessible from the
+"<code>java</code>" command line.
+
+<p>Here is the example code that creates a Java VM in the Java 2 SDK:
+
+<pre>
+JavaVMInitArgs vm_args;
+JavaVMOption options[4];
+
+options[0].optionString = "-Djava.compiler=NONE";           /* disable JIT */
+options[1].optionString = "-Djava.class.path=c:\myclasses"; /* user classes */
+options[2].optionString = "-Djava.library.path=c:\mylibs";  /* set native library path */
+options[3].optionString = "-verbose:jni";                   /* print JNI-related messages */
+
+vm_args.version = JNI_VERSION_1_2;
+vm_args.options = options;
+vm_args.nOptions = 4;
+vm_args.ignoreUnrecognized = TRUE;
+
+/* Note that in the Java 2 SDK, there is no longer any need to call 
+ * JNI_GetDefaultJavaVMInitArgs. 
+ */
+res = JNI_CreateJavaVM(&vm, (void **)&env, &vm_args);
+if (res < 0) ...
+</pre>
+
+<p>
+The Java 2 SDK still supports <code>JDK1_1InitArgs</code> in exactly the same
+way as JDK 1.1.
+
+</blockquote>
+
+<a name="AttachCurrentThread"></a>
+<p><code>jint AttachCurrentThread(JavaVM *vm, void **penv, void *args);</code>
+<blockquote>
+In JDK 1.1, the second argument to <code>AttachCurrentThread</code> is
+always a pointer to <code>JNIEnv</code>. The third argument to
+<code>AttachCurrentThread</code> was reserved, and should be set to
+<code>NULL</code>.
+
+<p>In the Java 2 SDK, you pass <code>NULL</code> as the third argument for
+1.1 behavior, or pass a pointer to the following structure to specify
+additional information:
+<blockquote>
+<pre>
+typedef struct JavaVMAttachArgs {
+    jint version;  /* must be JNI_VERSION_1_2 */
+    char *name;    /* the name of the thread, or NULL */
+    jobject group; /* global ref of a ThreadGroup object, or NULL */
+} JavaVMAttachArgs;
+</pre>
+</blockquote>
+</blockquote>
+
+<a name="DetachCurrentThread"></a>
+<p><code>jint DetachCurrentThread(JavaVM *vm);</code>
+<blockquote>
+In JDK 1.1, the main thread cannot be detached from the VM. It must call
+<code>DestroyJavaVM</code> to unload the entire VM.
+
+<p>In the Java 2 SDK, the main thread can be detached from the VM.
+</blockquote>
+
+<a name="DestroyJavaVM"></a>
+<p><code>jint DestroyJavaVM(JavaVM *vm);</code>
+
+<blockquote>
+The support for <code>DestroyJavaVM</code> was not complete in 1.1. 
+Only the main thread may call <code>DestroyJavaVM</code>. In the 
+Java 2 SDK,
+any thread, whether attached or not, can call this function.
+If the current thread is attached, the VM waits until the current
+thread is the only user-level Java thread. If the current thread
+is not attached, the VM attaches the current thread and
+then waits until the current thread is the only user-level thread.
+The Java 2 SDK still does not support VM unloading, however. 
+<code>DestroyJavaVM</code> always returns an error code.
+</blockquote>
+
+<p><a name="GetEnv"></a>
+<code>jint GetEnv(JavaVM *vm, void **env, jint version);</code>
+<blockquote>
+If the current thread is not attached to the VM, sets <code>*env</code>
+to <code>NULL</code>, and returns <code>JNI_EDETACHED</code>. 
+If the specified version is not supported, sets <code>*env</code>
+to <code>NULL</code>, and returns <code>JNI_EVERSION</code>.
+Otherwise, sets <code>*env</code> to the appropriate interface,
+and returns <code>JNI_OK</code>.
+</blockquote>
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+
+<TD>
+<FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 1995-99
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT>
+   <br>
+   <br>
+
+   <FONT SIZE=-1>
+   Please send comments to: <a href="mailto:jni@java.sun.com">jni@java.sun.com</a>
+   </FONT>
+
+</TD>
+
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+
+</TD>
+
+</TR>
+</TABLE>
+
+  </body>
+</html>

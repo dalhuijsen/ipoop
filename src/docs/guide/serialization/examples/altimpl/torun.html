@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//SoftQuad//DTD HoTMetaL PRO 4.0::19971010::extensions to HTML 4.0//EN"
+ "hmpro4.dtd">
+
+<HTML>
+  
+  <HEAD>
+    <TITLE>Using Serialization and the Serializable Fields API</TITLE>
+  </HEAD>
+  
+  <BODY BGCOLOR="ffffff"><IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" 
+    HEIGHT="4">
+    
+    <H2>Using Serialization and the Serializable Fields API</H2>
+    
+    <IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">
+    
+    <H3>Running the Example</H3>
+    
+    <BLOCKQUOTE>
+      
+      <P>Complete the following procedure to compile and run this example: </P>
+      <OL>
+        <LI>From <I>yourbasedir</I><TT>/objectserializationexamples/AlternatePersistentFieldAPI</TT>,
+          compile the Original Class using JDK<SUP><FONT SIZE="-2">TM</FONT></SUP>
+          1.2 or higher:
+
+<PRE>
+  javac OriginalClass.java
+</PRE></LI>
+        
+        <LI>Run the Original Class with the serialization flag:
+
+<PRE>
+  java OriginalClass -s
+</PRE></LI>
+        
+        <LI>Compile the Evolved Class:
+
+<PRE>
+  javac EvolvedClass.java
+</PRE></LI>
+        
+        <LI>Run the Evolved Class with the deserialization flag:
+
+<PRE>
+  java EvolvedClass -d
+</PRE></LI>
+      </OL>
+      
+      <P>This procedure tests compatibility in one direction only. To test
+        bidirectional compatibility, perform the same procedure in the other
+        direction (in steps 1-4, replace the original class name with the
+        evolved class name, and vice versa).</P> 
+      <IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="190" HEIGHT="2">
+      
+      <H3>Additional Information</H3>
+      
+      <DL>
+        <DD><A HREF="./index3.html">Abstract</A> </DD>
+        <DD><A HREF="./sources.html">Sources</A> </DD>
+        <DD><A HREF="../index.html">List of Examples</A> </DD>
+      </DL> <IMG SRC="./../images/bg2.gif" alt="blue bar" WIDTH="610" HEIGHT="4">  
+    </BLOCKQUOTE>
+  </BODY>
+</HTML>

@@ -1,0 +1,256 @@
+<html>
+
+<head>
+    <title>Introduction to JAAS and Java GSS-API Tutorials</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#000077" alink="#FF0000">
+
+
+<table summary="layout" width="550">
+<tr>
+<td align="left" valign="center">
+
+<a href="BasicClientServer.html" target="_top"><img src="images/NextArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Next Tutorial"></a></td>
+
+
+<td align="right" valign="center">
+<font size="-1">
+<a href="Feedback.html">Feedback</a>
+</font>
+</td>
+
+</tr>
+</table>
+
+<hr>
+
+
+<center>
+<H1>Introduction to JAAS and Java GSS-API Tutorials</H1>
+</center>
+
+<br>
+<br>
+
+<p>This page links to a series of tutorials demonstrating
+various aspects of the use of JAAS (Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 
+Authentication and Authorization Service) and
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> GSS-API.
+
+<p> <b>JAAS</b> can be used for two purposes:
+
+<ul>
+
+<li>for <i>authentication</i> of users, to reliably
+and securely determine who is currently executing Java code, and<p>
+
+<li>for <i>authorization</i> of users to ensure they have the 
+access control rights (permissions) required to do security-sensitive
+operations.
+
+</ul>
+
+<p><b>Java GSS-API</b> is used for <i>securely exchanging messages</i> between 
+communicating applications.
+The Java GSS-API contains the Java bindings for the Generic Security 
+Services Application Program Interface (GSS-API) defined in
+<a href = "http://www.ietf.org/rfc/rfc2853.txt">RFC 2853</a>. GSS-API offers 
+application programmers uniform access to security services atop a
+variety of underlying security mechanisms, including Kerberos.
+
+<p>Note: JSSE is another API that can be used for secure
+communication. For the differences between the two, see
+<a href="JGSSvsJSSE.html">When to use Java GSS-API vs. JSSE</a>.
+
+<p>The reason both JAAS and Java GSS-API tutorials are presented together
+is because JAAS authentication is typically performed prior to secure
+communication using Java GSS-API.  Thus JAAS and Java GSS-API
+are related and often used together.  However, it is possible
+for applications to use JAAS without Java GSS-API,
+and it is also possible to use Java GSS-API without JAAS.
+Furthermore, JAAS itself can be used simply for authentication
+or for both authentication and authorization.
+
+<p>The following tutorials provide working examples for
+all of the scenarios described above.
+
+<ol>
+
+<li><a href="BasicClientServer.html">Use of 
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> GSS-API for 
+Secure Message Exchanges Without JAAS Programming</a> 
+
+<p>Demonstrates the use of the Java GSS-API for secure message
+exchanges between a client application and a server application. <p>
+
+
+<li><a href="AcnOnly.html">JAAS Authentication</a> 
+
+<p>Explains how an application can authenticate users using JAAS. <p>
+
+
+<li><a href="AcnAndAzn.html">JAAS Authorization</a> 
+
+<p>Explains how to enforce user-based access controls using JAAS. <p>
+
+
+<li><a href="LoginSample.html">Use of JAAS Login Utility</a> 
+
+<p>Describes a utility program that authenticates a user using
+JAAS and executes any application as that user.
+The appropriate user-based access controls are enforced
+while the application executes.  This utility, as a convenience,
+essentially performs the operations described in the
+JAAS Authentication and JAAS Authorization tutorials on your behalf.
+Therefore it is possible to skip directly to this
+tutorial if you do not need to know how to perform JAAS
+authentication and authorization directly. <p>
+
+
+<li><a href="ClientServer.html">Use of JAAS Login Utility and Java GSS-API for 
+Secure Message Exchanges</a> 
+
+<p>The most comprehensive tutorial.  The Login utility is used to
+authenticate a service user and to start up a server application
+as that user. The Login utility is also used to authenticate a
+client user and to start up a client application as that user.
+Finally the client and server applications, on behalf of their
+authenticated client and service users, exchange secure messages
+using the Java GSS-API. <p>
+
+
+<li><a href="MoreToDo.html">More Things You Can Do With Java GSS-API 
+and JAAS</a> 
+
+<p>Shows additional operations the server application in the
+previous tutorial can perform once communication has been
+established with the client application. 
+
+</ol>
+
+
+
+
+<p>All applications in all tutorials in this series utilize Kerberos Version 5 
+as the underlying technology for authentication and
+secure communication. See <a href="KerberosReq.html">Kerberos Requirements</a>.
+The term "Kerberos" used throughout the tutorials is meant to refer to
+Kerberos Version 5.
+
+<br>
+<br>
+
+<H1>Related Documentation</H1>
+
+<blockquote>
+
+<H3>API Specifications</H3>
+
+<ul>
+
+   <LI><a href="../spec/com/sun/security/jgss/package-summary.html">com.sun.security.jgss Package</a>
+
+   <LI><a href="../../jaas/spec/com/sun/security/auth/package-summary.html">com.sun.security.auth Package</a>
+
+   <LI><a href="../../jaas/spec/com/sun/security/auth/callback/package-summary.html">com.sun.security.auth.callback Package</a>
+
+   <LI><a href="../../jaas/spec/com/sun/security/auth/login/package-summary.html">com.sun.security.auth.login Package</a>
+
+   <LI><a href="../../jaas/spec/com/sun/security/auth/module/package-summary.html">com.sun.security.auth.module Package</a>
+
+</ul>
+
+<H3>User Guides</H3>
+
+<ul>
+
+<li><a href="../../jaas/JAASRefGuide.html">
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Authentication and Authorization 
+Service (JAAS) Reference Guide</a>. <p>
+
+</ul>
+
+<H3>Papers</H3>
+
+<ul>
+
+<li><a href="../single-signon.html">
+Single Sign-on Using Kerberos in Java</a> <p>
+
+<li><a href="http://java.sun.com/security/jaas/doc/acsac.html">
+JAAS white paper</a> <p>
+
+</ul>
+
+<H3>Tutorials</H3>
+
+<ul>
+
+<li><a href="http://java.sun.com/docs/books/tutorial/security1.2/index.html">
+  Java 2 Security Tutorial</a> <p>
+
+</ul>
+
+<H3>Other Java Security Documentation </H3>
+
+<ul>
+
+<li><a href =
+"../../PolicyFiles.html">
+Default Policy Implementation and Policy File Syntax</a> <p>
+
+<li><a href = "../../permissions.html">
+Permissions in the Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK</a> <p>
+
+<li><a href="../../spec/security-spec.doc.html">
+  Java 2 Security Architecture</a> <p>
+
+</ul>
+
+<H3>Reference Document </H3>
+
+<ul>
+
+<li><a href="http://www.ietf.org/rfc/rfc2853.txt">Generic Security
+Service API Version 2: Java Bindings</a> presented and requested comments
+on the Java bindings for GSS-API that are incorporated into Java GSS-API.
+<p>
+
+</ul>
+
+</blockquote>
+
+
+<hr>
+
+<FONT SIZE="-2">
+   <A HREF="../../../../relnotes/SMICopyright.html">Copyright &#169;</A> 2001-2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+
+<p>
+
+<table summary="layout" width="550">
+<tr>
+<td align="left" valign="center">
+
+<a href="BasicClientServer.html" target="_top"><img src="images/NextArrow.gif" 
+width="26" height="26" align="center" border="0" alt="Next Tutorial"></a></td>
+
+
+<td align="right" valign="center">
+<font size="-1">
+<a href="Feedback.html">Feedback</a>
+</font>
+</td>
+
+</tr>
+</table>
+
+
+</body>
+
+</html>
+

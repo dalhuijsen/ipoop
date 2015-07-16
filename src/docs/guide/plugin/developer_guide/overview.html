@@ -1,0 +1,90 @@
+<html>
+<head>
+<title>Overview - What Is Java Plug-in</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Overview&#151;What Is Java Plug-in? What Does It Support?</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>This chapter includes the following topics:</p>
+<ul>
+  <li><a href="#what">What Is Java Plug-in?</a></li>
+  <li><a href="#supported">Supported Operating Systems and Browsers</a></li>
+</ul>
+<h2><a name="what"></a>What Is Java Plug-in?</h2>
+<p>Java Plug-in extends the functionality of a web browser, allowing applets or 
+  Java Beans to be run under Sun's Jave 2 runtime environment (JRE) rather than 
+  the Java runtime environment that comes with the web browser. Java Plug-in is 
+  part of Sun's JRE and is installed with it when the JRE is installed on a computer. 
+  It works with both Netscape and Internet Explorer. </p>
+<p>This functionality can be achieved in two different ways:</p>
+<ol>
+  <li>By <a href="applet_tag.html">using the conventional <code>APPLET</code> 
+    tag</a> in a web page.</li>
+  <li>By replacing the <code>APPLET</code> tag with the <code>OBJECT</code> tag 
+    for Internet Explorer; by replacing the <code>APPLET</code> tag with the <code>EMBED</code> 
+    tag for Netscape 4. Note, however, that the <code>OBJECT</code> and <code>EMBED</code> 
+    tags must conform to a special format as described in the next chapter, <i><a href="using_tags.html">Using 
+    OBJECT, EMBED and APPLET Tags in Java Plug-in</a></i>.</li>
+</ol>
+<table summary="layout" width="90%" align="center" bgcolor="#FFFFCC" cellpadding="5" cellspacing="0" border="1">
+  <tr>
+    <td>
+      <h2><u>Note:</u></h2>
+      <p>Currently the <code>OBJECT</code> and <code>EMBED</code> tags do not 
+        work with Netscape 6 with Java Plug-in. You must use the <code>APPLET</code> 
+        tag with Netscape 6.</p>
+    </td>
+  </tr>
+</table>
+<p><code>OBJECT</code> and <code>EMBED</code> tags may be manually updated in 
+  web pages, but to facilitate updating web pages to this special format, an HTML 
+  Converter is provided. It is describe in the section called <i><a href="html_converter.html">Using 
+  the HTML Converter to Convert Applet Tags for Java Plug-in</a></i>. </p>
+<p>While the above constitutes the heart of Java Plug-in, there are many other 
+  related topics that you may want to understand. For instance, you may want to 
+  know how proxy configuration works in Java Plug-in, you may want to know what 
+  protocols Java Plug-in supports, or you may want to know about cookie support 
+  and caching. Such topics are included in <i>Part I: Java Plug-in Basics</i>. 
+</p>
+<p>You can determine some of the behavior of Java Plug-in and set options via 
+  the Java Plug-in Control Panel. How you do this is also discussed in Part I 
+  in the chapter called <i>Using the Java Plug-in Control Panel to Set Plug-in 
+  Behavior/Options</i>.</p>
+<p>Java Plug-in may be deployed in various ways&#151;on the Internet, within an 
+  intranet, via Java Server Pages, etc. The various types and methods of deployments 
+  are discussed in the <i>Part II: Deployment Schemes</i>. </p>
+<p>Applets must be run in a secure environment, and various security topics are 
+  discussed in the <i>Part III: Security</i>, including RSA signed applet verification. 
+  As signing applets can be a difficult topic for novice applet developers, this 
+  guide provides step-by-step instructions for signing applets in the chapter 
+  called <a href="rsa_signing.html">How to Sign Applets Using RSA-Signed Certificates</a>. 
+</p>
+<p>Java Plug-in provides various kinds of debugging support for applets, and <i>Part 
+  IV: Debugging Support</i> describes them. Java Debugger support is discussed. 
+  So is the Java Plug-in Console, which includes various options that may be set 
+  for debugging, including ones for tracing and logging.</p>
+<p><i>Part V: Advanced Topics</i> discusses more esoteric matters such as supporting 
+  multiple JREs in the same environment, Java-toJavaScript communication, how 
+  to persist applets across browser sessions, special applet attributes for changing 
+  the applet window background color, etc.</p>
+<p>Finally, there are Appendices that information about Netscape 6; a FAQ; additional 
+  information about the HTML Converter; and Microsoft VM versus Java 2 compatibility 
+  issues.</p>
+<h2><a name="supported"></a>Supported Operating Systems and Browsers</h2>
+<h3><a name="os"></a>Operating System Support:</h3>
+<p>Window 98 SE, ME, NT 4.0 (SP6), 2000 (SP2), and XP; Solaris 7, 8, and 9; and 
+  Linux 6.0 or later.</p>
+<h3><a name="browser"></a>Browser Support:</h3>
+<p>Internet Explorer 4 (SP2), 5.01 (SP2), 5.5 (SP2), and 6; Netscape 4.5, 4.6, 
+  4.7, and 4.77; and Netscape 6.2.1 and higher.</p>
+<p>&nbsp;</p>
+</body>
+</html>

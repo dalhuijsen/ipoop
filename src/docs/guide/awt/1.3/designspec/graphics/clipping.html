@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>AWT graphics clip API</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<h1>AWT graphics clip API</h1>
+<hr>
+<address>last updated: October 30, 1996</address>
+<h2>The Issue</h2>
+Currently the AWT Graphics object has methods to implement an
+ever-decreasing clip area.  There is a single
+<a href="../../../../../api/java/awt/Graphics.html#clipRect(int, int, int)">clipRect()</a>
+method to manipulate the clip area.
+This method will intersect the current clipping area with the indicated
+rectangle and set a new clip area to the intersection of the two.
+This operation is convenient for many graphics algorithms that might
+wish to use clipping to control paint distribution while operating
+within a Graphics object set up to clip rendering to a contextual
+"repaint region".
+Unfortunately, when clipping is used in the rendering process, it is
+usually only used for a small number of rendering operations.
+Without the ability to enlarge the clip area back to the original
+contextual clip established by the repaint process, clipping for
+rendering purposes becomes a one-shot process.
+<p>
+If a programmer wants to temporarily set the clip to a smaller area
+for one or two rendering operations and then restore it later, then
+another mechanism must be used.
+The currently available work-around is to copy the Graphics object
+using one of the
+<a href="../../../../../api/java/awt/Graphics.html#create()">create()</a>
+methods and then set the temporary clip on the new Graphics object
+using the clipRect method and dispose of it when done.
+The original Graphics object will still have its original clip
+unmodified and can be used for further rendering.
+<p>
+Furthermore, all of the other attributes of the Graphics object
+can be queried, changed, and then restored to their original values.
+The clip area, when viewed as a rendering attribute, only partially
+follows this design model.  There is a
+<a href="../../../../../api/java/awt/Graphics.html#getClipRect()">getClipRect()</a>
+method to query the clip area as a Rectangle object, but that method
+is not extensible in the future when non-rectangular clip areas may
+be provided.  In addition, even if you queried the current clip area
+there was no way to explicitly set the clip to this value after you
+have installed a more restrictive clip.
+
+<h2>The new clip API</h2>
+To resolve this problem, 1 new class:
+<pre>	<a href="../../../../../api/java/awt/Shape.html">java.awt.Shape</a></pre>
+is being added to the AWT and 3 new methods:
+<pre>	<a href="../../../../../api/java/awt/Graphics.html#getClip()">getClip()</a>
+	<a href="../../../../../api/java/awt/Graphics.html#setClip(java.awt.Shape)">setClip(Shape)</a>
+	<a href="../../../../../api/java/awt/Graphics.html#setClip(int, int, int, int)">setClip(int x, int y, int w, int h)</a></pre>
+are being added to the AWT Graphics class.
+<p>In addition, the getClipRect() method is now deprecated in favor
+of the more general getClip() method detailed above and a new method:
+<pre>	<a href="../../../../../api/java/awt/Graphics.html#getClipBounds()">getClipBounds()</a></pre>
+which returns the bounding box of the current clip area as a Rectangle
+regardless of its shape.
+This method is also named consistently with the recent terminology
+updates that were implemented across the AWT classes.
+
+<h2>Sample Code</h2>
+<p>Following is sample code showing the use of the old API to perform
+temporary clipping:
+<pre>
+
+    import java.awt.*;
+    import java.applet.*;
+
+    public class TempClipExample extends Applet {
+	Image bgimg, img2;
+	public void paint(Graphics g) {
+	    // Draw a background image
+	    g.drawImage(bgimg, 0, 0, this);
+	    // Draw the upper left 100x100 portion of another image at 10,10
+	    <b>Graphics g2 = g.create();</b>
+	    <b>g2.clipRect(10, 10, 100, 100);</b>
+	    <b>g2.drawImage(img2, 10, 10, this);</b>
+	    <b>g2.dispose();	// reclaims resources more quickly</b>
+	    // Now continue drawing with original clip area
+	    g.fillRect(0, 0, 10, 10);
+	}
+    }
+</pre>
+<p>Following is sample code showing the use of the new API to perform
+temporary clipping:
+<pre>
+
+    import java.awt.*;
+    import java.applet.*;
+
+    public class TempClipExample extends Applet {
+	Image bgimg, img2;
+	public void paint(Graphics g) {
+	    // Draw a background image
+	    g.drawImage(bgimg, 0, 0, this);
+	    // Draw the upper left 100x100 portion of another image at 10,10
+	    <b>Shape oldclip = g.getClip();</b>
+	    <b>g.clipRect(10, 10, 100, 100);</b>
+	    <b>g.drawImage(img2, 10, 10, this);</b>
+	    <b>g.setClip(oldclip);</b>
+	    // Now continue drawing with original clip area
+	    g.fillRect(0, 0, 10, 10);
+	}
+    }
+</pre>
+
+<hr><br>
+
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1996, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

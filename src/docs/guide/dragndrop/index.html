@@ -1,0 +1,177 @@
+<html>
+
+<head>
+
+<title>Drag and Drop</title>
+
+</head>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH=60>
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Drag and Drop</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size=-1><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+
+
+<blockquote>
+
+            Drag and Drop enables data transfer both across Java<sup><font size="-2">TM</font></sup> programming language and native applications,
+between Java programming language applications, and within a single 
+Java programming language application. 
+
+</blockquote>
+
+
+<font size="+2"><b>Enhancements</b></font></font>
+<ul>
+<li><b>Enhancements in Java 2 Platform 1.4</b> include new support for 
+data transfer using Swing.  See <b><a href="../swing/1.4/dnd.html">Swing 
+Data Transfer</a></b>.
+<p>
+<li><b>Enhancements in previous release Java 2 Platform 1.3</b> included two new methods 
+in class <tt>java.awt.datatransfer.DataFlavor</tt>.
+<tt>
+<ul>
+<li><a href="../../api/java/awt/datatransfer/DataFlavor.html#getReaderForText(java.awt.datatransfer.Transferable)">getReaderForText(Transferable transferable)</a>
+<li><a href="../../api/java/awt/datatransfer/DataFlavor.html#selectBestTextFlavor(java.awt.datatransfer.DataFlavor[])">selectBestTextFlavor(DataFlavor[] availableFlavors)</a>
+</ul>
+</tt>
+Without the use of these methods, unicode-encoded text will not be 
+dragged onto some native-application documents correctly (an extra 
+character will be left at the beginning of the text. These methods 
+deliver ISO8859-1 text instead of unicode text to avoid this problem.
+</ul>
+
+<font size=+2><b>Drag and Drop Specification</b></font><br>
+
+<ul>
+  <li><a href="spec/dnd1TOC.html"><b>Drag and Drop Specification</b></a>.
+  	Also available in <a href="http://java.sun.com/j2se/1.4.2/pdf/dnd1.ps">postscript</a> and 
+	<a href="http://java.sun.com/j2se/1.4.2/pdf/dnd1.pdf">pdf</a>
+</ul>
+<br>
+
+<font size=+2><b>Drag and Drop API Specification</b></font><br>
+
+<ul>
+  <li><a href="../../api/java/awt/dnd/package-summary.html"><b>java.awt.dnd</b></a> <br>
+</ul>
+<br>
+
+<font size="+2"><b>Related Information</b></font><br>
+
+<p>
+
+<blockquote>
+
+<b>Located on the Java Software website:</b>
+
+</blockquote>
+
+<ul>
+
+<li><a href="http://java.sun.com/products/jfc/index.html"><b>The JFC Home Page</b></a>
+
+</ul>
+
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH=100%>
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+   Please send Drag and Drop comments to our Java Drag and Drop team: <a href="mailto:java-dnd@java.sun.com">java-dnd@java.sun.com</a> 
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT=" Sun Microsystems, Inc " BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+

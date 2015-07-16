@@ -1,0 +1,359 @@
+<html><head><title></title>
+</head>
+<body bgcolor=#ffffff>
+<hr>
+<h1>Chapter 7: Using Files and Format Converters</h1>
+<hr>
+<form name="form1">
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>&nbsp;</p>
+<p><a name="117603"> </a>
+Most application programs that deal with sound need to read sound files or audio streams. This is common functionality, regardless of what the program may subsequently do with the data it reads (such as play, mix, or process it). Similarly, many programs need to write sound files (or streams). In some cases, the data that has been read (or that will be written) needs to be converted to a different format.
+</p>
+<p><a name="117604"> </a> As was briefly mentioned in Chapter 3, "<a href="chapter3.html">Accessing 
+  Audio System Resources</a>," the Java<font size="-1"><sup>TM</sup></font> 
+  Sound API provides application developers with various facilities for file input/output 
+  and format translations. Application programs can read, write, and translate 
+  between a variety of sound file formats and audio data formats. </p>
+<p><a name="114517"> </a> Chapter 2, "<a href="chapter2.html">Overview of the 
+  Sampled Package</a>," introduced the main 
+  classes related to sound files and audio data formats. As a review: </p>
+<ul><a name="114884"> </a>
+<li>A stream of audio data, as might be read from or written to a file, is represented by an <code>AudioInputStream</code> object. (<code>AudioInputStream</code> inherits from <code>java.io.InputStream</code>.)
+<a name="114885"> </a>
+<li>The format of this audio data is represented by an <code>AudioFormat</code> object.
+<a name="117222"> </a>
+<P>
+This format specifies how the audio samples themselves are arranged, but not the structure of a file that they might be stored in. In other words, an<code> AudioFormat</code> describes "raw" audio data, such as the system might hand your program after capturing it from a microphone input or after parsing it from a sound file. An <code>AudioFormat</code> includes such information as the encoding, the byte order, the number of channels, the sampling rate, and the number of bits per sample.
+<p>
+<a name="114521"> </a>
+<li>There are several well-known, standard formats for sound files, such as WAV, AIFF, or AU. The different types of sound file have different structures for storing audio data as well as for storing descriptive information about the audio data. A sound file format is represented in the Java Sound API by an <code>AudioFileFormat</code> object. The <code>AudioFileFormat</code> includes an <code>AudioFormat</code> object to describe the format of the audio data stored in the file, and also includes information about the file type and the length of the data in the file.
+<a name="114522"> </a>
+<p>
+<li>The <code>AudioSystem</code> class provides methods for (1) storing a stream of audio data from an <code>AudioInputStream</code> into an audio file of a particular type (in other words, writing a file), (2) extracting a stream of audio bytes (an <code>AudioInputStream</code>) from an audio file (in other words, reading a file), and (3) converting audio data from one data format to another. The present chapter, which is divided into three sections, explains these three kinds of activity.
+<p><a name="114524"> </a>
+</ul>
+Note that an implementation of the Java Sound API does not necessarily provide 
+comprehensive facilities for reading, writing, and converting audio in different 
+data and file formats. It might support only the most common data and file formats. 
+However, service providers can develop and distribute conversion services that 
+extend this set, as outlined in Chapter 14, "<a href="chapter14.html">Providing 
+Sampled-Audio Services</a>." The <code>AudioSystem</code> 
+class supplies methods that allow application programs to learn what conversions 
+are available, as described later in this chapter under "<a href="chapter7.html#114640">Converting 
+File and Data Formats</a>." 
+<p></p><a name="114527"> </a>
+<h3> Reading Sound Files</h3>
+<p><a name="114529"> </a>
+The <code>AudioSystem</code> class provides two types of file-reading services: 
+</p><ul><a name="114530"> </a>
+<li>Information about the format of the audio data stored in the sound file 
+<a name="114531"> </a>
+<li>A stream of formatted audio data that can be read from the sound file 
+<p><a name="118569"> </a>
+</ul>
+The first of these is given by three variants of the <code>getAudioFileFormat</code> 
+method: 
+<blockquote> 
+  <p><code>static AudioFileFormat getAudioFileFormat (java.io.File file)<br>
+    static AudioFileFormat getAudioFileFormat(java.io.InputStream stream)<br>
+    static AudioFileFormat getAudioFileFormat (java.net.URL url)</code></p>
+</blockquote>
+<p>As mentioned above, the returned <code>AudioFileFormat</code> object tells 
+  you the file type, the length of the data in the file, encoding, the byte order, 
+  the number of channels, the sampling rate, and the number of bits per sample. 
+</p>
+<p></p>
+<p><a name="114541"> </a> The second type of file-reading functionality is given 
+  by these <code>AudioSystem</code> methods 
+<blockquote> 
+  <p><code>static AudioInputStream getAudioInputStream (java.io.File file) <br>
+    static AudioInputStream getAudioInputStream (java.net.URL url) <br>
+    static AudioInputStream getAudioInputStream (java.io.InputStream stream)</code></p>
+</blockquote>
+<p>These methods give you an object (an <code>AudioInputStream</code>) that lets 
+  you read the file's audio data, using one of the read methods of <code>AudioInputStream</code>. 
+  We'll see an example momentarily. </p>
+<p></p><p><a name="114549"> </a>
+Suppose you're writing a sound-editing application that allows the user to load sound data from a file, display a corresponding waveform or spectrogram, edit the sound, play back the edited data, and save the result in a new file. Or perhaps your program will read the data stored in a file, apply some kind of signal processing (such as an algorithm that slows the sound down without changing its pitch), and then play the processed audio. In either case, you need to get access to the data contained in the audio file. Assuming that your program provides some means for the user to select or specify an input sound file, reading that file's audio data involves three steps:
+</p><ol>
+<a name="114551"> </a>
+<li>Get an <code>AudioInputStream</code> object from the file.
+<a name="114552"> </a>
+<li>Create a byte array in which you'll store successive chunks of data from the file.
+<a name="114553"> </a>
+<li>Repeatedly read bytes from the audio input stream into the array. On each iteration, do something useful with the bytes in the array (for example, you might play them, filter them, analyze them, display them, or write them to another file).
+<p><a name="114555"> </a>
+</ol>
+The following code example outlines these steps.
+<p></p>
+<blockquote><pre>
+int totalFramesRead = 0;
+File fileIn = new File(somePathName);
+// somePathName is a pre-existing string whose value was
+// based on a user selection.
+try {
+  AudioInputStream audioInputStream = 
+    AudioSystem.getAudioInputStream(fileIn);
+  int bytesPerFrame = 
+    audioInputStream.getFormat().getFrameSize();
+  // Set an arbitrary buffer size of 1024 frames.
+  int numBytes = 1024 * bytesPerFrame; 
+  byte[] audioBytes = new byte[numBytes];
+  try {
+    int numBytesRead = 0;
+    int numFramesRead = 0;
+    // Try to read numBytes bytes from the file.
+    while ((numBytesRead = 
+      audioInputStream.read(audioBytes)) != -1) {
+      // Calculate the number of frames actually read.
+      numFramesRead = numBytesRead / bytesPerFrame;
+      totalFramesRead += numFramesRead;
+      // Here, do something useful with the audio data that's 
+      // now in the audioBytes array...
+    }
+  } catch (Exception ex) { 
+    // Handle the error...
+  }
+} catch (Exception e) {
+  // Handle the error...
+}
+</pre></blockquote>
+Let's take a look at what's happening in the above code sample. First, the outer try clause instantiates an <code>AudioInputStream</code> object through the call to the <code>AudioSystem.getAudioInputStream(File)</code> method. This method transparently performs all of the testing required to determine whether the specified file is actually a sound file of a type that is supported by the Java Sound API. If the file being inspected (<code>fileIn</code> in this example) is not a sound file, or is a sound file of some unsupported type, an <code>UnsupportedAudioFileException</code> exception is thrown. This behavior is convenient, in that the application programmer need not be bothered with testing file attributes, nor with adhering to any file-naming conventions. Instead, the <code>getAudioInputStream</code> method takes care of all the low-level parsing and verification that is required to validate the input file. 
+<p></p><p><a name="114595"> </a>
+The outer <code>try</code> clause then creates a byte array, <code>audioBytes</code>, of an arbitrary fixed length. We make sure that its length in bytes equals an integral number of frames, so that we won't end up reading only part of a frame or, even worse, only part of a sample. This byte array will serve as a buffer to temporarily hold a chunk of audio data as it's read from the stream. If we knew we would be reading nothing but very short sound files, we could make this array the same length as the data in the file, by deriving the length in bytes from the length in frames, as returned by <code>AudioInputStream's getFrameLength</code> method. (Actually, we'd probably just use a <code>Clip</code> object instead.) But to avoid running out of memory in the general case, we instead read the file in chunks, one buffer at a time.
+</p><p><a name="114597"> </a>
+The inner <code>try</code> clause contains a <code>while</code> loop, which is where we read the audio data from the <code>AudioInputStream</code> into the byte array. You should add code in this loop to handle the audio data in this array in whatever way is appropriate for your program's needs. If you're applying some kind of signal processing to the data, you'll probably need to query the <code>AudioInputStream's AudioFormat</code> further, to learn the number of bits per sample and so on. 
+</p>
+<p><a name="114599"> </a> Note that the method <code>AudioInputStream.read(byte[])</code> 
+  returns the number of <em>bytes</em> read&#151;not the number of samples or 
+  frames. This method returns -1 when there's no more data to read. Upon detecting 
+  this condition, we break from the <code>while</code> loop. </p>
+<a name="114602"> </a>
+<h3> Writing Sound Files</h3>
+<p><a name="114604"> </a>
+The previous section described the basics of reading a sound file, using specific methods of the <code>AudioSystem</code> and <code>AudioInputStream</code> classes. This section describes how to write audio data out to a new file.
+</p><p><a name="114606"> </a>
+The following <code>AudioSystem</code> method creates a disk file of a specified file type. The file will contain the audio data that's in the specified <code>AudioInputStream</code>:
+<blockquote><pre>
+static int write(AudioInputStream in, 
+  AudioFileFormat.Type fileType, File out)
+</pre></blockquote>
+Note that the second argument must be one of the file types supported by the system (for example, AU, AIFF, or WAV), otherwise the <code>write</code> method will throw an <code>IllegalArgumentException</code>. To avoid this, you can test whether or not a particular <code>AudioInputStream</code> may be written to a particular type of file, by invoking this <code>AudioSystem</code> method:
+<blockquote><pre>
+static boolean isFileTypeSupported
+  (AudioFileFormat.Type fileType, AudioInputStream stream)
+</pre></blockquote>
+which will return <code>true</code> only if the particular combination is supported. 
+<p></p><p><a name="114618"> </a>
+More generally, you can learn what types of file the system can write by invoking one of these <code>AudioSystem</code> methods:
+<blockquote><pre>
+static AudioFileFormat.Type[] getAudioFileTypes() 
+static AudioFileFormat.Type[]  
+  getAudioFileTypes(AudioInputStream stream) 
+</pre></blockquote>
+The first of these returns all the types of file that the system can write, and the second returns only those that the system can write from the given audio input stream.
+<p></p><p><a name="119705"> </a>
+The following excerpt demonstrates one technique for creating an output file from an <code>AudioInputStream</code> using the <code>write</code> method mentioned above. 
+<blockquote><pre>
+File fileOut = new File(someNewPathName);
+AudioFileFormat.Type fileType = fileFormat.getType();
+if (AudioSystem.isFileTypeSupported(fileType, 
+    audioInputStream)) {
+  AudioSystem.write(audioInputStream, fileType, fileOut);
+}
+</pre></blockquote>
+The first statement above, creates a new <code>File</code> object, <code>fileOut</code>, 
+with a user- or program-specified pathname. The second statement gets a file type 
+from a pre-existing <code>AudioFileFormat</code> object called <code>fileFormat</code>, 
+which might have been obtained from another sound file, such as the one that was 
+read in the "<a href="chapter7.html#114527">Reading Sound Files</a>" section of 
+this chapter. (You could instead supply whatever supported file type you want, 
+instead of getting the file type from elsewhere. For example, you might delete 
+the second statement and replace the other two occurrences of <code>fileType</code> 
+in the code above with <code>AudioFileFormat.Type.WAVE</code>.) 
+<p></p><p><a name="114635"> </a>
+The third statement tests whether a file of the designated type can be written from a desired <code>AudioInputStream</code>. Like the file format, this stream might have been derived from the sound file previously read. (If so, presumably you've processed or altered its data in some way, because otherwise there are easier ways to simply copy a file.) Or perhaps the stream contains bytes that have been freshly captured from the microphone input. 
+</p><p><a name="114637"> </a>
+Finally, the stream, file type, and output file are passed to the <code>AudioSystem</code>.<code>write</code> method, to accomplish the goal of writing the file.
+</p><a name="114640"> </a>
+<h3> Converting File and Data Formats</h3>
+<p><a name="114642"> </a> Recall from the section "<a href="chapter2.html#112348">What 
+  Is Formatted Audio Data?</a>" in Chapter 2, "<a href="chapter2.html">Overview 
+  of the Sampled Package</a>," that the Java 
+  Sound API distinguishes between audio <em>file</em> formats and audio <em>data</em> 
+  formats. The two are more or less independent. Roughly speaking, the data format 
+  refers to the way in which the computer represents each raw data point (sample), 
+  while the file format refers to the organization of a sound file as stored on 
+  a disk. Each sound file format has a particular structure that defines, for 
+  example, the information stored in the file's header. In some cases, the file 
+  format also includes structures that contain some form of meta-data, in addition 
+  to the actual "raw" audio samples. The remainder of this chapter examines methods 
+  of the Java Sound API that enable a variety of file-format and data-format conversions. 
+</p>
+<a name="114644"> </a>
+<h4> Converting from One File Format to Another</h4>
+<p><a name="114646"> </a>
+This section covers the fundamentals of converting audio file types in the Java Sound API. Once again we pose a hypothetical program whose purpose, this time, is to read audio data from an arbitrary input file and write it into a file whose type is AIFF. Of course, the input file must be of a type that the system is capable of reading, and the output file must be of a type that the system is capable of writing. (In this example, we assume that the system is capable of writing AIFF files.) The example program doesn't do any data format conversion. If the input file's data format can't be represented as an AIFF file, the program simply notifies the user of that problem. On the other hand, if the input sound file is an already an AIFF file, the program notifies the user that there is no need to convert it.
+</p><p><a name="114648"> </a>
+The following function implements the logic just described:
+</p><blockquote><pre>
+public void ConvertFileToAIFF(String inputPath, 
+  String outputPath) {
+  AudioFileFormat inFileFormat;
+  File inFile;
+  File outFile;
+  try {
+    inFile = new File(inputPath);
+    outFile = new File(outputPath);	
+  } catch (NullPointerException ex) {
+    System.out.println("Error: one of the 
+      ConvertFileToAIFF" +" parameters is null!");
+    return;
+  }
+  try {
+    // query file type
+    inFileFormat = AudioSystem.getAudioFileFormat(inFile);
+    if (inFileFormat.getType() != AudioFileFormat.Type.AIFF) 
+    {
+      // inFile is not AIFF, so let's try to convert it.
+      AudioInputStream inFileAIS = 
+        AudioSystem.getAudioInputStream(inFile);
+      inFileAIS.reset(); // rewind
+      if (AudioSystem.isFileTypeSupported(
+             AudioFileFormat.Type.AIFF, inFileAIS)) {
+         // inFileAIS can be converted to AIFF. 
+         // so write the AudioInputStream to the
+         // output file.
+         AudioSystem.write(inFileAIS,
+           AudioFileFormat.Type.AIFF, outFile);
+         System.out.println("Successfully made AIFF file, "
+           + outFile.getPath() + ", from "
+           + inFileFormat.getType() + " file, " +
+           inFile.getPath() + ".");
+         inFileAIS.close();
+         return; // All done now
+       } else
+         System.out.println("Warning: AIFF conversion of " 
+           + inFile.getPath()
+           + " is not currently supported by AudioSystem.");
+    } else
+      System.out.println("Input file " + inFile.getPath() +
+          " is AIFF." + " Conversion is unnecessary.");
+  } catch (UnsupportedAudioFileException e) {
+    System.out.println("Error: " + inFile.getPath()
+        + " is not a supported audio file type!");
+    return;
+  } catch (IOException e) {
+    System.out.println("Error: failure attempting to read " 
+      + inFile.getPath() + "!");
+    return;
+  }
+}
+</pre></blockquote>
+<p><a name="114706"> </a> As mentioned, the purpose of this example function, 
+  <code>ConvertFileToAIFF</code>, is to query an input file to determine whether 
+  it's an AIFF sound file, and if it isn't, to try to convert it to one, producing 
+  a new copy whose pathname is specified by the second argument. (As an exercise, 
+  you might try making this function more general, so that instead of always converting 
+  to AIFF, the function converts to the file type specified by a new function 
+  argument.) Note that the audio data format of the copy&#151;that is, the new 
+  file-mimics the audio data format of original input file. </p>
+<p><a name="114708"> </a>
+Most of this function is self-explanatory and is not specific to the Java Sound API. There are, however, a few Java Sound API methods used by the routine that are crucial for sound file-type conversions. These method invocations are all found in the second <code>try</code> clause, above, and include the following:
+</p><ul><a name="114710"> </a>
+<li><code>AudioSystem.getAudioFileFormat</code>: used here to determine whether the input file is already an AIFF type. If so, the function quickly returns; otherwise the conversion attempt proceeds.
+<a name="114712"> </a>
+<p>
+<li><code>AudioSystem.isFileTypeSupported</code>: Indicates whether the system can write a file of the specified type that contains audio data from the specified <code>AudioInputStream.</code> In our example, this method returns <code>true</code> if the specified audio input file can be converted to AIFF audio file format. If <code>AudioFileFormat.Type.AIFF</code> isn't supported, <code>ConvertFileToAIFF </code>issues a warning that the input file can't be converted, then returns.
+<a name="114714"> </a>
+<p>
+<li><code>AudioSystem.write</code>: used here to write the audio data from the AudioInputStream <code>inFileAIS</code> to the output file <code>outFile</code>.
+<p><a name="114716"> </a>
+</ul>
+The second of these methods, <code>isFileTypeSupported</code>, helps to determine, in advance of the write, whether a particular input sound file can be converted to a particular output sound file type. In the next section we will see how, with a few modifications to this <code>ConvertFileToAIFF</code> sample routine, we can convert the audio data format, as well as the sound file type.
+<p></p><a name="114718"> </a>
+<h4> Converting Audio between Different Data Formats</h4>
+<p><a name="114720"> </a>
+The previous section showed how to use the Java Sound API to convert a file from one <em>file</em> format (that is, one type of sound file) to another. This section explores some of the methods that enable audio <em>data</em> format conversions. 
+</p><p><a name="114722"> </a>
+In the previous section, we read data from a file of an arbitrary type, and saved it in an AIFF file. Note that although we changed the type of file used to store the data, we didn't change the format of the audio data itself. (Most common audio file types, including AIFF, can contain audio data of various formats.) So if the original file contained CD-quality audio data (16-bit sample size, 44.1-kHz sample rate, and two channels), so would our output AIFF file. 
+</p><p><a name="114724"> </a>
+Now suppose that we want to specify the <em>data</em> format of the output file, as well as the file type. For example, perhaps we are saving many long files for use on the Internet, and are concerned about the amount of disk space and download time required by our files. We might choose to create smaller AIFF files that contain lower-resolution data-for example, data that has an 8-bit sample size, an 8-kHz sample rate, and a single channel.
+</p><p><a name="114726"> </a>
+Without going into as much coding detail as before, let's explore some of the methods used for data format conversion, and consider the modifications that we would need to make to the <code>ConvertFileToAIFF</code> function to accomplish the new goal.
+</p><p><a name="118599"> </a>
+The principal method for audio data conversion is, once again, found in the <code>AudioSystem</code> class. This method is a variant of <code>getAudioInputStream</code>: 
+<blockquote><pre>AudioInputStream getAudioInputStream(AudioFormat
+    format, AudioInputStream stream)
+</pre></blockquote>
+This function returns an <code>AudioInputStream</code> that is the result of converting the <code>AudioInputStream</code>, <code>stream</code>, using the indicated <code>AudioFormat</code>, <code>format</code>. If the conversion isn't supported by <code>AudioSystem</code>, this function throws an <code>IllegalArgumentException</code>.
+<p></p><p><a name="114734"> </a>
+To avoid that, we can first check whether the system can perform the required conversion by invoking this <code>AudioSystem</code> method:
+<blockquote><pre>boolean isConversionSupported(AudioFormat targetFormat,
+    AudioFormat sourceFormat)
+</pre></blockquote>
+In this case, we'd pass <code>stream.getFormat()</code> as the second argument.
+<p></p><p><a name="119726"> </a>
+To create a specific <code>AudioFormat</code> object, we use one of the two <code>AudioFormat</code> constructors shown below, either
+<blockquote><pre> AudioFormat(float sampleRate, int sampleSizeInBits,
+    int channels, boolean signed, boolean bigEndian)
+</pre></blockquote>
+which constructs an <code>AudioFormat</code> with a linear PCM encoding and the given parameters, or
+<blockquote><pre>AudioFormat(AudioFormat.Encoding encoding, 
+    float sampleRate, int sampleSizeInBits, int channels,
+    int frameSize, float frameRate, boolean bigEndian) 
+</pre></blockquote>
+which also constructs an <code>AudioFormat</code>, but lets you specify the encoding, frame size, and frame rate, in addition to the other parameters.
+<p></p><p><a name="114751"> </a>
+Now, armed with the methods above, let's see how we might extend our <code>ConvertFileToAIFF</code> function to perform the desired "low-res" audio data format conversion. First, we would construct an <code>AudioFormat</code> object describing the desired output audio data format. The following statement would suffice and could be inserted near the top of the function:
+<blockquote><pre>AudioFormat outDataFormat = new AudioFormat((float) 8000.0,
+(int) 8, (int) 1, true, false);
+</pre></blockquote>
+Since the <code>AudioFormat</code> constructor above is describing a format with 8-bit samples, the last parameter to the constructor, which specifies whether the samples are big or little endian, is irrelevant. (Big versus little endian is only an issue if the sample size is greater than a single byte.)
+<p></p><p><a name="114758"> </a>
+The following example shows how we would use this new <code>AudioFormat</code> to convert the <code>AudioInputStream</code>, <code>inFileAIS</code>, that we created from the input file:
+<blockquote><pre>
+AudioInputStream lowResAIS;         
+  if (AudioSystem.isConversionSupported(outDataFormat,   
+    inFileAIS.getFormat())) {
+    lowResAIS = AudioSystem.getAudioInputStream
+      (outDataFormat, inFileAIS);
+  }
+</pre></blockquote>
+It wouldn't matter too much where we inserted this code, as long as it was after the construction of <code>inFileAIS</code>. Without the <code>isConversionSupported</code> test, the call would fail and throw an <code>IllegalArgumentException</code> if the particular conversion being requested was unsupported. (In this case, control would transfer to the appropriate <code>catch</code> clause in our function.)
+<p></p><p><a name="114769"> </a>
+So by this point in the process, we would have produced a new <code>AudioInputStream</code>, resulting from the conversion of the original input file (in its <code>AudioInputStream</code> form) to the desired low-resolution audio data format as defined by <code>outDataFormat</code>. 
+</p><p><a name="114771"> </a>
+The final step to produce the desired low-resolution, AIFF sound file would be to replace the <code>AudioInputStream</code> parameter in the call to <code>AudioSystem.write</code> (that is, the first parameter) with our converted stream, <code>lowResAIS</code>, as follows: 
+<blockquote><pre>
+AudioSystem.write(lowResAIS, AudioFileFormat.Type.AIFF, 
+  outFile);
+</pre></blockquote>
+These few modifications to our earlier function produce something that converts both the audio data and the file format of any specified input file, assuming of course that the system supports the conversion.
+<p></p><a name="114777"> </a>
+<h4> Learning What Conversions Are Available</h4>
+<p><a name="114779"> </a>
+Several <code>AudioSystem</code> methods test their parameters to determine whether the system supports a particular data format conversion or file-writing operation. (Typically, each method is paired with another that performs the data conversion or writes the file.) One of these query methods, <code>AudioSystem.isFileTypeSupported</code>, was used in our example function, <code>ConvertFileToAIFF</code>, to determine whether the system was capable of writing the audio data to an AIFF file. A related <code>AudioSystem</code> method, <code>getAudioFileTypes(AudioInputStream)</code>, returns the complete list of supported file types for the given stream, as an array of <code>AudioFileFormat.Type</code> instances. The method:
+<blockquote> 
+  <pre>
+boolean isConversionSupported(AudioFormat.Encoding encoding, <br>                              AudioFormat format) 
+</pre>
+</blockquote>
+is used to determine whether an audio input stream of the specified encoding can be obtained from an audio input stream that has the specified audio format. Similarly, the method:
+<blockquote>
+  <pre>
+boolean isConversionSupported(AudioFormat newFormat,
+                              AudioFormat oldFormat) 
+</pre>
+</blockquote>
+<p><a name="114790"> </a>
+tells us whether an <code>AudioInputStream</code> with the specified audio format, <code>newFormat</code>, can be obtained through the conversion of an <code>AudioInputStream</code> that has the audio format <code>oldFormat</code>. (This method was invoked in the previous section's code excerpt that created a low-resolution audio input stream, <code>lowResAIS</code>.)
+</p><p><a name="114792"> </a>
+These format-related queries help prevent errors when attempting to perform format conversions with the Java Sound API.
+</p>
+<p>&nbsp;</p></body>
+</html>

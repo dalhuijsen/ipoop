@@ -1,0 +1,187 @@
+<html>
+<head>
+<title>Using the Conventional Applet Tag</title>
+
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<hr>
+<h1>Using the Conventional <code>APPLET</code> Tag </h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <script src="menu_script.js" language="JavaScript"></script>
+  </select>
+</form>
+<p>This section includes the following topics:</p>
+<ul>
+  <li><b><a href="#applet">Support for the <tt>APPLET</tt> Tag</a></b></li>
+  <li><b><a href="#object">Compatibility with the <tt>OBJECT</tt> Tag</a></b></li>
+  <li><b><a href="#browsers">Supported Platforms and Browsers</a></b></li>
+  <li><b><a href="#update">Updating Old Class Files</a></b></li>
+  <li><b><a href="#enhancements">Other Enhancements</a></b></li>
+</ul>
+<h2><a name="applet">Support for the <tt>APPLET</tt> Tag</a></h2>
+<p> Java<sup><font size="-2">TM</font></sup> Plug-in now supports the HTML <tt>APPLET</tt> 
+  tag for launching applets. Users may configure their browsers so that Sun's 
+  JRE is the default runtime environment for handling <tt>APPLET</tt> tags. </p>
+<table width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr> 
+    <td> 
+      <h2><u>Notes</u></h2>
+      <ol>
+        <li>Even though Java Plug-in now supports the <tt>APPLET</tt> tag, it 
+          does not support applets that make use of proprietary technologies. 
+          Examples of such technologies are: 
+          <ul>
+            <li>CAB files </li>
+            <li>Authenticode signing </li>
+            <li>Java Moniker</li>
+          </ul>
+        </li>
+        <li>With the conventional applet format, use of an attribute named <code>object</code> 
+          with a <code>PARAM</code> element will cause an exception with the Sun 
+          VM: 'Either "code" or "object" should be specified, but not both.'. 
+          With the Microsoft VM, no exception will be thrown. This is a compatibility 
+          issue. To avoid the exception with the Sun VM, do not use an attribute 
+          named <code>object</code> with a <code>PARAM</code> element in an applet.</li>
+      </ol>
+    </td>
+  </tr>
+</table>
+<h2><a name="object">Compatibility with the <tt>OBJECT</tt> Tag</a> (Internet 
+  Explorer on Windows Platform)</h2>
+<p> This release of Java Plug-in supports the use of <tt>APPLET</tt> tags for 
+  launching applets. However, it is also fully backward compatible with previous 
+  Java Plug-in releases in its support of the <tt>OBJECT</tt> tag for launching 
+  applets in Internet Explorer running on the Windows platform. As before, developers 
+  have the option of using the HTML Converter to set up their applet web pages 
+  to use the <tt>OBJECT</tt> tag. </p>
+<p> For more information about using <tt>OBJECT</tt> tags to launch applets on 
+  Java Plug-in, see <a href="using_tags.html">Using OBJECT, EMBED and APPLET Tags 
+  in Java Plug-in</a> and <a href="html_converter.html">Using the HTML Converter 
+  to Convert Applet Tags for Java Plug-in</a>. </p>
+<h2><a name="browsers">Supported Platforms and Browsers</a></h2>
+The support for the <tt>APPLET</tt> tag in Java Plug-in is intended for use on 
+the following operating systems: 
+<ul>
+  <li>Windows 95 
+  <li>Windows 98 (1st and 2nd editions) 
+  <li>Windows ME 
+  <li>Windows NT 4.0 
+  <li>Windows 2000 
+  <li>Windows XP
+  <li>Unix
+  <li>Linux 
+</ul>
+<p> Java Plug-in provides support for the <tt>APPLET</tt> tag on the following 
+  web browsers: </p>
+<ul>
+  <li>Internet Explorer 4.0 (4.01 recommended), 5.0 (5.01 recommended), 5.5 (Service 
+    Pack 2 recommended), 6.0 </li>
+  <li>Netscape 6.0, 6.1</li>
+</ul>
+<table width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr>
+    <td>
+      <h2><u>Note</u></h2>
+      <p>Applet tag support currently does not work on Netscape 4.</p>
+</td>
+  </tr>
+</table>
+<h2><a name="update">Updating Old Class Files</a></h2>
+<h2></h2>
+<p> In some cases, the new Java Runtime Environment associated with this Java 
+  Plug-in release will not run class files that were generated with old compilers. 
+  The usual symptom is a <tt>java.lang.ClassFormatError</tt> that the virtual 
+  machine throws when it attempts to load such a class file. This failure has 
+  nothing specifically to do with the changes in this release. Rather, old bytecode 
+  compilers did not strictly adhere to proper class-file format in all situations 
+  when generating class files. Recent virtual machines are implemented to be strict 
+  in enforcing proper class file format, and this can lead to errors when they 
+  attempt to load old, improperly formatted class files. Some typical problems 
+  in some older class files are (this list is not exhaustive): </p>
+<ul>
+  <li>There are extra bytes at the end of the class file; </li>
+  <li>The class file contains method or field names that do not begin with a letter; 
+  </li>
+  <li>The class attempts to access private members of another class; </li>
+  <li>The class file has other format errors, including illegal constant pool 
+    indices and illegal UTF-8 strings; </li>
+  <li>Some early (third-party) bytecode obfuscators produced class files that 
+    violated proper class-file format. </li>
+</ul>
+<p> You can avoid this type of problem by recompiling your classes with the Javac 
+  bytecode compiler from the current Java 2 SDK. If you choose to use a third-party 
+  obfuscator, be sure to use one that produces class files that respect proper 
+  class-file format. </p>
+<h2><a name="enhancements">Other Enhancements</a></h2>
+<h2></h2>
+<p>In addition to the support for the <tt>APPLET</tt> tag described <a href="#applet">above</a>, 
+  the Java Plug-in has many performance and architecture enhancements that will 
+  make it more suitable for widespread use on consumer client machines that typically 
+  are not as powerful as client platforms in an enterprise environment. Some of 
+  these enhancements are summarized below. </p>
+<h3>Memory management<br>
+</h3>
+<ul>
+  <li> Dynamic maximum heap size is scaled down from 128 MB to 96MB to avoid unnecessary 
+    paging on the system.</li>
+  <li> Classloader implementation has been tuned to allow memory to be reclaimed 
+    more often by the garbage collector.</li>
+  <li> Potential memory leak issue is addressed by using JNI/COM smart pointers 
+    in implementation.<br>
+  </li>
+</ul>
+<h3> Performance<br>
+</h3>
+<ul>
+  <li> Applet download time is significant reduced by relying on browser caching 
+    when possible. No connection will be opened on the server side unless it is 
+    absolutely necessary.</li>
+  <li> Applet lifecycle is controlled asynchronously to allow very fast page switch.</li>
+  <li> Sped up classloader object reclaim by removing its <tt>finalize()</tt> 
+    method.</li>
+  <li> HTTPS read has been made significantly faster by increasing buffer size.</li>
+  <li> HTTPS calls are significant faster by statically linking Microsoft's Wininet 
+    instead of dynamic function lookup every time.</li>
+  <li> JavaScript performance is greatly enhanced by eliminating <i>BeanInfo</i> 
+    lookup over the network.</li>
+  <li> Java Console performance is enhanced by using the Console Writer thread 
+    to avoid blocking <tt>System.out</tt> and <tt>System.err</tt> when possible.<br>
+  </li>
+</ul>
+<h3> Design<br>
+</h3>
+<ul>
+  <li> Default JavaScript/Java interaction is changed from <i>"not-scriptable"</i> 
+    to <i>"scriptable"</i>, allowing any applets running through the <tt>APPLET</tt> 
+    tag to be used from JavaScript without modification.</li>
+</ul>
+<h3> JDK 1.1 compatibility<br>
+</h3>
+<ul>
+  <li>Java Plug-in can now access the <tt>sun.audio</tt> package.</li>
+  <li>Some applets are compiled with compilers that don't generate proper class 
+    file format which conforms to the class-file specification. Such appletss 
+    may result in a <tt>ClassFormatError</tt> when Java Plug-in attempts to load 
+    them. To help address this problem, <tt>PluginClassLoader</tt> provides a 
+    bytecode scanner to transform bad class files to conforming on-the-fly to 
+    allow the applets to run. Currently, only bad class files with the following 
+    errors may be transformed 
+    <ul>
+      <li>Local variable name has bad constant pool index</li>
+      <li>Extra bytes at the end of the class file</li>
+      <li>Code segment has wrong length</li>
+      <li>Illegal Field/Method name</li>
+      <li>Illegal field/method modifiers</li>
+      <li>Invalid start_pc/length in local var table<br>
+      </li>
+    </ul>
+  </li>
+</ul>
+<p>See also <a href="#update">Updating Old Class Files</a> above. </p>
+<pre>
+</pre>
+</body>
+</html>

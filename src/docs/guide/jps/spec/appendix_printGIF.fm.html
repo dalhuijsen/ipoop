@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide:  - Example: PrintGIF.java
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="appendix_2DtoStream.fm.html">PREV</a>
+ | <a href="jps_glossaryapp.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+<a name="7081"><!-- --></a>
+<hr size="8" width="35%" align="left" noshade>
+
+<table summary="layout" border=0>
+<tr valign=bottom>
+<td valign=bottom>
+<U><h1><FONT FACE="ARIAL,HELVETICA,TIMES ROMAN" SIZE=-1>APPENDIX</FONT>
+F 	
+</h1></U>
+</td>
+</tr>
+</table>
+
+<a name="7083"><!-- --></a>
+<h1>
+Example: PrintGIF.java
+</h1>
+<!--
+<hr size="1" width="100%" align="left" noshade>
+-->
+<blockquote><pre>
+/*
+* Copyright 2001 Sun Microsystems, Inc. All Rights Reserved.
+*
+* This software is the proprietary information of Sun Microsystems, Inc.
+* Use is subject to license terms.
+*
+*/
+
+import java.io.*;
+import javax.print.*;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
+
+/*
+*  Use the Java(TM) Print Service API to locate a print service which
+*  can print a GIF-encoded image. A GIF image is printed according to
+*  a job template specified as a set of printing attributes.
+*/
+public class PrintGIF {
+
+	public static void main(String args[]) {
+
+		/* Use the pre-defined flavor for a GIF from an InputStream */
+		DocFlavor flavor = DocFlavor.INPUT_STREAM.GIF;
+
+		/* Create a set which specifies how the job is to be printed */
+		PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
+		aset.add(MediaSizeName.NA_LETTER);
+		aset.add(new Copies(1));
+
+		/* Locate print services which can print a GIF in the manner specified */
+		PrintService[] pservices =
+			PrintServiceLookup.lookupPrintServices(flavor, aset);
+
+		if (pservices.length &gt; 0) {
+			/* Create a Print Job */
+			DocPrintJob printJob = pservices[0].createPrintJob();
+
+			/* Create a Doc implementation to pass the print data */
+			Doc doc = new InputStreamDoc("java2dlogo.gif", flavor);
+
+			/* Print the doc as specified */
+			try {
+				printJob.print(doc, aset);
+			} catch (PrintException e) { 
+				System.err.println(e);
+			}
+		} else {
+			System.err.println("No suitable printers");
+		}
+	}
+}
+
+class InputStreamDoc implements Doc {
+	private String filename;
+	private DocFlavor docFlavor;
+	private InputStream stream;
+
+	public InputStreamDoc(String name, DocFlavor flavor) {
+		filename = name;
+		docFlavor = flavor;
+	}
+   
+	public DocFlavor getDocFlavor() { 
+		return docFlavor;
+	}
+
+	/* No attributes attached to this Doc - mainly useful for MultiDoc */
+	public DocAttributeSet getAttributes() {
+		return null;
+	}
+
+	/* Since the data is to be supplied as an InputStream delegate to
+	* getStreamForBytes().
+	*/
+	public Object getPrintData() throws IOException {
+		return getStreamForBytes();
+	}
+
+	/* Not possible to return a GIF as text */
+	public Reader getReaderForText()
+		throws UnsupportedEncodingException, IOException {
+   	return null;
+	}
+
+	/* Return the print data as an InputStream.
+	* Always return the same instance.
+	*/
+	public InputStream getStreamForBytes() throws IOException {
+		synchronized(this) {
+			if (stream == null) {
+				stream = new FileInputStream(filename);
+			}
+			return stream;
+		} 
+	}
+}
+</pre></blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="appendix_2DtoStream.fm.html">PREV</a>
+ | <a href="jps_glossaryapp.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

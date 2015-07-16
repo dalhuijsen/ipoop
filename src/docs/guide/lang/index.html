@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>The java.lang.* and java.util.* Packages</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+<h1>The java.lang.* and java.util.* Packages</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+<blockquote>
+The <tt>java.lang</tt> package provides classes that are fundamental to 
+the design of the Java<sup><font size=-2>TM</font></sup> programming 
+language. The <tt>java.lang.refs</tt> and <tt>java.lang.reflect</tt> 
+packages provide, respectively, reference-object classes and APIs 
+for obtaining reflective information about classes.
+<p>
+The <tt>java.util.*</tt> packages provide support for the event 
+model, collections framework, date and time facilities, and contains 
+various utility classes.  The <tt>java.util.zip</tt> and 
+<tt>java.util.jar</tt> packages provide support for ZIP file 
+format and Java Archive (JAR) file formats respectively, and
+the <tt>java.util.prefs</tt> package implements the Preferences API.
+</blockquote>
+
+
+<h2>Enhancements</h2>
+<blockquote>
+Java 2 SDK v1.4 offers several significant enhancements to the 
+functionality in the <tt>java.lang.*</tt> and <tt>java.util.*</tt> 
+packages, including
+<ul>
+<li><b><a href="assert.html">Assertion Factility</a></b> - 
+Assertions are boolean expressions that the programmer believes to be 
+true concerning the state of a computer program. For example, after 
+sorting a list, the programmer might assert that the list is in ascending 
+order.  Evaluating assertions at runtime to confirm their validity is 
+one of the most powerful tools for improving code quality, as it quickly 
+uncovers the programmer's misconceptions concerning a program's behavior. 
+<li><b><a href="preferences.html">Preferences API</a></b> - 
+The preferences API, implemented by package <tt><a href="../../api/java/util/prefs/package-summary.html">java.util.prefs</a></tt>, allows applications 
+to store and retrieve user and system preference and configuration data. 
+This data is stored persistently in an implementation-dependent backing store.
+The Preferences API is intended to replace most common uses of class 
+<tt>java.util.Properties</tt>, rectifying many of its deficiencies, while 
+retaining its light weight. 
+<li><b><a href="../util/logging/index.html">Logging API</a></b> - 
+The Java Logging API facilitates software servicing and
+      maintenance at customer sites by producing log reports suitable
+      for analysis by end users, system administrators, field service
+      engineers, and software development teams. The Logging APIs
+      capture information such as security failures, configuration
+      errors, performance bottlenecks, and/or bugs in the application
+      or platform. The core package includes support for delivering
+      plain text or XML formatted log records to memory, output
+      streams, consoles, files, and sockets. In addition, the logging
+      APIs are capable of interacting with logging services that
+      already exist on the host operating system.
+<li><b>Regular Expressions</b> - New package <a href="../../api/java/util/regex/package-summary.html"><tt>java.util.regex</tt></a> 
+contains classes for matching character sequences against patterns 
+specified by regular expressions. 
+<li><b><a href="chained-exceptions.html">Chained Exception Facility</a></b> 
+- This is a new facility that provides 
+a common API to record the fact that one exception caused
+another, to access causative exceptions, and to acess the 
+entire "causal chain" as part of the standard stack backtrace, ensuring that
+preexisting programs will provide this information with no additional effort
+on the part of their authors.
+</ul>
+
+<b>Enhancements in Java 2 SDK v1.3</b><br>
+Version 1.3 of the Java 2 SDK offered several enhancements in 
+the <tt>java.lang</tt> and <tt>java.util.*</tt> packages.  
+See <b><a href=enhancements-1.3.html>Enhancements in 1.3</a></b> for 
+details.
+</blockquote>
+
+<h2>API Specifications</h2>
+<UL>
+<LI>Package <a href="../../api/java/lang/package-summary.html"><b>java.lang</b></a> 
+
+<LI>Package <a href="../../api/java/lang/ref/package-summary.html"><b>java.lang.ref</b></a> 
+
+<LI>Package <a href="../../api/java/lang/reflect/package-summary.html"><b>java.lang.reflect</b></a> 
+
+
+<LI>Package <a href="../../api/java/util/package-summary.html"><b>java.util</b></a> 
+
+<LI>Package <a href="../../api/java/util/prefs/package-summary.html"><b>java.util.prefs</b></a>
+
+<LI>Package <a href="../../api/java/util/logging/package-summary.html"><b>java.util.logging</b></a> 
+
+<LI>Package <a href="../../api/java/util/regex/package-summary.html"><b>java.util.regex</b></a>
+
+<LI>Package <a href="../../api/java/util/jar/package-summary.html"><b>java.util.jar</b></a> 
+
+<LI>Package <a href="../../api/java/util/zip/package-summary.html"><b>java.util.zip</b></a> 
+
+</UL>
+
+<h2>Related Documentation</h2>
+<UL>
+<LI><a href="../collections">The Collections Framework</a> 
+<LI>Package <a href="../jar">Java Archive (JAR) Features</a> 
+<LI><a href="../intl/encoding.doc.html">Supported Encodings</a>
+</UL>
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+</BODY>
+
+</HTML>

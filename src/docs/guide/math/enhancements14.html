@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Enhancements to java.math</title>
+  </head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Enhancements to java.math</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+<blockquote>
+The following enhancement has been made to the <tt>java.math</tt> package 
+in version 1.4 of the Java<sup><font size=-2>TM</font></sup> 2 SDK.
+<p>
+<b>Performance enhancements for prime generation in <tt>BigIntenger</tt></b>
+<blockquote>
+New static method <a href="../../api/java/math/BigInteger.html#probablePrime(int, java.util.Random)"><tt>probablePrime</tt></a> has been added to class 
+<tt>BigInteger</tt> for generating prime numbers.  Previously, the sole 
+means of generating a prime <tt>BigInteger</tt> required
+the caller to provide a 'certainty' (the log of the probability of
+compositeness that the caller was willing to tolerate). However, providing 
+an unreasonable value for the certainty could lead to poor performance
+(if the certainty was too high) or serious bugs (if it was too low).  
+The new prime-generation method provides an efficient algorithm for 
+generating primes using an automatically determined, appropriate value 
+for the certainty based on a draft ANSI specification (X9-80).
+</blockquote>
+
+</blockquote>
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2001
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <br>
+
+
+
+<FONT SIZE="-1">
+Please send comments to:
+<a href="mailto:j2se-comments@java.sun.com">j2se-comments@java.sun.com</a>
+</FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </body>
+</html>

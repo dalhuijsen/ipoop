@@ -1,0 +1,383 @@
+<html>
+<head>
+<title>jdb - The Java Debugger</title>
+<BODY BGCOLOR="#FFFFFF">
+
+<h1>jdb - The Java Debugger</h1>
+<blockquote>
+<b>jdb</b> helps you find and fix bugs in Java language programs.
+</blockquote>
+
+<h2>SYNOPSIS</h2>
+<blockquote>
+<pre>
+<b>jdb</b> [ options ] [ class ] [ arguments ] 
+</pre>
+</blockquote>
+
+<blockquote>
+<dl>
+     <dt><a href="#options"><code>options</code></a>
+         <dd>Command-line options, as specified below.
+
+     <dt><code>class</code>
+         <dd>Name of the class to begin debugging.
+
+     <dt><code>arguments</code>
+         <dd>Arguments passed to the <code>main()</code> method of <code>class</code>.
+</dl>
+</blockquote>
+
+<a name="description"></a>
+<h2>DESCRIPTION</h2>
+<blockquote>
+The Java Debugger, <b>jdb</b>, is a simple command-line debugger for Java 
+classes. It is a demonstration of the 
+<a href="../../guide/jpda/index.html">Java Platform Debugger Architecture</a>
+that provides inspection and debugging of a local or remote Java 
+Virtual Machine.
+
+<h3>Starting a jdb Session</h3>
+<blockquote>
+There are many ways to start a jdb session. 
+The most frequently used way is to have <b>jdb</b> launch a new Java 
+Virtual Machine (VM) with the main class of the application 
+to be debugged. This is done by substituting the command <b>jdb</b> 
+for <b>java</b> in the command line. 
+For example, if your application's main class is MyClass,  
+you use the following command to debug it under JDB: 
+
+<pre width=80>
+ % jdb MyClass 
+</pre>
+
+When started this way, <b>jdb</b> invokes a second Java VM
+with any specified parameters, loads the specified class, and stops the 
+VM before executing that class's first instruction.
+
+<p>
+Another way to use <b>jdb</b> is by attaching it to a Java VM
+that is already running. A VM that is to be debugged with
+<b>jdb</b> must be started with the following options:
+<p>
+<center><table BORDER WIDTH="90%" summary="Options for Starting a VM to which j
+db will Attach when the VM is Running">
+
+<tr>
+<th align="left">Option</th>
+<th align="left">Purpose</th>
+</tr>
+
+<tr>
+<td><tt>-Xdebug</tt></td> 
+<td>Enables debugging support in the VM</td>
+</tr>
+
+<tr>
+<td><tt>-Xrunjdwp:transport=dt_socket,server=y,suspend=n</tt></td> 
+<td>Loads in-process debugging libraries and specifies the kind 
+of connection to be made.</td>
+</tr>
+
+</table></center>
+<p>
+For example, the following command will run the MyClass application, and
+allow <b>jdb</b> to connect to it at a later time. 
+
+<pre width=80>
+ % java -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n MyClass
+</pre>
+
+You can then attach <b>jdb</b> to the VM with the 
+following commmand:
+
+<pre width=80>
+ % jdb -attach 8000 
+</pre>
+
+Note that "MyClass" is not specified in the <b>jdb</b> command line
+in this case because <b>jdb</b> is connecting to an existing VM
+instead of launching a new one. 
+
+
+<p>
+There are many other ways to connect the debugger to a VM, 
+and all of them are supported by <b>jdb</b>. The Java Platform 
+Debugger Architecture has additional <a href="../../guide/jpda/conninv.html">documentation</a>
+on these connection options.
+
+<h3>Basic jdb Commands</h3>
+The following is a list of the basic <b>jdb</b> commands. The Java debugger
+supports other commands which you can list using <b>jdb</b>'s <tt>help</tt>
+command.
+<p>
+<blockquote>
+<dl>
+<dt><b>help</b>, or <b>?</b>
+<dd>
+The most important <b>jdb</b> command, <tt>help</tt> displays the list of
+recognized commands with a brief description.
+
+<dt><b>run</b>
+<dd>
+After starting <b>jdb</b>, and setting any necessary breakpoints,
+you can use this command to start the execution the debugged application. 
+This command is available only when <b>jdb</b> launches the 
+debugged application (as opposed to attaching to an existing VM). 
+
+<dt><b>cont</b>
+<dd>
+Continues execution of the debugged application after a breakpoint, 
+exception, or step. 
+
+<dt><b>print</b>
+<dd>
+Displays Java objects and primitive values. For variables or fields of 
+primitive types, the actual value is printed. For objects, a short
+description is printed. See the <tt>dump</tt> command below for 
+getting more information about an object.
+<p><em>NOTE: To display local variables, the containing class must have been
+compiled with the <a href="javac.html">javac</a> 
+<i>-g</i> option.</em>
+<p>
+<tt>print</tt> supports many simple Java expressions including those
+with method invocations, for example:
+<ul>
+<li><tt>print MyClass.myStaticField</tt>
+<li><tt>print myObj.myInstanceField</tt>
+<li><tt>print i + j + k</tt>        <i>(i, j, k are primities and either fields or local variables)</i>
+<li><tt>print myObj.myMethod()</tt> <i>(if myMethod returns a non-null)</i>
+<li><tt>print new java.lang.String("Hello").length()</tt>
+</ul>
+
+<dt><b>dump</b>
+<dd>
+For primitive values, this command is identical to <tt>print</tt>.
+For objects, it prints the current value of each field defined in 
+the object. Static and instance fields are included. 
+<p>
+The <tt>dump</tt> command supports the same set of expressions as the 
+<tt>print</tt> command.
+
+<dt><b>threads</b>
+<dd>
+List the threads that are currently running.  
+For each thread, its name and current status are printed, as well
+as an index that can be used for other commands, for example:
+
+<blockquote>
+<pre>
+4. (java.lang.Thread)0x1 main      running
+</pre>
+</blockquote>
+
+In this example, the thread index is 4, the thread is an instance of 
+java.lang.Thread, the thread name is "main", and it is currently running, 
+                                     
+<dt><b>thread</b> </dd>
+<dd>
+Select a thread to be the current thread. Many <b>jdb</b> commands are
+based on the setting of the current thread. The thread is specified with
+the thread index described in the <tt>threads</tt> command above. 
+                                     
+<dt><b>where</b> </dd>
+<dd>
+<code>where</code> with no arguments dumps the stack of the current thread.
+<code>where all</code> dumps the stack of all threads in the current thread
+group. <code>where </code><i>threadindex</i> dumps the stack of the specified thread.
+<p>
+If the current thread is suspended (either through an event such
+as a breakpoint or through the <tt>suspend</tt> command), local
+variables and fields can be displayed with the <tt>print</tt> and
+<tt>dump</tt> commands. The <tt>up</tt> and <tt>down</tt> commands select
+which stack frame is current.
+
+</dl>
+</blockquote>
+
+<h3>Breakpoints</h3>
+<blockquote>
+Breakpoints can be set in <b>jdb</b> at line numbers or at 
+the first instruction of a method, for example:
+<ul>
+<li><tt>stop at MyClass:22</tt>   <i>(sets a breakpoint at the 
+first instruction for line 22 of the source file containing MyClass)</i>
+<li><tt>stop in java.lang.String.length</tt> <i>(sets a breakpoint at the 
+beginnig of the method <tt>java.lang.String.length</tt>)</i>
+<li><tt>stop in MyClass.&lt;init&gt;</tt> <i>(&lt;init&gt; identifies the MyClass constructor)</i>
+<li><tt>stop in MyClass.&lt;clinit&gt;</tt> <i>(&lt;clinit&gt; identifies the static initialization code for MyClass)</i>
+</ul>
+<p>
+If a method is overloaded, you must also specify its argument types 
+so that the proper method can be selected for a breakpoint. For
+example, "<tt>MyClass.myMethod(int,java.lang.String)</tt>", or 
+"<tt>MyClass.myMethod()</tt>".
+<p>
+The <tt>clear</tt> command removes breakpoints using a syntax as in  
+"<tt>clear&nbsp;MyClass:45</tt>".  Using the <tt>clear</tt> or command 
+with no argument displays a list of all breakpoints currently set. The
+<tt>cont</tt> command continues execution. 
+</blockquote>
+
+<h3>Stepping</h3>
+<blockquote>
+The <tt>step</tt> commands advances execution to the next line
+whether it is in the current stack frame or a called method. The 
+<tt>next</tt> command advances execution to the next line in the 
+current stack frame. 
+</blockquote>
+
+<h3>Exceptions</h3>
+<blockquote>
+When an exception occurs for which there isn't a catch statement anywhere 
+in the throwing thread's call stack, the VM normally prints an exception trace
+and exits. When running under <b>jdb</b>, however, control returns to 
+<b>jdb</b> at the offending throw. You can then use <b>jdb</b> to diagnose the 
+cause of the exception.
+
+<p>
+Use the <tt>catch</tt> command to cause the debugged application to 
+stop at other thrown exceptions, for example: 
+"<tt>catch java.io.FileNotFoundException</tt>" or 
+"<tt>catch mypackage.BigTroubleException</tt>.  Any exception which 
+is an instance of the specifield class (or of a subclass) will 
+stop the application at the point where it is thrown. 
+<p>
+The <tt>ignore</tt> command negates the effect of a previous 
+<tt>catch</tt> command. 
+
+<p>
+<em>NOTE: The <tt>ignore</tt> command does not cause the debugged VM
+to ignore specific exceptions, only the debugger.</em>
+</blockquote>
+
+</blockquote>
+</blockquote>
+<a name="options">
+<h2>Command Line Options</h2>
+</a>
+<blockquote>
+When you use <b>jdb</b> in place of the Java application launcher 
+on the command line, <b>jdb</b> accepts many of the same options as the 
+<a href=java.html#options>java</a> command, including 
+<tt>-D</tt>, <tt>-classpath</tt>, and <tt>-X&lt;option&gt;</tt>. 
+
+<p>
+The following additional options are accepted by <b>jdb</b>:
+<dl>
+<dt><b>-help</b>
+<dd>
+    Displays a help message.
+<dt><b>-sourcepath <i>&lt;dir1:dir2:...&gt;</i></b>
+<dd>
+    Uses the given path in searching for source files in the specified 
+    path. If this option is not specified, the default path of "." is 
+    used.
+
+<dt><b>-attach <i>&lt;address&gt;</i></b>
+<dd>
+    Attaches the debugger to previously running VM using the default
+    connection mechanism.    
+
+<dt><b>-listen <i>&lt;address&gt;</i></b>
+<dd>
+    Waits for a running VM to connect at the specified address using 
+    standard connector.
+
+<dt><b>-listenany</b>
+<dd>
+    Waits for a running VM to connect at any available address using 
+    standard connector.
+
+<dt><b>-launch</b>
+<dd>
+    Launches the debugged application immediately upon startup of 
+    jdb. This option removes the need for using the <tt>run</tt>
+    command. The debuged application is launched and then stopped
+    just before the initial application class is loaded. At that
+    point you can set any necessary breakpoints and use the 
+    <tt>cont</tt> to continue execution. 
+
+
+<dt><b>-connect <i>&lt;connector-name&gt;:&lt;name1&gt;=&lt;value1&gt;,...</i></b>
+<dd>
+    Connects to target VM using named connector with listed argument values.
+    
+<dt><b>-dbgtrace [flags]</b> 
+<dd>
+    Prints info for debugging jdb.
+
+
+<dt><b>-tclient</b>
+<dd>
+    Runs the application in the Java HotSpot(tm) VM (Client).
+
+<dt><b>-tserver</b>
+<dd>
+    Runs the application in the Java HotSpot(tm) VM (Server).
+
+
+<dt><b>-J</b><i>option</i>
+    <dd>Pass <i>option</i> to the Java virtual machine, where 
+    <i>option</i> is one of the options described on the 
+    reference page for the <a href="java.html">java application 
+    launcher</a>.  For example, <b>-J-Xms48m</b> sets the startup
+    memory to 48 megabytes. 
+</dl>
+
+<p>
+Other options are supported for alternate mechanisms for connecting
+the debugger and the VM it is to debug. 
+The Java Platform Debugger Architecture has additional 
+<a href="../../guide/jpda/conninv.html">documentation</a> on these connection alternatives.
+
+<h3>Options Forwarded to Debuggee Process</h3>
+<dl>
+<dt><b>-v -verbose[:class|gc|jni]</b>
+<dd>
+    Turns on verbose mode.
+
+<dt><b>-D<i>&lt;name&gt;=&lt;value&gt;</i></b>
+<dd>
+    Sets a system property.
+
+<dt><b>-classpath <i>&lt;directories separated by ":"&gt;</i></b>
+<dd>
+    Lists directories in which to look for classes.
+
+<dt><b>-X<i>&lt;option&gt;</i></b>
+<dd>
+    Non-standard target VM option
+</dl>
+</blockquote>
+
+</BLOCKQUOTE>
+
+<a name="seealso"></a>
+<h2>SEE ALSO</h2>
+<blockquote> 
+  <p><a href="javac.html">javac</a>, <a href="java.html">java</a>, 
+    <a href="javah.html">javah</a>, <a href="javap.html">javap</a>, <a href="javadoc.html">javadoc</a>.
+  </p>
+  </blockquote>
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+</body>
+</html>

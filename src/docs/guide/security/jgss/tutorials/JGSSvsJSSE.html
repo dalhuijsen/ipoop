@@ -1,0 +1,99 @@
+<html>
+
+<head>
+    <title>When to use Java GSS-API vs. JSSE</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#000077" alink="#FF0000">
+
+
+<center>
+<H1>When to use Java GSS-API vs. JSSE</H1>
+</center>
+
+<br>
+<br>
+
+
+<p>Java GSS-API and JSSE provide you with the same basic set of security features:
+
+<ol>
+
+<li>Client-server authentication<p>
+
+<li>Encryption and integrity protection of transmitted data
+
+</ol>
+
+<p>However, there are some key difference between the two. 
+This document lists some 
+of them to help you decide which might be more appropriate in your 
+environment:
+
+<ol>
+
+<li> <b>Kerberos Single Sign-On Support</b>
+
+<p>In the Java 2 Standard Edition, GSS-API contains support for Kerberos as a
+mandatory security mechanism. This means that if your desktop has Kerberos
+support, you can write Java GSS-API based applications that never prompt
+the user for a password. 
+
+<p>At present JSSE does not support cipher suites to use Kerberos-based
+authentication. 
+Support for such a cipher suite is dependent on its standarization in the 
+TLS protocol at the Internet Engineering Task Force (IETF).<p>
+
+
+<li><b>Communications API</b>
+
+<p>JSSE supports a socket-based API. JSSE sockets extend the socket classes 
+found in <code>java.net</code> and JSSE socket factories extend the socket 
+factories found in <code>javax.net</code>. Thus, if your application is written 
+such that its security needs to be configured via a socket factory, then JSSE 
+might be more appropriate for you. JSSE sockets need to use some reliable 
+transport. Typically, implementations use TCP. 
+
+<p>Java GSS-API, on the other hand, is a token-based API that relies on the 
+application to do the communication. This means that the application can 
+use TCP sockets, UDP datagrams, or any other channel that will allow it to 
+transport Java GSS-API generated tokens. If your application has varying 
+communication protocol needs, then Java GSS-API might be more appropriate 
+for you. Java GSS-API can read and write its tokens using input and output 
+streams. However, you will need to set up the streams yourself.<p>
+
+
+<li><b>Credential Delegation</b>
+
+<p>Java GSS-API allows the client to delegate its credentials to the server 
+when using Kerberos. If your application will be deployed in a multi-tier 
+environment where intermediaries need to impersonate clients when talking 
+to backend layers, Java GSS-API might be more appropriate for you.<p>
+
+
+<li><b>Selective Encryption</b>
+
+<p>Because Java GSS-API is token-based, you can choose to selectively 
+encrypt certain messages but not all. If your application needs to intersperse 
+plaintext and ciphertext messages, Java GSS-API might be more appropriate 
+for you.<p>
+
+
+<li><b>Protocol Requirements</b>
+
+<p>JSSE provides an implementation of the TLS protocol
+defined in RFC 2246.  Java GSS-API provides an implementation of the
+GSS-API framework defined in RFC 2853,
+as well as an implementation of the Kerberos Version 5 mechanism
+defined in RFC 1964. (On Microsoft Windows platforms, this may 
+be known as SSPI with Kerberos.) 
+Some servers such as HTTPS servers will require 
+you to use TLS, in which case JSSE will be appropriate for you. 
+Other servers such as LDAP servers using SASL might need GSS-API with 
+Kerberos, in which case Java GSS-API will be appropriate for you.
+
+
+</body>
+
+</html>
+

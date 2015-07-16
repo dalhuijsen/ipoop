@@ -1,0 +1,131 @@
+<title>
+Socket Options in Java
+</title>
+<!-- Changed by: David Brown,  1-Aug-1996 -->
+
+<P>
+<IMG alt="Duke icon" SRC="images/duke4.gif" ALIGN=CENTER WIDTH=55 HEIGHT=68>
+<H2>Socket Options in Java</H2>
+<H3>The C way</H3>
+Programming in C, one sets options by using a system call along the
+lines of:
+<PRE>
+	setsockopt(int fd, int level, int optval, void *optdata, 
+		   int optdatalen);
+
+	fd = already opened (possibly connected) socket fd;
+	level = level in the protocol stack (IP, UDP, TCP) where
+	        the option applies;
+	optval = the option, a CONSTANT;
+	optdata = ptr to option dependent struct of parameters relevant
+	         only to a particular option;
+</PRE>
+
+<H3>In java</H3>
+The C way of setting options lacks the type-safety of object-oriented 
+programming.  The option one wishes to set/get is identified by an int,
+and the value to set/get into is an opaque <B>void*</B>.  It is all too easy
+to pass the wrong option identifier, the wrong type object in the <B>void*</B>
+parameter, or the wrong for that parameter.  Worse still, the code for these 
+errors will typically compile, and the error will only be manifested at runtime.
+<P>
+Java now provides a type-safe way to set options.  Each socket class has a get/set
+method for each option it supports, taking and returning the appropriate type.
+The options supported, for which socket classes and their meaning in brief:
+<P>
+<UL> 
+
+<li><b>TCP_NODELAY</b>
+<ul>
+	<li>Disable Nagle's algorithm. 
+	<li>Valid for (client) Sockets. 
+</ul>
+<li><b>SO_LINGER</b> 
+<ul>
+	<li>Specify a linger-on-close timeout. 
+	<li>Valid for (client) Sockets.
+</ul> 
+<li><b>SO_TIMEOUT </b>
+<ul>
+	<li>Specify a timeout on blocking socket operations. (Don't block forever!
+	<li>Valid for all sockets: Socket, ServerSocket, DatagramSocket. 
+</ul>
+<li><b>SO_BINDADDR</b>
+<ul>
+	<li>Fetch the local address binding of a socket.
+	<li>Valid for Socket, ServerSocket, DatagramSocket.
+</ul>
+<li><b>SO_REUSEADDR</b>
+<ul>
+	<li>Enable reuse address for a socket.
+	<li>Valid for Socket, ServerSocket, DatagramSocket.
+</ul>
+<li><b>SO_BROADCAST</b>
+<ul>
+	<li>Enables a socket to send broadcast messages.
+	<li>Valid for DatagramSocket.
+</ul>
+<li><b>SO_SNDBUF</b>
+<ul>
+	<li>Set a hint the size of the underlying buffers for outgoing network I/O.
+	<li>Valid for all sockets: Socket, ServerSocket, DatagramSocket.
+</ul>
+<li><b>SO_RCVBUF</b>
+<ul>
+	<li>Get the size of the buffer actually used by the platform when
+receiving in data on this socket.
+	<li>Valid for all sockets: Socket, ServerSocket, DatagramSocket.
+</ul>
+<li><b>SO_KEEPALIVE</b>
+<ul>
+	<li>Turn on socket keepalive.
+        <li>Valid for Socket.
+</ul>
+<li><b>SO_OOBINLINE</b>
+<ul>
+	<li>Enable inline reception of TCP urgent data.
+	<li>Valid for Socket.
+</ul>
+<li><b>IP_MULTICAST_IF </b>
+<ul>
+	<li>Specify the outgoing interface for multicast packets (on
+multihomed hosts).
+	<li>Valid for MulticastSockets. 
+</ul>
+<li><b>IP_MULTICAST_LOOP</b>
+<ul>
+	<li>Enables or disables local loopback of multicast datagrams.
+	<li>Valid for MulticastSocket.
+</ul>
+<li><b>IP_TOS</b>
+<ul>
+	<li>Sets the type-of-service or traffic class field in the IP
+header for a TCP or UDP socket.
+	<li>Valid for Socket, DatagramSocket
+</ul>
+
+</UL>
+
+<H3>Fell by the wayside...</H3>
+Some possible BSD options that are <B>not</B> supported in java:
+<UL>
+<LI>RAW/ICMP SOCKETS:<BR>
+	The main argument in favor of this one seemed to be so people
+	could write "ping" in java.  Security nightmare.  Must be root
+	on UNIX machines.
+</UL>
+<H3>The implementation details...</H3>
+...that you don't need to know, unless you subclass SocketImpl/DatagramSocketImpl.  
+Every *Socket object has an underlying SocketImpl/DatagramSocketImpl that 
+interfaces to native code.  The Impl classes implement two methods to 
+support options:
+<PRE>
+	void setOption(int optID, Object val) throws SocketException;
+	Object getOption(int optID) throws SocketException;
+</PRE>
+that look much like C.  These methods act as glue to the native methods, and 
+ensure type safety before native methods are invoked.
+<P> 
+<!--#config timefmt="%r, %A %B %e, %Y" -->
+</ADDRESS>
+

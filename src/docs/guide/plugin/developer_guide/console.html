@@ -1,0 +1,148 @@
+<html>
+<head>
+<title>Java Plug-in Console</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Java Plug-in Console</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p>This chapter includes the following topics:</p>
+<ul>
+  <li><a href="#what">What is Java Console?</a></li>
+  <li><a href="#debugging">Debugging Options</a></li>
+  <li><a href="#task-bar">Task-Bar Integration</a></li>
+  <li><a href="#startup">Startup Behavior</a></li>
+</ul>
+<h3><a name="what"></a>What is Java Console?</h3>
+<p>Java Console is a simple air for debugging that redirects any <code>System.out</code> 
+  and <code>System.err</code> to the console window.</p>
+<h3><a name="debugging"></a>Debugging Options</h3>
+<p>Java Console provides various options as shown below to make applet debugging 
+  easier. </p>
+<p align="center"><a name="console"></a> <img src="images/java_console_140.gif" alt="Sample console window" width="450" height="400"></p>
+<p>An action/option is selected by typing its letter/number while the Java Console 
+  window has focus.</p>
+<table summary="Keys and descriptions" width="90%" cellpadding="5" align="center" border="2">
+  <tr> 
+    <th width="10%" align="left" valign="top" bgcolor="#CCCCCC"> 
+      <div align="center"><font size="4"><b>Key</b></font></div>
+    </th>
+    <th bgcolor="#CCCCCC"> 
+      <div align="center"><font size="4"><b>Description</b></font></div>
+    </th>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">c:</td>
+    <td> Clears the Java Console window.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">f: </td>
+    <td>Triggers finalization on the objects in the finalization queue and then 
+      displays memory information. <i>Memory</i> refers to the current heap size 
+      used by the JRE. <i>Free</i> is the available memory that is free in the 
+      heap. The percent <i>(xx%)</i> is the free memory as a percent of the total 
+      heap size.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">g: </td>
+    <td>Triggers garbage collection and displays memory information as described 
+      above.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">h: </td>
+    <td>Displays help message, which is being described here.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">l: </td>
+    <td>Displays a list of the cached <code>ClassLoader</code> objects in the 
+      Java Plug-in. (These are runtime objects cached in semiconductor memory, 
+      not on disk, and should not be confused with the cached JAR files mentioned 
+      in <a href="applet_caching.html">Applet Caching</a>.) Classes are cached 
+      to avoid having to load them again when returning to previously-visited 
+      pages. When a page is visited the first time, a <code>ClassLoader</code> 
+      object will be created and all of the classes that are downloaded will be 
+      cached in that object. These objects are created and cached according to 
+      their <code>codebase</code>. To identify a <code>ClassLoader</code> object, 
+      the &quot;classloader list&quot; displays the <code>codebase</code> for 
+      that object. Additional information displayed with a <code>ClassLoader</code> 
+      object includes <code>zombie</code>, <code>cache</code> and <code>info</code>. 
+      <code>zombie = true</code> indicates that a <code>ClassLoader</code> object 
+      is not being used (i.e., the applet is not currently loaded on the page). 
+      <code>cache = true</code> indicates that the applet should be cached, while 
+      <code>false</code> indicates that the applet will be destroyed when the 
+      page is left. <code>info</code> is a value used for debugging.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">m: </td>
+    <td>Displays heap memory usage as described above.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">o:</td>
+    <td>Triggers logging, which directs output from the Java Plug-in Console to 
+      a log file.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">p:</td>
+    <td>Reloads the proxy configuration.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">q: </td>
+    <td>Causes the Java Console to disapper from the main screen.</td>
+  </tr>
+  <tr>
+    <td width="10%" align="left" valign="top">r:</td>
+    <td>Reloads the policy configuration.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">s: </td>
+    <td>Prints out the system properties. This is mostly for debugging. </td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">t: </td>
+    <td>Prints out all the existing thread groups. The first group shown is <code>Group 
+      main</code>. <code>ac</code> stands for <i>active count</i>; it is the total 
+      number of active threads in a thread group and its child thread groups. 
+      <code>agc</code> stands for <i>active group count</i>; it is the number 
+      of active child thread groups of a thread group. <code>pri</code> stands 
+      for <i>priority</i>; it is the priority of a thread group. Following <code>Group 
+      main</code>, other thread groups will be shown as <code>Group &lt;</code><i>name</i><code>&gt;</code>, 
+      where <i>name</i> is the URL associated with an applet. Individual listings 
+      of threads will show the thread name, the thread priority, <code>alive</code> 
+      if the thread is alive or <code>destroyed</code> if the thread is in the 
+      process of being destroyed, and <code>daemon</code> if the thread is a daemon 
+      thread.</td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">x: </td>
+    <td>
+      <p>This removes (destroys) all <code>ClassLoader</code> objects in the cache.</p>
+      <p>Modified jar files will be downloaded from the server when a page with 
+        an applet is refreshed or revisited if you first do this: type &quot;x&quot; 
+        in the Java Console to clear the Classloader cache.</p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%" align="left" valign="top">0-5: </td>
+    <td>This sets the trace-level options as described in the next section, <a href="tracing_logging.html">Tracing 
+      and Logging</a>.</td>
+  </tr>
+</table>
+<p>
+<h3><a name="task-bar"></a>Task-Bar Integration</h3>
+<p>When Java Plug-in is running an icon is now displayed&#151;in the taskbar for 
+  Windows or on the desktop for Solaris. When clicked, the Java Console opens. 
+  This allows the user to open and close the Java Console any number of times 
+  within the same browser session. </p>
+<h3><a name="startup"></a>Startup Behavior</h3>
+<p>Java Console may be shown, hidden, or not started at startup time, as configured 
+  through the Java Plug-in Control Panel in the Basic tab.</p>
+<p>&nbsp;</p>
+</body>
+</html>

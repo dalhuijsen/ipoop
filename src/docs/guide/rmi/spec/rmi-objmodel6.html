@@ -1,0 +1,108 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 2 - Distributed Object Model
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-objmodel5.html">PREV</a>
+ | <a href="rmi-objmodel7.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	2.5	</i> Implementing a Remote Interface
+</a></h2>
+
+<a name="5102"><!-- --></a>
+<blockquote>
+<a name="3553"><!-- --></a>
+The general rules for a class that implements a remote interface are as follows:<p>
+</blockquote>
+
+
+<blockquote>
+<ul><li>
+<a name="3554"><!-- --></a>
+The class <em>usually</em> extends <code>java.rmi.server.UnicastRemoteObject</code>, thereby inheriting the remote behavior provided by the classes <code>java.rmi.server.RemoteObject</code> and <code>java.rmi.server.RemoteServer</code>.
+</li>
+<li>
+<a name="3574"><!-- --></a>
+The class can implement any number of remote interfaces.
+</li>
+<li>
+<a name="3555"><!-- --></a>
+The class can extend another remote implementation class.
+</li>
+<li>
+<a name="3556"><!-- --></a>
+The class can define methods that do not appear in the remote interface, but those methods can only be used locally and are not available remotely.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="1917"><!-- --></a>
+For example, the following class <code>BankAcctImpl</code> implements the <code>BankAccount</code> remote interface and extends the <code>java.rmi.server.UnicastRemoteObject</code> class:<p>
+</blockquote><blockquote><pre>package mypackage;
+
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class BankAccountImpl
+	extends UnicastRemoteObject
+	implements BankAccount
+{
+	private float balance = 0.0;
+
+	public BankAccountImpl(float initialBalance) 
+		throws RemoteException 
+	{
+		balance = initialBalance;
+	}
+	public void deposit(float amount) throws RemoteException {
+		...
+	}
+	public void withdraw(float amount) throws OverdrawnException,
+		RemoteException {
+		...
+	}
+	public float getBalance() throws RemoteException {
+		...
+	}
+}
+
+
+</pre></blockquote><blockquote>
+<a name="3543"><!-- --></a>
+Note that if necessary, a class that implements a remote interface can extend some other class besides <code>java.rmi.server.UnicastRemoteObject</code>. However, the implementation class must then assume the responsibility for exporting the object (taken care of by the <code>UnicastRemoteObject</code> constructor) and for implementing (if needed) the correct remote semantics of the <code>hashCode</code>, <code>equals</code>, and <code>toString</code> methods inherited from the <code>java.lang.Object</code> class.<p>
+</blockquote>
+
+</ul>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-objmodel5.html">PREV</a>
+ | <a href="rmi-objmodel7.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

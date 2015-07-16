@@ -1,0 +1,301 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Extension Versioning</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+
+<TD>
+<center>
+<H1>Optional Package Versioning</h1>
+</center>
+</TD>
+
+<td align=right valign=top><font size="-1"><a href=index.html>Optional Package Documentation</a></font></td>
+
+</TR>
+
+</TABLE>
+
+<blockquote> 
+  <p><em>Note:</em> Optional packages is the new term for what used to be known 
+    as <i>standard extensions</i> or just <i>extensions</i>. </p>
+</blockquote>
+<p>This section includes the following topics:</p>
+<ul>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#packages">Manifest Attributes for Use by Installed Optional Packages</a></li>
+  <li><a href="#applet">Manifest Attributes for Use by Applet Jar Files</a></li>
+  <li><a href="#rules">Java Plug-in Update Rules</a></li>
+  <li><a href="#download">Download and Installation of Optional Packages</a></li>
+</ul>
+<h2><a name="overview"></a>Overview</h2>
+<blockquote>
+  <p> Version 1.3 of the Java<sup><font size=-2>TM</font></sup> 2 Platform introduced 
+    support for an expanded set of Jar-file manifest attributes that enable applets 
+    to specify version and vendor information for the optional packages that they 
+    require. The manifests of Jar-packaged applets can specify a URL at which 
+    the latest version of the optional package the Java Plug-in can download if 
+  <ul>
+    <li>the needed optional package is not already installed in the Java runtime 
+      environment, or 
+    <li>the optional package is installed but has an out-of-date version number, 
+      or 
+    <li>the optional package is installed but is not from a specified vendor. 
+  </ul>
+  <p> The manifest attributes that can be used to specify version and vendor information 
+    are described below. </blockquote>
+<p>
+<h2><a name="packages"></a>Manifest Attributes for Use by Installed Optional Packages</h2>
+<blockquote>
+The following portion of a sample manifest file illustrates the attributes 
+that are available for use by optional packages.
+<blockquote><pre>
+Extension-Name: javax.help
+Specification-Vendor: Sun Microsystems, Inc 
+Specification-Version: 1.0 
+Implementation-Vendor-Id: com.sun 
+Implementation-Vendor: Sun Microsystems, Inc 
+Implementation-Version: 1.0 
+</pre></blockquote>
+The attributes in this example are:
+<dl>
+<dt><b>Extension-Name</b></dt>
+<dd>This attribute specifies a name for the optional package contained in the 
+Jar file.  The name should be a unique identifier such as the name of 
+the main package comprising the optional package.</dd>
+<dt><b>Specification-Vendor</b></dt>
+<dd>This attribute identifies the company that originated the specification 
+to which the optional package conforms.</dd>
+<dt><b>Specification-Version</b></dt>
+<dd>This attribute specifies the version number of the specification 
+to which the implementation conforms.</dd>
+<dt><b>Implementation-Vendor-Id</b></dt>
+<dd>This attribute's value is a unique identifier for the 
+company that produced the optional package implementation contained in the 
+Jar file.</dd>
+<dt><b>Implementation-Vendor</b></dt>
+<dd>This attribute's value is the name of the company that produced 
+the implementation of the optional package.  This attribute should be used 
+only for such purposes such as user feedback, and the Java Plug-in 
+software does not use it to identify the optional package vendor.  Rather, 
+the Java Plug-in relies on the <b>Implementation-Vendor-Id</b> attribute 
+to provide unique vendor identification.</dd>
+<dt><b>Implementation-Version</b></dt>
+<dd>This attribute indicates the vendor's version number for 
+the implementation of the optional package.</dd>
+</dl>
+<p>
+Each optional package installed in the Java runtime environment can use 
+these manifest attributes to identify itself. When the Java Plug-in 
+is running an applet that requires an optional package, the plug-in can 
+access these attributes to determine if the installed optional packages 
+match the vendor and version criteria specified by the applet.  
+The applet specifies such information by using the manifest 
+attributes described in the following section.  Note that <em>all</em> 
+of the above manifest attributes should be included in an optional package's 
+manifest.  If the plug-in looks for but doesn't 
+find one of these attributes in an optional package's manifest, it will 
+assume that the optional package is not suitable for the applet.
+
+</blockquote>
+
+
+
+
+<h2><a name="applet"></a>Manifest Attributes for Use by Applet Jar Files</h2>
+<blockquote> The following sample manifest file illustrates the attributes that 
+  are available for use by Jar-packaged applets. (This sample is for illustrative 
+  purposes only. No actual optional packages are available at the URLs mentioned 
+  in this example.) 
+  <blockquote>
+    <pre>
+Extension-List: javahelp java3d 
+javahelp-Extension-Name: javax.help 
+javahelp-Specification-Version: 1.0 
+javahelp-Implementation-Version: 1.0.3 
+javahelp-Implementation-Vendor-Id: com.sun 
+javahelp-Implementation-URL: http://java.sun.com/products/stdext/javahelp.jar 
+java3d-Extension-Name: javax.3d 
+java3d-Specification-Version: 1.0 
+java3d-Implementation-Version: 1.2.1 
+java3d-Implementation-Vendor-Id: com.sun 
+java3d-Implementation-URL: http://java.sun.com/products/stdext/java3d.jar 
+</pre>
+  </blockquote>
+  The attributes used in this example are: 
+  <dl>
+    <dt><b>Extension-List</b></dt>
+    <dd>This attribute indicates the optional packages that are needed by the 
+      applet. Each optional package listed in this attribute will have a set of 
+      additional attributes that the applet uses to specify which version and 
+      vendor of the optional package it requires. </dd>
+    <dt><b>&lt;extension&gt;-Extension-Name</b></dt>
+    <dd>This attribute is the unique name of the optional package. The Java Plug-in 
+      will compare the value of this attribute with the <b>Extension-Name</b> 
+      attribute in the manifests of installed optional packages to determine if 
+      the optional package is installed. </dd>
+    <dt><b>&lt;extension&gt;-Specification-Version</b>&nbsp;&nbsp;&nbsp;<em>(Optional)</em></dt>
+    <dd>This attribute specifies the minimum optional package specification version 
+      that is required by the applet. The Java Plug-in will compare the value 
+      of this attribute with the <b>Specification-Version</b> attribute of the 
+      installed optional package to determine if the optional package is up to 
+      date. </dd>
+    <dt><b>&lt;extension&gt;-Implementation-Version</b>&nbsp;&nbsp;&nbsp;<em>(Optional)</em></dt>
+    <dd>This attritute specifies the miminum optional package implementation version 
+      number that is required by the applet. The Java Plug-in will compare the 
+      value of this attribute with the <b>Implementation-Version</b> attribute 
+      of the installed optional package to see if a more recent implementation 
+      needs to be downloaded.</dd>
+    <dt>
+    <dt><b>&lt;extension&gt;-Implementation-Vendor-Id</b>&nbsp;&nbsp;&nbsp;<em>(Optional)</em></dt>
+    <dd>This attribute can be used to identify the vendor of an optional package 
+      implementation if the applet requires an implementation from a specific 
+      vendor. The Java Plug-in will compare the value of this attribute with the 
+      <b>Implementation-Vendor-Id</b> attribute of the installed optional package. 
+    </dd>
+    <dt><b>&lt;extension&gt;-Implementation-URL</b></dt>
+    <dd>This attritute specifies a URL that can be used to obtain the most recent 
+      version of the optional package if the required version is not already installed.</dd>
+  </dl>
+</blockquote>
+<h2><a name="rules"></a>Java Plug-in Update Rules</h2>
+<blockquote>
+  <p>The Java Plug-in performs the following determinations when loading an applet 
+    whose manifest indicates that it needs one or more optional packages: </p>
+  <ul>
+    <li>If an optional package with the correct value of the <b>Extension-Name</b> 
+      attribute is not installed, the Java Plug-in will prompt the user to let 
+      it download the optional package. 
+    <li>If an optional package with the correct value of the <b>Extension-Name</b> 
+      attribute is already installed, the Java Plug-in makes the following comparisons: 
+      <ul>
+        <li>If the optional package's <b>Specification-Version</b> value is greater 
+          or equal to that required by the applet: 
+          <ul>
+            <li>If the <b>Implementation-Vendor-Id</b> attributes match: 
+              <ul>
+                <li>If the optional package's <b>Implementation-Version</b> is 
+                  greater than or equal to that specified in the applet's manifest, 
+                  do nothing - an up-to-date version of the optional package is 
+                  already installed. 
+                <li>If the optional package's <b>Implementation-Version</b> is 
+                  less than that specified in applet's manifest, the plug-in will 
+                  prompt the user to download an upgrade from the same vendor. 
+              </ul>
+            <li>If the <b>Implementation-Vendor-Id</b> attributes do not match, 
+              the Java Plug-in will prompt the user to download the optional package 
+              from the vendor specified in the applet's manifest. 
+          </ul>
+        <li>If the optional package's <b>Specification-Version</b> value is less 
+          than that required by the applet: 
+          <ul>
+            <li>If the optional package's <b>Implementation-Vendor-Id</b> matches 
+              that indicated in the applet's manifest, the Java Plug-in will prompt 
+              the user to download an updated optional package from the same vendor. 
+            <li>If the optional package's <b>Implementation-Vendor-Id</b> does 
+              not match that specified by the applet's manifest, the Java Plug-in 
+              will prompt the user to download the optional package from the vendor 
+              specified in the the applet's manifest. 
+          </ul>
+      </ul>
+  </ul>
+  <p> If the applet's manifest doesn't contain one or more of the optional attributes, 
+    the plug-in will accept <em>any</em> value of the corresponding attribute 
+    in the optional package's manifest. </blockquote>
+
+
+<h2><a name="download"></a>Download and Installation of Optional Packages</h2>
+<blockquote>
+The following considerations pertain to optional packages that are 
+downloaded by the Java Plug-in.
+<p>
+The optional package download URL as indicated in the applet manifest's 
+<b>&lt;extension&gt;-Implementation-URL</b> attribute need not be 
+limited to the Applet codebase.
+<p>
+All downloadable files should be signed using a DSA or RSA 
+certificate.  Any optional packages not so signed will not be 
+installed but instead will be treated as 
+a bundled optional package and loaded through the applet class loader, 
+sharing the applet security attributes.
+<p>When the Java Plug-in retrieves an optional package from the URL indicated in 
+the applet's manifest, it will check the optional package's manifest for a 
+<b>Main-Class</b> attribute after verifying the optional package's signature. 
+If the optional package's manifest file does not contain a <b>Main-Class</b> 
+attribute, the Java Plug-in will simply drop the Jar file into the 
+optional packages directory of the runtime environment (<tt>jre/lib/ext</tt> in 
+the Java 2 SDK and <tt>lib/ext</tt> in the Java 2 Runtime Environment). 
+
+<p>Some optional package Jar files may contain their own installer programs 
+in either native code or as applications written in the Java programming 
+language. Such 
+an installer program may be necessary for purposes such as installing 
+native libraries or accessing the Microsoft Windows registry, for example. 
+If the Java Plug-in finds a <b>Main-Class</b> attribute in 
+the optional package's manifest, it will assume that it indicates a class 
+that serves as a Java-language installer and will invoke the 
+<tt>main()</tt> method of that class.
+<p>
+An optional package's manifest may alternatively contain a 
+<b>Extension-Installation</b> attribute.  The value of this field 
+will point to a native installation application that is to be used 
+by the Java Plug-in to install the optional package.
+<p>
+The URL of an optional package as specified by the 
+<b>&lt;extension&gt;-Implementation-URL</b> must point to a JAR-file. 
+The plug-in will <em>not</em> download and install optional packages packaged as 
+.exe or .bin files.  
+<p>
+Some optional packages come packaged in different Jar files for different 
+operating systems. Such cases can be accomodated by the 
+<b>&lt;extension&gt;-Implementation-URL</b> attribute by using the 
+<tt>$(os-name)$</tt> construction in the attribute's value.  Here is 
+an example.
+<blockquote><pre>
+javaExt-Implementation-URL: http://.../stdext/javaExt-$(os-name)$.jar
+</pre></blockquote> 
+Here, <tt>$(os-name)$</tt> is the name of target operating system as 
+defined by the <tt>os.name</tt> system property.
+</blockquote>
+
+
+
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+  <TR VALIGN=TOP>
+
+<TD>
+<FONT SIZE="-2">
+Copyright &#169; 1999
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT>
+</TD>
+
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+
+</TR>
+</TABLE>
+
+<pre>
+
+
+
+</pre>
+</body>
+</html>

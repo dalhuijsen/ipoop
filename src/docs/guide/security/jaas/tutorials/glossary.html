@@ -1,0 +1,56 @@
+<html>
+
+<head>
+    <title>Subjects, Principals, Authentication, and Credentials</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#000077" alink="#FF0000">
+
+
+<H2>Subjects, Principals, Authentication, and Credentials</H2>
+
+<blockquote>
+
+<p> To authorize access to resources, applications first need to
+authenticate the source of the request.  The JAAS framework defines the term
+<b><i>subject</i></b> to represent the source of a request.
+A subject may be any entity, such as a person or service.
+A subject is represented by the 
+<a href="../../../../api/javax/security/auth/Subject.html">
+<code>javax.security.auth.Subject</code></a> class.
+
+<p><b><i>Authentication</i></b> represents
+the process by which the identity of a subject is verified,
+and must be performed in a secure fashion; otherwise a perpetrator may
+impersonate others to gain access to a system. Authentication
+typically involves the subject demonstrating some form of evidence to
+prove its identity.  Such evidence may be information only the subject
+would likely know or have (such as a password or fingerprint), or it may be
+information only the subject could produce (such as signed data using a
+private key).
+
+<p>Once authenticated, a Subject is populated with associated identities, or
+<b><i>Principals</i></b> (of type 
+<a href="../../../../api/java/security/Principal.html">
+<code>java.security.Principal</code></a>).  
+A Subject may have many Principals.
+For example, a person may have a name Principal
+("John Doe") and an SSN Principal ("123-45-6789"),
+which distinguish it from other Subjects.
+
+<p> In addition to associated Principals, a Subject may own security-related 
+attributes, which are referred to as <b><i>credentials</i></b>.
+A credential may contain information used to authenticate the subject to 
+new services.  Such credentials include passwords, Kerberos tickets,
+and public key certificates.
+Credentials might also contain data that simply enables
+the subject to perform certain activities.  Cryptographic keys, for
+example, represent credentials that enable the subject to sign or
+encrypt data. 
+Public and private credential classes are not part of the core JAAS class
+library.  Any class, therefore, can represent a credential.
+
+</body>
+
+</html>
+

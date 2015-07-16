@@ -1,0 +1,159 @@
+<html>
+<head>
+<title>AWT image rendering API</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<h1>AWT image rendering API</h1>
+<hr>
+<address>last updated: October 30, 1996</address>
+<h2>The Issue</h2>
+Currently the AWT Graphics object has 4 methods to render an entire
+image with an optional scale and/or an optional background color.
+<p>
+There is no way to render a subset of the entire image without using
+either a cropping filter or the clipping mechanism of the Graphics
+object.
+This situation is further compounded by the fact that the clip attribute
+of the Graphics object can only be set to a more restrictive value, it
+can never be expanded or restored to a previous clip area.
+<p>
+The existing methods to scale an image also do not allow the
+programmer to flip an image horizontally or vertically by scaling
+it to a negative size or by any other means.
+Even though other arbitrary manipulations of images are not supported,
+the lack of flipping is notable mainly because it is easily managed
+with minor mathematical modifications to the already supported scaling
+algorithms.
+<dl>
+<dd>
+Most of the existing Java interfaces that take rectangular arguments
+treat negative width and height values as meaning an empty rectangle.  
+The existing drawImage methods could have allowed image flipping
+when told to scale the image to a negative size, but that would have
+conflicted with the empty negative rectangle protocol seen elsewhere.
+Instead of treating the negative values as a null operation (which
+arguably would have been the right thing to do), the existing drawImage
+methods consider negative width and height values to indicate
+"proportional values".
+In other words, if one of the values is negative then an appropriate
+value is substituted based upon the other non-negative quantity to
+maintain the aspect ratio of the original image.
+If both are negative then the image is drawn at its original size and
+scale.
+This behavior was designed to be compatible with the way that some
+browsers treat missing specifications of width and height attributes
+in HTML &lt;img&gt; tags.
+In essence, scaling an image to a negative width or height is compared
+to scaling the image to an unspecified width or height and a standard
+"proportional" algorithm is applied to obtain default values.
+</dl>
+
+<h2>The new image rendering API</h2>
+To resolve this problem, 2 new methods are being added to the AWT
+Graphics class to provide a complete scaling, flipping, cropping
+image rendering facility.  The new methods are:
+<pre>	<a href="../../../../../api/java/awt/Graphics.html#drawImage(java.awt.Image, int, int, int, int, int, int, int, int, java.awt.image.ImageObserver)">drawImage</a>(Image img,
+		  int dx1, int dy1, int dx2, int dy2,
+		  int sx1, int sy1, int sx2, int sy2,
+		  ImageObserver observer)
+	<a href="../../../../../api/java/awt/Graphics.html#drawImage(java.awt.Image, int, int, int, int, int, int, int, int, java.awt.Color, java.awt.image.ImageObserver)">drawImage</a>(Image img,
+		  int dx1, int dy1, int dx2, int dy2,
+		  int sx1, int sy1, int sx2, int sy2,
+		  Color bgcolor, ImageObserver observer)</pre>
+<p>
+An interesting note about these new methods is that, while the former
+drawImage() methods may create a totally new representation of the image
+for the screen by rereading the raw image data in an asynchronous
+thread, the new methods will always use the pixels from the unscaled
+version of the image to draw to the screen.  As a result, the 2 new
+methods will complete synchronously as long as the full size version
+of the image has previously been loaded and converted as indicated by
+a MediaTracker or other image status API.
+<p>
+Another interesting change in the coordinate specifications of the
+new methods is the use of two coordinates to define the source and
+destination rectangles.  Since negative widths and heights carry
+existing meanings in the rest of the Java APIs, the new methods
+use the new coordinate pair specification to allow explicit control
+over which dimensions get flipped.  This new system is also more
+convenient for some applications which may be tracking the corner
+of the image by following a user dragging the mouse.  There is no
+need to decompose drag start and end coordinates into an x,y,w,h
+format.
+
+<h2>Sample Code</h2>
+<p>Following is sample code showing the use of the old API to perform
+image cropping:
+<pre>
+
+    import java.awt.*;
+    import java.applet.*;
+
+    public class ImgCropExample extends Applet {
+	Image bgimg, img2;
+	public void paint(Graphics g) {
+	    // Draw a background image
+	    g.drawImage(bgimg, 0, 0, this);
+	    // Draw the upper left 100x100 portion of another image at 10,10
+	    <b>Graphics g2 = g.create();</b>
+	    <b>g2.clipRect(10, 10, 100, 100);</b>
+	    <b>g2.drawImage(img2, 10, 10, this);</b>
+	    <b>g2.dispose();	// reclaims resources more quickly</b>
+	    // Now continue drawing with original clip area
+	    g.fillRect(0, 0, 10, 10);
+	}
+    }
+</pre>
+<p>Following is sample code showing the use of the new API to perform
+image cropping:
+<pre>
+
+    import java.awt.*;
+    import java.applet.*;
+
+    public class ImgCropExample extends Applet {
+	Image bgimg, img2;
+	public void paint(Graphics g) {
+	    // Draw a background image
+	    g.drawImage(bgimg, 0, 0, this);
+	    // Draw the upper left 100x100 portion of another image at 10,10
+	    <b>g.drawImage(img2,
+			10, 10, 110, 110,
+			0, 0, 100, 100, this);</b>
+	    // Now continue drawing with original clip area
+	    g.fillRect(0, 0, 10, 10);
+	}
+    }
+</pre>
+
+<p>Following is sample code showing the use of the new API to perform
+image flipping:
+<pre>
+
+    import java.awt.*;
+    import java.applet.*;
+
+    public class ImgCropExample extends Applet {
+    	Image img2;
+	public void paint(Graphics g) {
+	    // Draw the center 100x100 portion of a 200x200 image
+	    // at location 10, 10, flipped horizontally.
+	    <b>g.drawImage(img2,
+			10, 10, 110, 110,
+			150, 50, 50, 150, this);</b>
+	}
+    }
+</pre>
+
+<hr><br>
+
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1996, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+     <TITLE>Reflection</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR>
+<TD WIDTH="60">
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+</TD>
+
+<TD>
+<center>
+           <h1>Reflection</h1>
+</center>
+</TD>
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+</TD>
+</TR>
+</TABLE>
+
+<!-- ====================== Body text begins here ====================== -->
+
+<blockquote>
+Reflection enables Java code to discover information about the fields, methods 
+and constructors of loaded classes, and to use reflected fields,
+methods, and constructors to operate on their underlying counterparts 
+on objects, within security restrictions. The API accommodates 
+applications that need access to either the public members of a target 
+object (based on its runtime class) or the members declared by a given class. 
+<p>
+The Java<sup><font size=-2>TM</font></sup> 2 Platform allows programs to suppress default reflective
+access control.
+
+</blockquote>
+<font size="+2"><b>Performance Enhancement</b></font>
+<blockquote>
+Beginning with J2SDK 1.4.0, certain reflective operations, specifically 
+<a href="../../api/java/lang/reflect/Field.html">java.lang.reflect.Field</a>,
+<a href="../../api/java/lang/reflect/Method.html#invoke(java.lang.Object, java.lang.Object[])">java.lang.reflect.Method.invoke()</a>,
+<a href="../../api/java/lang/reflect/Constructor.html#newInstance(java.lang.Object[])">java.lang.reflect.Constructor.newInstance()</a>, and <a href="../../api/java/lang/Class.html#newInstance()">Class.newInstance()</a>,
+have been rewritten for higher performance.  Reflective
+invocations and instantiations are several times faster than in
+previous releases. 
+</blockquote>
+
+<font size="+2"><b>Dynamic Proxy Classes</b></font>
+<ul>
+<li><a href=proxy.html><b>Dyanmic Proxy Classes</b></a> are supported  
+by three classes and interfaces in the Java 2 Platform.
+</ul>
+<br>
+
+<font size="+2"><b>Reflection Overview</b></font><br>
+<ul>
+<LI><b>
+<a href="spec/java-reflectionTOC.doc.html">Reflection Overview 1.1</a></b> <em>(Not Updated for the Java 2 Platform)</em>
+
+</ul>
+
+<br>
+<font size="+2"><b>Suppressing Reflective Access Control</b></font>
+<ul>
+   <LI><b><a href="reflection.html">Suppressing Reflective Access Control</a></b><br>
+</ul>
+<br>
+
+
+<font size="+2"><b>Reflection API Specification</b></font><br>
+<font size="-1">(javadoc)</font>
+<ul>
+   <LI><b><a href="../../api/java/lang/reflect/package-summary.html">java.lang.reflect Package</a></b>
+</ul>
+<br>
+
+
+<!-- Body text ends here -->
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+<TR VALIGN=TOP>
+
+<TD>
+<FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT>
+   <br>
+   <br>
+
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:reflection-comments@sun.com">reflection-comments@eng.sun.com</a>
+   </FONT>
+
+</TD>
+
+<TD ALIGN=RIGHT>
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+</TD>
+
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
+

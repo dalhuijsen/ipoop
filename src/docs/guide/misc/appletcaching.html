@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<!--#config timefmt="%d-%b-%y" -->
+
+<TITLE>Applet Caching</TITLE>
+
+</HEAD>
+<BODY BGCOLOR="#FFFFFF"  TEXT="#000000">
+
+<center><h1>Applet Caching in Java Plug-in</h1></center>
+
+<p>
+Applet caching ensures that applets are not unnecessarily downloaded
+by a browser every time a user references them. Java Plug-in has
+supported caching in previous versions by using the same cache the browser
+uses for all other web documents.
+<P>
+This works for casual applet usage, but larger applets can often 
+get flushed from the cache to make room for other documents since 
+the browser has no knowledge that an applet file might be needed in the
+future. The result is that this caching strategy fails where is 
+needed most in large business applets.
+<p>
+This release introduces an alternative form of applet caching which allows
+an applet deployer to decide her applet should be "sticky", that is, to
+stay on the disk in a secondary cache which the browser cannot overwrite.
+The only time "sticky" applets get downloaded after that is when they
+are updated on their server. Otherwise the applet is always available
+for quick loading.  We recommend that applets which provide core
+business applications be made sticky to improve their startup performance.
+<p>
+This new feature 
+is activated by including the new <tt>PARAM NAME="cache_option"</tt> and 
+<tt>PARAM NAME="cache_archive"</tt> values in the tag that specifies the use
+of Java Plug-in as below:
+<blockquote><pre>
+&lt;OBJECT ....>
+	 &lt;PARAM NAME="archive" VALUE="...">
+	 ....
+	 &lt;PARAM NAME="cache_option" VALUE="...">
+	 &lt;PARAM NAME="cache_archive" VALUE="...">
+&lt;/OBJECT>
+</pre></blockquote>
+<p>
+The <tt>cache_option</tt> attribute can take one of three values:
+<blockquote>
+<dl>
+<dt><b>No</b>
+<dd>Disable applet installation. Always download the file from the web server.
+<p>
+<dt><b>Browser</b>
+<dd>Run applets from the browser cache (default).
+<p>
+<dt><b>Plugin</b>
+<dd>Run applets from the new Java Plug-in cache.
+</dl>
+</blockquote>
+<p>
+The <tt>cache_archive</tt> attribute contains a list of the files to be cached:
+<blockquote><pre>
+&lt;PARAM NAME="cache_archive" VALUE="a.jar,b.jar,c.jar">
+</pre></blockquote>
+<p>
+Like the <tt>archive</tt> attribute in the <tt>APPLET</tt> tag, the list of jar
+files in the <tt>cache_archive</tt> attribute do not contain the full URL, but
+are always downloaded from the <tt>codebase</tt> specified in the 
+<tt>EMBED</tt>/<tt>OBJECT</tt> tag.
+<p>Note that the list of JAR files in the <tt>cache_archive</tt> attribute and those
+in the <tt>archive</tt> attribute may be similar but should not contain the 
+same JAR files. There are two possible cases:
+<ol>
+<li>A JAR file is listed in <tt>cache_archive</tt> but <b>not</b> in 
+<tt>archive</tt>. In this case, the JAR file is cached according to 
+<tt>cache_option</tt>.
+<p>
+<li>A JAR file is listed in <tt>archive</tt> but <b>not</b> in 
+<tt>cache_archive</tt>. In this case, the JAR file is cached using the native
+browser cache. This guarantees a minimum of caching.
+</ol>
+<tt>cache_option</tt> and <tt>cache_archive</tt> can only be
+specified once per <tt>EMBED</tt>/<tt>OBJECT</tt> tag. In addition, both attributes
+must be specified. If either <tt>cache_archive</tt> or <tt>cache_option</tt> are
+missing, Java Plug-in will treat the applet normally using the <tt>archive</tt>
+attribute.
+<P>
+<b>Note:</b> Caching of the JAR files specified in the manifest's CLASSPATH
+variable using Java Plug-in's cache is currently not supported.
+
+
+</BODY>
+</HTML>

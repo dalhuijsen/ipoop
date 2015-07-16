@@ -1,0 +1,714 @@
+
+<HTML>
+<HEAD>
+<!--updated dcarson 10/2001-->
+   <TITLE>Java IDL: Portable Object Adapter (POA)</TITLE>
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1 ALIGN=CENTER>Portable Object Adapter (POA)</H1>
+<HR>
+<P>
+
+<H2>What is the Portable Object Adapter (POA)?</H2>
+
+<P>An <em>object adapter</em> is the mechanism that connects a request using
+an object reference with the proper code to service that request.  The
+ Portable Object Adapter, or POA, is a particular type of object adapter that
+ is defined by the CORBA specification.  The POA is designed to meet the following goals:
+<P>
+<UL>
+<LI>Allow programmers to construct object implementations that are portable between different 
+ORB 
+products.
+<LI>Provide support for objects with persistent identities.
+<LI>Provide support for transparent activation of objects.
+<LI>Allow a single <a href="jidlGlossary.html#servant">servant</a> to support multiple object 
+identities simultaneously.
+</UL>
+
+<P>This document presents an introduction to using the POA with the Java 2 Platform, 
+Standard Edition.  For a more complete description of the POA, see Chapter 11 of the 
+<em><a href="http://www.omg.org/docs/formal/99-10-07.pdf">CORBA 2.3.1 
+Specification</a></em>.  
+
+
+<!--  ********** Using the POA  ***************-->
+<a name="using"></a>
+<H2>Creating and Using the POA</H2>
+
+<P>The steps for creating and using a POA will vary according to the specific application 
+being 
+developed.  The following steps generally occur during the POA life cycle:
+<P>
+<OL>
+<LI><a href="#create">Get the root POA</a>
+<LI><a href="#policy">Define the POA's policies</a>
+<LI><a href="#createpoa">Create the POA</a>
+<LI><a href="#poamanager">Activate the POAManager</a>
+<LI><a href="#servant">Activate the servants</a>, which may include activating the Tie
+<LI><a href="#objref">Create the object reference from the POA</a>
+</OL>
+
+<P>Each step is described in more detail in the sections that follow.
+
+
+<!--  **********  Get THE ROOT POA ***************-->
+<a name="create"></a>
+<P><FONT SIZE=+1><STRONG>Step 1: Get the root POA</STRONG></FONT>
+<BLOCKQUOTE>
+<P>The first step is to get the first POA, which is called the <em>rootPOA</em>.  
+
+The root POA is managed by the ORB and provided to the application using the ORB 
+initialization interface under the initial object name "RootPOA". 
+
+  <P>An example of code that will get the root POA object and cast it to a POA is:
+<P>
+<PRE>
+      ORB orb = ORB.init( args, null );
+      POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+</PRE>
+</BLOCKQUOTE>
+
+
+<!--  ********** Define the POA's Policies ***************-->
+<a name="policy"></a>
+<FONT SIZE=+1><STRONG>Step 2: Define the POA's Policies</STRONG></FONT>
+
+<BLOCKQUOTE>
+<P>The Portable Object Adapter (POA) is designed to provide an object adapter that can be 
+used with 
+multiple ORB implementations with no rewriting needed to deal with different vendors' 
+implementations.  
+
+<P>The POA is also intended to allow persistent objects -- at least, from the client's 
+perspective. 
+That is, as far as the client is concerned, these objects are always alive, and maintain data 
+values 
+stored in them, even though physically, the server
+ may have been restarted many times. 
+
+<P>The POA allows the object implementer a lot more control over the object's identity, 
+state, storage, 
+and life cycle. You can create a POA without defining any policies and the default values 
+will be used. 
+ The root POA has the following policies by default:
+<P>
+<UL>
+<LI>Thread Policy: ORB_CTRL_MODEL 
+<LI>Lifespan Policy: TRANSIENT
+<LI>Object Id Uniqueness Policy: UNIQUE_ID
+<LI>Id Assignment Policy: SYSTEM_ID
+<LI>Servant Retention Policy: RETAIN
+<LI>Request Processing Policy: USE_ACTIVE_OBJECT_MAP_ONLY
+<LI>Implicit Activation Policy: IMPLICIT_ACTIVATION
+</UL>
+
+<P>The following code snippet shows how policies are set
+in the <a href="../rmi-iiop/rmiiiopexample.html#server">RMI-IIOP (with POA)</a> example:
+<P>
+<pre>
+      Policy[] tpolicy = new Policy[3];
+      tpolicy[0] = rootPOA.create_lifespan_policy(
+        LifespanPolicyValue.TRANSIENT );
+      tpolicy[1] = rootPOA.create_request_processing_policy(
+        RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY );
+      tpolicy[2] = rootPOA.create_servant_retention_policy(
+        ServantRetentionPolicyValue.RETAIN);
+</pre>
+
+
+
+<P>Each policy is discussed briefly in the following topics.  For more information on POA 
+policies, 
+refer to Chapter 11, <em>Portable Object Adapter</em> of the CORBA/IIOP 2.3.1 Specification 
+at <a 
+href="http://www.omg.org/docs/formal/99-10-07.pdf">http://www.omg.org/docs/formal/99-10-07.pdf</a>
+
+<!--  ********** Thread Policy ***************-->
+<a name="thread"></a>
+<H4>Thread Policy</H4>
+
+<P>This policy specifies the threading model used with the created POA. The default is
+<code>ORB_CTRL_MODEL</code>. 
+
+<P>The <code>ThreadPolicyValue</code> can have the following values:
+<P>
+<UL>
+<LI><code>ORB_CTRL_MODEL</code> - The ORB is responsible for assigning requests for an 
+ORB-controlled 
+POA to threads. 
+<LI><code>SINGLE_THREAD_MODEL</code> - Requests for a single-threaded POA are processed 
+sequentially. 
+(<STRONG>NOTE: </STRONG> This policy is not supported in the ORB
+shipped with Sun's J2SE v.1.4.1).
+</UL>
+
+<!--  ********** Lifespan Policy ***************-->
+<a name="lifespan"></a>
+<H4>Lifespan Policy</H4>
+
+<P>This policy specifies the lifespan of the objects implemented in the created POA. The 
+default is 
+<code>TRANSIENT</code>. 
+
+<P>The <code>LifespanPolicyValue</code> can have the following values:
+	<UL>
+	 <LI><code>TRANSIENT</code> - The objects implemented in the POA 
+	  cannot outlive the POA instance in which they are 
+	  first created. 
+	 <LI><code>PERSISTENT</code> - The objects implemented in the POA can 
+	  outlive the process in which they are first created.
+	 </UL>
+
+<!--  ********** Object Id Uniqueness Policy ***************-->
+<a name="oi"></a>
+<H4>Object Id Uniqueness Policy</H4>
+
+<P>This policy specifies whether the servants activated in the created POA must have unique 
+object 
+identities. The default is <code>UNIQUE_ID</code>. 
+
+<P>The <code>IdUniquenessPolicyValue</code> can have the following values:
+<P>
+<UL>
+<LI><code>UNIQUE_ID</code> - Servants activated with that POA support exactly one Object Id.
+<LI><code>MULTIPLE_ID</code> - A servant activated with that POA may support one or more
+Object Ids. 
+</UL>
+
+
+<!--  ********** Id Assignment Policy ***************-->
+<a name="ia"></a>
+<H4>Id Assignment Policy</H4>
+<P>This policy specifies whether Object Ids in the created POA are generated by the 
+application or by 
+the ORB. The default is <code>SYSTEM_ID</code>. 
+
+<P>The <code>IdAssignmentPolicyValue</code> can have the following values:
+<P>
+<UL>
+<LI><code>USER_ID</code> - Objects created with that POA are
+assigned Object Ids only by the application. 
+<LI><code>SYSTEM_ID</code> - Objects created with that POA are assigned
+a unique object id  by the POA. If the POA also has the <code>PERSISTENT</code> policy, 
+assigned Object 
+Ids must be unique across all instantiations of the same POA. 
+</UL>
+
+
+
+
+<!--  ********** Servant Retention Policy ***************-->
+<a name="sr"></a>
+<H4>Servant Retention Policy</H4>
+
+
+<P>This policy specifies whether the created POA retains active servants in an Active Object 
+Map.  The 
+default is <code>RETAIN</code>.
+
+<P>The <code>ServantRetentionPolicyValue</code> can have the following 
+	  values. 
+	  <UL>
+	  <LI><code>RETAIN</code> - to indicate that the POA will retain 
+	  active servants in its Active Object Map. 
+	  <LI><code>NON_RETAIN</code> - to indicate Servants are not retained by 
+	  the POA. 
+	  </UL>
+
+<!--  ********** Request Processing Policy ***************-->
+<a name="rp"></a>
+<H4>Request Processing Policy</H4>
+
+<P>This policy specifies how requests are processed by the created POA. The default is
+<code>USE_ACTIVE_OBJECT_MAP_ONLY</code>. 
+
+<P>The  <code>RequestProcessingPolicyValue</code> can have the following
+	  values:  
+	  <UL>
+	  <LI><code>USE_ACTIVE_OBJECT_MAP_ONLY</code> - If the object ID 
+	  is not found in the Active Object Map, 
+	  an <code>OBJECT_NOT_EXIST</code> exception is returned to the 
+	  client. The <code>RETAIN</code> policy is also required.
+	  <LI><code>USE_DEFAULT_SERVANT</code> - If the object ID is not found in 
+	  the Active Object Map or the <code>NON_RETAIN</code> policy is 
+	  present, and a default servant has been registered 
+	  with the POA using the <code>set_servant</code> operation, 
+	  the request is dispatched to the default servant. 
+	  <LI><code>USE_SERVANT_MANAGER</code> - If the object ID is not found 
+	  in the Active Object Map or the <code>NON_RETAIN</code> policy 
+	  is present, and a servant manager has been registered 
+	  with the POA using the <code>set_servant_manager</code> operation, 
+	  the servant manager is given the opportunity to 
+	  locate or activate a servant or raise an exception. 
+	  </UL>
+
+<!--  **********Implicit ActivationPolicy ***************-->
+<a name="ia"></a>
+<H4>Implicit Activation Policy</H4>
+
+<P>This policy specifies whether implicit activation of servants is supported in the created 
+POA. The 
+default value is <code>IMPLICIT_ACTIVATION</code>.
+
+<P>The <code>ImplicitActivationPolicyValue</code> can have the following values:
+<P>
+<UL>
+<LI><code>IMPLICIT_ACTIVATION</code> - Indicates implicit
+activation of servants. This requires <code>SYSTEM_ID</code> and 
+<code>RETAIN</code> policies to be set.
+<LI><code>NO_IMPLICIT_ACTIVATION</code> - Indicates no implicit servant activation. 
+</UL>
+</BLOCKQUOTE>
+
+<!--  ********** CREATE THE POA  ***************-->
+<a name="createpoa"></a>
+<FONT SIZE=+1><STRONG>Step 3: Create the POA</STRONG></FONT>
+<BLOCKQUOTE>
+<P>Creating a new POA allows the application developer to declare specific policy choices for 
+the new 
+POA and to provide a different <a href="#adapteractivator">adapter activator</a> and <a 
+href="#servantmanager">servant manager</a> (these are callback objects used by the POA to 
+activate POAs 
+on demand and activate servants). Creating new POAs also allows the application developer to 
+partition 
+the name space of objects, as Object Ids are interpreted relative to a POA. Finally, by 
+creating new 
+POAs, the developer can independently control request processing for multiple sets of 
+objects.
+
+<P>A POA is created as a child of an existing POA using the <tt>create_POA</tt>
+operation on the parent POA.  To create a new POA, pass in the following information: 
+<P>
+<UL>
+<LI>Name of the POA. The POA is given a name that must be unique with respect to all other 
+POAs with 
+the same parent.  In the following example, the POA is named <code>childPOA</code>.
+<LI>POA Manager.  Specify the POA Manager to be associated with the new POA.  If, as is
+shown in the following example, <tt>null</tt> is passed for this parameter, a new POA 
+Manager will be created. The user can also choose to pass the POA Manager of another POA.
+<LI>Policy List.  Specify the policy list to be associated with the POA to control its 
+behavior.  In 
+the following example, a persistent lifespan policy has already been defined for this POA.  
+</UL>
+
+
+<P>The following code snippet shows how the POA is created
+in the <a href="jidlExample2.html#server">Hello World: Persistent Server</a> example.
+
+
+<UL><PRE>
+// Create a POA by passing the Persistent Policy
+POA persistentPOA = rootPOA.create_POA("childPOA", null, 
+   persistentPolicy ); 
+</PRE>
+</UL>
+</BLOCKQUOTE>
+
+
+
+<!--  ********** POA MANAGER ***************-->
+<a name="poamanager"></a>
+<FONT SIZE=+1><STRONG>Step 4: Activate the POAManager</STRONG></FONT>
+<BLOCKQUOTE>
+
+<P>Each POA object has an associated <code>POAManager</code> object that controls
+the processing  state of the POAs with which it is associated, such as  whether requests to 
+the POA are 
+queued or discarded.  The  <code>POAManager</code> can also
+deactivate the POA.  A POA Manager may be associated with one or more 
+ POA objects.  
+ 
+<P>The <code>POAManager</code> can have the following states: 
+<P>
+<UL>
+<LI>Holding - In this state, associated POAs will queue incoming requests. 
+<LI>Active - In this state, associated POAs will start processing requests.
+<LI>Discarding - In this state, associated POAs will discard incoming requests. 
+<LI>Inactive  -  In this state, associated POAs will reject the requests that have not begun 
+executing 
+as well as as any new requests. 
+</UL>
+
+<P>The <a href="../../api/org/omg/PortableServer/POAManagerOperations.html">
+<code>POAManagerOperations</code></a> javadocs contain more information on
+these states.
+
+
+<P>POA Managers are not automatically activated when they are created. The following code 
+snippet shows 
+how the <tt>POAManager</tt> is activated
+in the <a href="jidlExample2.html#server">Hello World: Persistent Server</a> example.
+If the POA Manager is not activated in this way, all calls to the 
+<code>Servant</code> will hang because, by default, the POA Manager is in the 
+<code>HOLD</code> state.
+ 
+<P><PRE>
+            // Activate PersistentPOA's POAManager. Without this step,
+            // all calls to Persistent Server will hang because POAManager
+            // will be in the 'HOLD' state.
+            persistentPOA.the_POAManager().activate( );
+</PRE>
+</BLOCKQUOTE>
+<P>
+
+<!--  ********** SERVANTS ***************-->
+<a name="servant"></a>
+<FONT SIZE=+1><STRONG>Step 5: Activate the servants</STRONG></FONT>
+<BLOCKQUOTE>
+
+<P>The following information is quoted from section 11.2.5 of the <em>CORBA 
+Specification</em>.
+
+<blockquote>At any point in time, a CORBA object may or may not be associated with an active 
+servant. 
+
+<P>If the POA has the <code>RETAIN</code> policy, the servant and its associated Object Id 
+are entered 
+into the Active Object Map of the appropriate POA. This type of activation can be 
+accomplished in one 
+of the following ways.
+
+<P>
+<UL>
+<LI>The server application itself explicitly activates individual objects (via the 
+<code>activate_object</code> or <code>activate_object_with_id</code> operations).<P>
+<LI>The server application instructs the POA to activate objects on demand by having the POA 
+invoke a 
+user-supplied servant manager. The server application registers this servant manager with 
+<code>set_servant_manager</code>.<P>
+<LI>Under some circumstances (when the <code>IMPLICIT_ACTIVATION</code> policy is also in 
+effect and 
+the language binding allows such an operation), the POA may implicitly activate an object 
+when the 
+server application attempts to obtain a reference for a servant that is not already active 
+(that is, 
+not associated with an Object Id).
+</UL>
+
+<P>If the <code>USE_DEFAULT_SERVANT</code> policy is also in effect, the server application 
+instructs 
+the POA to activate unknown objects by having the POA invoke a single servant no matter what 
+the Object 
+Id is. The server application registers this servant with <code>set_servant</code>. 
+
+<P>If the POA has the <code>NON_RETAIN</code> policy, for every request, the POA may use 
+either a 
+default servant or a servant manager to locate an active servant. From the POA's point of 
+view, the 
+servant is active only for the duration of that one request. The POA does not enter the 
+servant-object 
+association into the Active Object Map.
+</blockquote>
+
+
+<P>When using RMI-IIOP technology, your implementations use delegation (known as the Tie 
+model) to 
+associate your implementation with the interface.  When you create an instance of your 
+implementation,  
+you also need to create a Tie object to associate it 
+with a CORBA interface. The following code snippet shows  how to activate the Tie, if the POA 
+policy is 
+<code>USE_ACTIVE_OBJECT_MAP_ONLY</code>.  This sample code is from  the <a 
+href="../rmi-iiop/rmiiiopexample.html#server">RMI-IIOP with POA</a> example.
+<P>
+<UL>
+<PRE>
+_HelloImpl_Tie tie = (_HelloImpl_Tie)Util.getTie( helloImpl );
+String helloId = "hello";
+byte[] id = helloId.getBytes();
+tPOA.activate_object_with_id( id, tie );
+</pre>
+</UL>
+
+<P>The CORBA Specification discusses creating object references (section 11.2.4),
+activating objects (section 11.2.5), and processing requests (section 11.2.6) in 
+more detail than is done in this document.  Please refer to the
+<em><a href="http://www.omg.org/docs/formal/99-10-07.pdf">CORBA 2.3.1 Specification</a></em> for 
+more information.
+<P>
+</BLOCKQUOTE>
+
+<!--  **********  OBJECT REFERENCES ***************-->
+<a name="objref"></a>
+<FONT SIZE=+1><STRONG>Step 6: Create the object reference</STRONG></FONT>
+<BLOCKQUOTE>
+<P>Object references are created in servers. Once created, they may be 
+exported to clients.  Object references encapsulate object identity
+information and information required by the ORB to identify and locate
+ the server and the POA with which the object is associated. References are created
+ in the following ways:
+ 
+ <P>
+ <UL>
+ <LI>Explicitly activate a servant and associate it with an object reference.
+ 
+ <P>The following example is from <a href="jidlExample2.html#server">Hello World: Persistent 
+Server</a>. This example uses the <code>servant_to_reference</code> operation to  map an 
+activated 
+servant to its corresponding object reference.
+
+<P>
+<UL>
+<PRE>
+// Resolve Root Naming context and bind a name for the
+// servant.
+org.omg.CORBA.Object obj = orb.resolve_initial_references(
+  "NameService" );
+NamingContextExt rootContext = NamingContextExtHelper.narrow( obj );
+
+NameComponent[] nc = rootContext.to_name( 
+  "PersistentServerTutorial" );
+rootContext.rebind( nc, persistentPOA.<strong>servant_to_reference</strong>( 
+  servant ) );
+</PRE>
+</UL></LI><P>
+
+<LI>Server application directly creates a reference.
+
+
+<P>The following example is from the <a 
+href="../rmi-iiop/rmiiiopexample.html#server">RMI-IIOP with 
+POA</a> example.  In this example, the following code directly creates a reference.  In doing 
+so, they 
+bring the abstract object into existence, but do not associate it with an active servant.
+<P>
+<ul>
+<pre>
+// Publish the object reference using the same object id
+// used to activate the Tie object.
+Context initialNamingContext = new InitialContext();
+initialNamingContext.rebind("HelloService", 
+tPOA.<strong>create_reference_with_id</strong>(id, 
+  tie._all_interfaces(tPOA,id)[0]) );
+</pre>
+</ul></LI>
+<P>
+<LI>Server application causes a servant to implicitly activate itself.
+
+<P>The behavior can occur only if the POA has been created with the 
+<code>IMPLICIT_ACTIVATION</code> policy, which is the default behavior.
+
+</UL>
+
+<P>Once an reference is created in the server, it can be made available to clients.
+For more information on creating object references and exporting to clients, 
+please refer to section 11.2.4 of the
+<em><a href="http://www.omg.org/docs/formal/99-10-07.pdf">CORBA 2.3.1 Specification</a></em> for 
+more information.
+</BLOCKQUOTE>
+
+<!--  ********** ADAPTER ACTIVATORS ***************-->
+<a name="adapteractivator"></a>
+<H2>Adapter Activators</H2>
+
+<P><STRONG>
+<UL>
+<LI>
+For an example application that uses Adapter Activators, see <a 
+href="adapteractivator.html"><em>Using Adapter Activators</em></a>.</STRONG>
+</UL>
+<P>An <strong>adapter activator</strong> is optional.  You would use an adapter activator if 
+POAs need 
+to be created during request processing.  If all needed POAs are created when the application 
+is 
+executed, an adapter activator is not required.
+
+
+<P>An adapter activator supplies a POA with the ability to create child POAs on demand, as a 
+side-effect of receiving a request that names the
+child POA (or one of its children), or when the <code>find_POA</code> method is called with 
+an activate 
+parameter value of TRUE.  The ORB will invoke an operation on an adapter activator when a 
+request is 
+received for a child POA that does not currently exist. The adapter activator can then create 
+the 
+required POA on demand.
+
+<P>A request must be capable of conveying the Object Id of the target object as well as the 
+identification of the POA that created the target object reference. When a client issues a 
+request, the 
+ORB first locates an appropriate server (perhaps starting one if needed) and then it locates 
+the 
+appropriate POA within that server. 
+
+<P>If the POA does not exist in the server process, the application has the opportunity to 
+re-create 
+the required POA by using an adapter activator. An adapter activator is a user-implemented 
+object that 
+can be associated with a POA. It is invoked by the ORB when a request is received for a 
+non-existent 
+child POA. The adapter activator has the opportunity to create the required POA. If it does 
+not, the 
+client receives the <code>ADAPTER_NONEXISTENT</code> exception. 
+
+<P>Once the ORB has located the appropriate POA, it delivers the request to that POA. The 
+further 
+processing of that request depends both upon the policies associated with that POA as well as 
+the 
+object's current state of activation.
+
+
+
+
+<P>For more information on Adapter Activators, 
+please refer to section 11.3.3 of the
+<em><a href="http://www.omg.org//docs/formal/99-10-07.pdf">CORBA 2.3.1 Specification</a></em> or the 
+<a 
+href="../../api/org/omg/PortableServer/AdapterActivatorOperations.html"><em>AdapterActivatorO
+perations 
+API documentation</em></a>.
+
+<P>If you are reading this documentation as part of the J2SE documentation bundle, check the 
+Web 
+site at 
+<a 
+href="http://java.sun.com/j2se/1.4.1/docs/guide/idl/POA.html#adapteractivator">
+http://java.sun.com/j2se/1.4.1/docs/guide/idl/POA.html#adapteractivator</a>
+ for updates to this topic.
+
+
+<!--  ********** SERVANT MANAGERS ***************-->
+<a name="servantmanager"></a>
+<H2>Servant Managers</H2>
+
+<P>Servant Managers are optional.   You would use a servant manager to allow the POA to 
+activate 
+servants on demand when a request for an inactive object is received.  If your server loads 
+all objects 
+when it starts up, you do not need a servant manager.  
+
+<P>A <strong>servant manager</strong> is a callback  object that the application developer 
+can 
+associate with a POA. The ORB will invoke operations on servant managers to activate servants 
+on 
+demand, and to deactivate servants. Servant managers are responsible for managing the 
+association of an 
+object reference (as characterized by its Object Id value) with a particular servant, and for 
+determining whether an object reference exists or not. Each servant manager type contains two 
+operations, the first called to find and return a servant and the second to deactivate a 
+servant. The 
+operations differ according to the amount of information usable for their situation.
+
+<P>To use servant managers, the <code>USE_SERVANT_MANAGER</code> policy must be set.  Once 
+set, the 
+type of servant manager used in a particular situation depends on other policies in the POA.  
+The two 
+types of servant managers are:
+<P>
+<UL>
+<LI><code><a 
+href="../../api/org/omg/PortableServer/ServantActivatorOperations.html">
+ServantActivator</a></code>
+<P>When the POA has the <code>RETAIN</code> policy, it uses servant managers that are 
+<code>ServantActivators</code>. 
+<P>This type is typically used to activate persistent objects. 
+<P><UL>
+<LI><STRONG>For an example that uses Servant Activators, see 
+<a href="servantactivator.html">Using Servant Activators</a>. </STRONG>
+</UL>
+
+<P>
+<LI><code><a 
+href="../../api/org/omg/PortableServer/ServantLocatorOperations.html">
+ServantLocator</a></code>
+<P>When the POA has the <code>NON_RETAIN</code> policy, it uses servant managers that are 
+<code>ServantLocators</code>. Because the POA knows that the servant
+returned by this servant manager will be used only for a single request, it can supply extra 
+information to the servant manager's operations and
+the servant manager's pair of operations may be able to cooperate to do something different 
+than a 
+<code>ServantActivator</code>. When the POA uses the
+<code>ServantLocator</code> interface, immediately after performing the operation invocation 
+on the 
+servant returned by preinvoke, the POA will invoke
+postinvoke on the servant manager, passing the ObjectId value and the Servant value as 
+parameters 
+(among others). This feature may be used
+to force every request for objects associated with a POA to be mediated by the servant 
+manager. 
+<P>This type is typically used to activate transient objects.
+<P><UL>
+<LI><STRONG>For an example that uses Servant Locators see 
+<a href="servantlocators.html">Using Servant Locators</a>.</STRONG>
+</UL>
+</UL> 
+
+
+<P>For more information on Servant Managers, 
+please refer to section 11.3.4 of the
+<em><a href="http://www.omg.org/docs/formal/99-10-07.pdf">CORBA 2.3.1 Specification</a></em>.
+
+<P>If you are reading this documentation as part of the J2SE documentation bundle, check the 
+Web 
+site at <a 
+href="http://java.sun.com/j2se/1.4.1/docs/guide/idl/POA.html#servantmanager">
+http://java.sun.com/j2se/1.4.1/docs/guide/idl/POA.html#servantmanager</a> 
+for updates to this topic.
+
+
+<!--           **** POA Q & A *************** -->
+<H2>POA Q&A</H2>
+
+<H3>Is <tt>POAManager.activate()</tt> required for a newly created POA?</H3>
+
+<P><tt>POAManager.activate()</tt> is required for a newly created POA if a null is passed for 
+the 
+<tt>POAManager</tt> parameter to <tt>POA::createPOA</tt> . If null is passed, 
+ a new <tt>POAManager</tt> is created
+and associated with the created POA.  In this case, <tt>POAManager.activate()</tt> is needed.
+
+
+<P>To control several
+POAs with the same <tt>POAManager</tt>,  you would:
+<P>
+<OL>
+<LI>Create a POA or  use the <tt>rootPOA</tt>
+<LI>Obtain the POA's manager via <tt>POA::the_POAManager</tt>
+<LI>Pass the <tt>POAManager</tt> to subsequent <tt>createPOA</tt> calls
+</OL>
+
+<P>There is no implicit relationship
+between the Root POA's <tt>POAManager</tt> and other POAs unless explicitly
+programmed by the programmer as shown above.
+
+<P>For more information, read section 11.3.2 of the <a 
+href="http://www.omg.org/docs/formal/99-10-07.pdf">CORBA specification, formal/99-10-07</a>.
+
+<!--     ********** FOR  MORE  INFO  **********-->
+ 
+<H2>For more information</H2>
+<DL>
+<DT>For more information about the Portable Object Adapter, read Chapter 11 of the CORBA/IIOP 
+v.2.3.1 
+Specification from the Object Management Group's Web site.  At the time of this writing, the 
+specification can be found at <a 
+href="http://www.omg.org/docs/formal/99-10-07.pdf">http://www.omg.org/docs/formal/99-10-07.pdf</a>.</DT>
+</DL>
+
+
+<P><HR>
+<CENTER><P>
+
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html">Java IDL Home</A></TD>
+</TR>
+<TR>
+  <TD ALIGN=CENTER>Last updated: June 6, 2002</TD>
+</TR>
+</TABLE>
+<P>
+<P>
+<!-- server side include for page footer -->
+
+  <!--#include virtual="/share/include/normal.footer.v4.0.html"-->
+
+<!-- end server side include for footer -->
+
+</CENTER>
+</BODY>
+</HTML>

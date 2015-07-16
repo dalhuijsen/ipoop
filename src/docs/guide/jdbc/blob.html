@@ -1,0 +1,207 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<hr><br>
+ 
+<p><a name="1002542"> </a>
+<h1> Blob </h1>
+<a name="1002544"> </a>
+<h2>8.1	 Blob Overview</h2>
+<p><a name="997474"> </a>
+A <code>Blob</code> object represents the Java programming language </a>mapping of an SQL <code>BLOB</code> (Binary Large Object). An SQL <code>BLOB</code> is a built-in type that stores a Binary Large Object as a column value in a row of a database table. Methods in the interfaces <code>ResultSet</code>, <code>CallableStatement</code>, <code>and</code> <code>PreparedStatement </code>allow a programmer to access the SQL3 type <code>BLOB</code> in the same way that SQL92 built-in types are accessed.  In other words, an application using the JDBC 2.0 API uses methods such as <code>getBlob</code> and <code>setBlob</code> for a <code>BLOB</code> value the same way it uses <code>getInt</code> and <code>setInt</code> for an <code>INTEGER</code> value or <code>getString</code> and <code>setString</code> for a <code>CHAR</code> or <code>VARCHAR</code> value.
+</p><p><a name="998304"> </a>
+In a standard </a>implementation, a JDBC driver implements the <code>Blob</code> interface using the SQL type <code>LOCATOR(BLOB)</code> behind the scenes. A <code>LOCATOR(BLOB)</code> designates an SQL <code>BLOB</code> value residing on a database server, and operations on the locator achieve the same results as operations on the <code>BLOB</code> value itself. This means that a client can operate on a <code>Blob</code> instance without ever having to materialize the <code>BLOB</code> data on the client machine, which can improve performance significantly. Because the driver uses <code>LOCATOR(BLOB)</code> behind the scenes, its use is completely transparent to the programmer using a JDBC driver.
+</p><p><a name="999633"> </a>
+The standard behavior for a <code>Blob</code> instance is to </a>remain valid until the transaction in which it was created is either committed or rolled back.
+</p><p><a name="998385"> </a>
+The <code>Blob</code> interface provides methods for getting the length of an SQL <code>BLOB</code> value, for materializing a <code>BLOB</code> value on the client, and for determining the position of a pattern of bytes within a <code>BLOB</code> value.
+</p><a name="1003400"> </a>
+<h3>8.1.1	 Creating a Blob Object</h3>
+<p><a name="1003401"> </a>
+The following code fragment illustrates </a>creating</a> a <code>Blob</code> object, where <code>stmt</code> is a <code>Statement</code> object:
+</p><blockquote><pre>ResultSet rs = stmt.executeQuery("SELECT DATA FROM TABLE1");
+rs.first();
+Blob data = rs.getBlob("DATA");
+</blockquote></pre>
+<p><a name="999815"> </a>
+The variable <code>blob</code> contains a logical pointer to the <code>BLOB</code> value that is stored in the column <code>DATA</code> in the first row of the result set <code>rs</code>. It does not contain the data in the <code>BLOB</code> value, but as far as JDBC methods are concerned, it is operated on as if it did.
+</p><a name="999879"> </a>
+<h3>8.1.2	 Materializing Blob Data</h3>
+<p><a name="1000978"> </a>
+Programmers can invoke methods in the JDBC API on a <code>Blob</code> object as if they were operating on the SQL <code>BLOB</code> it designates. However, if they want to operate on a <code>Blob</code> object as if it were an object in the Java programming language, they must first materialize it on the client. The <code>Blob</code> interface provides two methods for </a>materializing a <code>Blob</code> object: <code>getBinaryStream</code>, which materializes the <code>BLOB</code> value as an input stream, and <code>getBytes</code>, which materializes all or part of the <code>BLOB</code> value as an array of bytes. The following code fragment </a>materializes all of the data in the <code>BLOB</code> value designated by <code>blob</code> as an input stream:
+</p><blockquote><pre>java.io.InputStream in = blob.getBinaryStream();
+byte b;
+while ((in.read()) &gt; -1) {
+	b = in.read();
+	System.out.println(b);
+}
+// prints out all the bytes in the BLOB value that blob designates
+</pre></blockquote>
+<p><a name="999931"> </a>
+The next code fragment also materializes all of the data in the <code>BLOB</code> value designated by <code>blob</code>, but as an </a>array of bytes instead of as an input stream.
+<blockquote><pre>
+long len = blob.length();
+byte [] data = blob.getBytes(1, len);
+for (int i = 0; i &lt; len; i++) {
+	byte b = data[i];
+	System.out.println(b);
+}
+// prints out all the bytes in the BLOB value that blob designates
+</pre></blockquote>
+<p><a name="999914"> </a>
+The variable <code>data</code> contains a copy of all of the bytes in the <code>BLOB</code> value that <code>blob</code> designates. This is true because the arguments passed to the method <code>getBytes</code> specify the entire <code>BLOB</code> value: the first argument tells it to return bytes starting with the first byte, and the second argument tells it to return the number of bytes in the length of the <code>BLOB</code> value. The following line of code illustrates materializing 1024 bytes starting with the 256th byte:
+<blockquote><pre>byte [] data = blob.getBytes(256, 1024);
+byte b = data[0];
+// data contains bytes 256 through 1280 in the BLOB value that blob 
+// designates; b contains the 256th byte
+</pre></blockquote>
+<p><a name="1000089"> </a>
+A point to keep in mind is that because of differences in SQL and the Java programming language, the first byte in a <code>BLOB</code> value is at position <code>1</code>, whereas the first element of an array in the Java programming language is at index <code>0</code>. 
+</p><a name="999822"> </a>
+<h3>8.1.3	 Storing a Blob Object</h3>
+<p><a name="999792"> </a>
+To store a <code>Blob</code> object in the database, it is passed as a parameter to the <code>PreparedStatement</code> method <code>setBlob</code>. For example, the following code fragment </a>stores the <code>Blob</code> object <code>stats</code> by passing it as the first input parameter to the <code>PreparedStatement</code> object <code>pstmt</code>:
+</p><blockquote><pre>Blob stats = rs.getBlob("STATS");
+PreparedStatement pstmt = con.prepareStatement(
+	"UPDATE SIGHTINGS SET MEAS = ? WHERE AREA = 'NE'");
+pstmt.setBlob(1, stats);
+pstmt.executeUpdate();
+</pre></blockquote>
+<p><a name="1000219"> </a>
+The <code>BLOB</code> value designated by <code>stats</code> is now stored in the table <code>SIGHTINGS</code> in column <code>MEAS</code> in the row where column <code>AREA</code> contains <code>NE</code>.
+</p><a name="1003483"> </a>
+<a name="998392"> </a>
+<h2>8.2	 Blob Interface Definition</h2>
+<blockquote><pre>
+package java.sql;
+public interface Blob {
+	long <strong>length</strong>() throws SQLException;
+	InputStream <strong>getBinaryStream</strong>() throws SQLException;
+	byte[] <strong>getBytes</strong>(long <em>pos</em><code>,</code><em> </em>int <em>length</em>) throws SQLException;
+	long <strong>position</strong>(byte [] <em>pattern</em><code>,</code><em> </em>long <em>start</em>) throws SQLException;
+	long <strong>position</strong>(Blob <em>pattern</em><code>,</code><em> </em>long <em>start</em>) throws SQLException;
+}
+</pre></blockquote><a name="998397"> </a>
+<h2>8.3	 Blob Methods</h2>
+<pre>InputStream <strong>getBinaryStream</strong>() throws SQLException</pre>
+<blockquote>
+Materializes the <code>BLOB</code> value designated by this <code>Blob</code> object as a stream of uninterpreted bytes.
+<p>
+<b>RETURNS:</b>
+</p><p><a name="998544"> </a>
+an <code>InputStream</code> object with the data of the <code>BLOB</code> value designated by this <code>Blob</code> object
+</p><p><a name="998545"> </a>
+<b>EXAMPLE: </b>
+<pre>InputStream in = blob.getBinaryStream();
+// in has the data in the BLOB value that blob designates
+</pre></blockquote><a name="998828"> </a>
+<h4> </a>getBytes</h4>
+<p><a name="998829"> </a>
+</a><pre>byte[] <strong>getBytes</strong>(long <em>pos</em><code>,</code><em> </em>int <em>length</em>) throws SQLException</pre>
+</p><blockquote>
+Materializes part or all of the <code>BLOB</code> value that this <code>Blob</code> object designates as an array of bytes. The byte array contains up to <code>length</code> consecutive bytes starting at position <code>pos</code>.
+<p>
+<b>PARAMETERS:</b>
+</p><p><a name="998833"> </a>
+<table summary="layout" border=0>
+<tr><td valign=top><em>pos</em></td><td> </td>
+<td>the ordinal position in the <code>BLOB</code> value <br>
+           		of the first <code>byte</code> to be extracted; the <br>
+				first <code>byte</code> is at position <code>1</code>
+				</td>
+				</tr>
+<tr><td valign=top><em>length</em></td><td> </td>
+<td>the number of consecutive bytes to be copied
+</td></tr></table>
+<p>
+<b>RETURNS:</b>
+<p><a name="998836"> </a>
+a <code>byte</code> array with up to <code>length</code> consecutive bytes from the <code>BLOB</code> value pointed to by this <code>Blob</code> object, starting with the <code>byte</code> at position <code>pos</code>
+</p><p><a name="998837"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>
+byte [] part = blob.getBytes(5, 100);
+// part contains the fifth through 104th bytes, inclusive, as an
+// array of bytes
+</pre></blockquote><a name="998812"> </a>
+</blockquote>
+<h4> </a>length</h4>
+<p><a name="998813"> </a>
+<pre>long <strong>length</strong>() throws SQLException</pre>
+<blockquote>Returns the number of bytes in the <code>BLOB</code> value designated by this <code>Blob</code> object.
+<p><a name="998816"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998817"> </a>
+the length of the <code>BLOB</code> value designated by this <code>Blob</code> object, in bytes
+</p><p><a name="998818"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>
+Blob blob = rs.getBlob(2);
+long len = blob.length(); 
+// len contains the number of bytes in the BLOB value designated by
+// blob (the BLOB value in the second column of the current row of the
+// ResultSet object rs)
+</pre></blockquote><a name="998673"> </a>
+</blockquote>
+<h4> </a>position</h4>
+<p><a name="998674"> </a>
+<pre>long <strong>position</strong>(byte [] <em>pattern</em><code>,</code><em> </em>long <em>start</em>) throws SQLException</pre>
+<a name="998676"> </a>
+<blockquote>Determines the position at which the <code>byte</code> array <code>pattern</code> begins within the <code>BLOB</code> value that this <code>Blob</code> object represents. The search for <code>pattern</code> begins at position <code>start</code>.
+<a name="1003490"> </a>
+<p>
+<b>PARAMETERS:</b>
+<table summary="layout" border=0>
+<tr><td valign=top><em>pattern</em></td><td> </td>
+<td>the <code>byte</code> array for which to search
+</td></tr>
+<tr><td><em>start</em></td><td> </td>
+<td>the position in the <code>BLOB</code> value at which to begin searching; the first <code>byte</code> is at position <code>1</code>
+</td></tr></table>
+</p><p><a name="998681"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998682"> </a>
+the position in the <code>BLOB</code> value at which the <code>byte</code> array <code>pattern</code> begins, which will be <code>start</code> or larger if the search, starting at position <code>start</code>, is successful; <code>-1</code> otherwise
+</p><p><a name="998683"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>
+byte [] part = blob.getBytes(5, 100);
+long beginning = blob.position(part, 1024);
+// if part is contained in the BLOB value that blob designates, from
+// position 1024 on, beginning will contain the position at which
+// part begins
+</pre></blockquote><a name="998752"> </a>
+</blockquote>
+<h4> </a>position</h4>
+<p><a name="998753"> </a>
+<pre>long <strong>position</strong>(Blob <em>pattern</em><code>,</code><em> </em>long <em>start</em>) throws SQLException</pre>
+<blockquote>Determines the <code>byte</code> position in the <code>BLOB</code> value designated by this <code>Blob</code> object at which <code>pattern</code> begins. The search begins at position <code>start</code>.
+<p><a name="998756"> </a>
+<b>PARAMETERS:</b>
+<table summary="layout" border=0>
+<tr><td valign=top><em>pattern</em></td><td> </td>
+<td>the <code>Blob</code> object designating the <code>BLOB</code> value for which to search</td></tr> 
+<tr><td valign=top><em>start</em></td><td> </td>
+<td>the position in the <code>BLOB</code> value at which to begin searching; the first <code>byte</code> is at position <code>1</code></td></tr></table>
+</p><p><a name="998760"> </a>
+<b>RETURNS:</b>
+</p><p><a name="998761"> </a>
+the position at which the <code>Blob</code> object <code>pattern</code> begins, which will be <code>start</code> or larger if the search, starting at position <code>start</code>, is successful; <code>-1</code> otherwise
+</p><p><a name="998762"> </a>
+<b>EXAMPLE: </b>
+<blockquote><pre>
+Blob blob2 = rs.getBlob(4);
+long beginning = blob1.position(blob2, 512);
+// if the BLOB value designated by blob2 is contained in the BLOB
+// value designated by blob1, starting at position 512 or later, 
+// beginning will contain the position at which the BLOB value 
+// designated by blob2 begins
+</pre></blockquote>
+</blockquote>
+<hr><br>
+ 
+<i>Copyright &#169; 2000, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

@@ -1,0 +1,180 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Mon Jan 27 15:24:09 2003" />
+    <title>Security in Object Serialization</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="serialTOC.html" />
+    <link rel="Previous" href="protocol.html" />
+    <link rel="Next" href="exceptions.html" />
+    <link rel="Index" href="examples.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="protocol.html">Previous</a> | 
+        <a accesskey="n" href="exceptions.html">Next</a>
+       </td>
+	   <td align="right"><i>Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp2527"> </a><h2 class="pNewHTMLPage">
+Security in Object Serialization
+</h2>
+<hr class="pHr"/>
+<a name="wp3445"> </a><h2 class="pAppxNum">
+Appendix &#160; A
+</h2>
+<a name="wp3461"> </a><h4 class="pHeading3">
+		Topics:
+</h4>
+<ul class="pBullet1"><a name="wp3415"> </a><div class="pBullet1"><li><a  href="security.html#wp4138">Overview</a></li></div>
+<a name="wp3436"> </a><div class="pBullet1Plus"><li><a  href="security.html#wp2630">Design Goals</a></li></div>
+<a name="wp4149"> </a><div class="pBullet1Plus"><li><a  href="security.html#wp4169">Security Issues</a></li></div>
+<a name="wp4150"> </a><div class="pBullet1Plus"><li><a  href="security.html#wp4214">Preventing Serialization of Sensitive Data</a></li></div>
+<a name="wp4151"> </a><div class="pBullet1Plus"><li><a  href="security.html#wp4229">Writing Class-Specific Serializing Methods</a></li></div>
+<a name="wp4152"> </a><div class="pBullet1Plus"><li><a  href="security.html#wp4271">Guarding Unshared Deserialized Objects</a></li></div>
+<a name="wp4153"> </a><div class="pBullet1Plus"><li><a  href="security.html#wp4324">Preventing Overwriting of Externalizable Objects</a></li></div>
+<a name="wp3430"> </a><div class="pBullet1Last"><li><a  href="security.html#wp4346">Encrypting a Bytestream</a></li></div>
+</ul>
+<a name="wp4138"> </a><h2 class="pHeading1">
+	A.1	Overview
+</h2>
+<a name="wp3410"> </a><p class="pBody">
+The object serialization system allows a bytestream to be produced from a graph of objects, sent out of the Java&#8482; environment (either saved to disk or transmitted over the network) and then used to recreate an equivalent set of new objects with the same state.
+</p>
+<a name="wp2667"> </a><p class="pBody">
+What happens to the state of the objects outside of the environment is outside of the control of the Java&#8482; system (by definition), and therefore is outside the control of the security provided by the system. The question then arises: once an object has been serialized, can the resulting byte array be examined and changed in a way that compromises the security of the Java program that deserializes it?  The intent of this section is to address these security concerns.
+</p>
+<a name="wp2630"> </a><h2 class="pHeading1">
+	A.2	Design Goals
+</h2>
+<a name="wp2945"> </a><p class="pBody">
+The goal for object serialization is to be as simple as possible and yet still be consistent with known security restrictions; the simpler the system is, the more likely it is to be secure. The following points summarize the security measures present in object serialization:
+</p>
+<ul class="pBullet1"><a name="wp3046"> </a><div class="pBullet1"><li>Only objects implementing the <code class="cCode">java.io.Serializable</code> or <code class="cCode">java.io.Externalizable</code> interfaces can be serialized.  Mechanisms are provided which can be used to prevent the serialization of specific fields (typically, those containing sensitive or unneeded data).</li></div>
+<a name="wp2551"> </a><div class="pBullet1Plus"><li>The serialization package cannot be used to recreate or reinitialize objects.  Deserializing a byte stream may result in the creation of new objects, but will not overwrite or modify the contents of existing objects.</li></div>
+<a name="wp4166"> </a><div class="pBullet1Last"><li>Although deserializing an object may trigger downloading of code from a remote source, the downloaded code is restricted by all of the usual Java&#8482; code verification and security mechanisms.  Classes loaded as a side-effect of deserialization are no more or less secure than those loaded in any other fashion.</li></div>
+</ul>
+<a name="wp4169"> </a><h2 class="pHeading1">
+	A.3	Security Issues
+</h2>
+<a name="wp4170"> </a><p class="pBody">
+Naive use of object serialization may allow a malicious party with access to the serialization byte stream to read private data, create objects with illegal or dangerous state, or obtain references to the private fields of deserialized objects.  Implementors concerned with security should be aware of the following implications of serialization:
+</p>
+<ul class="pBullet1"><a name="wp4171"> </a><div class="pBullet1"><li>Default serialization of an object writes the values of all fields of that object to the serialization stream, regardless of whether or not they are public.  Malicious code can effectively read the values of private fields of a serializable object by serializing the object and then examining the resulting byte stream.  Methods for avoiding this problem are described in <a  href="security.html#wp4214">Section&#160;A.4 &quot;Preventing Serialization of Sensitive Data</a>&#8221;.</li></div>
+<a name="wp4197"> </a><div class="pBullet1Plus"><li>During deserialization, objects are created and initialized using data from the incoming serialization stream.  If the stream was corrupted or tampered with prior to deserialization, the deserialized objects may have unexpected or illegal state.  Methods for avoiding this problem are described in <a  href="security.html#wp4229">Section&#160;A.5 &quot;Writing Class-Specific Serializing Methods</a>&#8221;.</li></div>
+<a name="wp4202"> </a><div class="pBullet1Plus"><li>By inserting extra wire handle references into a serialization byte stream, it is possible during deserialization to forge extra references to objects occurring earlier in the stream.  Therefore, it is unsafe for developers to assume that references to private objects obtained via deserialization are unique.  Techniques for dealing with this problem are discussed in section <a  href="security.html#wp4271">Section&#160;A.6 &quot;Guarding Unshared Deserialized Objects</a>&#8221;.</li></div>
+<a name="wp4208"> </a><div class="pBullet1Last"><li>Objects implementing the Externalizable interface are susceptible to overwriting, since the readExternal method is public.  A caller can invoke the <code class="cCode">readExternal</code> method at any time, passing it an arbitrary stream to read values from, causing the target object to be reinitialized.  A means of preventing this is outlined in <a  href="security.html#wp4324">Section&#160;A.7 &quot;Preventing Overwriting of Externalizable Objects</a>&#8221;.</li></div>
+</ul>
+<a name="wp4214"> </a><h2 class="pHeading1">
+	A.4	Preventing Serialization of Sensitive Data
+</h2>
+<a name="wp4216"> </a><p class="pBody">
+Fields containing sensitive data should not be serialized; doing so exposes their values to any party with access to the serialization stream.  There are several methods for preventing a field from being serialized:
+</p>
+<ul class="pBullet1"><a name="wp4220"> </a><div class="pBullet1"><li>Declare the field as private transient.</li></div>
+<a name="wp4222"> </a><div class="pBullet1Plus"><li>Define the <code class="cCode">serialPersistentFields</code> field of the class in question, and omit the field from the list of field descriptors.</li></div>
+<a name="wp4225"> </a><div class="pBullet1Last"><li>Write a class-specific serialization method (i.e., <code class="cCode">writeObject</code> or <code class="cCode">writeExternal</code>) which does not write the field to the serialization stream (i.e., by not calling <code class="cCode">ObjectOutputStream.defaultWriteObject</code>).</li></div>
+</ul>
+<a name="wp4229"> </a><h2 class="pHeading1">
+	A.5	Writing Class-Specific Serializing Methods
+</h2>
+<a name="wp4231"> </a><p class="pBody">
+To guarantee that a deserialized object does not have state which violates some set of invariants that need to be guaranteed, a class can define its own serializing and deserializing methods. If there is some set of invariants that need to be maintained between the data members of a class, only the class can know about these invariants, and it is up to the class author to provide a deserialization method that checks these invariants.
+</p>
+<a name="wp4241"> </a><p class="pBody">
+Security-conscious implementors should keep in mind that a serializable class&#8217; <code class="cCode">readObject</code> method is effectively a public constructor, and should be treated as such.  This is true whether the <code class="cCode">readObject</code> method is implicit or explicit.  It is not safe to assume that the byte stream that is provided to the <code class="cCode">readObject</code> method was generated by serializing a properly constructed object of the correct type.  It is good defensive programming to assume that the byte stream is provided by an adversary whose goal is to compromise the object under construction.
+</p>
+<a name="wp4270"> </a><p class="pBody">
+This is important even if you are not worried about security; it is possible that disk files can be corrupted and serialized data be invalid. So checking such invariants is more than just a security measure; it is a validity measure.  However, the only place it can be done is in the code for the particular class, since there is no way the serialization package can determine what invariants should be maintained or checked.
+</p>
+<a name="wp4448"> </a><p class="pBody">
+In version 1.4 of the Java&#8482; 2 SDK, Standard Edition, support was added for class-defined <code class="cCode">readObjectNoData</code> methods (see <a  href="input.html#wp6053">Section&#160;1.5 &quot;The readObjectNoData Method</a>&#8221;).  Non-<code class="cCode">final</code> serializable classes which initialize fields to non-default values should define a <code class="cCode">readObjectNoData</code> method to ensure consistent state in the event that a subclass instance is deserialized and the serialization stream does not list the class in question as a superclass of the deserialized object.  This may occur in cases where the receiving party uses a different version of the deserialized instance&#8217;s class than the sending party, and the receiver&#8217;s version extends classes that are not extended by the sender&#8217;s version.  This may also occur if the serialization stream has been tampered; hence, <code class="cCode">readObjectNoData</code> is useful for initializing deserialized objects properly despite a &#8220;hostile&#8221; or incomplete source stream
+</p>
+<a name="wp4271"> </a><h2 class="pHeading1">
+	A.6	Guarding Unshared Deserialized Objects
+</h2>
+<a name="wp4275"> </a><p class="pBody">
+If a class has any private or package private object reference fields, and the class depends on the fact that these object references are not available outside the class (or package), then either the referenced objects must be defensively copied as part of the deserialization process, or else the <code class="cCode">ObjectOutputStream.writeUnshared</code> and <code class="cCode">ObjectInputStream.readUnshared</code> methods (introduced in version 1.4 of the Java&#8482; 2 SDK, Standard Edition) should be used to ensure unique references to the internal objects.
+</p>
+<a name="wp4469"> </a><p class="pBody">
+In the copying approach, the sub-objects deserialized from the stream should be treated as &quot;untrusted input&quot;: newly created objects, initialized to have the same value as the deserialized sub-objects, should be substituted for the sub-objects by the <code class="cCode">readObject</code> method.  For example, suppose an object has a private byte array field, b, that must remain private:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+	private void readObject(ObjectInputStream s)        
+		throws IOException, ClassNotFoundException    
+	{        
+		s.defaultReadObject();        
+		b = (byte[])b.clone();        
+		if (&lt;invariants are not satisfied&gt;)            
+			throw new java.io.StreamCorruptedException();    
+	}<a name="wp4291"> </a>
+</pre></div>
+<a name="wp4300"> </a><p class="pBody">
+This issue is particularly important when considering serialization of immutable objects containing internal (necessarily private) references to mutable sub-objects.  If no special measures are taken to copy the sub-objects during deserialization of the container object, then a malicious party with write access to the serialization stream may violate the container object&#8217;s immutability by forging references to its mutable sub-objects, and using these references to change the internal state of the container object.  Thus, in this case it is imperative that the immutable container class provide a class-specific deserialization method which makes private copies of each mutable component object it deserializes.  Note that for the purpose of maintaining immutability, it is unnecessary to copy immutable component objects.
+</p>
+<a name="wp4312"> </a><p class="pBody">
+It is also important to note that calling <code class="cCode">clone</code> may not always be the right way to defensively copy a sub-object.  If the <code class="cCode">clone</code> method cannot be counted on to produce an independent copy (and not to &quot;steal&quot; a reference to the copy), an alternative means should be used to produce the copy.  An alternative means of copying should always be used if the class of the sub-object is not final, since the <code class="cCode">clone</code> method or helper methods that it calls may be overridden by subclasses.
+</p>
+<a name="wp4470"> </a><p class="pBody">
+Starting in version 1.4 of the Java&#8482; 2 SDK, Standard Edition, unique references to deserialized objects can also be ensured by using the <code class="cCode">ObjectOutputStream.writeUnshared</code> and <code class="cCode">ObjectInputStream.readUnshared</code> methods, thus avoiding the complication, performance costs and memory overhead of defensive copying.  The <code class="cCode">readUnshared</code> and <code class="cCode">writeUnshared</code> methods are further described in <a  href="input.html#wp961">Section&#160;1.1 &quot;The ObjectInputStream Class</a>&#8221; and <a  href="output.html#wp933">Section&#160;1.1 &quot;The ObjectOutputStream Class</a>&#8221;.
+</p>
+<a name="wp4324"> </a><h2 class="pHeading1">
+	A.7	Preventing Overwriting of Externalizable Objects
+</h2>
+<a name="wp4326"> </a><p class="pBody">
+Objects which implement the <code class="cCode">Externalizable</code> interface must provide a public <code class="cCode">readExternal</code> method.  Since this method is public, it can be called at arbitrary times by anyone with access to the object.  To prevent overwriting of the object&#8217;s internal state by multiple (illegal) calls to <code class="cCode">readExternal</code>, implementors may choose to add checks to insure that internal values are only set when appropriate:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+	public synchronized void readExternal(ObjectInput in)        
+		throws IOException, ClassNotFoundException    
+	{        
+		if (! initialized) {            
+			initialized = true;            
+			
+			// read in and set field values ...        
+		} else {            
+			throw new IllegalStateException();        
+		}    
+	}<a name="wp4333"> </a>
+</pre></div>
+<a name="wp4346"> </a><h2 class="pHeading1">
+	A.8	Encrypting a Bytestream
+</h2>
+<a name="wp4347"> </a><p class="pBody">
+Another way of protecting a bytestream outside the virtual machine is to encrypt the stream produced by the serialization package. Encrypting the bytestream prevents the decoding and the reading of a serialized object&#8217;s private state, and can help safeguard against tampering with stream contents.
+</p>
+<a name="wp4352"> </a><p class="pBody">
+Object serialization allows encryption, both by allowing classes to define their own methods for serialization and deserialization (inside which encryption can be used), and by adhering to the composable stream abstraction (allowing the output of a serialization stream to be channelled into another filter stream which encrypts the data).
+</p>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="protocol.html">Previous</a> | 
+        <a accesskey="n" href="exceptions.html">Next</a>
+       </td>
+        <td align="right">
+          <span class="copyright">Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification  </span>
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

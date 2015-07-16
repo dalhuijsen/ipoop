@@ -1,0 +1,417 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide:  - 
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="jpsTitle.fm.html">PREV</a>
+ | <a href="jpsOverview.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+<h2>
+
+<a href="jpsOverview.fm.html">1. Introduction</a>
+</h2>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="jpsOverview.fm1.html">
+<b>History of Printing on the Java Platform</b></a>
+
+<dd>
+<a href="jpsOverview.fm2.html">
+<b>What the Java Print Service API Offers</b></a>
+
+<dd>
+<a href="jpsOverview.fm3.html">
+<b>Java Print Service Architecture</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="jpsOverview.fm3.html#998713">	The javax.print Package</a>
+</b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="jpsOverview.fm3.html#998585">	Discover Print Services</a>
+</b>
+
+<dd>
+<b> 
+<a href="jpsOverview.fm3.html#999672">	Specify the Print Data Format</a>
+</b>
+
+<dd>
+<b> 
+<a href="jpsOverview.fm3.html#998604">	Create Print Jobs</a>
+</b>
+
+</dl>
+<dd>
+<b> 
+<a href="jpsOverview.fm3.html#998393">	The javax.print.event Package</a>
+</b>
+
+</dl>
+<dd>
+<a href="jpsOverview.fm4.html">
+<b>How Applications Use the Java Print Service</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="jpsOverview.fm4.html#998638">	A Basic Example</a>
+</b>
+
+</dl>
+</dl>
+<h2>
+
+<a href="attributes.fm.html">2. Attributes</a>
+</h2>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="attributes.fm1.html">
+<b>Attribute Categories and Values</b></a>
+
+<dd>
+<a href="attributes.fm2.html">
+<b>Attribute Roles</b></a>
+
+<dd>
+<a href="attributes.fm3.html">
+<b>Attribute Sets</b></a>
+
+<dd>
+<a href="attributes.fm4.html">
+<b>How to Specify Attributes</b></a>
+
+<dd>
+<a href="attributes.fm5.html">
+<b>Standard Attributes</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="attributes.fm5.html#1000918">OrientationRequested</a>
+</b>
+
+<dd>
+<b> 
+<a href="attributes.fm5.html#997296">Copies</a>
+</b>
+
+<dd>
+<b> 
+<a href="attributes.fm5.html#1000214">Media</a>
+</b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="attributes.fm5.html#997389">MediaSize</a>
+</b>
+
+<dd>
+<b> 
+<a href="attributes.fm5.html#997393">MediaPrintableArea</a>
+</b>
+
+</dl>
+<dd>
+<b> 
+<a href="attributes.fm5.html#997419">Destination</a>
+</b>
+
+<dd>
+<b> 
+<a href="attributes.fm5.html#997448">SheetCollate</a>
+</b>
+
+<dd>
+<b> 
+<a href="attributes.fm5.html#997461">Sides</a>
+</b>
+
+<dd>
+<b> 
+<a href="attributes.fm5.html#997478">Fidelity</a>
+</b>
+
+</dl>
+<dd>
+<a href="attributes.fm6.html">
+<b>Uses of JPS Attributes</b></a>
+
+</dl>
+<h2>
+
+<a href="docflavor.fm.html#996958">	3.	Specifying Document Types</a>
+</h2>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="docflavor.fm1.html">
+<b>Client-Formatted Print Data</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="docflavor.fm1.html#997684">	MIME Types for Preformatted Data</a>
+</b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="docflavor.fm1.html#998469">	Text Data</a>
+</b>
+
+<dd>
+<b> 
+<a href="docflavor.fm1.html#999079">	Page Description Language Documents</a>
+</b>
+
+<dd>
+<b> 
+<a href="docflavor.fm1.html#999556">	Image Data</a>
+</b>
+
+<dd>
+<b> 
+<a href="docflavor.fm1.html#997874">	Autosense Print Data</a>
+</b>
+
+</dl>
+<dd>
+<b> 
+<a href="docflavor.fm1.html#997680">	Representation Classes</a>
+</b>
+
+</dl>
+<dd>
+<a href="docflavor.fm2.html">
+<b>Importance of Character Encoding</b></a>
+
+<dd>
+<a href="docflavor.fm3.html">
+<b>Service-Formatted Print Data</b></a>
+
+<dd>
+<a href="docflavor.fm4.html">
+<b>How to Use DocFlavor</b></a>
+
+</dl>
+<h2>
+
+<a href="printing.fm.html#996958">	4.	Printing and Streaming Documents</a>
+</h2>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="printing.fm1.html">
+<b>StreamPrintService Versus PrintService</b></a>
+
+<dd>
+<a href="printing.fm2.html">
+<b>Locating Services</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="printing.fm2.html#998927">	Discovering Print Services</a>
+</b>
+
+<dd>
+<b> 
+<a href="printing.fm2.html#999433">	Discovering Stream Print Services</a>
+</b>
+
+</dl>
+<dd>
+<a href="printing.fm3.html">
+<b>Obtaining a Print Job</b></a>
+
+<dd>
+<a href="printing.fm4.html">
+<b>Creating a Doc</b></a>
+
+<dd>
+<a href="printing.fm5.html">
+<b>Registering for Events</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="printing.fm5.html#999518">	Print Service Events</a>
+</b>
+
+<dd>
+<b> 
+<a href="printing.fm5.html#999530">	Print Job Events</a>
+</b>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="printing.fm5.html#999542">PrintJobAttributeListener</a>
+</b>
+
+<dd>
+<b> 
+<a href="printing.fm5.html#999544">PrintJobListener</a>
+</b>
+
+</dl>
+</dl>
+<dd>
+<a href="printing.fm6.html">
+<b>Submitting the Print Job</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="printing.fm6.html#1000147">	Submitting the Print Job to the Printer</a>
+</b>
+
+<dd>
+<b> 
+<a href="printing.fm6.html#1000151">	Submitting the Print Job to the Stream</a>
+</b>
+
+</dl>
+<dd>
+<a href="printing.fm7.html">
+<b>Print Service Providers</b></a>
+
+</dl>
+<h2>
+
+<a href="printing2d.fm.html#996958">	5.	Printing and Streaming 2D Graphics</a>
+</h2>
+
+<dl>
+<dt></dt>
+<dd>
+<a href="printing2d.fm.html">
+<b>Using PrinterJob to Print or Stream Graphics</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="printing2d.fm1.html#999379">	Printing 2D Graphics</a>
+</b>
+
+<dd>
+<b> 
+<a href="printing2d.fm1.html#999400">	Streaming 2D Graphics</a>
+</b>
+
+</dl>
+<dd>
+<a href="printing2d.fm2.html">
+<b>Using Service-Formatted Data</b></a>
+
+
+<dl>
+<dt></dt>
+<dd>
+<b> 
+<a href="printing2d.fm2.html#999853">	Printing the Service-Formatted Data</a>
+</b>
+
+<dd>
+<b> 
+<a href="printing2d.fm2.html#999490">	Streaming Service-Formatted Print Data</a>
+</b>
+
+</dl>
+</dl>
+<H2>
+<a href="appendix_printPS.fm.html#7083">
+
+A.	Example: PrintPS.java		</a>
+</H2>
+<H2>
+<a href="appendix_printGIFStream.fm.html#7083">
+
+B.	Example: PrintGIFtoStream.java		</a>
+</H2>
+<H2>
+<a href="appendix_2DPrinterJob.fm.html#997825">
+
+C.	Example: Print2DPrinterJob.java		</a>
+</H2>
+<H2>
+<a href="appendix_2Dgraphicsdoc.fm.html#7083">
+
+D.	Example: Print2DGraphics.java		</a>
+</H2>
+<H2>
+<a href="appendix_2DtoStream.fm.html#7083">
+
+E.	Example: Print2DtoStream.java		</a>
+</H2>
+<H2>
+<a href="appendix_printGIF.fm.html#7083">
+
+F.	Example: PrintGIF.java		</a>
+</H2>
+<H2>
+<a href="jps_glossaryapp.fm.html#1035348">
+
+G.	JavaTM Print Service Glossary		</a>
+</H2>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="jpsTitle.fm.html">PREV</a>
+ | <a href="jpsOverview.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

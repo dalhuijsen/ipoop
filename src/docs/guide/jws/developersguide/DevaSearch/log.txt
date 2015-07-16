@@ -1,0 +1,89 @@
+INDEXER SETTINGS:
+ Minimum term length: 2
+ Maximum term length: 20
+ Index files with extensions: htm html 
+ Ignore files and directories: 
+
+Starting indexer at "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide"
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\contents.html"
+  Last updated: 
+  File Size: 6 KB
+  Title: Java Web Start 1.4.2 Developer Guide KB
+  Description: ... Guide &nbsp; Overview Java Web Start Technology Where to Find Java Web Start Technology KB
+  Total terms in file: 92
+  Total terms indexed: 72
+
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\converting.html"
+  Last updated: 
+  File Size: 1 KB
+  Title: Converting JNLP Files to Work With This Release KB
+  Description: ... This Release The JNLP file format has not changed between the 1.0 and this KB
+  Total terms in file: 66
+  Total terms indexed: 43
+
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\development.html"
+  Last updated: 
+  File Size: 10 KB
+  Title: Application Development Considerations KB
+  Description: ... the following topics: Introduction Retrieving Resources from JAR files Security and Code Signing Signing KB
+  Total terms in file: 402
+  Total terms indexed: 314
+
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\examples.html"
+  Last updated: 
+  File Size: 20 KB
+  Title: JNLP API Examples KB
+  Description: ... the following topics: Introduction Using a BasicService Service Using a ClipboardService Service Using a KB
+  Total terms in file: 402
+  Total terms indexed: 309
+
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\launch.html"
+  Last updated: 
+  File Size: 10 KB
+  Title: Creating the Web Page That Lauches the Application KB
+  Description: ... the Application This chapter includes the following topics: Introduction Detecting if Java Web Start KB
+  Total terms in file: 274
+  Total terms indexed: 197
+
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\overview.html"
+  Last updated: 
+  File Size: 5 KB
+  Title: Overview KB
+  Description: ... Web Start is a helper application that gets associated with a Web browser. When KB
+  Total terms in file: 242
+  Total terms indexed: 186
+
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\packaging.html"
+  Last updated: 
+  File Size: 1 KB
+  Title: Packaging an Application for Easy Deployment KB
+  Description: ... The Developer's Pack contains a servlet that can be used to bundle a JNLP-deployed KB
+  Total terms in file: 27
+  Total terms indexed: 17
+
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\setup.html"
+  Last updated: 
+  File Size: 2 KB
+  Title: Setting Up the Web Site KB
+  Description: ... Web Start leverages existing Internet technology, such as the HTTP protocol and Web servers, KB
+  Total terms in file: 142
+  Total terms indexed: 95
+
+Indexed "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\syntax.html"
+  Last updated: 
+  File Size: 19 KB
+  Title: JNLP File Syntax KB
+  Description: ... the following topics: Introduction Example JNLP Elements jnlp Element information Element security Element resources KB
+  Total terms in file: 475
+  Total terms indexed: 387
+
+Enter directory: "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\DevaSearch"
+Enter directory: "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\images"
+Saved index file: C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\DevaSearch\devasearch.js (26KB)
+Write output file: "searchtopframe.html".
+Write output file: "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\DevaSearch\help.html".
+Write output file: "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\DevaSearch\search.html".
+Write output file: "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\DevaSearch\searchalt.html".
+Write output file: "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\DevaSearch\searchresults.html".
+Write output file: "C:\Dreamweaver\Projects\java.sun.com\j2se\1.4.2\docs\guide\jws\developersguide\DevaSearch\style.css".
+Finished: Indexed 1023 terms from 9 files (73KB) with 2122 total terms.

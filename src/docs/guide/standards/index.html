@@ -1,0 +1,245 @@
+<html>
+
+<head>
+
+<title>Endorsed Standards Override Mechanism</title>
+
+</head>
+
+<BODY BGCOLOR="#FFFFFF" TEXT=#000000 LINK=#0000ff VLINK=#000077 ALINK=#ff0000>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH=60>
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Endorsed Standards Override Mechanism</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP WIDTH=60>
+
+   <font size=-1><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+
+
+<h3>Introduction</h3>
+<blockquote>
+      An <em>endorsed standard</em> is a Java<sup><font size="-2">TM</font></sup> 
+      API defined through a standards process other than the 
+      <a href="http://www.jcp.org/">Java 
+      Community Process</a><sup><font size="-2">SM</font></sup> 
+     (JCP<sup><font size="-2">SM</font></sup>). 
+      Because endorsed standards are defined outside the JCP, it 
+      is anticipated that such standards may be revised between 
+      releases of the Java 2 Platform.  In order to take advantage of 
+      new revisions to endorsed standards, developers and software vendors 
+      may use the Endorsed Standards Override Mechanism to provide 
+      newer versions of an endorsed standard than those included 
+      in the Java 2 Platform as released by Sun Microsystems. 
+</blockquote>
+
+<h3>Endorsed Standards Classes Deployment</h3>
+<blockquote>
+      Classes implementing newer versions of endorsed standards should be 
+      placed in JAR files.  The system property <tt>java.endorsed.dirs</tt> 
+      specifies one or more directories that the Java runtime environment 
+      will search for such JAR files.  If more than one directory path is 
+      specified by <tt>java.endorsed.dirs</tt>, they must be separated by
+      <a href="../../api/java/io/File.html#pathSeparatorChar"><tt>File.pathSeparatorChar</tt></a>. If no value is set for <tt>java.endorsed.dirs</tt>, 
+      then Sun Microsystem's
+      implementation of the Java 2 Platform looks for JAR files in a
+      default standard location:
+<blockquote><pre>
+&lt;java-home&gt;\lib\endorsed          [Microsoft Windows]
+&lt;java-home&gt;/lib/endorsed          [Solaris or Linux]
+</pre></blockquote>
+      Here <tt>&lt;java-home&gt;</tt> refers to the directory where the runtime
+      software is installed (which is the top-level directory of the
+      Java 2 Runtime Environment or the <tt>jre</tt> directory in the Java 2
+      SDK).
+      <p>
+      The Java runtime environment will use classes in such JAR files 
+      to override the corresponding classes provided in the 
+      Java 2 Platform as shipped by Sun.
+</blockquote>
+
+<h3>Endorsed Standards APIs</h3>
+<blockquote>
+The endorsed standards for J2SE<sup><font size="-2">TM</font></sup> 1.4 
+constitute all classes and interfaces that are defined in the packages 
+listed below.  Classes and interfaces defined in sub-packages of listed 
+packages are not endorsed standards unless those sub-packages are 
+themselves listed.  The Endorsed Standards Override Mechanism may be 
+used to override the J2SE platform packages in the list below, 
+and these packages may be overriden only by versions of the endorsed 
+standard that are newer than that provided by the Java 2 Platform as 
+released by Sun.  No other packages from the J2SE platform API specification 
+may be overridden.
+<blockquote><pre>
+javax.rmi.CORBA 
+org.omg.CORBA 
+org.omg.CORBA.DynAnyPackage
+org.omg.CORBA.ORBPackage
+org.omg.CORBA.portable
+org.omg.CORBA.TypeCodePackage
+org.omg.CORBA_2_3 
+org.omg.CORBA_2_3.portable
+org.omg.CosNaming 
+org.omg.CosNaming.NamingContextExtPackage
+org.omg.CosNaming.NamingContextPackage
+org.omg.Dynamic
+org.omg.DynamicAny
+org.omg.DynamicAny.DynAnyFactoryPackage
+org.omg.DynamicAny.DynAnyPackage
+org.omg.IOP
+org.omg.IOP.CodecFactoryPackage
+org.omg.IOP.CodecPackage
+org.omg.Messaging
+org.omg.PortableInterceptor
+org.omg.PortableInterceptor.ORBInitInfoPackage
+org.omg.PortableServer
+org.omg.PortableServer.CurrentPackage
+org.omg.PortableServer.POAManagerPackage
+org.omg.PortableServer.POAPackage
+org.omg.PortableServer.portable
+org.omg.PortableServer.ServantLocatorPackage
+org.omg.SendingContext
+org.omg.stub.java.rmi 
+org.w3c.dom
+org.xml.sax
+org.xml.sax.ext
+org.xml.sax.helpers
+</pre></blockquote>
+
+In addition to the packages listed above, which are part of the 
+J2SE specification, users of Sun's J2SE Reference Implementation 
+may be allowed to use the Endorsed Standards Override Mechanism 
+to override implementation-specific classes such as the 
+<tt>org.w3c.dom</tt> sub-packages delivered in Sun's 
+Reference Implementation.  See the corresponding license for details.
+</blockquote>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH=100%>
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+   Please send comments to: <a href="mailto:j2se-comments@sun.com">j2se-comments@sun.com</a> 
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT=" Sun Microsystems, Inc " BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+
+
+</BODY>
+
+</HTML>
+

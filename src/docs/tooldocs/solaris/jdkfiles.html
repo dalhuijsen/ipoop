@@ -1,0 +1,295 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<HEAD>
+	<TITLE>Java 2 SDK File Structure</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white">
+
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR>
+<TD>
+<H1>Java 2 SDK and Runtime Environment File Structure</H1>
+</TD>
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+<font size="-1"><a href="../tools.html">SDK Tools</a></font>
+</TD>
+</TR>
+</TABLE>
+
+<P>This document gives an overview of the Java 2 SDK directories and the files they contain. This page may also be used as 
+a reference for the file structure of the Java 2 Runtime Environment. 
+To see the file structure of the Runtime Environment, just look at the 
+description of the contents of the SDK's <tt>jre</tt> directory on this 
+page.  
+The file structure of the Java 2 Runtime Environment is identical to that 
+of the SDK's <tt>jre</tt> directory.</P>
+<H2>Development Files and Directories</H2>
+
+
+<BLOCKQUOTE>
+	<P>This section describes the files and directories that are required to develop apps for the Java platform. (The
+	directories that are not required include demos, Java source code, and C header files. They are discussed in the
+	following section, <A HREF="#additional">Additional Files and Directories</A>.) The following chart shows the most
+	important directories:</P>
+
+</BLOCKQUOTE>
+
+
+<OL>
+	<PRE>          <A HREF="#/j2sdk1.4.2">j2sdk1.4.2</A>
+   ___________|_________________
+  |           |                 |
+ <A HREF="#/j2sdk1.4.2/bin">bin</A>         <A HREF="#/j2sdk1.4.2/lib">lib</A>               <A HREF="#/j2sdk1.4.2/jre">jre</A>
+  |           |         ________|__________
+java*     tools.jar    |                   |        
+javac*    dt.jar      <A HREF="#/j2sdk1.4.2/jre/bin">bin</A>                 <A HREF="#/j2sdk1.4.2/jre/lib">lib</A>                
+javap*                 |       ________ ___|___ _________ ________ _______       
+javah*               java*    |        |       |         |        |       |
+javadoc*                    rt.jar    <A HREF="#/j2sdk1.4.2/jre/lib/ext">ext</A>   <A HREF="#/j2sdk1.4.2/jre/lib/security">security</A>   sparc    <a href=#applet>applet</a>  <a href=#fonts>fonts</a>
+                        charsets.jar   |              /     \
+                                  localedata.jar  <a href="#/j2sdk1.4.2/jre/lib/sparc/server">server</a>  <a href="#/j2sdk1.4.2/jre/lib/sparc/client">client</a>
+                                                            
+</PRE>
+</OL>
+
+
+
+<BLOCKQUOTE>
+	<P>Assuming the SDK software is installed at <CODE>/j2sdk1.4.2</CODE>, here are some of the most important directories:
+
+	<BLOCKQUOTE>
+
+		<DL>
+	<DT><A NAME="/j2sdk1.4.2"></A><CODE>/j2sdk1.4.2</CODE></DT>
+	<DD>The root directory of the SDK software installation. Contains copyright, license, and README files. Also contains <tt>src.zip</tt>, the archive 
+of source code for the Java&nbsp;2 platform.
+		</DL>
+
+
+<P>
+
+
+		<DL>
+	<DT><A NAME="/j2sdk1.4.2/bin"></A><CODE>/j2sdk1.4.2/bin</CODE></DT>
+	<DD>The executables for all the development tools contained in the Java 2 SDK. The <B>PATH</B> environment
+	variable should contain an entry for this directory. For more information on the tools, see the <A HREF="../tools.html">SDK
+	Tools</A>.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/lib"></A><CODE>/j2sdk1.4.2/lib</CODE></DT>
+	<DD>Files used by the development tools. Includes <CODE>tools.jar</CODE>, which contains non-core classes for support
+	of the tools and utilities in the SDK. Also includes <CODE>dt.jar</CODE>, the DesignTime archive of BeanInfo files
+	that tell interactive development environments (IDE's) how to display the Java components and how to let the developer
+	customize them for the application.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/jre"></A><CODE>/j2sdk1.4.2/jre</CODE></DT>
+	<DD>The root directory of the Java runtime environment used by the SDK development tools. The runtime environment
+	is an implementation of the Java 2 platform. This is the directory 
+        referred to by the <tt>java.home</tt> system property.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/jre/bin"></A><CODE>/j2sdk1.4.2/jre/bin</CODE></DT>
+	<DD>Executable files for tools and libraries used by the Java platform. The executable files are identical to files
+	in <CODE>/j2sdk1.4.2/bin</CODE>. The <B>java</B> launcher tool serves as an application launcher, in place of the old
+	<B>jre</B> tool that shipped with 1.1 versions of the SDK software. This directory does not need to be in the <B>PATH</B>
+	environment variable.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/jre/lib"></A><CODE>/j2sdk1.4.2/jre/lib</CODE></DT>
+	<DD>Code libraries, property settings, and resource files used by the Java runtime environment. Includes:
+		</DL>
+
+
+		<UL>
+	<LI><CODE>rt.jar</CODE> -- the <I>bootstrap</I> classes (the RunTime classes that comprise the Java platform's
+	core API).
+	<LI><TT>charsets.jar</TT> -- character-conversion classes.
+		</UL>
+
+
+		<DL>
+	<DD>Aside from the <CODE>ext</CODE> subdirectory (described below) there are several additional resource subdirectories
+	not described here.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/jre/lib/ext"></A><CODE>/j2sdk1.4.2/jre/lib/ext</CODE></DT>
+	<DD>Default installation directory for <a href="../../guide/extensions">Extensions</a> 
+        to the Java platform. This is where the JavaHelp jar file goes
+	when it is installed, for example.
+		</DL>
+         <ul>
+         <li><tt>localedata.jar</tt> -- locale data for <tt>java.text</tt> and <tt>java.util</tt>.
+         </ul>
+		<DL>
+	<DT><A NAME="/j2sdk1.4.2/jre/lib/security"></A><CODE>/j2sdk1.4.2/jre/lib/security</CODE></DT>
+	<DD>Contains files used for security management. These include the security policy (<CODE>java.policy</CODE>) and
+	security properties (<CODE>java.security</CODE>) files.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/jre/lib/sparc"></A><CODE>/j2sdk1.4.2/jre/lib/sparc</CODE></DT>
+	<DD>Contains the<TT> .so </TT>(shared object) files used by the Solaris version of the Java platform.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/jre/lib/sparc/client"></A><CODE>/j2sdk1.4.2/jre/lib/sparc/client</CODE></DT>
+	<DD>Contains the<TT> .so </TT>file used by the Java HotSpot Client 
+        Virtual Machine, which is implemented with Java 
+        HotSpot<sup><font size=-2>TM</font></sup> technology. This is the default VM.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/jre/lib/sparc/server"></A><CODE>/j2sdk1.4.2/jre/lib/sparc/server</CODE></DT>
+	<DD>Contains the<TT> .so </TT>file used by the Java HotSpot Server  
+         Virtual Machine.  
+        <P>
+        <DT><A NAME="applet"></A><CODE>/j2sdk1.4.2/jre/lib/applet</CODE></DT>
+        <DD>Jar files containing support classes for applets can be 
+placed in the <tt>lib/applet/</tt> directory. 
+This reduces startup time for large applets by allowing applet classes 
+to be pre-loaded from teh local file system by the applet class loader, 
+providing the same protections as if they had been downloaded over the 
+net.
+<p>
+        <DT><A NAME="fonts"></A><CODE>/j2sdk1.4.2/jre/lib/fonts</CODE></DT>
+        <DD>Font files for use by platform.
+		</DL>
+
+
+	</BLOCKQUOTE>
+
+</BLOCKQUOTE>
+
+<P><A NAME="additional"></A>
+<H2>Additional Files and Directories</H2>
+
+
+<BLOCKQUOTE>
+	<P>This section describes the directory structure for the demos, Java source code, and C header files. Here is
+	the directory structure:</P>
+
+</BLOCKQUOTE>
+
+
+<OL>
+	<PRE>                        <A HREF="#/j2sdk1.4.2">j2sdk1.4.2</A>
+                 ___________|__________ _________
+                |           |          |         |
+              <A HREF="#/j2sdk1.4.2/demo">demo</A>       <A HREF="#/j2sdk1.4.2/include">include</A>    <A HREF="#/j2sdk1.4.2/src.zip">src.zip</A>     <A HREF="#/j2sdk1.4.2/man">man</A>
+             ___|___ _________ __________ ________
+            |       |         |          |        |
+          <A HREF="#/j2sdk1.4.2/demo/applets">applets</A>  <A HREF="#/j2sdk1.4.2/demo/jfc">jfc</A>       <A href="#/j2sdk1.4.2/demo/jpda">jpda</A>     <A HREF="#/j2sdk1.4.2/demo/plugin">plugin</A>     <a href="#/j2sdk1.4.2/demo/jni">jni</a>
+       </PRE>
+</OL>
+
+
+
+<BLOCKQUOTE>
+	<P>The additional files and directories shown above are:</P>
+
+	<BLOCKQUOTE>
+
+		<DL>
+	<DT><A NAME="/j2sdk1.4.2/src.zip"></A><CODE>/j2sdk1.4.2/src.zip</CODE></DT>
+	<DD>Archive containing source code for the Java 2 platform.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/demo"></A><CODE>/j2sdk1.4.2/demo</CODE></DT>
+	<DD>Examples, with source code, that show you how to program for the Java platform.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/demo/applets"></A><CODE>/j2sdk1.4.2/demo/applets</CODE></DT>
+	<DD>Applets that can be used on a Web page.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/demo/jfc"></A><CODE>/j2sdk1.4.2/demo/jfc</CODE></DT>
+	<DD>Examples that use Java 2D<sup><font size=-2>TM</font></sup> and 
+            JFC/Swing components.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/demo/jpda"></A><CODE>/j2sdk1.4.2/demo/jpda</CODE></DT>
+	<DD>Examples of using the <a href=../../guide/jpda>Java Platform 
+        Debugging Architecture</a>.  Includes source code for the javadt and jdb utilities.
+        <P>
+        <DT><A NAME="/j2sdk1.4.2/demo/plugin"><CODE>/j2sdk1.4.2/demo/plugin</CODE></A></DT>
+        <DD>Demos for use with Java Plug-in product.
+        <P>
+        <dt><a name="/j2sdk1.4.2/demo/jni"></a><code>/j2sdk1.4.2/demo/jni</code></dt>
+        <dd>Example classes and C code that demonstrate access to poll(2) 
+        functionality from the Java 2 Platform.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/include"></A><CODE>/j2sdk1.4.2/include</CODE></DT>
+	<DD>C-language header files that support native-code programming using the <A HREF="../../guide/jni/index.html">Java
+	Native Interface</A> and the <A HREF="../../guide/jpda/jvmdi-spec.html">Java Virtual Machine
+	Debugger Interface</A>.
+	<P>
+	<DT><A NAME="/j2sdk1.4.2/man"></A><CODE>/j2sdk1.4.2/man</CODE></DT>
+	<DD>Contains troff-formatted man pages for the Java 2 SDK tools.
+		</DL>
+
+		</BLOCKQUOTE>	</BLOCKQUOTE>
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</BODY>
+
+</HTML>
+

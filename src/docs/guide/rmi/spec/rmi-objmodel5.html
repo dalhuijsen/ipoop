@@ -1,0 +1,204 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 2 - Distributed Object Model
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-objmodel4.html">PREV</a>
+ | <a href="rmi-objmodel6.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	2.4	</i> Overview of RMI Interfaces and Classes
+</a></h2>
+
+
+<blockquote>
+<a name="3161"><!-- --></a>
+The interfaces and classes that are responsible for specifying the remote behavior of the RMI system are defined in the java.rmi package hierarchy. The following figure shows the relationship between several of these interfaces and classes:<p>
+</blockquote><a name="1646"><!-- --></a>
+<p><center><img src="rmi-objmodela.gif" ALT="relationship between several of these interfaces and classes"></center>
+
+
+
+<br>
+<h3>
+<a name="3459"><!-- --></a>
+<i>	2.4.1	</i> The <code>java.rmi.Remote</code> Interface
+</h3>
+
+<blockquote>
+<a name="3480"><!-- --></a>
+In RMI, a <em>remote</em> interface is an interface that declares a set of methods that may be invoked from a remote Java virtual machine. A remote interface must satisfy the following requirements:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="4453"><!-- --></a>
+A remote interface must at least extend, either directly or indirectly, the interface <code>java.rmi.Remote</code>.
+</li>
+</ul>
+</blockquote>
+
+<blockquote>
+<ul><li>
+<a name="4463"><!-- --></a>
+Each method declaration in a remote interface or its super-interfaces must satisfy the requirements of a <em>remote method</em> declaration as follows:
+</li>
+<ul>
+
+<a name="4464"><!-- --></a>
+<LI>A remote method declaration must include the exception <code>java.rmi.RemoteException</code> (or one of its superclasses such as <code>java.io.IOException</code> or <code>java.lang.Exception</code>) in its throws clause, in addition to any application-specific exceptions (note that application specific exceptions do not have to extend <code>java.rmi.RemoteException</code>).
+
+<a name="4469"><!-- --></a>
+<LI>In a remote method declaration, a remote object declared as a parameter or return value (either declared directly in the parameter list or embedded within a non-remote object in a parameter) must be declared as the remote <em>interface</em>, not the implementation class of that interface.
+</UL></UL>
+<blockquote>
+<a name="4454"><!-- --></a>
+The interface <code>java.rmi.Remote</code> is a marker interface that defines no methods:<p>
+</blockquote><blockquote><pre>public interface Remote {}
+
+</pre></blockquote><blockquote>
+<a name="4496"><!-- --></a>
+A remote interface must <em>at least</em> extend the interface <code>java.rmi.Remote</code> (or another remote interface that extends <code>java.rmi.Remote</code>). However, a remote interface may extend a non-remote interface under the following condition:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="4497"><!-- --></a>
+A remote interface may also extend another non-remote interface, as long as all of the methods (if any) of the extended interface satisfy the requirements of a remote method declaration.
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="4437"><!-- --></a>
+For example, the following interface <code>BankAccount</code> defines a remote interface for accessing a bank account. It contains remote methods to deposit to the account, to get the account balance, and to withdraw from the account:<p>
+</blockquote><blockquote><pre>public interface BankAccount extends java.rmi.Remote {
+	public void deposit(float amount)
+		throws java.rmi.RemoteException;
+	public void withdraw(float amount)
+		throws OverdrawnException, java.rmi.RemoteException;
+	public float getBalance()
+		throws java.rmi.RemoteException;
+}
+
+
+</pre></blockquote><blockquote>
+<a name="4523"><!-- --></a>
+The next example shows a valid remote interface <code>Beta</code> that extends a non-remote interface <code>Alpha</code>, which has remote methods, and the interface <code>java.rmi.Remote</code>:<p>
+</blockquote><blockquote><pre>public interface Alpha {
+	public final String okay = &#34;constants are okay too&#34;;
+	public Object foo(Object obj)
+		throws java.rmi.RemoteException;
+	public void bar() throws java.io.IOException;
+	public int baz() throws java.lang.Exception;
+}
+
+
+public interface Beta extends Alpha, java.rmi.Remote {
+	public void ping() throws java.rmi.RemoteException;
+}
+
+
+</pre></blockquote>
+</UL>
+<h3>
+<a name="3569"><!-- --></a>
+<i>	2.4.2	</i> The <code>RemoteException</code> Class
+</h3>
+
+<blockquote>
+<a name="3570"><!-- --></a>
+The <code>java.rmi.RemoteException</code> class is the superclass of exceptions thrown by the RMI runtime during a remote method invocation. To ensure the robustness of applications using the RMI system, each remote method declared in a remote interface must specify <code>java.rmi.RemoteException</code> (or one of its superclasses such as <code>java.io.IOException</code> or <code>java.lang.Exception</code>) in its throws clause.<p>
+<a name="3571"><!-- --></a>
+The exception <code>java.rmi.RemoteException</code> is thrown when a remote method invocation fails for some reason. Some reasons for remote method invocation failure include:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="4581"><!-- --></a>
+Communication failure (the remote server is unreachable or is refusing connections; the connection is closed by the server, etc.)
+</li></ul>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="4583"><!-- --></a>
+Failure during parameter or return value marshalling or unmarshalling
+</li><p>
+<li>
+<a name="4589"><!-- --></a>
+Protocol errors
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="4604"><!-- --></a>
+The class <code>RemoteException</code> is a checked exception (one that must be handled by the caller of a remote method and is checked by the compiler), not a <code>RuntimeException</code>.<p>
+</blockquote>
+<br>
+<h3>
+<a name="1800"><!-- --></a>
+<i>	2.4.3	</i> The <code>RemoteObject</code> Class and its Subclasses
+</h3>
+
+<blockquote>
+<a name="3481"><!-- --></a>
+RMI server functions are provided by <code>java.rmi.server.RemoteObject</code> and its subclasses, <code>java.rmi.server.RemoteServer</code> and <code>java.rmi.server.UnicastRemoteObject</code> and <code>java.rmi.activation.Activatable</code>.<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="1816"><!-- --></a>
+The class <code>java.rmi.server.RemoteObject</code> provides implementations for the<code> java.lang.Object</code> methods, <code>hashCode</code>, <code>equals</code>, and <code>toString</code> that are sensible for remote objects.
+</li>
+</ul>
+</blockquote>
+
+<blockquote>
+<ul><li>
+<a name="4631"><!-- --></a>
+The methods needed to create remote objects and export them (make them available to remote clients) are provided by the classes <code>UnicastRemoteObject</code> and <code>Activatable</code>. The subclass identifies the semantics of the remote reference, for example whether the server is a simple remote object or is an activatable remote object (one that executes when invoked).
+</li><p>
+<li>
+<a name="4634"><!-- --></a>
+The <code>java.rmi.server.UnicastRemoteObject</code> class defines a singleton (unicast) remote object whose references are valid only while the server process is alive.
+</li>
+</ul>
+</blockquote>
+
+<blockquote>
+<ul><li>
+<a name="4637"><!-- --></a>
+The class <code>java.rmi.activation.Activatable</code> is an abstract class that defines an <em>activatable</em> remote object that starts executing when its remote methods are invoked and can shut itself down when necessary.
+</li>
+</ul>
+</blockquote>
+
+
+</ul>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-objmodel4.html">PREV</a>
+ | <a href="rmi-objmodel6.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

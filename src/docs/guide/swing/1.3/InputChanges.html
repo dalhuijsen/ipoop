@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Input Verification</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Input Verification</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+
+
+<h2>New class InputVerifier</h2>
+
+<p>
+The purpose of this class is to help clients support smooth focus navigation 
+through GUIs with text fields. Such GUIs often need to ensure that the text 
+entered by the user is valid (for example, that it's in the proper format)
+before allowing the 
+user to navigate out of the text field. To do this, clients create
+a subclass of InputVerifier and, using JComponent's
+<code>setInputVerifier</code> method, attach 
+an instance of their subclass to the JComponent whose input they want to validate. Before 
+focus is transfered to another Swing component that requests it, the input
+verifier's
+<code>shouldYieldFocus</code> method is called.  Focus is transfered only if that 
+method returns <code>true</code>.
+
+<p>
+Sometimes a component, such as a Cancel button or a scroll bar,
+should receive the focus even if input is invalid.
+To enable this, invoke <code>setVerifyInputWhenFocusTarget(false)</code>
+on the component.
+
+<p>
+The API change consists of a new abstract class, InputVerifier, and 
+four new methods added to JComponent.
+
+<p>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/InputVerifier.html">javax.swing.InputVerifier</a>
+</tt>
+</ul>
+
+<p>
+New methods in JComponent:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JComponent.html#setInputVerifier(javax.swing.InputVerifier)">public void setInputVerifier(InputVerifier inputVerifier)</a>
+<li><a href="../../../api/javax/swing/JComponent.html#getInputVerifier()">public InputVerifier getInputVerifier()</a>
+<li><a href="../../../api/javax/swing/JComponent.html#setVerifyInputWhenFocusTarget(boolean)">public void setVerifyInputWhenFocusTarget(boolean flag)</a>
+<li><a href="../../../api/javax/swing/JComponent.html#getVerifyInputWhenFocusTarget()">public boolean getVerifyInputWhenFocusTarget()</a>
+</tt>
+</ul>
+
+
+
+
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

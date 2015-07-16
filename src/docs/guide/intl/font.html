@@ -1,0 +1,454 @@
+<!--This file created by Claris Home Page version 2.0-->
+<HTML>
+<HEAD>
+   <TITLE>Supported Fonts</TITLE>
+   <META NAME=GENERATOR CONTENT="Claris Home Page 2.0">
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" VLINK="#000077">
+
+<P><TABLE summary="layout" BORDER=0 WIDTH="100%">
+   <TR>
+      <TD WIDTH=60>
+         <P><IMG SRC="../../images/javalogo52x88.gif" ALT="Java"
+         WIDTH=52 HEIGHT=88 BORDER=0 ALIGN=bottom>
+      </TD><TD>
+         <H1><CENTER>Supported Fonts</CENTER></H1>
+      </TD><TD WIDTH=60>
+         <P>
+      </TD></TR>
+</TABLE><!-- Body text begins here --></P>
+
+<P>The set of supported fonts varies between different
+implementations of the Java 2 platform. This page documents font
+support in Sun's Java 2 Software Development Kit, Standard Edition,
+v. 1.4 (J2SDK), and Java 2 Runtime Environment, Standard Edition, v.
+1.4 (J2RE). For the terminology used, see the <CODE><A HREF="../../api/java/awt/Font.html">Font</A></CODE>
+class description.</P>
+
+<UL>
+   <LI><B><A HREF="#physical">Support for Physical Fonts</A></B>
+   
+   <LI><B><A HREF="#logical">Support for Logical Fonts</A></B>
+   
+   <LI><B><A HREF="#lucida">The Lucida Fonts</A> </B>
+</UL>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="physical"></A>Support for Physical Fonts</H2>
+
+<P>Sun's Java 2 Runtime Environment supports TrueType and PostScript
+Type 1 fonts.</P>
+
+<P>Physical fonts need to be installed in locations known to the Java
+runtime environment. Sun's Java 2 Runtime Environments look in two
+locations: the <CODE>lib/fonts</CODE> directory within the J2RE
+itself, and the normal font location(s) defined by the host operating
+system. If fonts with the same name exist in both locations, the one
+in the <CODE>lib/fonts</CODE> directory is used.</P>
+
+<P>Users can add physical fonts that use a supported font technology
+by installing them either in the <CODE>lib/fonts</CODE> directory
+within the J2RE, or by installing them in a way supported by the host
+operating system (dropping them into the Fonts folder on Windows,
+using the pkgadd command on Solaris).</P>
+
+<P>
+<HR>
+</P>
+
+<H2><A NAME="logical"></A>Support for Logical Fonts</H2>
+
+<P>Logical font names are mapped to physical fonts in implementation
+dependent ways. Typically one logical font name maps to several
+physical fonts in order to cover a large range of characters. Sun's
+Java 2 Runtime Environments use
+<A HREF="fontprop.html">font.properties files</A> to define the
+mapping.</P>
+
+<P>Adventurous users can modify the font.properties files or create
+new ones. For example, users may want to add additional physical
+fonts to a given mapping in order to extend the set of characters
+supported by a logical font.</P>
+
+<P>
+<HR>
+</P>
+
+<H2><B><A NAME="lucida"></A>The Lucida Fonts</B></H2>
+
+<P>Sun's Java 2 Software Development Kit and Java 2 Runtime
+Environments bundles several physical fonts of the "Lucida" design
+family. These fonts are also licensed for use in other
+implementations of the Java 2 platform. These fonts are physical
+fonts, but since they come with the Java 2 runtime, they don't depend
+on the host operating system. Using them provides the benefit of a
+consistent look and feel across platforms and implementations for a
+large set of languages.</P>
+
+<P>There are three different type families: <CODE>"Lucida
+Sans"</CODE>, <CODE>"Lucida Sans Typewriter"</CODE>, and<CODE>
+"Lucida Bright"</CODE>. Each family has plain, bold, italic, and
+bold-italic styles. Not all of these are present in all Java 2
+implementations. For example, the default download bundle of Sun's
+Java 2 Runtime Environment for Windows only contains the Lucida Sans
+plain font (but note that application developers can include all
+Lucida fonts with a J2RE that they
+<A HREF="http://java.sun.com/j2se/1.4.2/jre/README">redistribute with
+an application</A>).</P>
+
+<P>The following table shows which Unicode 3.0 character blocks are
+covered by each font family:</P>
+
+<P><TABLE summary="Unicode 3.0 character blocks" BORDER=1>
+   <Thead>
+      <TH WIDTH="40%">
+         <P ALIGN=LEFT>Unicode Block
+      </TH><TH WIDTH="20%">
+         <P ALIGN=LEFT>Lucida Sans
+      </TH><TH WIDTH="20%">
+         <P ALIGN=LEFT>Lucida Sans Typewriter
+      </TH><TH WIDTH="20%">
+         <P ALIGN=LEFT>Lucida Bright
+      </TH></Thead>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Basic Latin
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Latin-1 Supplement
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Latin Extended-A
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Latin Extended-B
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>IPA Extensions
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Spacing Modifier Letter
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Combining Diacritical Marks
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Greek
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Cyrillic
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Hebrew
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Arabic
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Devanagari
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Thai
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>General Punctuation
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Superscripts and Subscripts
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Currency Symbols
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Letterlike Symbols
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Number Forms
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Arrows
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Mathematical Operators
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Enclosed Alphanumerics
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Box Drawings
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Block Elements
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Geometric Shapes
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Miscellaneous Symbols
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Dingbats
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Alphabetic Presentation Forms
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>no
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Arabic Presentation Forms-A
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD><TD WIDTH="20%">
+         <P>partial
+      </TD></TR>
+   <TR>
+      <TD WIDTH="40%">
+         <P>Arabic Presentation Forms-B
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD><TD WIDTH="20%">
+         <P>yes
+      </TD></TR>
+</TABLE></P>
+
+<P>Note that of the writing systems that are generally
+<A HREF="locale.doc.html#jfc-table">fully supported</A> by Sun's Java
+2 Runtime Environments, the Lucida fonts do not support Chinese
+(Simplified), Chinese (Traditional), Japanese, and Korean.</P>
+
+<P>The fonts are installed in the Java 2 Runtime Environment's
+<CODE>lib/fonts</CODE> directory as the following files (not all of
+them may be present):</P>
+
+<BLOCKQUOTE><PRE>LucidaSansDemiBold.ttf
+LucidaSansDemiOblique.ttf
+LucidaSansOblique.ttf
+LucidaSansRegular.ttf
+LucidaTypewriterBold.ttf
+LucidaTypewriterBoldOblique.ttf
+LucidaTypewriterOblique.ttf
+LucidaTypewriterRegular.ttf
+LucidaBrightDemiBold.ttf
+LucidaBrightDemiItalic.ttf
+LucidaBrightItalic.ttf
+LucidaBrightRegular.ttf</PRE></BLOCKQUOTE>
+
+<P><!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE="3" NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%">
+   <TR>
+      <TD VALIGN=top>
+         <P><FONT
+         SIZE="-2"><A HREF="../../relnotes/SMICopyright.html">Copyright
+         &copy;</A></FONT><FONT SIZE="-2"> 2002 </FONT><FONT
+         SIZE="-2"><A HREF="http://www.sun.com/">Sun Microsystems,
+         Inc.</A></FONT><FONT SIZE="-2"> All Rights Reserved.</FONT>
+         </P>
+         
+         <P><FONT SIZE="-1">Please send comments to: </FONT><FONT
+         SIZE="-1"><A HREF="mailto:java-intl@java.sun.com">java-intl@java.sun.com</A></FONT><FONT
+         SIZE="-1"> </FONT>
+      </TD><TD VALIGN=top align=RIGHT>
+         <P ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif"
+         ALT="Sun" WIDTH=64 HEIGHT=30 BORDER=0 ALIGN=bottom><BR>
+         
+         <I><FONT SIZE="+1">Java Software</FONT></I><FONT SIZE="+1">
+         </FONT>
+      </TD></TR>
+</TABLE></P>
+</BODY>
+</HTML>

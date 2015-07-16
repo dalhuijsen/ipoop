@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide:  - Example: Print2DPrinterJob.java
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="appendix_printGIFStream.fm.html">PREV</a>
+ | <a href="appendix_2Dgraphicsdoc.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+<a name="997823"><!-- --></a>
+<hr size="8" width="35%" align="left" noshade>
+
+<table summary="layout" border=0>
+<tr valign=bottom>
+<td valign=bottom>
+<U><h1><FONT FACE="ARIAL,HELVETICA,TIMES ROMAN" SIZE=-1>APPENDIX</FONT>
+C 	
+</h1></U>
+</td>
+</tr>
+</table>
+
+<a name="997825"><!-- --></a>
+<h1>
+Example: Print2DPrinterJob.java
+</h1>
+<!--
+<hr size="1" width="100%" align="left" noshade>
+-->
+<blockquote><pre>
+import java.io.*;
+import java.awt.*;
+import java.net.*;
+import java.awt.image.*;
+import java.awt.print.*;
+import javax.print.*;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
+
+public class Print2DPrinterJob implements Printable {
+
+	public Print2DPrinterJob() {
+
+		/* Construct the print request specification.
+		* The print data is a Printable object.
+		* the request additonally specifies a job name, 2 copies, and
+		* landscape orientation of the media.
+		*/
+		PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
+		aset.add(OrientationRequested.LANDSCAPE);
+		aset.add(new Copies(2));
+		aset.add(new JobName("My job", null));
+
+		/* Create a print job */
+		PrinterJob pj = PrinterJob.getPrinterJob();       
+		pj.setPrintable(this);
+		/* locate a print service that can handle the request */
+		PrintService[] services =
+			PrinterJob.lookupPrintServices();
+
+		if (services.length &gt; 0) {
+			System.out.println("selected printer " + services[0].getName());
+			try {
+				pj.setPrintService(services[0]);
+				pj.pageDialog(aset);
+				if(pj.printDialog(aset)) {
+					pj.print(aset);
+				}
+			} catch (PrinterException pe) { 
+				System.err.println(pe);
+			}
+		}
+	}
+
+	public int print(Graphics g,PageFormat pf,int pageIndex) {
+
+		if (pageIndex == 0) {
+			Graphics2D g2d= (Graphics2D)g;
+			g2d.translate(pf.getImageableX(), pf.getImageableY()); 
+			g2d.setColor(Color.black);
+			g2d.drawString("example string", 250, 250);
+			g2d.fillRect(0, 0, 200, 200);
+			return Printable.PAGE_EXISTS;					
+		} else {
+			return Printable.NO_SUCH_PAGE;
+		}
+	}
+
+	public static void main(String arg[]) {
+
+		Print2DPrinterJob sp = new Print2DPrinterJob();
+	}
+}
+</pre></blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="appendix_printGIFStream.fm.html">PREV</a>
+ | <a href="appendix_2Dgraphicsdoc.fm.html">NEXT</a> <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>

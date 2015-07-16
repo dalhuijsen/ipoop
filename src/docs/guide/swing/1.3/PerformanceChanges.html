@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Performance</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>Performance</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+<h2>New Class: UIDefaults.UIDefaultProxy, Related Performance Changes</h2>
+
+One of the main reasons that Swing's startup performance 
+was slower than desired was that as soon as any component
+requires a UI delegate, the UIManager loads a look and feel,
+which results in loading a defaults table which includes 
+defaults for UIs for all component classes.
+<p>
+In previous releases, we mistakenly believed that instance 
+creation should be avoided, and so we delayed instance 
+creation by creating anonymous implementations of 
+LazyValue, an interface which acts as a lightweight proxy
+that only creates its instance the first time it is retrieved
+from the defaults table.
+<p>
+Performance analysis for Kestrel indicates that we were wrong
+in believing that instance creation was the determining factor.
+In fact, the overwhelming factor contributing to delay and 
+increased footprint in this area was classloading, which was
+ironically not helped by our creation of lots of anonymous
+interface implementations!
+<p>
+The general approach taken to fix this was to define a concrete
+LazyValue implementation in UIDefaults.java which uses reflection
+to create its proxied instance when asked to do so.  This class
+is called UIDefaultProxy.  As a result only one class is loaded,
+and about 90 other classloads could be avoided in a Hello World
+example. 
+<P>
+See:  UIDefaults.UIDefaultProxy
+<P>
+   In the course of replacing the existing anonymous LazyValue 
+implementations and identifying other classloads that could
+be avoided, we came across several classes and accessor methods
+which were incorrectly package private.  Since the UIDefaultProxy
+is in the javax.swing package, and most of the uses are in 
+javax.swing.plaf.* packages, these signatures needed to be changed
+so that they could be used by the proxy.
+<p>
+The following is a list of these:
+
+<p>
+
+<b>javax.swing.plaf.basic.BasicBorders</b>
+
+<code>
+<ul>
+<li><a href="../../../api/javax/swing/plaf/basic/BasicBorders.html#getSplitPaneDividerBorder()">public static Border getSplitPaneDividerBorder()</a>
+</ul>
+</code>
+
+<b>javax.swing.plaf.metal.MetalBorders</b>
+<ul>
+<code>
+<li><a href="../../../api/javax/swing/plaf/metal/MetalBorders.PaletteBorder.html">public static class PaletteBorder</a>
+
+  
+  
+     <li><a href="../../../api/javax/swing/plaf/metal/MetalBorders.html#getButtonBorder()">public static Border getButtonBorder()</a>
+     <li><a href="../../../api/javax/swing/plaf/metal/MetalBorders.html#getTextBorder()">public static Border getTextBorder()</a>
+     <li><a href="../../../api/javax/swing/plaf/metal/MetalBorders.html#getTextFieldBorder()">public static Border getTextFieldBorder()</a>
+     
+<li><a href="../../../api/javax/swing/plaf/metal/MetalBorders.ToggleButtonBorder.html">static class ToggleButtonBorder extends ButtonBorder</a>
+
+     
+     <li><a href="../../../api/javax/swing/plaf/metal/MetalBorders.html#getToggleButtonBorder()">public static Border getToggleButtonBorder()</a>
+     <li><a href="../../../api/javax/swing/plaf/metal/MetalBorders.html#getDesktopIconBorder()">public static Border getDesktopIconBorder()</a> 
+     
+</code>
+</ul>
+
+<b>javax.swing.plaf.metal.MetalIconFactory</b>
+
+<code>
+<ul>
+    
+<li><a href="../../../api/javax/swing/plaf/metal/MetalIconFactory.html#getCheckBoxIcon()">public static Icon getCheckBoxIcon()</a>
+   
+<li><a href="../../../api/javax/swing/plaf/metal/MetalIconFactory.PaletteCloseIcon.html">public static class PaletteCloseIcon implements Icon, UIResource, Serializable</a>
+
+</ul>
+</code>
+
+
+
+
+
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

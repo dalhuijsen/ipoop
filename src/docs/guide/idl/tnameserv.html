@@ -1,0 +1,355 @@
+
+<HTML>
+<HEAD>
+<!--changed by dcarson, 5/2001 -->
+   <TITLE>Java IDL: Transient Naming Service - <tt>tnameserv</tt></TITLE>
+
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1 ALIGN=CENTER>Java IDL: Transient Naming Service - <tt>tnameserv</tt></H1>
+<HR>
+
+<P>This document discusses using the Java IDL Transient Naming Service, 
+<tt>tnameserv</tt>.  In J2SE v. 1.4., Java IDL includes the Object Request 
+Broker Daemon (ORBD).  ORBD is a daemon process containing a Bootstrap Service, a 
+Transient Naming Service, a <strong>Persistent</strong> Naming Service, and a 
+Server Manager.  The Java IDL tutorials all use ORBD, however, you can substitute 
+<tt>tnameserv</tt> for <tt>orbd</tt> in any of the examples that use a Transient 
+Naming Service.  For documentation on the <tt>orbd</tt> tool, link to its <a 
+href="orbd.html">man page</a> or the <a href="jidlNaming.html">Java IDL Naming 
+Service Included with ORBD</a> topic.
+
+<P>Topics in this section include:
+<UL>
+<LI><A href="#nameserver">Java&nbsp;IDL Transient Naming Service</A>
+<LI><A href="#startingnameserver">Starting the Java&nbsp;IDL Transient
+	Naming Service</A>
+<LI><A href="#stoppingnameserver">Stopping the Java&nbsp;IDL Transient
+	Naming Service</A>
+<LI><A href="#example1">Sample Client: Adding Objects to the Namespace</A>
+<LI><A href="#example2">Sample Client: Browsing the Namespace</A>
+</UL>
+
+
+<A NAME="nameserver">
+<H2>Java&nbsp;IDL Transient Naming Service</H2></A>
+
+<P>The CORBA COS (Common Object Services) Naming
+Service</A> provides a tree-like directory for object references much like a
+filesystem provides a directory structure for files. 
+The Transient Naming Service provided with Java IDL, <tt>tnameserv</tt>, is a 
+simple
+implementation of the COS Naming Service specification.
+
+<P>Object references
+are stored in the namespace by name and each object reference-name pair
+is called a name <I>binding</I>. Name bindings may be organized under 
+<i>naming contexts</i>. Naming contexts are themselves name bindings and
+serve the same organizational function as a file system subdirectory. All
+bindings are stored under the <i>initial naming context</i>. The 
+initial naming context is the only persistent binding in the namespace; the rest
+of the namespace is lost if 
+the Java IDL naming service process halts and restarts.
+
+<P>For an applet or application to use COS naming,
+its ORB must know the port of a host running a naming
+service or have access to a stringified initial naming context for that
+naming service. The naming service can either be the Java&nbsp;IDL naming service 
+or
+another COS-compliant naming service. 
+
+
+<A name="startingnameserver">
+<H2>Starting the Java&nbsp;IDL Transient Naming Service</H2></A>
+
+<P>You must start the Java&nbsp;IDL naming service before an application or
+applet that uses its naming service. Installation of the Java&nbsp;IDL
+product creates a script (Solaris: <TT>tnameserv</TT>) or executable file
+(Windows NT: <TT>tnameserv.exe</TT>) that starts the Java&nbsp;IDL naming 
+service.
+Start the naming service so
+it runs in the background.</P>
+
+<P>If you do not specify otherwise, the Java&nbsp;IDL naming service listens
+on port 900 for the bootstrap protocol used to implement the ORB
+<TT>resolve_initial_references()</TT> and <TT>list_initial_references()</TT>
+methods, as follows:
+</P>
+<PRE>
+	tnameserv -ORBInitialPort <em>nameserverport</em>&
+</PRE>
+<P>If you do not specify the name server port, port 900 is used by default.  When 
+running  Solaris software, you must become root to start a process on a port 
+under 1024.  For this reason, we recommend that you use a port number greater 
+than or equal to 1024.  To specify a different port, for example, 1050, and to run 
+the naming service in the background, from a 
+UNIX command shell, enter:
+</P>
+
+<PRE>
+	tnameserv -ORBInitialPort 1050&
+</PRE>  
+
+<P>From an MS-DOS system prompt (Windows), enter:
+<PRE>
+	start tnameserv -ORBInitialPort 1050
+</PRE>
+   
+<P>Clients of the name server must be made aware of the new port number.
+Do this by setting the <TT>org.omg.CORBA.ORBInitialPort</TT>
+property to the new port number when creating the ORB object.
+<p>
+<h3>Running the server and client on different hosts</h3>
+
+<P>In most of the Java IDL and RMI-IIOP tutorials, the Naming Service, Server,
+and Client are all running on the development machine.  In real world deployment, it is likely that the client and server will run on  different host machines than the Naming Service.  
+
+<P>For the client and server to find the Naming Service, they must be made 
+aware of the port number and host on which the naming service is running.
+Do this by setting the <TT>org.omg.CORBA.ORBInitialPort</TT> and <TT>org.omg.CORBA.ORBInitialHost</TT>
+properties in the client and server files to the machine name and port number on which the Naming Service is running.  An example of this is shown in 
+<a href="../rmi-iiop/rmiiiopexample.html"><em>The Hello World Example Using RMI-IIOP</em></a>.  You could also use the command line options <tt>-ORBInitialPort</tt> <em>nameserverport#</em> and <tt>-ORBInitialHost</tt> <em>nameserverhostname</em> to tell the client and server where to find the Naming Service.  <a href="tutorial/jidl2machines.html"><em>Java IDL: Running the Hello World Example on TWO Machines</em></a> shows one way of doing this using the command line option.
+
+<P>For example, suppose the Transient Naming Service, <tt>tnameserv</tt> is running on port 1050 on host <em>nameserverhost</em>.  The client is running on host <em>clienthost</em> and the server is running on host <em>serverhost</em>.
+<P>
+<UL>
+<LI>Start <tt>tnameserv</tt> on the host <em>nameserverhost</em>, as follows:
+<P>
+<PRE>
+     tnameserv -ORBInitialPort 1050
+</PRE>
+<P>
+
+<LI>Start the server on the <em>serverhost</em>, as follows:
+<P>
+<PRE>
+     java Server -ORBInitialPort 1050 -ORBInitialHost nameserverhost
+</PRE>
+<P>
+<LI>Start the client on the <em>clienthost</em>, as follows:
+<P>
+<PRE>
+     java Client -ORBInitialPort 1050 -ORBInitialHost nameserverhost
+</PRE>
+</UL>
+
+
+<h3>The -J option</h3>
+This command-line option is available for use with <tt>tnameserve</tt>:
+<blockquote>
+<dl>
+    <dt><b>-J</b><i>option</i>
+        <dd>Pass <i>option</i> to the Java virtual machine, where 
+        <i>option</i> is one of the options described on the 
+        reference page for the <a href="../../tooldocs/solaris/java.html">java 
+application 
+        launcher</a>.  For example, <b>-J-Xms48m</b> sets the startup
+        memory to 48 megabytes.  It is a common convention for <b>-J</b> 
+        to pass options to the underlying virtual machine.
+</dl>
+</blockquote>
+
+<A name="stoppingnameserver">
+<H2>Stopping the Java&nbsp;IDL Transient Naming Service</H2></A>
+
+<P>To stop the Java&nbsp;IDL naming service, use the relevant operating
+system command, such as <TT>kill</TT> for a Unix process, or <tt>Ctrl-C</tt> for a 
+Windows process. The naming service will continue to
+wait for invocations until it is explicitly shutdown.  Note that names registered
+with the Java&nbsp;IDL naming service disappear when the service is
+terminated.</P>
+
+<A name="example1"><H2>Sample Client: Adding Objects to the Namespace</H2>
+<P>
+The following sample program illustrates how to add names to the namespace.  It 
+is a self-contained
+Transient Naming Service client that creates the following simple tree. 
+
+<center><IMAGE SRC="images/NameClienttree.gif"></center>
+
+<P>
+In this example,
+<strong>plans</strong> is an object reference and <strong>Personal</strong> is a 
+naming context 
+that contains two object references:
+<strong>calendar</strong> and <strong>schedule</strong>.
+
+<pre>
+import java.util.Properties;
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class NameClient
+{
+   public static void main(String args[])
+   {
+      try {
+</pre>
+In the above section, 
+<a href="#startingnameserver">Starting the Java IDL Transient Naming Service</a>, 
+the nameserver was started on port 1050. The following code ensures that the 
+client
+program is aware of this port number.
+<pre>
+        Properties props = new Properties();
+        props.put("org.omg.CORBA.ORBInitialPort", "1050");
+        ORB orb = ORB.init(args, props);
+
+</pre>
+This code obtains the initial naming context and assigns it to 
+<strong>ctx</strong>. The
+second line copies <strong>ctx</strong> into a dummy object reference 
+<strong>objref</strong>
+that we'll attach to various names and add into the namespace.
+<pre> 
+        NamingContext ctx = 
+NamingContextHelper.narrow(orb.resolve_initial_references("NameService"));
+        NamingContext objref = ctx;
+
+</pre>
+This code creates a name "plans" of type "text" and binds it to our dummy object 
+reference. "plans"
+is then added under the initial naming context using <code>rebind</code>. The 
+<code>rebind</code> method allows us to run this program over and over again 
+without getting
+the exceptions we'd get from using <code>bind</code>.
+<pre>
+        NameComponent nc1 = new NameComponent("plans", "text");
+        NameComponent[] name1 = {nc1};
+        ctx.rebind(name1, objref);
+        System.out.println("plans rebind sucessful!");
+
+</pre>
+This code creates a naming context called "Personal" of type "directory". The 
+resulting 
+object reference, <strong>ctx2</strong>, is bound to the name and added under the 
+initial
+naming context.
+<pre>
+        NameComponent nc2 = new NameComponent("Personal", "directory");
+        NameComponent[] name2 = {nc2};
+        NamingContext ctx2 = ctx.bind_new_context(name2);
+        System.out.println("new naming context added..");
+
+</pre>
+The remainder of the code binds the dummy object reference using the names 
+"schedule" and
+"calendar" under the "Personal" naming context (<strong>ctx2</strong>).
+<pre>
+        NameComponent nc3 = new NameComponent("schedule", "text");
+        NameComponent[] name3 = {nc3};
+        ctx2.rebind(name3, objref);
+        System.out.println("schedule rebind sucessful!");
+
+        NameComponent nc4 = new NameComponent("calender", "text");
+        NameComponent[] name4 = {nc4};
+        ctx2.rebind(name4, objref);
+        System.out.println("calender rebind sucessful!");
+
+
+    } catch (Exception e) {
+        e.printStackTrace(System.err);
+    }
+  }  
+}
+</pre>
+
+
+<A name="example2"><H2>Sample Client: Browsing the Namespace</H2>
+<P>
+The following sample program illustrates how to browse the namespace. 
+
+<pre>
+import java.util.Properties;
+import org.omg.CORBA.*;
+import org.omg.CosNaming.*;
+
+public class NameClientList
+{
+   public static void main(String args[])
+   {
+      try {
+</pre>
+In the above section,
+<a href="#startingnameserver">Starting the Java IDL Transient Naming Service</a>,
+the nameserver was started on port 1050. The following code ensures that the 
+client
+program is aware of this port number.
+<pre>
+
+        Properties props = new Properties();
+        props.put("org.omg.CORBA.ORBInitialPort", "1050");
+        ORB orb = ORB.init(args, props);
+
+
+</pre>
+The following code obtains the intial naming context.
+<pre>
+        NamingContext nc = 
+NamingContextHelper.narrow(orb.resolve_initial_references("NameService"));
+
+</pre>
+The <code>list</code> method lists the bindings in the naming context. In this 
+case, 
+up to 1000 bindings from the initial naming
+context will be returned in the BindingListHolder; any remaining bindings are 
+returned
+in the BindingIteratorHolder.
+<pre> 
+        BindingListHolder bl = new BindingListHolder();
+        BindingIteratorHolder blIt= new BindingIteratorHolder();
+        nc.list(1000, bl, blIt);
+
+</pre>
+This code gets the array of bindings out of the returned BindingListHolder. If 
+there
+are no bindings, the program ends.
+<pre>
+        Binding bindings[] = bl.value;
+        if (bindings.length == 0) return;
+
+</pre>
+The remainder of the code loops through the bindings and prints the names out.
+<pre>
+        for (int i=0; i < bindings.length; i++) {
+
+            // get the object reference for each binding
+            org.omg.CORBA.Object obj = nc.resolve(bindings[i].binding_name);
+            String objStr = orb.object_to_string(obj);
+            int lastIx = bindings[i].binding_name.length-1;
+
+            // check to see if this is a naming context
+            if (bindings[i].binding_type == BindingType.ncontext) {
+              System.out.println( "Context: " + 
+bindings[i].binding_name[lastIx].id);
+            } else {
+                System.out.println("Object: " + 
+bindings[i].binding_name[lastIx].id);
+            }
+        }
+
+       } catch (Exception e) {
+        e.printStackTrace(System.err);
+       } 
+   }
+}
+</pre>
+<P><HR>
+<CENTER><P>
+
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html">Home</A></TD>
+</TR></TABLE>
+
+<HR><FONT
+SIZE="-2">
+<A HREF="http://www.sun.com/share/text/SMICopyright.html">Copyright
+&copy;</A></FONT><FONT SIZE="-2"> 1996-2001 Sun Microsystems, Inc.,
+2550 Garcia Ave., Mtn. View, CA. 94043-1100 USA., All rights
+reserved.</FONT></P>
+</CENTER>
+</BODY>
+</HTML>

@@ -1,0 +1,1360 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Fri Oct 25 14:15:02 2002" />
+    <title>Drag and Drop subsystem for the Java Foundation Classes </title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="dnd1TOC.html" />
+    <link rel="Previous" href="dnd1TOC.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="dnd1TOC.html">Contents</a> | 
+	<a accesskey="p" href="dnd1TOC.html">Previous</a> | 
+       </td>
+	   <td align="right"><i>Drag and Drop subsystem for the Java Foundation Classes</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp919259"> </a><h2 class="pChapTitle">
+Drag and Drop subsystem for the Java Foundation Classes 
+</h2>
+<a name="wp919264"> </a><p class="pBody">
+Laurence P. G. Cable.
+</p>
+<a name="wp924103"> </a><p class="pBody">
+Send comments to java-dnd@java.sun.com.
+</p>
+<a name="wp921295"> </a><h2 class="pHeading1">
+1.0  Requirements
+</h2>
+<a name="wp919268"> </a><p class="pBody">
+This specification is based upon an (incomplete) earlier work undertaken in 1996 to specify a Uniform Data Transfer Mechanism, Clipboard, and Drag and Drop facilities for AWT.
+</p>
+<a name="wp919321"> </a><p class="pBody">
+The AWT implementation in JDK1.1 introduced the Uniform Data Transfer Mechanism and the Clipboard protocol. This specification defines the API for the Drag and Drop facilities for JavaTM 2 Platform based upon, but extending these 1.1 UDT API&#8217;s.
+</p>
+<a name="wp919311"> </a><p class="pBody">
+The primary requirements that this specification addresses, are:
+</p>
+<ol class="pList1"><a name="wp919266"> </a><div class="pList1"><li>	 Provision of a platform independent Drag and Drop facility for Java GUI clients implemented through AWT and JFC classes.</li></div>
+<a name="wp919275"> </a><div class="pList1Plus"><li> Integration with platform dependent Drag and Drop facilities, permitting Java clients to be able to participate in DnD operation with native applications using:</li></div>
+<ul class="pBullet1"><a name="wp919292"> </a><div class="pBullet1"><li> OLE (Win32) DnD</li></div>
+<a name="wp919293"> </a><div class="pBullet1Plus"><li> CDE/Motif dynamic protocol</li></div>
+<a name="wp919294"> </a><div class="pBullet1Plus"><li> MacOS</li></div>
+<a name="wp925473"> </a><div class="pBullet1Last"><li> OS/2</li></div>
+</ul>
+<a name="wp920129"> </a><div class="pList1Plus"><li> Support for 100% pure JavaOS/Java implementation.</li></div>
+<a name="wp919276"> </a><div class="pList1Plus"><li> Leverages the existing <em class="cEmphasis">java.awt.datatransfer.*</em> package to enable the transfer of</li></div>
+<a name="wp919312"> </a><p class="pIndented1">
+ data, described by an extensible data type system based on the MIME standard.
+</p>
+<a name="wp919352"> </a><div class="pList1Plus"><li> Does not preclude the use of &#8220;accessibility&#8221; features where available.</li></div>
+<a name="wp922595"> </a><div class="pList1Last"><li> Extensible to support diverse input devices.</li></div>
+</ol>
+<a name="wp919331"> </a><p class="pBody">
+The specification derives from the previous work mentioned above, but incorporates significant differences from that original work as a result of the advent of the JavaBeans event model, Lightweight (JFC) Components, and an increasing understanding of the cross-platform integration and interoperability issues.
+</p>
+<a name="wp919329"> </a><h2 class="pHeading1">
+2.0  API
+</h2>
+<a name="wp926670"> </a><p class="pBody">
+The following sections cover the Drag and Drop API.
+</p>
+<a name="wp919335"> </a><h3 class="pHeading2">
+2.1  Overview
+</h3>
+<a name="wp919340"> </a><p class="pBody">
+Drag and Drop is a direct manipulation gesture found in many Graphical User Interface systems that provides a mechanism to transfer information between two entities logically associated with presentation elements in the GUI. Normally driven by a physical gesture of a human user using an appropriate input device, Drag and Drop provides both a mechanism to enable continuous feedback regarding the possible outcome of any subsequent data transfer to the user during navigation over the presentation elements in the GUI, and the facilities to provide for any subsequent data negotiation and transfer.
+</p>
+<a name="wp919369"> </a><p class="pBody">
+A typical Drag and Drop operation can be decomposed into the following states (not entirely sequentially):
+</p>
+<ul class="pBullet1"><a name="wp919370"> </a><div class="pBullet1"><li>A <em class="cEmphasis">DragSource</em> comes into existence, associated with some presentation element (<em class="cEmphasis">Component</em>) in the GUI, to initiate a Drag and Drop of some potentially <em class="cEmphasis">Transferable</em> data.</li></div>
+<a name="wp919371"> </a><div class="pBullet1Plus"><li>1 or more <em class="cEmphasis">DropTarget</em>(s) come into/go out of existence, associated with presentation elements in the GUI (<em class="cEmphasis">Components</em>), potentially capable of consuming <em class="cEmphasis">Transferable</em> data types.</li></div>
+<a name="wp919378"> </a><div class="pBullet1Plus"><li>A <em class="cEmphasis">DragGestureRecognizer</em> is obtained from the <em class="cEmphasis">DragSource</em> and is associated with a <em class="cEmphasis">Component</em> in order to track and identify any Drag initiating gesture by the user over the <em class="cEmphasis">Component</em>.</li></div>
+<a name="wp923910"> </a><div class="pBullet1Plus"><li>A Human user makes a Drag gesture over the <em class="cEmphasis">Component</em>, which the registered <em class="cEmphasis">DragGestureRecognizer</em> detects, and notifies its <em class="cEmphasis">DragGestureListener</em> of.</li></div>
+<a name="wp919729"> </a><p class="pIndented1">
+Note: Although the body of this document consistently refers to the stimulus for a drag and drop operation being a physical gesture by a human user this does not preclude a programmatically driven DnD operation given the appropriate implementation of a <em class="cEmphasis">DragSource</em>.
+</p>
+<a name="wp919373"> </a><div class="pBullet1Plus"><li>The <em class="cEmphasis">DragGestureListener </em>causes the <em class="cEmphasis">DragSource</em> to initiate the Drag and Drop operation on behalf of the user, perhaps animating the GUI <em class="cEmphasis">Cursor</em> and/or rendering an <em class="cEmphasis">Image</em> of the item(s) that are the subject of the operation.</li></div>
+<a name="wp919374"> </a><div class="pBullet1Plus"><li>As the user gestures navigate over <em class="cEmphasis">Component(s)</em> in the GUI with associated <em class="cEmphasis">DropTarget</em>(s), the <em class="cEmphasis">DragSource</em> receives notifications in order to provide &#8220;Drag Over&#8221; feedback effects, and the <em class="cEmphasis">DropTarget</em>(s) receive notifications in order to provide &#8220;Drag Under&#8221; feedback effects based upon the operation(s) supported and the data type(s) involved.</li></div>
+<a name="wp920068"> </a><p class="pIndented1">
+The gesture itself moves a logical cursor across the GUI hierarchy, intersecting the geometry of GUI <em class="cEmphasis">Component</em>(s), possibly resulting in the logical &#8220;Drag&#8221; cursor entering, crossing, and subsequently leaving <em class="cEmphasis">Component(s)</em> and associated <em class="cEmphasis">DropTarget</em>(s)<em class="cEmphasis">.</em>
+</p>
+<a name="wp920072"> </a><p class="pIndented1">
+The <em class="cEmphasis">DragSource</em> object manifests &#8220;Drag Over&#8221; feedback to the user, in the typical case by animating the GUI <em class="cEmphasis">Cursor</em> associated with the logical cursor.
+</p>
+<a name="wp920073"> </a><p class="pIndented1">
+<em class="cEmphasis">DropTarget</em> objects manifest &#8220;Drag Under&#8221; feedback to the user, in the typical case, by rendering animations into their associated GUI <em class="cEmphasis">Component</em>(s) under the GUI <em class="cEmphasis">Cursor</em>.
+</p>
+<a name="wp920071"> </a><div class="pBullet1Plus"><li>The determination of the feedback effects, and the ultimate success or failure of the data transfer, should one occur, is parameterized as follows:</li></div>
+<a name="wp919770"> </a><div class="pBullet1Last"><li> By the transfer &#8220;operation&#8221; selected by the user, and supported by both the <em class="cEmphasis">DragSource</em> and <em class="cEmphasis">DropTarget</em>: Copy, Move or Reference(link).</li></div>
+<a name="wp919771"> </a><div class="pBullet1Last"><li> By the intersection of the set of data types provided by the <em class="cEmphasis">DragSource</em> and the set of data types comprehensible by the <em class="cEmphasis">DropTarget</em>.</li></div>
+<a name="wp919774"> </a><div class="pBullet1Last"><li>When the user terminates the drag operation, normally resulting in a successful Drop, both the <em class="cEmphasis">DragSource</em> and <em class="cEmphasis">DropTarget</em> receive notifications that include, and result in the type negotiation and transfer of, the information associated with the <em class="cEmphasis">DragSource </em>via a <em class="cEmphasis">Transferable</em> object.</li></div>
+</ul>
+<a name="wp922602"> </a><p class="pBody">
+The remainder of this document details the proposed API changes to support this model.
+</p>
+<a name="wp923911"> </a><h3 class="pHeading2">
+2.2  Drag Gesture Recognition
+</h3>
+<a name="wp923917"> </a><p class="pBody">
+The gesture(s) that can initiate a Drag and Drop operation vary, not only per platform, but also per <em class="cEmphasis">Component, </em>and per device. Therefore a mechanism is required in order to encapsulate these dependencies, thus making the task of the author of a <em class="cEmphasis">Component</em> that wishes to initiate a Drag and Drop operation much simpler. 
+</p>
+<a name="wp923922"> </a><h4 class="pHeading3">
+2.2.1  DragGestureRecognizer
+</h4>
+<a name="wp923923"> </a><p class="pBody">
+The <em class="cEmphasis">DragGestureRecognizer</em> is an abstract base class for all device/platform/<em class="cEmphasis">Component</em> specific Drag and Drop gesture recognizers, and is defined as:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public abstract DragGestureRecognizer {<a name="wp923924"> </a>
+    protected DragGestureRecognizer(<a name="wp923926"> </a>
+				DragSource          ds,<a name="wp923933"> </a>
+				Component           c,<a name="wp923927"> </a>
+				int                 srcActions,<a name="wp923931"> </a>
+				DragGestureListener dgl<a name="wp923932"> </a>
+    );<a name="wp923934"> </a>
+<a name="wp923935"> </a>
+    public Component getComponent();<a name="wp923936"> </a>
+    public void      setComponent(Component c);<a name="wp923938"> </a>
+<a name="wp923939"> </a>
+    public int  getSourceActions();<a name="wp923940"> </a>
+    public void setSourceActions(int actions);<a name="wp923946"> </a>
+    <a name="wp923941"> </a>
+    public java.awt.InputEvent getTriggerEvent();<a name="wp923949"> </a>
+<a name="wp923950"> </a>
+    public void resetRecognizer();<a name="wp923951"> </a>
+<a name="wp923952"> </a>
+    public void addDragGestureListener(<a name="wp923953"> </a>
+                    DragGestureListener dgl<a name="wp923959"> </a>
+    ) throws TooManyListenerExceptions;<a name="wp923960"> </a>
+<a name="wp923955"> </a>
+    public void removeDragGestureListener(<a name="wp923956"> </a>
+                    DragGestureListener dgl<a name="wp923957"> </a>
+    );<a name="wp923958"> </a>
+<a name="wp923963"> </a>
+    protected abstract void registerListeners();<a name="wp923964"> </a>
+    protected abstract void unregisterListeners();<a name="wp923965"> </a>
+<a name="wp923967"> </a>
+    protected void fireDragGestureRecognized(<a name="wp923966"> </a>
+                       int dragAction<a name="wp923971"> </a>
+    );<a name="wp923972"> </a>
+<a name="wp923986"> </a>
+    protected void appendEvent(InputEvent awtie);<a name="wp923987"> </a>
+}<a name="wp923925"> </a>
+<a name="wp923973"> </a>
+</pre></div>
+<a name="wp924252"> </a><p class="pBody">
+An appropriate concrete subclasses of <em class="cEmphasis">DragGestureRecognizer</em> for a particular may be obtained in a variety of ways; from a <em class="cEmphasis">DragSource </em>instance, from the <em class="cEmphasis">Toolkit</em>, or by other means. Concrete implementation subclasses are obtained through standard APIs&#8217; by specifying a <em class="cEmphasis">Class</em> reference to an abstract <em class="cEmphasis">DragGestureRecognizer</em> superclass, an instance of a concrete subclass of this actual parameter is instantiated and returned to the requestor.
+</p>
+<a name="wp924253"> </a><p class="pBody">
+Once a <em class="cEmphasis">DragGestureRecognizer</em> instance is associated with a <em class="cEmphasis">Component</em> and a <em class="cEmphasis">DragSource</em> it registers its own particular set of <em class="cEmphasis">EventListener</em>s&#8217; with the target <em class="cEmphasis">Component</em> in order to monitor the appropriate events being delivered to that <em class="cEmphasis">Component</em> to detect an initiating gesture. (Using <em class="cEmphasis">registerListeners()</em> and <em class="cEmphasis">unregisterListeners()</em> to add/remove these monitoring <em class="cEmphasis">EventListener</em>s&#8217;).
+</p>
+<a name="wp925486"> </a><p class="pBody">
+Note that a <em class="cEmphasis">DragGestureRecognizer</em> may throw either an <em class="cEmphasis">IllegalStateException</em> or an <em class="cEmphasis">IllegalArgumentException</em> if either the <em class="cEmphasis">Component</em> or <em class="cEmphasis">DragSource</em> specified is either not in the correct state for, or is not interoperable with, that <em class="cEmphasis">DragGestureRecognizer</em>.
+</p>
+<a name="wp925495"> </a><p class="pBody">
+When a concrete <em class="cEmphasis">DragGestureRecognizer</em> instance detects a Drag initiating user gesture on the <em class="cEmphasis">Component</em> it is associated with, it will fire a <em class="cEmphasis">DragGestureEvent</em> to the <em class="cEmphasis">DragGestureListener</em> registered on its unicast event source for <em class="cEmphasis">DragGestureListener</em> events. This <em class="cEmphasis">DragGestureListener</em> is responsible for causing the associated <em class="cEmphasis">DragSource</em> to start the Drag and Drop operation (if appropriate).
+</p>
+<a name="wp924071"> </a><p class="pBody">
+The implementation provides (at least) an abstract subclass for recognizing mouse device gestures <em class="cEmphasis">MouseDragGestureRecognizer</em>. Other abstract subclasses may be provided by the platform to support other input devices or particular Component class semantics. Concrete superclasses of this <em class="cEmphasis">MouseDragGestureRecognizer</em> that encapsulate platform dependent mouse based gestures are available from the <em class="cEmphasis">Toolkit</em> object via its <em class="cEmphasis">createDragGestureRecognizer(Class adgrc, DragSource ds, Component c, int sa, DragGestureListener dgl)</em> method. This <em class="cEmphasis">Toolkit</em> API provides platform dependent concrete implementations that extend particular platform independent abstract definitions (classes).
+</p>
+<a name="wp924230"> </a><p class="pBody">
+The <em class="cEmphasis">MouseDragGestureRecognizer</em> abstract class is defined as:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public abstract   MouseDragGestureRecognizer<a name="wp924231"> </a>
+       extends    DragGestureRecognizer<a name="wp924232"> </a>
+	  implements MouseListener, MouseMotionListener {<a name="wp924233"> </a>
+<a name="wp924238"> </a>
+    public MouseDragGestureRecognizer(<a name="wp924235"> </a>
+			DragSource          ds,<a name="wp924245"> </a>
+			Component           c,<a name="wp924239"> </a>
+			int                 sa,<a name="wp924246"> </a>
+			DragGestureListener dsl<a name="wp924247"> </a>
+    );<a name="wp924248"> </a>
+   <a name="wp924244"> </a>
+    // ...                      <a name="wp924249"> </a>
+}<a name="wp924234"> </a>
+</pre></div>
+<a name="wp923997"> </a><p class="pBody">
+The <em class="cEmphasis">DragGestureListener</em> is defined as:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public interface DragGestureListener extends EventListener {<a name="wp923999"> </a>
+    void dragGestureRecognized(DragGestureEvent dge);<a name="wp924000"> </a>
+}<a name="wp924001"> </a>
+</pre></div>
+<a name="wp923998"> </a><p class="pBody">
+Usually the <em class="cEmphasis">dragGestureRecognized()</em> method will simply, via the <em class="cEmphasis">DragGestureEvent</em>&#8217;s convenience API <em class="cEmphasis">startDrag()</em>, start a Drag and Drop operation on the associated <em class="cEmphasis">DragSource</em>.
+</p>
+<a name="wp924007"> </a><p class="pBody">
+Note that per <em class="cEmphasis">Component</em> (class or instance) behavior that may effect the initiating gesture would usually be implemented in this <em class="cEmphasis">DragGestureListener</em> method, or in the <em class="cEmphasis">DragGestureRecognizer</em> subclass where appropriate or possible.
+</p>
+<a name="wp924006"> </a><p class="pBody">
+The <em class="cEmphasis">DragGestureEvent</em> is defined as:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+publc class DragGestureEvent extends EventObject {<a name="wp924002"> </a>
+	public DragGestureEvent(DragGestureRecognizer dgr,<a name="wp924008"> </a>
+                             int                   dragAction,<a name="wp924009"> </a>
+                             java.util.List        events<a name="wp924013"> </a>
+     );<a name="wp924014"> </a>
+<a name="wp924015"> </a>
+    public DragGestureRecognizer<a name="wp924016"> </a>
+               getSourceAsDragGestureRecognizer();<a name="wp924017"> </a>
+<a name="wp924018"> </a>
+    public Component  getComponent();<a name="wp924019"> </a>
+    public DragSource getDragSource();<a name="wp924020"> </a>
+<a name="wp924021"> </a>
+    public java.util.Iterator iterator();<a name="wp924022"> </a>
+<a name="wp924023"> </a>
+    public Object[] toArray();<a name="wp924028"> </a>
+    public Object[] toArray(Object[] array);<a name="wp924029"> </a>
+<a name="wp924030"> </a>
+    public int getDragAction();<a name="wp924031"> </a>
+<a name="wp924032"> </a>
+    public startDrag(Cursor             dragCursor,<a name="wp924033"> </a>
+                     Transferable       t,<a name="wp924034"> </a>
+                     DragSourceListener dsl<a name="wp924035"> </a>
+    );<a name="wp924036"> </a>
+   <a name="wp924047"> </a>
+    public startDrag(Cursor             dragCursor,<a name="wp924041"> </a>
+                     Image              dragImage,<a name="wp924045"> </a>
+                     Point              imageOffset,<a name="wp924046"> </a>
+                     Transferable       t,<a name="wp924038"> </a>
+                     DragSourceListener dsl<a name="wp924039"> </a>
+    );<a name="wp924040"> </a>
+}<a name="wp924003"> </a>
+<a name="wp924048"> </a>
+</pre></div>
+<a name="wp924049"> </a><p class="pBody">
+The <em class="cEmphasis">DragGestureEvent</em> encapsulates all the information regarding the nature of the gesture that has just been recognized, including:
+</p>
+<ul class="pBullet1"><a name="wp924050"> </a><div class="pBullet1"><li>The <em class="cEmphasis">DragGestureRecognizer </em>that recognized the gesture</li></div>
+<a name="wp924051"> </a><div class="pBullet1Plus"><li>The <em class="cEmphasis">Component</em> that the gesture occurred on</li></div>
+<a name="wp924052"> </a><div class="pBullet1Plus"><li>The <em class="cEmphasis">DragSource </em>that will process the operation</li></div>
+<a name="wp924053"> </a><div class="pBullet1Plus"><li>The List of <em class="cEmphasis">InputEvent</em> objects that comprise the gesture.</li></div>
+<a name="wp924054"> </a><div class="pBullet1Last"><li>The action (ACTION_COPY, ACTION_MOVE or ACTION_LINK, selected by the users gesture.</li></div>
+</ul>
+<a name="wp923985"> </a><h3 class="pHeading2">
+2.3  Drag Source
+</h3>
+<a name="wp919379"> </a><p class="pBody">
+The <em class="cEmphasis">DragSource</em> is the entity responsible for the initiation of the Drag and Drop operation:
+</p>
+<a name="wp921901"> </a><h4 class="pHeading3">
+2.3.1  The DragSource definition
+</h4>
+<a name="wp920316"> </a><p class="pBody">
+The <em class="cEmphasis">DragSource</em> and associated constant interfaces are defined as follows:
+</p>
+<a name="wp922609"> </a><p class="pBody">
+The <em class="cEmphasis">DnDConstants</em> class defines the operations that may be applied to the subject of the transfer:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public final class java.awt.dnd.DnDConstants {<a name="wp921329"> </a>
+	public static int ACTION_NONE					= 	0x0;<a name="wp921335"> </a>
+	public static int ACTION_COPY					=	 0x1;<a name="wp921336"> </a>
+	public static int ACTION_MOVE					=	 0x2;<a name="wp921337"> </a>
+	public static int ACTION_COPY_OR_MOVE					= ACTION_COPY | 		                                             ACTION_MOVE;<a name="wp921338"> </a>
+	public static int ACTION_REFERENCE = 0x40000000;<a name="wp921344"> </a>
+}<a name="wp921330"> </a>
+<a name="wp921341"> </a>
+public class java.awt.dnd.DragSource {<a name="wp919381"> </a>
+<a name="wp921915"> </a>
+     public static Cursor     DefaultCopyDrop;<a name="wp921916"> </a>
+     public static Cursor     DefaultMoveDrop;<a name="wp921917"> </a>
+     public static Cursor     DefaultLinkDrop;<a name="wp921929"> </a>
+<a name="wp921930"> </a>
+     public static Cursor     DefaultCopyNoDrop;<a name="wp921927"> </a>
+     public static Cursor     DefaultMoveNoDrop;<a name="wp921921"> </a>
+     public static Cursor     DefaultLinkNoDrop;<a name="wp921919"> </a>
+<a name="wp921932"> </a>
+	public static DragSource getDefaultDragSource();<a name="wp921446"> </a>
+<a name="wp923890"> </a>
+	public static boolean isDragImageSupported();<a name="wp923891"> </a>
+<a name="wp919426"> </a>
+	public void<a name="wp921910"> </a>
+		  startDrag(DragGestureEvent    trigger,<a name="wp921935"> </a>
+				  Cursor			 dragCursor,<a name="wp921936"> </a>
+				  Image			 dragImage,<a name="wp921312"> </a>
+				  Point			 dragImageOffset,<a name="wp921873"> </a>
+				  Transferable 			 transferable,<a name="wp919931"> </a>
+			 	  DragSourceListener			 dsl,<a name="wp919935"> </a>
+			       FlavorMap           fm)<a name="wp924229"> </a>
+		  throws InvalidDnDOperationException;<a name="wp919437"> </a>
+<a name="wp922610"> </a>
+	protected DragSourceContext<a name="wp922611"> </a>
+		createDragSourceContext(<a name="wp922612"> </a>
+			DragSourceContextPeer dscp,<a name="wp924060"> </a>
+			DragGestureEvent      trigger,<a name="wp923897"> </a>
+			Cursor                dragCursor,<a name="wp922617"> </a>
+			Image                 dragImage,<a name="wp922618"> </a>
+  			Point                 dragImageOffset,<a name="wp922619"> </a>
+			Transferable          transferable,<a name="wp922620"> </a>
+			DragSourceListener    dsl<a name="wp922621"> </a>
+		);<a name="wp922614"> </a>
+<a name="wp921310"> </a>
+	public FlavorMap getFlavorMap();<a name="wp921939"> </a>
+<a name="wp924057"> </a>
+     public DragGestureRecongizer<a name="wp924058"> </a>
+         createDragGestureRecognizer(<a name="wp924062"> </a>
+              Class               abstractRecognizerClass,<a name="wp924064"> </a>
+              Component           c,<a name="wp924063"> </a>
+              int                 srcActions,<a name="wp924078"> </a>
+              DragGestureListener dgl<a name="wp924082"> </a>
+     );<a name="wp924065"> </a>
+<a name="wp924100"> </a>
+     public DragGestureRecongizer<a name="wp924059"> </a>
+         createDefaultDragGestureRecognizer(<a name="wp924086"> </a>
+              Component           c,<a name="wp924088"> </a>
+              int                 srcActions,<a name="wp924089"> </a>
+              DragGestureListener dgl<a name="wp924090"> </a>
+     );<a name="wp924091"> </a>
+}<a name="wp921442"> </a>
+<a name="wp921443"> </a>
+</pre></div>
+<a name="wp921249"> </a><p class="pBody">
+The <em class="cEmphasis">DragSource</em> may be used in a number of scenarios:
+</p>
+<ul class="pBullet1"><a name="wp921278"> </a><div class="pBullet1"><li>1 default instance per JVM for the lifetime of that JVM. (defined by this spec)</li></div>
+<a name="wp921283"> </a><div class="pBullet1Plus"><li>1 instance per class of potential Drag Initiator object (e.g <em class="cEmphasis">TextField</em>). [implementation dependent]</li></div>
+<a name="wp921280"> </a><div class="pBullet1Plus"><li>1 per instance of a particular <em class="cEmphasis">Component</em>, or application specific object associated with a <em class="cEmphasis">Component</em> instance in the GUI. [implementation dependent]</li></div>
+<a name="wp921758"> </a><div class="pBullet1Last"><li>some other arbitrary association. [implementation dependent]</li></div>
+</ul>
+<a name="wp921257"> </a><p class="pBody">
+ A controlling object, shall obtain a <em class="cEmphasis">DragSource</em> instance prior to a users gesture, effecting an associated <em class="cEmphasis">Component</em>, in order to process the operation. Once obtained a <em class="cEmphasis">DragGestureRecognizer</em> should be obtained and used to associate the <em class="cEmphasis">DragSource</em> with a <em class="cEmphasis">Component</em>.
+</p>
+<a name="wp921539"> </a><p class="pBody">
+The initial interpretation of the users gesture, and the subsequent starting of the Drag operation are the responsibility of the implementing <em class="cEmphasis">Component</em>, this is usually implemented by a <em class="cEmphasis">DragGestureRecognizer</em>.
+</p>
+<a name="wp921231"> </a><p class="pBody">
+When a gesture occurs, the <em class="cEmphasis">DragSource</em>&#8217;s <em class="cEmphasis">startDrag()</em> method shall be invoked in order to cause processing of the users navigational gestures and delivery of Drag and Drop protocol notifications. A DragSource shall only permit a single Drag and Drop operation to be current at any one time, and shall reject any further <em class="cEmphasis">startDrag()</em> requests by throwing an <em class="cEmphasis">IllegalDnDOperationException</em> until such time as the extant operation is complete.
+</p>
+<a name="wp921950"> </a><p class="pBody">
+In order to start a drag operation the caller of the <em class="cEmphasis">startDrag</em>() method shall provide the following parameters:
+</p>
+<ul class="pBullet1"><a name="wp921951"> </a><div class="pBullet1"><li>The <em class="cEmphasis">DragGestureEvent</em> for the gesture.</li></div>
+<a name="wp923905"> </a><div class="pBullet1Plus"><li>A <em class="cEmphasis">Cursor</em> representing the initial &#8220;Drag Over&#8221; feedback for the operation(s) specified. (This shall be a <em class="cEmphasis">Cursor</em> that provides &#8220;No Drop&#8221; visual feedback to the user).</li></div>
+<a name="wp921967"> </a><div class="pBullet1Plus"><li>An (optional) <em class="cEmphasis">Image</em> to visually represent the item, or item(s) that are the subject(s) of the operation.</li></div>
+<a name="wp921969"> </a><p class="pIndented1">
+On platforms that can support this feature, a &#8220;Drag&#8221; image may be associated with the operation to enhance the fidelity of the &#8220;Drag Over&#8221; feedback. This image would typically be a small &#8220;iconic&#8221; representation of the object, or objects being dragged, and would be rendered by the underlying system, tracking the movement of, and coincident with, but typically in addition to the <em class="cEmphasis">Cursor</em> animation.
+</p>
+<a name="wp921968"> </a><p class="pIndented1">
+Where this facility is not available, or where the image is not of a suitable type to be rendered by the underlying system, this parameter is ignored and only <em class="cEmphasis">Cursor</em> &#8220;Drag Over&#8221; animation results, so applications should not depend upon this feature. The presence of the facility on a particular platform may be tested by invoking the static method <em class="cEmphasis">isDragImageSupported()</em>.
+</p>
+<a name="wp921959"> </a><div class="pBullet1Plus"><li>Where an <em class="cEmphasis">Image</em> is provided; a <em class="cEmphasis">Point</em> (in the co-ordinate space of the <em class="cEmphasis">Component) </em>specifying the initial origin of that <em class="cEmphasis">Image</em> relative to the co-ordinates of the &#8220;hotspot&#8221; of the drag &#8220;Cursor&#8221;, in the co-ordinate space of the <em class="cEmphasis">Component</em>, at the time of the initial gesture, for the purposes of initiating a correctly positioned &#8220;Drag Over&#8221; animation of that <em class="cEmphasis">Image</em> relative to that &#8220;hotspot&#8221;.</li></div>
+<a name="wp921960"> </a><div class="pBullet1Plus"><li>A <em class="cEmphasis">Transferable</em> that describes the various <em class="cEmphasis">DataFlavor</em>(s) that represent the subject(s) of any subsequent data transfer that may result from a successful Drop.</li></div>
+<a name="wp920395"> </a><p class="pIndented1">
+The <em class="cEmphasis">Transferable </em>instance associated with the <em class="cEmphasis">DragSource</em> at the start of the Drag operation, represents the object(s) or data that are the operand(s), or the subject(s), of the Drag and Drop operation, that is the information that will subsequently be passed from the <em class="cEmphasis">DragSource</em> to the <em class="cEmphasis">DropTarget </em>as a result of a successful Drop on the <em class="cEmphasis">Component</em> associated with that <em class="cEmphasis">DropTarget</em>.
+</p>
+<a name="wp920667"> </a><p class="pIndented1">
+Note that multiple (collections) of either homogeneous, or heterogeneous, objects may be subject of a Drag and Drop operation, by creating a container object, that is the subject of the transfer, and implements <em class="cEmphasis">Transferable</em>. However it should be noted that since none of the targeted native platforms systems support a standard mechanism for describing and thus transferring such collections it is not possible to implement such transfers in a transparent, or platform portable fashion.
+</p>
+<a name="wp922007"> </a><div class="pBullet1Last"><li>A <em class="cEmphasis">DragSourceListener</em> instance, which will subsequently receive events notifying it of changes in the state of the ongoing operation in order to provide the &#8220;Drag Over&#8221; feedback to the user.</li></div>
+</ul>
+<a name="wp922002"> </a><p class="pBody">
+As stated above, the primary role of the <em class="cEmphasis">startDrag</em>() method is to initiate a Drag on behalf of the user. In order to accomplish this, the <em class="cEmphasis">startDrag</em>() method must create a <em class="cEmphasis">DragSourceContext</em> instance to track the operation itself, and more importantly it must initiate the operation itself in the underlying platform implementation. In order to accomplish this, the <em class="cEmphasis">DragSource</em> must first obtain a <em class="cEmphasis">DragSourceContextPeer</em> from the underlying system (usually via an invocation of <em class="cEmphasis">java.awt.Toolkit.createDragSourceContextPeer()</em> method) and subsequently associate this newly created <em class="cEmphasis">DragSourceContextPeer</em> (which provides a platform independent interface to the underlying systems capabilities) with a <em class="cEmphasis">DragSourceContext</em>.The <em class="cEmphasis">startDrag</em>() method invokes the <em class="cEmphasis">createDragSourceContext</em>() method to instantiate an appropriate <em class="cEmphasis">DragSourceContext</em> and associate the <em class="cEmphasis">DragSourceContextPeer with that.</em>
+</p>
+<a name="wp925502"> </a><p class="pBody">
+If the Drag and Drop System is unable to initiate a Drag operation for some reason the <em class="cEmphasis">startDrag</em>() method shall throw a <em class="cEmphasis">java.awt.dnd.InvalidDnDOperationException</em> to signal such a condition. Typically this exception is thrown when the underlying platform system is either not in a state to initiate a Drag, or the parameters specified are invalid.
+</p>
+<a name="wp925503"> </a><p class="pBody">
+Note that during the Drag neither the set of operations the source exposed at the start of the Drag operation may change for the duration of the operation, in other words the operation(s) and are constant for the duration of the operation with respect to the <em class="cEmphasis">DragSource</em>.
+</p>
+<a name="wp922594"> </a><p class="pBody">
+The <em class="cEmphasis">getFlavorMap</em>() method is used by the underlying system to obtain a <em class="cEmphasis">FlavorMap</em> object in order to map the <em class="cEmphasis">DataFlavors</em> exposed by the <em class="cEmphasis">Transferable</em> to data type names of the underlying DnD platform. [see later for details of the <em class="cEmphasis">FlavorMap</em>]
+</p>
+<a name="wp925511"> </a><p class="pBody">
+A &#8220;private&#8221; <em class="cEmphasis">FlavorMap</em> may be provided to the <em class="cEmphasis">startDrag()</em> method of the <em class="cEmphasis">DragSource</em>, or null, in which case the &#8220;default&#8221; <em class="cEmphasis">FlavorMap</em> for that <em class="cEmphasis">DragSource</em> class or instance is used.
+</p>
+<a name="wp920428"> </a><h4 class="pHeading3">
+2.3.2  The DragSourceContext Definition
+</h4>
+<a name="wp921985"> </a><p class="pBody">
+As a result of a <em class="cEmphasis">DragSource</em>&#8217;s <em class="cEmphasis">startDrag</em>() method being successfully invoked an instance of the <em class="cEmphasis">DragSourceContext</em> class is created. This instance is responsible for tracking the state of the operation on behalf of the <em class="cEmphasis">DragSource</em> and dispatching state changes to the <em class="cEmphasis">DragSourceListener</em>.
+</p>
+<a name="wp920319"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceContext</em> class is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public class DragSourceContext implements DragSourceListener {<a name="wp920310"> </a>
+	protected DragSourceContext(<a name="wp921991"> </a>
+				DragSourceContextPeer	dscp,<a name="wp924110"> </a>
+				DragGestureEvent      trigger,<a name="wp921996"> </a>
+				Cursor			dragCursor,<a name="wp921997"> </a>
+				Image			dragImage,<a name="wp921998"> </a>
+				Point			dragOffset,<a name="wp921999"> </a>
+				Transferable		transferable,<a name="wp922000"> </a>
+				DragSourceListener		dsl		<a name="wp922001"> </a>
+	);<a name="wp921992"> </a>
+<a name="wp921993"> </a>
+	public DragSource			 getDragSource();<a name="wp919994"> </a>
+<a name="wp919995"> </a>
+	public Component		 getComponent();<a name="wp919952"> </a>
+<a name="wp920416"> </a>
+	public DragGestureEvent				getTrigger();<a name="wp920417"> </a>
+<a name="wp922039"> </a>
+	public Image	 getDragImage();<a name="wp922040"> </a>
+	public Point	 getDragImageOffset();<a name="wp922042"> </a>
+<a name="wp924331"> </a>
+     public void transferablesFlavorsChanged();<a name="wp924332"> </a>
+<a name="wp919979"> </a>
+	public int getSourceActions();<a name="wp919958"> </a>
+<a name="wp922035"> </a>
+	public Cursor getCursor();<a name="wp922033"> </a>
+	pbulic void   setCursor(Cursor Cursor) <a name="wp922022"> </a>
+				   throws InvalidDnDOperationException;<a name="wp921449"> </a>
+<a name="wp922038"> </a>
+	public void <a name="wp919985"> </a>
+		addDragSourceListener(DragSourceListener dsl)<a name="wp924381"> </a>
+		    throws TooManyListenersException;<a name="wp919987"> </a>
+<a name="wp919988"> </a>
+	public void <a name="wp919989"> </a>
+		removeDragSourceListener(DragSourceListener dsl);<a name="wp924378"> </a>
+<a name="wp925517"> </a>
+     protected updateCurrentCursor(int dropOperation,<a name="wp925518"> </a>
+                                   int targetActions,<a name="wp925519"> </a>
+                                   int status<a name="wp925520"> </a>
+     );<a name="wp925521"> </a>
+<a name="wp925529"> </a>
+    // values for status parameter above.<a name="wp925530"> </a>
+<a name="wp925531"> </a>
+    protected static final int DEFAULT = 0;<a name="wp925522"> </a>
+    protected static final int ENTER   = 1;<a name="wp925525"> </a>
+    protected static final int OVER    = 2;<a name="wp925526"> </a>
+    protected static final int CHANGED = 3;<a name="wp925527"> </a>
+<a name="wp925528"> </a>
+    protected boolean cursorDirty;<a name="wp925523"> </a>
+ }<a name="wp919950"> </a>
+<a name="wp922077"> </a>
+</pre></div>
+<a name="wp922082"> </a><p class="pBody">
+Note that the <em class="cEmphasis">DragSourceContext</em> itself implements <em class="cEmphasis">DragSourceListener</em>, this is to allow the platform peer, the <em class="cEmphasis">DragSourceContextPeer</em> instance, created by the <em class="cEmphasis">DragSource</em>, to notify the <em class="cEmphasis">DragSourceContext</em> of changes in state in the ongoing operation, and thus allows the <em class="cEmphasis">DragSourceContext</em> to interpose itself between the platform and the <em class="cEmphasis">DragSourceListener</em> provided by the initiator of the operation.
+</p>
+<a name="wp919840"> </a><p class="pBody">
+The state machine the platform exposes, with respect to the source, or initiator of the Drag and Drop operation is detailed below:
+</p>
+<a name="wp926698"> </a><p class="pBody">
+</p><div align="left"><img src="images/dnd1a.gif" height="286" width="432" alt="Following context describes this graphic" border="0" hspace="0" vspace="0"/></div><p class="pBody">
+</p>
+<a name="wp919609"> </a><p class="pBody">
+
+</p>
+<a name="wp919509"> </a><p class="pBody">
+Notifications of changes in state with respect to the initiator during a Drag and Drop operation, as illustrated above, are delivered from the <em class="cEmphasis">DragSourceContextPeer, </em>to the appropriate <em class="cEmphasis">DragSourceContext</em>, which delegates notifications, via a unicast JavaBeans compliant <em class="cEmphasis">EventListener</em> subinterface, to an arbitrary object that implements <em class="cEmphasis">DragSourceListener</em> registered with the <em class="cEmphasis">DragSource</em> via <em class="cEmphasis">startDrag</em>().
+</p>
+<a name="wp919728"> </a><p class="pBody">
+The primary responsibility of the <em class="cEmphasis">DragSourceListener</em> is to monitor the progress of the users navigation during the Drag and Drop operation and provide the &#8220;Drag-Over&#8221; effects feedback to the user. Typically this is accomplished via changes to the &#8220;Drag Cursor&#8221;.
+</p>
+<a name="wp919761"> </a><p class="pBody">
+Every Drag operation has 2 logical cursor states (Drag Cursors) associated with it:
+</p>
+<ul class="pBullet1"><a name="wp922064"> </a><div class="pBullet1"><li> The Drop <em class="cEmphasis">Cursor</em>, the cursor displayed when dragging over a valid <em class="cEmphasis">DropTarget</em>. </li></div>
+<a name="wp922070"> </a><div class="pBullet1Last"><li>The NoDrop <em class="cEmphasis">Cursor</em>, the cursor displayed when dragging over everything else (the initial state of the cursor at the start of a Drag).</li></div>
+</ul>
+<a name="wp922631"> </a><p class="pBody">
+The state of the <em class="cEmphasis">Cursor</em> may be modified by calling the <em class="cEmphasis">setCursor</em>() method of the <em class="cEmphasis">DragSourceContext</em>.
+</p>
+<a name="wp925558"> </a><p class="pBody">
+
+</p>
+<a name="wp925559"> </a><p class="pBody">
+
+</p>
+<a name="wp925560"> </a><p class="pBody">
+
+</p>
+<a name="wp925561"> </a><p class="pBody">
+
+</p>
+<a name="wp920315"> </a><h4 class="pHeading3">
+2.3.3  The DragSourceListener Definition
+</h4>
+<a name="wp919799"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceListener</em> interface is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public interface java.awt.dnd.DragSourceListener<a name="wp919787"> </a>
+	extends java.util.EventListener {<a name="wp919382"> </a>
+	void dragEnter					(DragSourceDragEvent dsde);<a name="wp919385"> </a>
+	void dragOver					(DragSourceDragEvent dsde);<a name="wp919386"> </a>
+	void dropActionChanged (DragSourceDragEvent dsde);<a name="wp919692"> </a>
+	void dragExit					(DragSourceEvent     dse);<a name="wp919387"> </a>
+	void dragDropEnd					(DragSourceDropEvent dsde);<a name="wp919388"> </a>
+}<a name="wp919383"> </a>
+</pre></div>
+<a name="wp925637"> </a><p class="pBody">
+
+</p>
+<a name="wp925638"> </a><p class="pBody">
+As the drag operation progresses, the <em class="cEmphasis">DragSourceListener&#8217;</em>s <em class="cEmphasis">dragEnter()</em>, <em class="cEmphasis">dragOver()</em>, and <em class="cEmphasis">dragExit()</em> methods shall be invoked as a result of the users navigation of the logical &#8220;Drag&#8221; cursor&#8217;s location intersecting the geometry of GUI <em class="cEmphasis">Component(s)</em> with associated <em class="cEmphasis">DropTarget(s)</em>. [See below for details of the <em class="cEmphasis">DropTarget&#8217;s</em> protocol interactions].
+</p>
+<a name="wp922100"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceListener</em>&#8217;s <em class="cEmphasis">dragEnter</em>() method is invoked when the following conditions are true:
+</p>
+<a name="wp922101"> </a><div class="pBullet1Plus"><li>The logical cursor&#8217;s hotspot initially intersects a GUI <em class="cEmphasis">Component</em>&#8217;s visible geometry.</li></div>
+<a name="wp922104"> </a><div class="pBullet1Plus"><li>That <em class="cEmphasis">Component</em> has an active <em class="cEmphasis">DropTarget</em> associated.</li></div>
+<a name="wp922107"> </a><p class="pBody">
+The <em class="cEmphasis">DropTarget</em>&#8217;s registered <em class="cEmphasis">DropTargetListener</em> <em class="cEmphasis">dragEnter</em>() method is invoked and returns successfully.
+</p>
+<a name="wp922108"> </a><p class="pBody">
+The registered <em class="cEmphasis">DropTargetListener </em>invokes the <em class="cEmphasis">DropTargetDragEvent</em>&#8217;s <em class="cEmphasis">acceptDrag</em>() method to accept the Drag based upon interrogation of the source&#8217;s potential Drop actions and available data types (<em class="cEmphasis">DataFlavors</em>).
+</p>
+<a name="wp922111"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceListener&#8217;s dragOver()</em> method is invoked when the following conditions are true:
+</p>
+<ul class="pBullet1"><a name="wp922117"> </a><div class="pBullet1"><li>The cursor&#8217;s logical hotspot has moved but still intersects the visible geometry of the <em class="cEmphasis">Component</em> associated with the previous <em class="cEmphasis">dragEnter</em>() invocation.</li></div>
+<a name="wp922121"> </a><div class="pBullet1Plus"><li>That <em class="cEmphasis">Component</em> still has a <em class="cEmphasis">DropTarget</em> associated.</li></div>
+<a name="wp922122"> </a><div class="pBullet1Plus"><li>That <em class="cEmphasis">DropTarget</em> is still active.</li></div>
+<a name="wp922123"> </a><div class="pBullet1Plus"><li>The <em class="cEmphasis">DropTarget</em>&#8217;s registered <em class="cEmphasis">DropTargetListener</em> <em class="cEmphasis">dragOver</em>() method is invoked and returns successfully.</li></div>
+<a name="wp922183"> </a><div class="pBullet1Last"><li>The <em class="cEmphasis">DropTarget</em> does not reject the drag via <em class="cEmphasis">rejectDrag</em>().</li></div>
+</ul>
+<a name="wp922127"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceListener</em>&#8217;s <em class="cEmphasis">dragExit</em>() method is invoked when one of the following conditions is true:
+</p>
+<ul class="pBullet1"><a name="wp922132"> </a><div class="pBullet1"><li>The cursor&#8217;s logical hotspot no longer intersects the visible geometry of the <em class="cEmphasis">Component</em> associated with the previous <em class="cEmphasis">dragEnter</em>() invocation.</li></div>
+<a name="wp922196"> </a><p class="pBody">
+Or:
+</p>
+<a name="wp922197"> </a><div class="pBullet1Plus"><li>The <em class="cEmphasis">Component</em> that the logical cursor&#8217;s hotspot intersected that resulted in the previous <em class="cEmphasis">dragEnter</em>() invocation, no longer has an active <em class="cEmphasis">DropTarget</em> (or <em class="cEmphasis">DropTargetListener</em>) associated.</li></div>
+<a name="wp922200"> </a><p class="pBody">
+Or:
+</p>
+<a name="wp922213"> </a><div class="pBullet1Last"><li>The current <em class="cEmphasis">DropTarget</em>&#8217;s <em class="cEmphasis">DropTargetListener</em> has invoked <em class="cEmphasis">rejectDrag</em>() since the last <em class="cEmphasis">dragEnter</em>() or <em class="cEmphasis">dragOver</em>() invocation.</li></div>
+</ul>
+<a name="wp922228"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceListener&#8217;s dropActionChanged()</em> method is invoked when the state of the input device(s), typically the mouse buttons or keyboard modifiers, that the user is interacting with in order to preform the Drag operation, changes.
+</p>
+<a name="wp922232"> </a><p class="pBody">
+The <em class="cEmphasis">dragDropEnd()</em> method is invoked to signify that the operation is completed. The <em class="cEmphasis">getDropSuccess()</em> method of the <em class="cEmphasis">DragSourceDropEvent</em> can be used to determine the termination state. The <em class="cEmphasis">getDropAction</em>() method returns the operation that the <em class="cEmphasis">DropTarget</em> selected (via the <em class="cEmphasis">DropTargetDropEvent</em> <em class="cEmphasis">acceptDrop</em>() parameter) to apply to the Drop operation.<a href="#wp922238"><span class="Footnote">1</span></a>
+</p>
+<a name="wp922236"> </a><p class="pBody">
+Once this method is complete the current <em class="cEmphasis">DragSourceContext</em> and the associated resources are invalid.
+</p>
+<a name="wp922136"> </a><h4 class="pHeading3">
+2.3.4  The DragSourceEvent Definition
+</h4>
+<a name="wp922138"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceEvent</em> class is the root <em class="cEmphasis">Event</em> class for all events pertaining to the DragSource, and is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public class   java.awt.dnd.DragSourceEvent<a name="wp922141"> </a>
+	  extends java.util.EventObject {<a name="wp922144"> </a>
+	public DragSourceEvent(DragSourceContext dsc);<a name="wp922149"> </a>
+<a name="wp922150"> </a>
+	public DragSourceContext getDragSourceContext();<a name="wp922147"> </a>
+};<a name="wp922148"> </a>
+<a name="wp922245"> </a>
+</pre></div>
+<a name="wp922246"> </a><p class="pBody">
+An instance of this event is passed to the <em class="cEmphasis">DragSourceListener</em> <em class="cEmphasis">dragExit</em>() method.
+</p>
+<a name="wp922137"> </a><h4 class="pHeading3">
+2.3.5  The DragSourceDragEvent Definition
+</h4>
+<a name="wp920327"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceDragEvent</em> class is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+<a name="wp919648"> </a>
+public class java.awt.dnd.DragSourceDragEvent <a name="wp920259"> </a>
+	  extends DragSourceEvent {<a name="wp920036"> </a>
+	public int getTargetActions();<a name="wp919685"> </a>
+<a name="wp925549"> </a>
+     public int getUserAction();<a name="wp925550"> </a>
+<a name="wp922447"> </a>
+	public int getGestureModifiers();<a name="wp922443"> </a>
+<a name="wp922444"> </a>
+	public boolean isDropTargetLocal();<a name="wp922180"> </a>
+<a name="wp924124"> </a>
+     public int getDropAction();<a name="wp924125"> </a>
+}<a name="wp922179"> </a>
+<a name="wp920261"> </a>
+</pre></div>
+<a name="wp920332"> </a><p class="pBody">
+An instance of the above class is passed to a <em class="cEmphasis">DragSourceListener&#8217;s dragEnter(), dragOver(), </em>and<em class="cEmphasis"> dragGestureChanged() </em>methods.
+</p>
+<a name="wp920364"> </a><p class="pBody">
+The <em class="cEmphasis">getDragSourceContext</em><em class="cEmphasis">()</em> method returns the <em class="cEmphasis">DragSourceContext</em> associated with the current Drag and Drop operation.
+</p>
+<a name="wp920365"> </a><p class="pBody">
+The <em class="cEmphasis">getTargetActions() </em>method returns the drop actions, supported by, and returned from the current <em class="cEmphasis">DropTarget (</em>if any in the case of<em class="cEmphasis"> dropActionChanged())</em>.
+</p>
+<a name="wp924126"> </a><p class="pBody">
+The <em class="cEmphasis">getDropAction()</em> method returns the action that is currently selected by the users gesture.
+</p>
+<a name="wp924395"> </a><p class="pBody">
+The <em class="cEmphasis">getTargetActions()</em> method returns the set of actions supported by the current <em class="cEmphasis">DropTarget</em>.
+</p>
+<a name="wp924398"> </a><p class="pBody">
+The logical OR of these two results defines the actual effect of a Drop.
+</p>
+<a name="wp920367"> </a><p class="pBody">
+The <em class="cEmphasis">getGestureModifiers()</em> returns the current state of the input device modifiers, usually the mouse buttons and keyboard modifiers, associated with the users gesture.
+</p>
+<a name="wp922247"> </a><p class="pBody">
+The <em class="cEmphasis">isDropTargetLocal</em>() method returns true if the current <em class="cEmphasis">DropTarget</em> is contained within the same JVM as the <em class="cEmphasis">DragSource</em>, and false otherwise. This information can be useful to the implementor of the <em class="cEmphasis">DragSource</em>&#8217;s <em class="cEmphasis">Transferable</em> in order to implement certain local optimizations.
+</p>
+<a name="wp920366"> </a><h4 class="pHeading3">
+2.3.6  The DragSourceDropEvent Definition
+</h4>
+<a name="wp920325"> </a><p class="pBody">
+The <em class="cEmphasis">DragSourceDropEvent</em> class is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+<a name="wp922167"> </a>
+public public class java.awt.dnd.DragSourceDropEvent<a name="wp922168"> </a>
+	  extends java.util.EventObject {<a name="wp920277"> </a>
+<a name="wp922159"> </a>
+	public DragSourceDropEvent(DragSourceContext dsc);<a name="wp922160"> </a>
+	public DragSourceDropEvent(DragSourceContext dsc,<a name="wp922170"> </a>
+						      int                action, <a name="wp922162"> </a>
+						      boolean            success);<a name="wp922163"> </a>
+<a name="wp922161"> </a>
+	public boolean getDropSuccess();<a name="wp920283"> </a>
+<a name="wp922157"> </a>
+	public int getDropAction();<a name="wp922158"> </a>
+}<a name="wp920278"> </a>
+</pre></div>
+<a name="wp920334"> </a><p class="pBody">
+An instance of the above class is passed to a <em class="cEmphasis">DragSourceListener&#8217;s dragDropEnd()</em> method. This event encapsulates the termination state of the Drag and Drop operation for the <em class="cEmphasis">DragSource</em>.
+</p>
+<a name="wp920344"> </a><p class="pBody">
+If the Drop occurs, then the participating <em class="cEmphasis">DropTarget</em> will signal the success or failure of the data transfer via the <em class="cEmphasis">DropTargetContext&#8217;s dropComplete()</em> method, this status is made available to the initiator via the <em class="cEmphasis">getDropSuccess()</em> method. The operation that the destination <em class="cEmphasis">DropTarget</em> selected to perform on the subject of the Drag (passed by the <em class="cEmphasis">DropTarget</em>&#8217;s <em class="cEmphasis">acceptDrop</em>() method) is returned via the <em class="cEmphasis">getDropAction</em>() method.
+</p>
+<a name="wp922434"> </a><p class="pBody">
+If the Drag operation was aborted for any reason prior to a Drop occurring, for example if the users ends the gesture outside a <em class="cEmphasis">DropTarget</em>, or if the <em class="cEmphasis">DropTarget</em> invokes <em class="cEmphasis">rejectDrop</em>(), the <em class="cEmphasis">isGetDropSuccess()</em> method will return false, otherwise true.
+</p>
+<a name="wp919284"> </a><h3 class="pHeading2">
+2.4  Drop Target
+</h3>
+<a name="wp921389"> </a><h4 class="pHeading3">
+2.4.1  java.awt.Component additions for DropTarget (de)registration.
+</h4>
+<a name="wp921390"> </a><p class="pBody">
+The <em class="cEmphasis">Java.awt.Component</em> class has two additional methods added to allow the (dis)association with a <em class="cEmphasis">DropTarget. </em>In particular:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public class java.awt.Component /* ... */ {<a name="wp921391"> </a>
+	// ...<a name="wp921392"> </a>
+<a name="wp921393"> </a>
+	public synchronized<a name="wp921394"> </a>
+			void       setDropTarget(DropTarget dt);<a name="wp921395"> </a>
+<a name="wp921396"> </a>
+	public synchronized<a name="wp921397"> </a>
+			DropTarget getDropTarget(DropTarget df);<a name="wp921398"> </a>
+	<a name="wp921399"> </a>
+	//<a name="wp921400"> </a>
+}<a name="wp921401"> </a>
+</pre></div>
+<a name="wp921405"> </a><p class="pBody">
+To associate a <em class="cEmphasis">DropTarget</em> with a <em class="cEmphasis">Component</em> one may invoke either; <em class="cEmphasis">DropTarget.setCompononent</em>() or <em class="cEmphasis">Component.setDropTarget</em>() methods. Thus conforming implementations of both methods are required to guard against mutual recursive invocations.
+</p>
+<a name="wp921414"> </a><p class="pBody">
+To disassociate a <em class="cEmphasis">DropTarget</em> with a <em class="cEmphasis">Component</em> one may invoke either; <em class="cEmphasis">DropTarget.setCompononent</em>(null) or <em class="cEmphasis">Component.setDropTarget</em>(null) methods.
+</p>
+<a name="wp921419"> </a><p class="pBody">
+Conformant implementations of both setter methods in <em class="cEmphasis">DropTarget</em> and <em class="cEmphasis">Component</em> should be implemented in terms of each other to ensure proper maintenance of each other&#8217;s state.
+</p>
+<a name="wp921641"> </a><p class="pBody">
+The <em class="cEmphasis">setDropTarget</em>() method throws <em class="cEmphasis">IllegalArgumentException</em> if the <em class="cEmphasis">DropTarget</em> actual parameter is not suitable for use with this class/instance of <em class="cEmphasis">Component</em>. It may also throw <em class="cEmphasis">UnsupportedOperationException</em> if, for instance, the <em class="cEmphasis">Component</em> does not support external setting of a <em class="cEmphasis">DropTarget</em>.
+</p>
+<a name="wp920326"> </a><h4 class="pHeading3">
+2.4.2  The DropTarget Definition
+</h4>
+<a name="wp920482"> </a><p class="pBody">
+A <em class="cEmphasis">DropTarget</em> encapsulates all of the platform-specific handling of the Drag and Drop protocol with respect to the role of the recipient or destination of the operation.
+</p>
+<a name="wp920475"> </a><p class="pBody">
+A single <em class="cEmphasis">DropTarget</em> instance may typically be associated with any arbitrary instance of <em class="cEmphasis">java.awt.Component. </em>Establishing such a relationship exports the associated <em class="cEmphasis">Component&#8217;s</em> geometry to the client desktop as being receptive to Drag and Drop operations when the coordinates of the logical cursor intersects that visible geometry. 
+</p>
+<a name="wp920494"> </a><p class="pBody">
+The <em class="cEmphasis">DropTarget</em> class is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public class java.awt.dnd.DropTarget<a name="wp919847"> </a>
+       implements DropTargetListener, Serializable {<a name="wp922272"> </a>
+<a name="wp922566"> </a>
+     public DropTarget(Component          c,<a name="wp924258"> </a>
+                       int                actions,<a name="wp924259"> </a>
+                       DropTargetListener dsl,<a name="wp924260"> </a>
+                       boolean            isActive,<a name="wp924261"> </a>
+                       FlavorMap          fm<a name="wp924262"> </a>
+     );<a name="wp924263"> </a>
+<a name="wp924264"> </a>
+	public DropTarget();<a name="wp922571"> </a>
+<a name="wp922572"> </a>
+	public DropTarget(Component c);<a name="wp922567"> </a>
+	public DropTarget(Component c, DropTargetListener dsl);<a name="wp922568"> </a>
+<a name="wp922569"> </a>
+	public Component getComponent();<a name="wp920098"> </a>
+	public void      setComponent(Component c);<a name="wp921425"> </a>
+<a name="wp921533"> </a>
+	public DropTargetContext getDropTargetContext();<a name="wp921534"> </a>
+<a name="wp920099"> </a>
+<a name="wp922357"> </a>
+	public void<a name="wp920103"> </a>
+	    addDropTargetListener(DropTargetListener dte)<a name="wp920104"> </a>
+		  throws TooManyListenersException;<a name="wp920105"> </a>
+<a name="wp920106"> </a>
+	public void<a name="wp920107"> </a>
+	    removeDropTargetListener(DropTargetListener dte);<a name="wp920108"> </a>
+<a name="wp920613"> </a>
+	public void	    setActive(boolean active);<a name="wp920284"> </a>
+	public boolean isActive();<a name="wp920286"> </a>
+<a name="wp922580"> </a>
+	public FlavorMap getFlavorMap();<a name="wp922581"> </a>
+     public void      setFlavorMap(FlavorMap fm);<a name="wp924254"> </a>
+<a name="wp922585"> </a>
+     public void setDefaultActions(int actions);<a name="wp924265"> </a>
+     public int  getDefaultActions();<a name="wp924266"> </a>
+<a name="wp924267"> </a>
+	protected DropTargetContext createDropTargetContext();<a name="wp922586"> </a>
+<a name="wp922582"> </a>
+	public void addNotify(ComponentPeer cp);<a name="wp922583"> </a>
+	public void removeNotify(ComponentPeer cp);<a name="wp922584"> </a>
+}<a name="wp920097"> </a>
+</pre></div>
+<a name="wp921642"> </a><p class="pBody">
+The <em class="cEmphasis">setComponent</em>() method throws <em class="cEmphasis">IllegalArgumentException</em> if the <em class="cEmphasis">Component</em> actual parameter is not appropriate for use with this class/instance of <em class="cEmphasis">DropTarget</em>, and may also throw <em class="cEmphasis">UnsupportedOperationException</em> if the Component specified disallows the external setting of a <em class="cEmphasis">DropTarget</em>. 
+</p>
+<a name="wp923077"> </a><p class="pBody">
+The <em class="cEmphasis">addDropTargetListener</em>() and <em class="cEmphasis">removeDropTargetListener</em>() methods allow the unicast <em class="cEmphasis">DropTargetListener</em> to be changed.
+</p>
+<a name="wp923078"> </a><p class="pBody">
+The <em class="cEmphasis">setActive</em>() and <em class="cEmphasis">isActive</em>() methods allow the <em class="cEmphasis">DropTarget</em> to be made active or otherwise and for its current state to be determined.
+</p>
+<a name="wp923086"> </a><p class="pBody">
+The <em class="cEmphasis">getFlavorMap</em>() methods is used to obtain the <em class="cEmphasis">FlavorMap</em> associated with this <em class="cEmphasis">DropTarget</em> for the purposes of mapping any platform dependent type names to/from their corresponding platform independent <em class="cEmphasis">DataFlavors</em>.
+</p>
+<a name="wp924257"> </a><p class="pBody">
+The <em class="cEmphasis">setFlavorMap()</em> method allows a new <em class="cEmphasis">FlavorMap</em> to be assigned to the <em class="cEmphasis">DropTarget</em>, a parameter of null causes a &#8220;default&#8221; <em class="cEmphasis">FlavorMap</em> to be installed for the <em class="cEmphasis">DropTarget</em>.
+</p>
+<a name="wp923072"> </a><p class="pBody">
+The <em class="cEmphasis">createDropTargetContext</em>() method is only invoked to provide the underlying platform dependent peer with an instantiation of a new <em class="cEmphasis">DropTargetContext</em> as a Drag operation initially encounters the <em class="cEmphasis">Component</em> associated with the <em class="cEmphasis">DropTarget</em>. If no <em class="cEmphasis">DropTargetContext</em> is currently associated with a <em class="cEmphasis">DropTarget</em>, a permitted side-effect of an invocation of <em class="cEmphasis">getDropTargetContext</em>() is to instantiate a new <em class="cEmphasis">DropTargetContext</em>.
+</p>
+<a name="wp923073"> </a><p class="pBody">
+The <em class="cEmphasis">addNotify</em>() and <em class="cEmphasis">removeNotify</em>() methods are only called from <em class="cEmphasis">Component</em> to notify the <em class="cEmphasis">DropTarget</em> of the <em class="cEmphasis">Component</em>&#8217;s (dis)association with its <em class="cEmphasis">ComponentPeer</em>.
+</p>
+<a name="wp924141"> </a><p class="pBody">
+Note that the <em class="cEmphasis">DropTarget</em> itself implements <em class="cEmphasis">DropTargetListener</em>, this is to allow the platform peer, the <em class="cEmphasis">DropTargetContextPeer</em> instance, created by the platform, to notify the <em class="cEmphasis">DropTarget</em> of changes in state in the ongoing operation, and thus allows the <em class="cEmphasis">DropTarget</em> to interpose itself between the platform and the <em class="cEmphasis">DropTargetListener</em> registered with the <em class="cEmphasis">DropTarget</em>.
+</p>
+<a name="wp922407"> </a><h4 class="pHeading3">
+2.4.3  The DropTargetContext Definition
+</h4>
+<a name="wp920519"> </a><p class="pBody">
+As the logical cursor associated with an ongoing Drag and Drop operation first intersects the visible geometry of a <em class="cEmphasis">Component</em> with an associated <em class="cEmphasis">DropTarget</em>, the <em class="cEmphasis">DropTargetContext</em> associated with the <em class="cEmphasis">DropTarget</em> is the interface, through which, access to, and control over state of the recipient protocol is achieved from the <em class="cEmphasis">DropTargetListener</em>.
+</p>
+<a name="wp924283"> </a><p class="pBody">
+A <em class="cEmphasis">DropTargetContext</em> is created by a <em class="cEmphasis">DropTarget</em>, via it&#8217;s <em class="cEmphasis">createDropTargetContext() </em>method, as a side effect of a call to a <em class="cEmphasis">DropTarget</em>&#8217;s <em class="cEmphasis">getDropTargetContext()</em> method, if no <em class="cEmphasis">DropTargetContext</em> currently exists for that <em class="cEmphasis">DropTarget</em>.
+</p>
+<a name="wp920363"> </a><p class="pBody">
+The <em class="cEmphasis">DropTargetContext</em> interface is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public class DropTargetContext {<a name="wp920119"> </a>
+	public DropTarget getDropTarget();<a name="wp920121"> </a>
+<a name="wp920184"> </a>
+	public Component		 getComponent();<a name="wp920122"> </a>
+<a name="wp920171"> </a>
+	public void		 dropComplete(boolean success)<a name="wp920234"> </a>
+				throws InvalidDnDOperationException;<a name="wp920235"> </a>
+<a name="wp921837"> </a>
+	public void acceptDrag(int dropAction);<a name="wp921834"> </a>
+	public void rejectDrag();<a name="wp921848"> </a>
+<a name="wp924136"> </a>
+	public void acceptDrop(int dropAction);<a name="wp922906"> </a>
+	public void rejectDrop();<a name="wp924134"> </a>
+<a name="wp924135"> </a>
+	public void addNotify(DropTargetContextPeer dtcp);<a name="wp922907"> </a>
+	public void removeNotify();<a name="wp922918"> </a>
+<a name="wp922919"> </a>
+	protected Transferable<a name="wp922923"> </a>
+		createTransferableProxy(Transferable t,<a name="wp922924"> </a>
+		                        boolean      isLocal<a name="wp922925"> </a>
+		);<a name="wp922931"> </a>
+<a name="wp924272"> </a>
+     protected void setTargetActions(int actions);<a name="wp924273"> </a>
+     protected int  getTargetActions();<a name="wp924275"> </a>
+<a name="wp924276"> </a>
+     protected DataFlavor[] getCurrentDataFlavors();<a name="wp924277"> </a>
+     protected List         getCurrentDataFlavorsAsList();<a name="wp924278"> </a>
+    <a name="wp924279"> </a>
+     protected boolean isDataFlavorSupported(DataFlavor df);<a name="wp924280"> </a>
+<a name="wp924281"> </a>
+     protected Transferable getTransferable();<a name="wp924282"> </a>
+    <a name="wp924274"> </a>
+}<a name="wp920120"> </a>
+<a name="wp924284"> </a>
+</pre></div>
+<a name="wp924285"> </a><p class="pBody">
+Most of the access and control methods are protected, since public access to their state is usually achieved by calling through a particular <em class="cEmphasis">DropTargetEvent</em> subclass that delegates the request to the <em class="cEmphasis">DropTargetContext</em>.
+</p>
+<a name="wp923113"> </a><p class="pBody">
+The <em class="cEmphasis">getDropTarget()</em> method return the <em class="cEmphasis">DropTarget</em> that created this <em class="cEmphasis">DropTargetContext</em>.
+</p>
+<a name="wp924287"> </a><p class="pBody">
+The g<em class="cEmphasis">etComponent()</em> method returns the <em class="cEmphasis">Component</em> associated with the <em class="cEmphasis">DropTarget</em> that created this <em class="cEmphasis">DropTargetContext</em>.
+</p>
+<a name="wp924304"> </a><p class="pBody">
+The <em class="cEmphasis">acceptDrag</em><em class="cEmphasis">()</em> method is delegated from the similar method on <em class="cEmphasis">DropTargetDragEvent</em> and is invoked from one of the <em class="cEmphasis">DropTargetListener</em>&#8217;s methods; d<em class="cEmphasis">ragEnter()</em>, <em class="cEmphasis">dragOver()</em> or <em class="cEmphasis">dropActionChanged()</em> to signify that the recipient is prepared to accept a drop with the operation specified, which is usually the user&#8217;s currently selected action.
+</p>
+<a name="wp924306"> </a><p class="pBody">
+The <em class="cEmphasis">rejectDrag</em><em class="cEmphasis">()</em> method is delegated from the similar method on <em class="cEmphasis">DropTargetDragEvent</em> and is invoked from one of the <em class="cEmphasis">DropTargetListener</em>&#8217;s methods; d<em class="cEmphasis">ragEnter()</em>, <em class="cEmphasis">dragOver()</em> or <em class="cEmphasis">dropActionChanged()</em> to signify that the recipient is unable to accept a drop with the user&#8217;s currently selected action.
+</p>
+<a name="wp924311"> </a><p class="pBody">
+The <em class="cEmphasis">acceptDrop</em><em class="cEmphasis">()</em> method is delegated from the similar method on <em class="cEmphasis">DropTargetDropEvent</em> and is invoked from the <em class="cEmphasis">DropTargetListener</em>&#8217;s <em class="cEmphasis">drop()</em> method to signify that the recipient is prepared to accept a drop with the operation specified, which is usually the user&#8217;s currently selected action.
+</p>
+<a name="wp924312"> </a><p class="pBody">
+The <em class="cEmphasis">rejectDrop</em><em class="cEmphasis">()</em> method is delegated from the similar method on <em class="cEmphasis">DropTargetDropEvent</em> and is invoked from the <em class="cEmphasis">DropTargetListener</em>&#8217;s <em class="cEmphasis">drop()</em> method to signify that the recipient is unable to accept a drop with the user&#8217;s currently selected action. This terminates a Drag and Drop operation without a data transfer.
+</p>
+<a name="wp924319"> </a><p class="pBody">
+The <em class="cEmphasis">dropComplete()</em> method signals to the originating <em class="cEmphasis">DragSource</em> that the <em class="cEmphasis">DropTargetListener</em> has completed the transfer(s) that comprise the subject of the Drag and Drop operation and that the operation is complete. The success (or failure) of the transfer(s) and the subsequent application of the operation specified is signaled by the value of the actual parameter.
+</p>
+<a name="wp924286"> </a><p class="pBody">
+The <em class="cEmphasis">getDataFlavors</em>() method returns an array of the <em class="cEmphasis">DataFlavors</em> available from the <em class="cEmphasis">DragSource</em>.
+</p>
+<a name="wp923124"> </a><p class="pBody">
+The <em class="cEmphasis">getTransferable</em>() method returns a <em class="cEmphasis">Transferable</em> (not necessarily the one the <em class="cEmphasis">DragSource</em> registered, it may be a proxy, and certainly shall be in the inter-JVM case) to enable data transfers to occur via its <em class="cEmphasis">getTransferData</em>() method. Note that it is illegal to invoke <em class="cEmphasis">getTransferable</em>() without first invoking an <em class="cEmphasis">acceptDrop</em>().
+</p>
+<a name="wp923128"> </a><p class="pBody">
+The <em class="cEmphasis">addNotify</em>() and <em class="cEmphasis">removeNotify</em>() methods are exclusively called by the underlying platform&#8217;s <em class="cEmphasis">DropTargetContextPeer</em> in order to notify the <em class="cEmphasis">DropTargetContext</em> that a Drag and Drop operation is occurring/ceasing on the <em class="cEmphasis">DropTargetContext</em> and associated <em class="cEmphasis">DropTarget</em>.
+</p>
+<a name="wp923129"> </a><p class="pBody">
+The <em class="cEmphasis">createTransferableProxy</em>() method enables a <em class="cEmphasis">DropTargetContext</em> implementation to interpose a <em class="cEmphasis">Transferable</em> between the <em class="cEmphasis">DropTargetListener</em> and the <em class="cEmphasis">Transferable</em> provided by the caller, which is typically the underlying platform <em class="cEmphasis">DropTargetContextPeer</em>.
+</p>
+<a name="wp920526"> </a><h4 class="pHeading3">
+2.4.4  The DropTargetListener Definition
+</h4>
+<a name="wp920509"> </a><p class="pBody">
+Providing the appropriate &#8220;Drag-under&#8221; feedback semantics, and processing of any subsequent Drop, is enabled through the <em class="cEmphasis">DropTargetListener</em> asssociated with a <em class="cEmphasis">DropTarget</em>.
+</p>
+<a name="wp921290"> </a><p class="pBody">
+The <em class="cEmphasis">DropTargetListener</em> determines the appropriate &#8220;Drag-under&#8221; feedback and its response to the <em class="cEmphasis">DragSource</em> regarding drop eligibility by inspecting the sources suggested actions and the data types available.
+</p>
+<a name="wp921293"> </a><p class="pBody">
+A particular <em class="cEmphasis">DropTargetListener</em> instance may be associated with a <em class="cEmphasis">DropTarget</em> via <em class="cEmphasis">addDropTargetListener()</em> and removed via <em class="cEmphasis">removeDropTargetListener()</em> methods.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public interface java.awt.dnd.DropTargetListener<a name="wp919401"> </a>
+	  extends java.util.EventListener {<a name="wp919402"> </a>
+	void dragEnter            (DropTargetDragEvent dtde);<a name="wp919404"> </a>
+	void dragOver             (DropTargetDragEvent dtde);<a name="wp919405"> </a>
+     void dropActionChanged    (DropTargetDragEvent dtde);<a name="wp924322"> </a>
+	void dragExit             (DropTargetDragEvent dtde);<a name="wp919407"> </a>
+	void drop                 (DropTargetDropEvent dtde);<a name="wp921814"> </a>
+}<a name="wp921816"> </a>
+</pre></div>
+<a name="wp922970"> </a><p class="pBody">
+</p><div align="left"><img src="images/dnd22.gif" height="267" width="432" alt="The following context describes this graphic." border="0" hspace="0" vspace="0"/></div><p class="pBody">
+</p>
+<a name="wp925723"> </a><p class="pBody">
+The <em class="cEmphasis">dragEnter()</em> method of the <em class="cEmphasis">DropTargetListener</em> is invoked when the hotspot of the logical &#8220;Drag&#8221; Cursor intersects a visible portion of the <em class="cEmphasis">DropTarget&#8217;s</em> associated <em class="cEmphasis">Component&#8217;s</em> geometry. The <em class="cEmphasis">DropTargetListener</em>, upon receipt of this notification, shall interrogate the operations or actions, and the types of the data (<em class="cEmphasis">DataFlavors</em>) as supplied by the <em class="cEmphasis">DragSource</em> to determine the appropriate actions and &#8220;Drag-under&#8221; feedback to respond with invocation of either <em class="cEmphasis">acceptDrag</em>() or <em class="cEmphasis">rejectDrag</em>().
+</p>
+<a name="wp923109"> </a><p class="pBody">
+The <em class="cEmphasis">dragOver()</em> method of the <em class="cEmphasis">DropTargetListener</em> is invoked while the hotspot of the logical &#8220;Drag&#8221; Cursor, in motion, continues to intersect a visible portion of the <em class="cEmphasis">DropTarget&#8217;s</em> associated <em class="cEmphasis">Component&#8217;s</em> geometry. The <em class="cEmphasis">DropTargetListener</em>, upon receipt of this notification, shall interrogate the operation &#8220;actions&#8221; and the types of the data as supplied by the <em class="cEmphasis">DragSource</em> to determine the appropriate &#8220;actions&#8221; and &#8220;Drag-under&#8221; feedback to respond with an invocation of either <em class="cEmphasis">acceptDrag</em>() or <em class="cEmphasis">rejectDrag</em>().
+</p>
+<a name="wp923112"> </a><p class="pBody">
+The get<em class="cEmphasis">Location()</em> method return the current co-ordinates, relative to the associated <em class="cEmphasis">Component&#8217;s</em> origin, of the hotspot of the logical &#8220;Drag&#8221; cursor.
+</p>
+<a name="wp922961"> </a><p class="pBody">
+The <em class="cEmphasis">getSourceActions()</em> method return the current &#8220;actions&#8221;, or operations (ACTION_MOVE, ACTION_COPY, or ACTION_LINK) the <em class="cEmphasis">DragSource</em> associates with the current Drag and Drop gesture.
+</p>
+<a name="wp920647"> </a><p class="pBody">
+The <em class="cEmphasis">dragExit()</em> method of the <em class="cEmphasis">DropTargetListener</em> is invoked when the hotspot of the logical &#8220;Drag&#8221; Cursor ceases to intersect a visible portion of the <em class="cEmphasis">DropTarget&#8217;s</em> associated <em class="cEmphasis">Component&#8217;s</em> geometry, or immediately prior to a <em class="cEmphasis">drop()</em> notification. The <em class="cEmphasis">DropTargetListener,</em> upon receipt of this notification, shall undo any &#8220;Drag-under&#8221; feedback effects it has previously applied. Note that the DropTargetContext associated with the <em class="cEmphasis">DropTarget</em> is invalidated as a side-effect 
+</p>
+<a name="wp920658"> </a><p class="pBody">
+The <em class="cEmphasis">drop()</em> method of the <em class="cEmphasis">DropTargetListener</em> is invoked as a result of the user terminating their Drag gesture while intersecting. The <em class="cEmphasis">DropTargetListener,</em> upon receipt of this notification, shall perform the operation specified by the return value of the <em class="cEmphasis">getSourceActions() </em>method on the <em class="cEmphasis">DropTargetDropEvent</em> object, upon the <em class="cEmphasis">Transferable</em> object returned from the <em class="cEmphasis">getTransferable() </em>method, and subsequently invoke the <em class="cEmphasis">dropComplete(</em>) method of the associated <em class="cEmphasis">DropTargetContext</em> to signal the success, or otherwise, of the operation.
+</p>
+<a name="wp920622"> </a><h4 class="pHeading3">
+2.4.5  The DropTargetDragEvent and DropTargetDropEvent Definitions
+</h4>
+<a name="wp920352"> </a><p class="pBody">
+The <em class="cEmphasis">DropTargetEvent</em> and <em class="cEmphasis">DropTargetDragEvent</em> are defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public abstract class java.awt.dnd.DropTargetEvent<a name="wp919658"> </a>
+	  extends java.util.EventObject<a href="#wp919857"><span class="Footnote">2</span></a> {<a name="wp919878"> </a>
+<a name="wp920112"> </a>
+	public DropTargetContext getDropTargetContext();<a name="wp920113"> </a>
+<a name="wp920240"> </a>
+}<a name="wp919659"> </a>
+</pre></div>
+<a name="wp922891"> </a><p class="pBody">
+A <em class="cEmphasis">DropTargetEvent</em> is passed to the <em class="cEmphasis">DropTargetListener</em>&#8217;s <em class="cEmphasis">dragExit</em>() method.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+<a name="wp919660"> </a>
+public class   java.awt.dnd.DropTargetDragEvent<a name="wp919859"> </a>
+	  extends java.awt.dnd.DropTargetEvent {<a name="wp919879"> </a>
+	public DataFlavor[] getDataFlavors();<a name="wp920544"> </a>
+<a name="wp922877"> </a>
+	public Point	  getLocation();<a name="wp922870"> </a>
+<a name="wp922874"> </a>
+	public int getSourceActions();<a name="wp922875"> </a>
+<a name="wp924218"> </a>
+     public getDropAction();<a name="wp924219"> </a>
+<a name="wp924491"> </a>
+     public DataFlavor[] getCurrentDataFlavors();<a name="wp924492"> </a>
+	public List         getCurrentDataFlavorsAsList();<a name="wp924493"> </a>
+<a name="wp924494"> </a>
+     public boolean isDataFlavorSupported();<a name="wp924495"> </a>
+<a name="wp922876"> </a>
+	public void acceptDrag(int operation);<a name="wp922871"> </a>
+	public void rejectDrag();<a name="wp922872"> </a>
+<a name="wp923055"> </a>
+}<a name="wp919860"> </a>
+</pre></div>
+<a name="wp920556"> </a><p class="pBody">
+A <em class="cEmphasis">DropTargetDragEvent</em> is passed to the <em class="cEmphasis">DropTargetListener&#8217;s</em> <em class="cEmphasis">dragEnter()</em>,  <em class="cEmphasis">dragOver() </em>and<em class="cEmphasis"> dropActionChanged() </em>methods.
+</p>
+<a name="wp922887"> </a><p class="pBody">
+The get<em class="cEmphasis">Location()</em> method return the current co-ordinates, relative to the associated <em class="cEmphasis">Component&#8217;s</em> origin, of the hotspot of the logical &#8220;Drag&#8221; cursor.
+</p>
+<a name="wp922888"> </a><p class="pBody">
+The <em class="cEmphasis">getSourceActions()</em> method return the current &#8220;actions&#8221;, or operations (ACTION_MOVE, ACTION_COPY, or ACTION_REFERENCE) the <em class="cEmphasis">DragSource</em> associates with the current Drag and Drop gesture.
+</p>
+<a name="wp920666"> </a><p class="pBody">
+The <em class="cEmphasis">getCurrentDataFlavors()</em>, <em class="cEmphasis">getCurrentDataFlavorsAsList()</em>, and <em class="cEmphasis">isDataFlavorSupported()</em>, methods are provided in order for the recipient to interrogate the list of types available from the source.
+</p>
+<a name="wp924500"> </a><p class="pBody">
+
+</p>
+<a name="wp919661"> </a><p class="pBody">
+The  is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public class java.awt.dnd.DropTargetDropEvent<a name="wp919881"> </a>
+	  extends java.awt.dnd.DropTargetEvent {<a name="wp919880"> </a>
+<a name="wp922882"> </a>
+	public Point	  getLocation();<a name="wp921825"> </a>
+<a name="wp922879"> </a>
+	public int getSourceActions();<a name="wp922880"> </a>
+<a name="wp924220"> </a>
+     public int getDropAction();<a name="wp924221"> </a>
+<a name="wp922881"> </a>
+	public void acceptDrop(int dropAction);<a name="wp921826"> </a>
+	public void rejectDrop();	<a name="wp921827"> </a>
+<a name="wp923060"> </a>
+	public boolean isLocalTransfer();<a name="wp923061"> </a>
+<a name="wp924347"> </a>
+     public DataFlavor[] getCurrentDataFlavors();<a name="wp924348"> </a>
+     public List         getCurrentDataFlavorsAsList();<a name="wp924349"> </a>
+<a name="wp924351"> </a>
+     public boolean isDataFlavorSupported(DataFlavor df);<a name="wp924350"> </a>
+<a name="wp921828"> </a>
+	public Transferable getTransferable();<a name="wp919662"> </a>
+ <a name="wp924222"> </a>
+     public void dropComplete(boolean success);<a name="wp924223"> </a>
+}<a name="wp919663"> </a>
+</pre></div>
+<a name="wp919803"> </a><p class="pBody">
+A <em class="cEmphasis">DropTargetDropEvent</em> is passed to the <em class="cEmphasis">DropTargetListener&#8217;s drop()</em> method, as the Drop occurs. The <em class="cEmphasis">DropTargetDropEvent</em> provides the <em class="cEmphasis">DropTargetListener</em> with access to the Data associated with the operation, via the <em class="cEmphasis">Transferable </em>returned from the <em class="cEmphasis">getTransferable</em>() method.
+</p>
+<a name="wp920553"> </a><p class="pBody">
+The return value of the <em class="cEmphasis">getSourceActions() </em>method is defined to be the action(s) defined by the source at the time at which the Drop occurred.
+</p>
+<a name="wp924226"> </a><p class="pBody">
+The return value of the <em class="cEmphasis">getDropAction() </em>method is defined to be the intersection of both the Drop action selected by the users gesture, and the set of actions supported by the source, at the time of the Drop. The resulting action is normally the intersection of this value and the set of actions supported by the target at the time of the drop.
+</p>
+<a name="wp924463"> </a><p class="pBody">
+The return value of the <em class="cEmphasis">getLocation()</em> method is defined to be the location at which the Drop occurred.
+</p>
+<a name="wp924487"> </a><p class="pBody">
+The <em class="cEmphasis">getCurrentDataFlavors()</em>, <em class="cEmphasis">getCurrentDataFlavorsAsList()</em>, and <em class="cEmphasis">isDataFlavorSupported()</em>, methods are provided in order for the recipient to interrogate the list of types available from the source for subsequent transfer via the <em class="cEmphasis">getTransferData()</em> method of the <em class="cEmphasis">Transferable</em>.
+</p>
+<a name="wp921841"> </a><p class="pBody">
+A typical implementation of the <em class="cEmphasis">drop()</em> method will inspect the actions and the <em class="cEmphasis">DataFlavor</em>s&#8217; available to determine if a successful exchange can occur or not.
+</p>
+<a name="wp924464"> </a><p class="pBody">
+When an exchange may occur, a <em class="cEmphasis">DropTargetListener.drop</em>() implementation shall invoke <em class="cEmphasis">acceptDrop</em>() with the selected operation as an actual parameter, prior to any invocation of <em class="cEmphasis">getTransferable</em>(). Calling <em class="cEmphasis">getTransferable()</em> prior to <em class="cEmphasis">acceptDrop()</em> shall result in an <em class="cEmphasis">InvalidDnDOperationException</em>.
+</p>
+<a name="wp921844"> </a><p class="pBody">
+The <em class="cEmphasis">rejectDrop</em>() shall be called to reject the Drop operation. Once called no further interaction can occur between the two participants, therefore it is typical to return from the <em class="cEmphasis">drop() </em>method immediately after calling this.
+</p>
+<a name="wp924475"> </a><p class="pBody">
+The <em class="cEmphasis">isLocalTransfer()</em> method shall return true, if the source of the Drag and Drop operation resides within the same physical JVM as the recipient of the <em class="cEmphasis">drop()</em> notification, and false otherwise.
+</p>
+<a name="wp924476"> </a><p class="pBody">
+This distinction is significant to the recipient when it receives object references back from invoking <em class="cEmphasis">Transferable.getTransferData()</em> in the local case, since in this case the object reference it receives is the same object reference held by the source (i.e it is not a copy, proxy or distinct object) thus the recipient must treat such a shared object reference differently in the local case as follows:
+</p>
+<ul class="pBullet1"><a name="wp924481"> </a><div class="pBullet1"><li>If the action is ACTION_COPY then the recipient shall, depending upon the nature of the object(s) and data transferred, either take a copy of; the object itself, the data encapsulated within, or both. </li></div>
+<a name="wp924482"> </a><div class="pBullet1Plus"><li>If the action is ACTION_MOVE, then the recipient shall not modify the state of the object or the data encapsulated within until after it has signalled to the source, via an invocation of <em class="cEmphasis">dropCompete()</em> that the transfer is effected. (Note that a source is also prohibited from modifying the state of such an object after it has returned such an object from it&#8217;s <em class="cEmphasis">getTransferData()</em> method, until such time as it receives a <em class="cEmphasis">dragDropEnd() </em>notification.)</li></div>
+<a name="wp924486"> </a><div class="pBullet1Last"><li>If the action is ACTION_LINK, neither the recipient nor the source shall alter the state of either the object exchanged or any data contained therein until after the d<em class="cEmphasis">ropComplete()</em> and <em class="cEmphasis">dragDropEnd()</em> methods have been processed. Thereafter the sharing semantics are implementation dependent upon the object(s) shared.</li></div>
+</ul>
+<a name="wp924488"> </a><p class="pBody">
+The <em class="cEmphasis">dropComplete()</em> method signals the end of the associated Drag and Drop operation, and indicates the success (or failure) of the transfers performed by the recipient. Invoking this method results in the <em class="cEmphasis">DragSourceListener</em>&#8217;s <em class="cEmphasis">dragDropEnd()</em> method being called with the appropriate state available from it&#8217;s <em class="cEmphasis">DragSourceDropEvent</em>. Failure to invoke this method will result in the Drag and Drop operation failing to terminate properly.
+</p>
+<a name="wp922449"> </a><h4 class="pHeading3">
+2.4.6  Autoscrolling support
+</h4>
+<a name="wp922451"> </a><p class="pBody">
+Many GUI <em class="cEmphasis">Component</em>s present a scrollable &#8220;viewport&#8221; over a (potentially) large dataset. During a Drag and Drop operation it is desirable to be able to &#8220;autoscroll&#8221; such &#8220;viewports&#8221; to allow a user to navigate over such a dataset, scrolling to locate a particular member (initially not visible through the &#8220;viewport&#8221;) that they wish to drop the subject of the operation upon.
+</p>
+<a name="wp922489"> </a><p class="pBody">
+<em class="cEmphasis">Components</em> that are scrollable provide Drag &#8220;autoscrolling&#8221; support to their <em class="cEmphasis">DropTarget</em> by implementing the following interface:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public interface Autoscroll {<a name="wp922482"> </a>
+	Insets getAutoscrollInsets();<a name="wp922455"> </a>
+<a name="wp922511"> </a>
+	void autoScrollContent(Point cursorLocn);<a name="wp922457"> </a>
+}<a name="wp922452"> </a>
+</pre></div>
+<a name="wp922517"> </a><p class="pBody">
+An implementing <em class="cEmphasis">DropTarget</em> shall periodically call the <em class="cEmphasis">autoscroll</em>() method of its associated <em class="cEmphasis">Component</em> (if present), passing the current logical cursor location in <em class="cEmphasis">Component</em> co-ordinates, when the following conditions are met:
+</p>
+<ul class="pBullet1"><a name="wp922498"> </a><div class="pBullet1"><li>If the logical cursor&#8217;s hotspot intersects with the associated <em class="cEmphasis">Component&#8217;</em>s visible geometry and the boundary region described by the <em class="cEmphasis">Insets</em> returned by the <em class="cEmphasis">getAutoscrollInsets</em>() method.</li></div>
+<a name="wp922537"> </a><div class="pBullet1Plus"><li>If the logical cursor&#8217;s hotspot has not moved (subject to the next condition below) for an implementation defined period (millisecs)</li></div>
+<a name="wp924210"> </a><div class="pBullet1Last"><li>If any cursor movement subsequent to the initial triggering occurrence does not exceed a platform dependent hysteresis value (pixels).</li></div>
+</ul>
+<a name="wp924213"> </a><p class="pBody">
+Should any of the above conditions cease to be valid, autoscrolling shall terminate until the next triggering condition occurs.
+</p>
+<a name="wp924458"> </a><p class="pBody">
+Both the initial delay prior to autoscrolling commencing, the interval between autoscrolling notifications, and the pixel hysteresis value are externally configurable and can be queried from the <em class="cEmphasis">Toolkit.getDesktopProperty()</em> method.
+</p>
+<a name="wp919804"> </a><h3 class="pHeading2">
+2.5  Data Transfer Phase
+</h3>
+<a name="wp920244"> </a><p class="pBody">
+In the case where a valid drop occurs, the <em class="cEmphasis">DropTargetListener&#8217;s drop()</em> method is responsible for undertaking the transfer of the data associated with the gesture. The <em class="cEmphasis">DropTargetDropEvent</em> provides a means to obtain a <em class="cEmphasis">Transferable</em> object that represent that data object(s) to be transferred. 
+</p>
+<a name="wp923041"> </a><p class="pBody">
+From the <em class="cEmphasis">drop</em>() method, the <em class="cEmphasis">DropTargetListener</em> shall initially either <em class="cEmphasis">rejectDrop</em>() (immediately returning thereafter) or <em class="cEmphasis">acceptDrop</em>() specifying the selected operation from those returned by <em class="cEmphasis">getSourceActions</em>().
+</p>
+<a name="wp923042"> </a><p class="pBody">
+Subsequent to an <em class="cEmphasis">acceptDrop</em>(), but not before, <em class="cEmphasis">getTransferable</em>() may be invoked, and any data transfers performed via the returned <em class="cEmphasis">Transferable</em>&#8217;s <em class="cEmphasis">getTransferData</em>() method. Finally, once the destination of the drop has completed the transfer(s) of the objects from the source it shall signal the success, or immediate failure, of the transfer(s) via an invocation of <em class="cEmphasis">DropTargetContext.ropComplete</em>().
+</p>
+<a name="wp920249"> </a><p class="pBody">
+Upon returning from the <em class="cEmphasis">DropTargetContext.dropComplete</em>() method the <em class="cEmphasis">Transferable</em> and <em class="cEmphasis">DragSourceContext</em> instances are no longer guaranteed to be valid and all references to them shall be discarded by the recipient to allow them to be subsequently garbage collected.
+</p>
+<a name="wp923051"> </a><p class="pBody">
+When using the ACTION_REFERENCE operation the source and destination should take care to agree upon the object and the associated semantics of the transfer. Typically in intra-JVM transfers a live object reference would be passed between source and destination, but in the case of inter-JVM transfers, or transfers between native and Java applications, live object references do not make sense, so some other &#8216;reference&#8217; type should be exchanged such as a URI for example. Both the <em class="cEmphasis">DragSource</em> and <em class="cEmphasis">DropTarget</em> can detect if the transfer is intra-JVM or not.
+</p>
+<a name="wp923066"> </a><h4 class="pHeading3">
+2.5.1  FlavorMap and SystemFlavorMap
+</h4>
+<a name="wp922863"> </a><p class="pBody">
+All the target DnD platforms represent their transfer data types using a similar mechanism, however the representations do differ. The Java platform uses MIME types encapsulated within a <em class="cEmphasis">DataFlavor</em> to represent its data types. Unfortunately in order to permit the transfer of data between Java and platform native applications the existence of these platform names need to be exposed, thus a mechanism is required in order to create an extensible (platform independent) mapping between these platform dependent type names, their representations, and the Java MIME based <em class="cEmphasis">DataFlavors</em>.
+</p>
+<a name="wp922864"> </a><p class="pBody">
+The implementation will provide a mechanism to externally specify a mapping between platform native data types (strings) and MIME types (strings) used to construct <em class="cEmphasis">DataFlavors</em>. This external mapping will be used by the underlying platform specific implementation code in order to expose the appropriate <em class="cEmphasis">DataFlavors</em> (MIME types), exported by the source, to the destination, via the underlying platform DnD mechanisms.
+</p>
+<a name="wp922867"> </a><p class="pBody">
+Both the <em class="cEmphasis">DragSource</em> and <em class="cEmphasis">DropTarget</em> classes provide access for the underlying system to map platform dependent names to and from <em class="cEmphasis">DataFlavors</em>.
+</p>
+<a name="wp922951"> </a><p class="pBody">
+
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public interface java.awt.datatransfer.FlavorMap {<a name="wp922411"> </a>
+	java.util.Map getNativesForFlavors(DataFlavor[] dfs);<a name="wp922417"> </a>
+	java.util.Map getFlavorsForNatives(String[] natives);<a name="wp922418"> </a>
+}<a name="wp922419"> </a>
+<a name="wp922952"> </a>
+</pre></div>
+<a name="wp922953"> </a><p class="pBody">
+The <em class="cEmphasis">getNativesForFlavors</em>() method takes an array of <em class="cEmphasis">DataFlavor</em>s and returns a <em class="cEmphasis">Map</em> object containing zero or more keys of type <em class="cEmphasis">DataFlavor</em>, from the actual parameter <em class="cEmphasis">dfs</em>, with associated values of type <em class="cEmphasis">String</em>, which correspond to the platform dependent type name for that MIME type.
+</p>
+<a name="wp922957"> </a><p class="pBody">
+The <em class="cEmphasis">getFlavorsForNatives</em>() method takes an array of <em class="cEmphasis">String</em> types and returns a <em class="cEmphasis">Map</em> object containing zero or more keys of type <em class="cEmphasis">String</em>, from the actual parameter natives, with associated values of type <em class="cEmphasis">DataFlavor</em>, which correspond to the platform independent type for that platform dependent type name.
+</p>
+<a name="wp922958"> </a><p class="pBody">
+The <em class="cEmphasis">Map</em> object returned by both methods may be mutable but is not required to be.
+</p>
+<a name="wp924197"> </a><p class="pBody">
+If NULL is passed to either of these methods they should return their current map of all keys and values known to the implementation at the time of the call.
+</p>
+<a name="wp922956"> </a><p class="pBody">
+For example on Win32 the Clipboard Format Name for simple text is &#8220;CF_TEXT&#8221; (actually it is the integer 1) and on Motif it is the X11 Atom named &#8220;STRING&#8221;, the MIME type one may use to represent this would be &#8220;text/plain charset=us-ascii&#8221;. Therefore a platform portable <em class="cEmphasis">FlavorMap</em> would map between these names; CF_TEXT on win32 and STRING on Motif/X11.
+</p>
+<a name="wp922940"> </a><p class="pBody">
+Typically, as implemented in the <em class="cEmphasis">SystemFlavorMap</em> these mappings are held in an external persistent configuration format (a properties file or URL) and are loaded from the platform to configure the <em class="cEmphasis">FlavorMap</em> appropriately for a given platform.
+</p>
+<a name="wp922947"> </a><p class="pBody">
+The <em class="cEmphasis">SystemFlavorMap</em> class is provided to implement a simple, platform configurable mechanism for specifying a system-wide set of common mappings, and is defined as follows:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public class      java.awt.datatransfer.SystemFlavorMap <a name="wp922948"> </a>
+       implements FlavorMap {<a name="wp924453"> </a>
+	public static FlavorMap getSystemFlavorMap();<a name="wp922986"> </a>
+<a name="wp922987"> </a>
+	public synchronized Map <a name="wp922988"> </a>
+		getNativesForFlavors(DataFlavor[] dfs);<a name="wp922989"> </a>
+<a name="wp922990"> </a>
+	public synchronized Map<a name="wp922991"> </a>
+		getFlavorsForNatives(String[] natives);<a name="wp922992"> </a>
+<a name="wp922993"> </a>
+	public static String<a name="wp923001"> </a>
+		encodeJavaMIMEType(DataFlavor df);<a name="wp923002"> </a>
+<a name="wp923004"> </a>
+	public static String<a name="wp923005"> </a>
+		encodeJavaMimeType(java.util.mime.MimeType mime);<a name="wp923008"> </a>
+<a name="wp923009"> </a>
+	public static boolean<a name="wp923010"> </a>
+		isEncodedJavaMimeType(String mimeStr);<a name="wp923011"> </a>
+<a name="wp923012"> </a>
+	public static DataFlavor<a name="wp923013"> </a>
+		createFlavorFromEncodedJavaMimeType(String ejmts);<a name="wp923018"> </a>
+<a name="wp923020"> </a>
+	public static java.util.mime.MimeType<a name="wp923021"> </a>
+		createMimeTypeFromEncodedJavaMimeType(<a name="wp923022"> </a>
+							String ejmts<a name="wp923027"> </a>
+		);<a name="wp923028"> </a>
+}<a name="wp922985"> </a>
+</pre></div>
+<a name="wp923029"> </a><p class="pBody">
+The <em class="cEmphasis">SystemFlavorMap</em> class provides a simple implementation, using a properties file (see <em class="cEmphasis">java.awt.Properties</em>), of a persistent platform <em class="cEmphasis">FlavorMap</em>. Using the value of the AWT property &#8220;AWT.flavorMapFileURL&#8221; (see <em class="cEmphasis">Toolkit.getProperty</em>()) or the default file location of <em class="cEmphasis">System.getProperty(&#8220;</em>java.home<em style="font-style: italic" class="cEmphasis">&#8221;) + File.separator + &#8220;lib&#8221; + File.separator + &#8220;</em>flavormap.properties<em style="font-style: italic" class="cEmphasis">&#8221;, </em>this class creates the appropriate <em class="cEmphasis">Map</em>s from the properties found therein.
+</p>
+<a name="wp923034"> </a><p class="pBody">
+In addition the class provides several static convenience functions used to encode and decode Java <em class="cEmphasis">MimeType</em>s to and from a platform dependent namespace. The syntax of the properties file is:
+</p>
+<a name="wp923040"> </a><p class="pBody">
+{ &lt;platform_type_name&gt; &#8216;=&#8217; &lt;IETF_MIME_RFC_conformant_specification&gt; &lt;nl&gt; } *
+</p>
+<a name="wp923039"> </a><p class="pBody">
+The default implementations of <em class="cEmphasis">DragSource</em> and <em class="cEmphasis">DropTarget</em> return the <em class="cEmphasis">SystemFlavorMap</em> from their <em class="cEmphasis">getFlavorMap</em>() method, unless they have been provided with an overriding implementation.
+</p>
+<a name="wp924198"> </a><h4 class="pHeading3">
+2.5.2  Transferring Data across the JVM boundary
+</h4>
+<a name="wp924352"> </a><p class="pBody">
+Since one of the primary goals of this API is to allow Drag and Drop of data between Java and native applications this has some significant consequences upon the method and mechanism of the actual data encoding and exchange when data is passed across the boundary of the Java Virtual Machine.
+</p>
+<a name="wp924357"> </a><p class="pBody">
+Since one of the participants in such an exchange may be a native application, and thus has no knowledge of the Java type system, the Drag and Drop system cannot just exchange a Java object reference since the other participant may have no knowledge of, or capability to manipulate such a type.
+</p>
+<a name="wp924363"> </a><p class="pBody">
+When any exchange occurs, it can only do so, regardless of the implementation of the participants, if and only if both participants are agreed upon a familiar data type and encoding. Thus, sadly the burden of the exchange is born mostly by the participants themselves.
+</p>
+<a name="wp924367"> </a><p class="pBody">
+What this means in practical terms is that for &#8220;native&#8221; data formats, such as platform dependent image, document, or other &#8220;Content-Types&#8221; the encoding and decoding of their associated external data format is the responsibility of the source and destination of the transfer.
+</p>
+<a name="wp924368"> </a><p class="pBody">
+The Drag and Drop system shall expose the external representation of such &#8220;native&#8221; data types across the boundary of the Java Virtual Machine as encapsulated within a <em class="cEmphasis">java.io.InputStream </em>or a subclass thereof.
+</p>
+<a name="wp924369"> </a><p class="pBody">
+This means that any <em class="cEmphasis">DataFlavor</em> with a representation class that extends <em class="cEmphasis">java.io.InputStream</em> can be transferred, and will be exposed for transfer, across the Java Virtual Machine boundary.
+</p>
+<a name="wp924371"> </a><p class="pBody">
+To implement the exchange of such a native data type, a developer would define a <em class="cEmphasis">DataFlavor</em> with a MIME &#8220;Content-Type&#8221; that describes the nature of the &#8220;native&#8221; data type, with a representation class that extends a <em class="cEmphasis">java.io.InputStream</em> class that encodes the data encapsulated into a stream of bytes.
+</p>
+<a name="wp924409"> </a><p class="pBody">
+In particular such <em class="cEmphasis">InputStream</em> subclasses shall implement the following semantics:
+</p>
+<ul class="pBullet1"><a name="wp924410"> </a><div class="pBullet1"><li>Provide a public constructor with a single argument of type <em class="cEmphasis">java.io.InputStream.</em></li></div>
+<a name="wp924411"> </a><p class="pIndented1">
+
+</p>
+<a name="wp924412"> </a><p class="pIndented1">
+Provision of this constructor by a subclass of <em class="cEmphasis">java.io.InputStream</em> will allow the Drag and Drop system (associated with the <em class="cEmphasis">DropTarget</em>) to automatically re-construct an instance of the representation class specified by the requested <em class="cEmphasis">DataFlavor</em>, and initialize it with an <em class="cEmphasis">InputStream</em> containing the encapsulated data formatted according to the expectations of that subclass. Once initialized this instance is returned to the caller of the Transferable.getTransferData() method, thus allowing the caller to subsequently re-read and interpret the formatted content of the data stream transferred.
+</p>
+<a name="wp924429"> </a><p class="pIndented1">
+
+</p>
+<a name="wp924413"> </a><div class="pBullet1Last"><li>Provide an implementation of <em class="cEmphasis">InputStream.read(byte b[], int off, int len)</em>.</li></div>
+</ul>
+<a name="wp924416"> </a><p class="pIndented1">
+
+</p>
+<a name="wp924421"> </a><p class="pIndented1">
+Provision of this method (or inheriting a superclasses implementation) enables the Drag and Drop system (associated with the <em class="cEmphasis">DragSource</em>) to automatically extract an encoded stream of the encapsulated data from the <em class="cEmphasis">Transferable</em>, thus enabling the transfer of the data across the JVM boundary as a simple byte stream to the requestor of the particular <em class="cEmphasis">DataFlavor</em>.
+</p>
+<a name="wp924199"> </a><h4 class="pHeading3">
+2.5.3  Transferring lists of files across the JVM boundary.
+</h4>
+<a name="wp924343"> </a><p class="pBody">
+A typical subject of a Drag and Drop transfer is a list of one or more platform dependent filenames. In order to ease the programming task of developers either producing or consuming such lists the Drag and Drop system treats them as a special case.
+</p>
+<a name="wp924344"> </a><p class="pBody">
+If a <em class="cEmphasis">DataFlavor</em> is specified with a MIME &#8220;Content-Type&#8221; of application/x-java-file-list;class=java.util.List the Drag and Drop system will expect the list elements to be a homogeneous list of objects of type <em class="cEmphasis">java.io.File</em>. Thus a source shall, if supporting the transfer of a list of files, construct such a <em class="cEmphasis">List</em> of <em class="cEmphasis">File</em> objects when such a <em class="cEmphasis">DataFlavor</em> is requested, and a recipient shall expect such a <em class="cEmphasis">List</em> of <em class="cEmphasis">File</em> objects if it requests such a valid <em class="cEmphasis">DataFlavor</em> from it&#8217;s source. This special case provides a simple mechanism for the transfer of lists of files between source and target.
+</p>
+<a name="wp924336"> </a><h4 class="pHeading3">
+2.5.4  Transferring java.rmi.Remote references across the JVM boundary.
+</h4>
+<a name="wp924436"> </a><p class="pBody">
+It is possible to Drag and Drop object references between JVMs&#8217; by using the facilities of the RMI mechanism. The Drag and Drop system will automatically arrange for the transfer of any object reference that adheres to these requirements:
+</p>
+<ul class="pBullet1"><a name="wp924439"> </a><div class="pBullet1"><li>The representation class of interface associated with the requested <em class="cEmphasis">DataFlavor</em> implements both <em class="cEmphasis">java.rmi.Remote</em> and <em class="cEmphasis">java.io.Serializable</em>. </li></div>
+<a name="wp924445"> </a><p class="pIndented1">
+(the MIME &#8220;Content-Type&#8221; can be any suitable, arbitrary type or application/x-java-remote-object)
+</p>
+<a name="wp924444"> </a><p class="pIndented1">
+
+</p>
+<a name="wp924446"> </a><p class="pIndented1">
+(effectively the object implementation class transferred should be extended from <em class="cEmphasis">java.rmi.server.UnicastRemoteObject </em>since the RMI system implements some required initialization, without which the transfer will not complete properly).
+</p>
+<a name="wp924447"> </a><p class="pIndented1">
+
+</p>
+<a name="wp924443"> </a><div class="pBullet1Last"><li>The drop action is ACTION_LINK.</li></div>
+</ul>
+<a name="wp924448"> </a><p class="pBody">
+If these conditions are met, then if an appropriate <em class="cEmphasis">DataFlavor</em> is requested, then the object returned to the requestor (if it is in a difference JVM from the source) will be an RMI reference to an instance of the <em class="cEmphasis">Remote</em> object subinterface specified as the representation class of the <em class="cEmphasis">DataFlavor</em>.
+</p>
+<a name="wp921691"> </a><h2 class="pHeading1">
+3.0  Issues
+</h2>
+<a name="wp919822"> </a><h4 class="pHeading3">
+3.0.1  What are the implications of the various platform protocol engines?
+</h4>
+<a name="wp920390"> </a><p class="pBody">
+Due to limitations of particular underlying platform Drag and Drop and Window System implementations, the interaction of a Drag operation, and the event delivery semantics to AWT <em class="cEmphasis">Components</em> is platform dependent. Therefore during a drag operation a <em class="cEmphasis">DragSource</em> may process platform Window System Events pertaining to that drag to the exclusion of normal event processing.
+</p>
+<a name="wp922369"> </a><p class="pBody">
+Due to interactions between the single-threaded design center of the platform native DnD systems, and the native window system event dispatching implementations in AWT,  &#8220;callbacks&#8221; into <em class="cEmphasis">DropTargetListener</em> and <em class="cEmphasis">DragSourceListener</em> will occur either on, or synchronized with the AWT system event dispatch thread. This behavior is highly undesirable for security reasons but is an implementation, not architectural feature, and is unavoidable.
+</p>
+<a name="wp919656"> </a><h4 class="pHeading3">
+3.0.2  Inter/Intra VM transfers?
+</h4>
+<a name="wp920296"> </a><p class="pBody">
+To enable intra-JVM Drag and Drop Transfers the existing <em class="cEmphasis">DataFlavor</em> class will be extended to enable it to represent the type of a &#8220;live&#8221; object reference, as opposed to a Serialized (persistent) representation of one. Such objects may be transferred between source and destination within the same JVM and <em class="cEmphasis">ClassLoader</em> context.
+</p>
+<a name="wp924196"> </a><p class="pBody">
+The MIME Content-Type shall be application/x-java-local-objectref. 
+</p>
+<a name="wp919768"> </a><h4 class="pHeading3">
+3.0.3  Lifetime of the Transferable(s)?
+</h4>
+<a name="wp920297"> </a><p class="pBody">
+<em class="cEmphasis">Transferable</em> objects, their associated <em class="cEmphasis">DataFlavor</em>s&#8217;, and the objects that encapsulate the underlying data specified as the operand(s) of a drag and drop operation shall remain valid until, at least, the <em class="cEmphasis">DragSourceListener,</em> associated with the <em class="cEmphasis">DragSource</em> controlling the operation, receives a <em class="cEmphasis">dragDropEnd</em>(). The lifetime of the subject(s) of the operation, transferred between source and target is implementation defined beyond that point in time.
+</p>
+<a name="wp920248"> </a><h4 class="pHeading3">
+3.0.4  Implications of ACTION_MOVE semantics on source objects exposed via Transferable?
+</h4>
+<a name="wp920299"> </a><p class="pBody">
+The &#8220;source&#8221; of a successful Drag and Drop (ACTION_MOVE) operation is required to delete/relinquish all references to the object(s) that are the subject of the <em class="cEmphasis">Transferable</em> immediately after transfer has been successfully completed. That is before returning from the <em class="cEmphasis">DragSourceListener.dragDropEnd()</em> notification.
+</p>
+<a name="wp921474"> </a><h4 class="pHeading3">
+3.0.5  Semantics of ACTION_REFERENCE operation.
+</h4>
+<a name="wp921475"> </a><p class="pBody">
+As a result of significant input from developers to an earlier version of the specification an additional operation/action tag; ACTION_REFERENCE was added to include existing platform Drag and Drop&#8221;Link&#8221; semantics.
+</p>
+<a name="wp921480"> </a><p class="pBody">
+It is believed that Reference, or Link, semantics are already sufficiently poorly specified for the platform native Drag and Drop to render it essentially useless even between native applications, thus between native and platform independent Java applications it is not recommended.
+</p>
+<a name="wp921481"> </a><p class="pBody">
+For Java to Java usage the required semantic; within the same JVM/<em class="cEmphasis">ClassLoader</em>, is defined such that the destination shall obtain a Java object reference to the subject(s) of the transfer. Between Java JVM&#8217;s or <em class="cEmphasis">ClassLoader</em>s, the semantic is implementation defined, but could be implemented through transferring either a URL from the source to the destination or an RMI <em class="cEmphasis">Remote</em> reference.
+</p>
+<a name="wp922646"> </a><p class="pBody">
+
+</p>
+<a name="wp922647"> </a><h2 class="pHeading1">
+Appendix A : DropTargetPeer definition
+</h2>
+<a name="wp922657"> </a><p class="pBody">
+Although not a normative part of this specification this definition is included for clarity:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public interface DropTargetPeer {<a name="wp922729"> </a>
+<a name="wp922665"> </a>
+    void addDropTarget(DropTarget dt);<a name="wp922666"> </a>
+ <a name="wp922667"> </a>
+     void removeDropTarget(DropTarget dt);<a name="wp922674"> </a>
+}<a name="wp922675"> </a>
+</pre></div>
+<a name="wp922676"> </a><h2 class="pHeading1">
+Appendix B : DragSourceContextPeer definition
+</h2>
+<a name="wp922681"> </a><p class="pBody">
+Although not a normative part of this specification this definition is included for clarity:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public interface DragSourceContextPeer {<a name="wp922751"> </a>
+ <a name="wp922683"> </a>
+    void startDrag(DragSourceContext dsc,<a name="wp922688"> </a>
+                   Cursor            c, <a name="wp922744"> </a>
+                   Image             di,<a name="wp922745"> </a>
+                   Point             ioff<a name="wp924172"> </a>
+    ) throws InvalidDnDOperationException;<a name="wp922689"> </a>
+ <a name="wp922690"> </a>
+    Cursor getCursor();<a name="wp922707"> </a>
+<a name="wp926664"> </a>
+    void   setCursor(Cursor c)<a name="wp926665"> </a>
+		     throws InvalidDnDOperationException;<a name="wp924175"> </a>
+<a name="wp924403"> </a>
+    void transferablesFlavorsChanged();<a name="wp924404"> </a>
+}<a name="wp924179"> </a>
+</pre></div>
+<a name="wp922753"> </a><h2 class="pHeading1">
+Appendix C : DropTargetContextPeer definition
+</h2>
+<a name="wp922754"> </a><p class="pBody">
+Although not a normative part of this specification this definition is included for clarity:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+public interface DropTargetContextPeer {<a name="wp922756"> </a>
+<a name="wp924163"> </a>
+    int  getTargetActions();<a name="wp924164"> </a>
+    void setTargetActions(int actions);<a name="wp924165"> </a>
+ <a name="wp922770"> </a>
+    DropTarget getDropTarget();<a name="wp922775"> </a>
+ <a name="wp922776"> </a>
+    DataFlavor[] getTransferDataFlavors();<a name="wp922781"> </a>
+ <a name="wp922782"> </a>
+    Transferable getTransferable()<a name="wp922787"> </a>
+	            throws InvalidDnDOperationException;<a name="wp922852"> </a>
+ <a name="wp922788"> </a>
+    boolean isTransferableJVMLocal();<a name="wp922793"> </a>
+ <a name="wp922794"> </a>
+    void acceptDrag(int dragAction);<a name="wp922799"> </a>
+    void rejectDrag();<a name="wp922805"> </a>
+ <a name="wp922806"> </a>
+    void acceptDrop(int dropAction);<a name="wp922811"> </a>
+    void rejectDrop();<a name="wp922817"> </a>
+ <a name="wp922818"> </a>
+    void dropComplete(boolean success);<a name="wp922828"> </a>
+}<a name="wp922829"> </a>
+</pre></div>
+
+  <a name="wp922238"> </a><div class="pFootNote">
+<a href="#wp922232"><span class="Footnote">1</span></a>It would be nice to design an API that would allow the DragSource to be notified of the DropTarget&#8217;s 
+selected operation before the DropTarget invokes the source Transferable&#8217;s getTransferData() method, 
+sadly however, OLE&#8217;s bass-ackwards DnD protocol forces the above design on us where the operation is 
+reported after it has occurred, this makes life for the source implementor harder when supporting certain 
+&#8220;Link&#8221; semantics.
+
+</div>
+<a name="wp922240"> </a><div class="pFootNote">
+<a href="#wp922232"><span class="Footnote">1</span></a>
+
+</div>
+<a name="wp919857"> </a><div class="pFootNote">
+<a href="#wp919878"><span class="Footnote">2</span></a>This could be a subclass of AWTEvent but there seems little motivation to make it so.
+
+</div>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="dnd1TOC.html">Contents</a> | 
+	<a accesskey="p" href="dnd1TOC.html">Previous</a> | 
+       </td>
+        <td align="right">
+          <span class="copyright">Drag and Drop subsystem for the Java Foundation Classes <br /> , </span>
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

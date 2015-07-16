@@ -1,0 +1,633 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 7.0.2.1128" />
+    <meta name="TEMPLATEBASE" content="book-no-index" />
+    <meta name="LASTUPDATED" content="Mon Jan 27 15:23:53 2003" />
+    <title>Object Serialization Stream Protocol</title>
+	<link rel="StyleSheet" href="document.css" type="text/css" />
+	<link rel="StyleSheet" href="catalog.css" type="text/css" />
+    <link rel="Table of Contents" href="serialTOC.html" />
+    <link rel="Previous" href="version.html" />
+    <link rel="Next" href="security.html" />
+    <link rel="Index" href="examples.html" />
+  </head>
+
+  <body>
+<a href="#skip" title="Skip navigation bar"></a>
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="version.html">Previous</a> | 
+        <a accesskey="n" href="security.html">Next</a>
+       </td>
+	   <td align="right"><i>Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification</i></td>
+      </tr>
+    </table>
+<hr size="8" width="35%" align="left" noshade>
+<a name="skip"></a>
+<a name="wp8101"> </a><h2 class="pNewHTMLPage">
+Object Serialization Stream Protocol
+</h2>
+<hr class="pHr"/>
+<a name="wp8116"> </a><h2 class="pChapNum">
+Chapter &#160; 6
+</h2>
+<a name="wp8121"> </a><h4 class="pHeading3">
+		Topics:
+</h4>
+<ul class="pBullet1"><a name="wp8120"> </a><div class="pBullet1"><li><a  href="protocol.html#wp8130">Overview</a></li></div>
+<a name="wp8136"> </a><div class="pBullet1Plus"><li><a  href="protocol.html#wp8299">Stream Elements</a></li></div>
+<a name="wp10246"> </a><div class="pBullet1Plus"><li><a  href="protocol.html#wp5849">Stream Protocol Versions</a></li></div>
+<a name="wp8283"> </a><div class="pBullet1Plus"><li><a  href="protocol.html#wp10258">Grammar for the Stream Format</a></li></div>
+<a name="wp8526"> </a><div class="pBullet1Last"><li><a  href="protocol.html#wp10128">Example</a></li></div>
+</ul>
+<a name="wp8130"> </a><h2 class="pHeading1">
+	6.1	Overview
+</h2>
+<a name="wp286"> </a><p class="pBody">
+The stream format satisfies the following design goals:
+</p>
+<ul class="pBullet1"><a name="wp3872"> </a><div class="pBullet1"><li>Is compact and is structured for efficient reading.</li></div>
+<a name="wp8296"> </a><div class="pBullet1Plus"><li>Allows skipping through the stream using only the knowledge of the structure and format of the stream. Does not require invoking any per class code.</li></div>
+<a name="wp8297"> </a><div class="pBullet1Last"><li>Requires only stream access to the data.</li></div>
+</ul>
+<a name="wp8299"> </a><h2 class="pHeading1">
+	6.2	Stream Elements
+</h2>
+<a name="wp9605"> </a><p class="pBody">
+A basic structure is needed to represent objects in a stream. Each attribute of the object needs to be represented: its classes, its fields, and data written and later read by class-specific methods. The representation of objects in the stream can be described with a grammar. There are special representations for null objects, new objects, classes, arrays, strings, and back references to any object already in the stream. Each object written to the stream is assigned a handle that is used to refer back to the object. Handles are assigned sequentially starting from 0x7E0000. The handles restart at 0x7E0000 when the stream is reset.
+</p>
+<a name="wp4499"> </a><p class="pBody">
+A class object is represented by the following:
+</p>
+<ul>
+<a name="wp8441"> </a><div class="pBullet1Plus"><li>Its <code class="cCode">ObjectStreamClass</code> object.</li></div>
+</ul>
+<a name="wp8442"> </a><p class="pBody">
+An <code class="cCode">ObjectStreamClass</code> object for a Class that is not a dynamic proxy class is represented by the following:
+</p>
+<ul class="pBullet1"><a name="wp7811"> </a><div class="pBullet1"><li>The Stream Unique Identifier (SUID) of compatible classes.</li></div>
+<a name="wp7812"> </a><div class="pBullet1Plus"><li>A flag indicating if the class defined a <code class="cCode">w</code><code class="cCode">riteObject</code> method</li></div>
+<a name="wp8445"> </a><div class="pBullet1Plus"><li>The number of serializable fields</li></div>
+<a name="wp9726"> </a><div class="pBullet1Plus"><li>The array of fields of the class that are serialized by the default mechanism<br />For arrays and object fields, the type of the field is included as a string which must be in &#8220;field descriptor&#8221; format (e.g., &#8220;<code class="cCode">Ljava/lang/Object;</code>&#8221;) as specified in section 4.3.2 of The Java&#8482; Virtual Machine Specification, Second Edition.</li></div>
+<a name="wp9733"> </a><div class="pBullet1Plus"><li>Optional block-data records or objects written by the <code class="cCode">annotateClass</code> method</li></div>
+<a name="wp9734"> </a><div class="pBullet1Last"><li>The <code class="cCode">ObjectStreamClass</code> of its supertype (null if the superclass is not serializable)</li></div>
+</ul>
+<a name="wp53671"> </a><p class="pBody">
+An <code class="cCode">ObjectStreamClass</code> object for a dynamic proxy class is represented by the following:
+</p>
+<ul class="pBullet1"><a name="wp53672"> </a><div class="pBullet1"><li>The number of interfaces that the dynamic proxy class implements</li></div>
+<a name="wp53673"> </a><div class="pBullet1Plus"><li>The names of all of the interfaces implemented by the dynamic proxy class, listed in the order that they are returned by invoking the <code class="cCode">getInterfaces</code> method on the Class object.</li></div>
+<a name="wp53674"> </a><div class="pBullet1Plus"><li>Optional block-data records or objects written by the <code class="cCode">annotateProxyClass</code> method.</li></div>
+<a name="wp53675"> </a><div class="pBullet1Last"><li>The ObjectStreamClass of its supertype, <code class="cCode">java.lang.reflect.Proxy</code>.</li></div>
+</ul>
+<a name="wp53679"> </a><p class="pBody">
+The representation of <code class="cCode">String</code> objects depends on the length of the UTF encoded string.  If the UTF encoding of the given <code class="cCode">String</code> is less than 65536 bytes in length, the <code class="cCode">String</code> is written in the standard Java UTF-8 format.  Starting with the Java&#8482; 2 SDK, Standard Edition, v1.3, strings for which the UTF encoding length is greater than or equal to 65536 bytes are written in a variant &#8220;long&#8221; UTF format.  The &#8220;long&#8221; UTF format is identical to the standard Java UTF-8 format, except that it uses 8 bytes to write the length of the UTF string, instead of 2 bytes.  The typecode preceding the <code class="cCode">String</code> in the serialization stream indicates which format was used to write the <code class="cCode">String</code>.
+</p>
+<a name="wp4523"> </a><p class="pBody">
+Arrays are represented by the following:
+</p>
+<ul class="pBullet1"><a name="wp7824"> </a><div class="pBullet1"><li>Their <code class="cCode">ObjectStreamClass</code> object.</li></div>
+<a name="wp7825"> </a><div class="pBullet1Plus"><li>The number of elements.</li></div>
+<a name="wp7826"> </a><div class="pBullet1Last"><li>The sequence of values. The type of the values is implicit in the type of the array. for example the values of a byte array are of type byte.</li></div>
+</ul>
+<a name="wp8447"> </a><p class="pBody">
+New objects in the stream are represented by the following:
+</p>
+<ul class="pBullet1"><a name="wp8448"> </a><div class="pBullet1"><li>The most derived class of the object.</li></div>
+<a name="wp8449"> </a><div class="pBullet1Last"><li>Data for each serializable class of the object, with the highest superclass first.<br /> For each class the stream contains the following:</li></div>
+<ul>
+<a name="wp7834"> </a><div class="pBullet2Plus"><li>The serializable fields.<br />See <a  href="serial-arch.html#wp6250">Section&#160;1.5 &quot;Defining Serializable Fields for a Class</a>.&#8221;</li></div>
+<a name="wp10285"> </a><div class="pBullet2Plus"><li>If the class has <code class="cCode">writeObject</code>/<code class="cCode">readObject</code> methods, there may be optional objects and/or block-data records of primitive types written by the <code class="cCode">writeObject</code> method followed by an <code class="cCode">endBlockData</code> code.</li></div>
+</ul></ul>
+<a name="wp7842"> </a><p class="pBody">
+All primitive data written by classes is buffered and wrapped in block-data records, regardless if the data is written to the stream within a <code class="cCode">writeObject</code> method or written directly to the stream from outside a <code class="cCode">writeObject</code> method. This data can only be read by the corresponding <code class="cCode">readObject</code> methods or be read directly from the stream. Objects written by the <code class="cCode">writeObject</code> method terminate any previous block-data record and are written either as regular objects or null or back references, as appropriate. The block-data records allow error recovery to discard any optional data. When called from within a class, the stream can discard any data or objects until the <code class="cCode">endBlockData</code>.
+</p>
+<a name="wp5849"> </a><h2 class="pHeading1">
+	6.3	Stream Protocol Versions
+</h2>
+<a name="wp10264"> </a><p class="pBody">
+It was necessary to make a change to the serialization stream format in JDK&#8482; 1.2 that is not backwards compatible to all minor releases of JDK&#8482; 1.1. To provide for cases where backwards compatibility is required, a capability has been added to indicate what <code class="cCode">PROTOCOL_VERSION</code> to use when writing a serialization stream. The method <code class="cCode">ObjectOutputStream.useProtocolVersion</code> takes as a parameter the protocol version to use to write the serialization stream.
+</p>
+<a name="wp10265"> </a><p class="pBody">
+The Stream Protocol Versions are as follows:
+</p>
+<ul class="pBullet1"><a name="wp11039"> </a><div class="pBullet1"><li><code class="cCode">ObjectStreamConstants.PROTOCOL_VERSION_1</code></li></div>
+<a name="wp11079"> </a><p class="pBody">
+Indicates the initial stream format.
+</p>
+<a name="wp11041"> </a><div class="pBullet1Last"><li><code class="cCode">ObjectStreamConstants.PROTOCOL_VERSION_2</code></li></div>
+</ul>
+<a name="wp11082"> </a><p class="pBody">
+Indicates the new external data format. Primitive data is written in block data mode and is terminated with <code class="cCode">TC_ENDBLOCKDATA</code>.
+</p>
+<a name="wp11085"> </a><p class="pBody">
+Block data boundaries have been standardized. Primitive data written in block data mode is normalized to not exceed 1024 byte chunks. The benefit of this change was to tighten the specification of serialized data format within the stream. This change is fully backward and forward compatible.
+</p>
+<a name="wp10255"> </a><p class="pBody">
+JDK&#8482; 1.2 defaults to writing <code class="cCode">PROTOCOL_VERSION_2</code>.
+</p>
+<a name="wp10388"> </a><p class="pBody">
+JDK&#8482; 1.1 defaults to writing <code class="cCode">PROTOCOL_VERSION_1</code>.
+</p>
+<a name="wp10251"> </a><p class="pBody">
+JDK&#8482; 1.1.7 and greater can read both versions.
+</p>
+<a name="wp11072"> </a><p class="pBody">
+Releases prior to JDK&#8482; 1.1.7 can only read <code class="cCode">PROTOCOL_VERSION_1</code>.
+</p>
+<a name="wp10258"> </a><h2 class="pHeading1">
+	6.4	Grammar for the Stream Format
+</h2>
+<a name="wp4999"> </a><p class="pBody">
+The table below contains the grammar for the stream format. Nonterminal symbols are shown in italics. Terminal symbols in a <code class="cCode">fixed width font</code>. Definitions of nonterminals are followed by a &#8220;:&#8221;. The definition is followed by one or more alternatives, each on a separate line. The following table describes the notation:
+</p>
+<a name="wp55694"> </a><div class="pTableCaption">
+</div><div align="left">
+<table summary=" notations and meanings" border="0" cellpadding="7" id="wp10013">
+  <caption></caption>
+<thead>
+<tr  align="center">    <th><a name="wp10013"> </a><div style="text-align: left" class="pTableHead">
+ Notation
+</div>
+
+</th>
+    <th><a name="wp10015"> </a><div style="text-align: left" class="pTableHead">
+ Meaning
+</div>
+
+</th>
+</tr>
+</thead>
+  <tr align="left">    <td align="left" valign="top"><a name="wp10017"> </a><div class="pTableText">
+<em class="cEmphasis"> (datatype</em>)	
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp10019"> </a><div class="pTableText">
+ This token has the data type specified, such as byte.
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp10021"> </a><div class="pTableText">
+<code class="cCode"> token[n]</code>
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp10023"> </a><div class="pTableText">
+	 A predefined number of occurrences of the token, that is an array.
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp10025"> </a><div class="pTableText">
+<code class="cCode"> x0001</code>	
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp10027"> </a><div class="pTableText">
+ A literal value expressed in hexadecimal. The number of hex digits<br /> reflects the size of the value.
+</div>
+</td>
+</tr>
+  <tr align="left">    <td align="left" valign="top"><a name="wp10029"> </a><div class="pTableText">
+ &lt;<code class="cCode">xxx</code>&gt;
+</div>
+</td>
+    <td align="left" valign="top"><a name="wp10031"> </a><div class="pTableText">
+		 A value read from the stream used to indicate the length of an array.
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="pTableCaption">
+
+</div>
+<a name="wp55693"> </a><p class="pBody">
+
+</p>
+<a name="wp9298"> </a><p class="pBody">
+Note that the symbol (long-utf) is used to designate a string written in &#8220;long&#8221; UTF format.  For details, refer to <a  href="protocol.html#wp8299">Section&#160;6.2 &quot;Stream Elements</a>&#8221;.
+</p>
+<a name="wp53688"> </a><h3 class="pHeading2">
+	6.4.1	Rules of the Grammar
+</h3>
+<a name="wp9583"> </a><p class="pBody">
+A Serialized stream is represented by any stream satisfying the <em class="cEmphasis">stream</em> rule.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+
+<pre><i>stream:
+</i>  <i>magic version contents
+</i></pre>
+
+
+<a name="4953"><!-- --></a>
+<pre><i>contents:
+</i>  <i>content
+</i>  <i>contents content
+</i></pre>
+
+
+<a name="9188"><!-- --></a>
+<pre><i>content:
+</i>  <i>object
+</i>  <i>blockdata
+</i></pre>
+
+
+<a name="4393"><!-- --></a>
+<pre><i>object:
+</i>  <i>newObject
+</i>  <i>newClass
+</i>  <i>newArray
+</i>  <i>newString
+</i>  <i>newClassDesc
+</i>  <i>prevObject
+</i>  <i>nullReference
+</i>  <i>exception
+</i>  <i>TC_RESET
+</i></pre>
+
+
+<a name="9070"><!-- --></a>
+<pre><i>newClass</i>:
+  <i>TC_CLASS classDesc newHandle
+</i></pre>
+
+
+<a name="9261"><!-- --></a>
+<pre><i>classDesc:
+  newClassDesc
+  nullReference
+  (ClassDesc)prevObject      // an object required to be of type
+                             // ClassDesc
+</i></pre>
+
+
+<a name="9716"><!-- --></a>
+<pre><i>superClassDesc:
+  classDesc
+</i></pre>
+
+
+<a name="10577"><!-- --></a>
+<pre><i>newClassDesc:
+  TC_CLASSDESC className serialVersionUID newHandle classDescInfo
+  TC_PROXYCLASSDESC newHandle proxyClassDescInfo</i>
+</pre>
+
+
+<a name="10578"><!-- --></a>
+<pre><i>classDescInfo:
+  classDescFlags fields classAnnotation superClassDesc 
+</i></pre>
+
+
+<a name="9169"><!-- --></a>
+<pre><i>className:
+  (utf)
+</i></pre>
+
+
+<a name="9171"><!-- --></a>
+<pre><i>serialVersionUID:
+  (long)
+</i></pre>
+
+
+<a name="9176"><!-- --></a>
+<pre><i>classDescFlags:
+  (byte)                  // Defined in Terminal Symbols and
+                            // Constants
+</i></pre>
+
+
+<a name="53665"><!-- --></a>
+<pre><i>proxyClassDescInfo:
+  (int)&lt;count&gt; proxyInterfaceName[count] classAnnotation
+      superClassDesc</i>
+</pre>
+
+
+<a name="53669"><!-- --></a>
+<pre><i>proxyInterfaceName:
+  (utf)</i>
+</pre>
+
+
+<a name="9170"><!-- --></a>
+<pre><i>fields:
+  (short)&lt;count&gt;  fieldDesc[count]
+</i></pre>
+
+
+<a name="9270"><!-- --></a>
+<pre><i>fieldDesc:
+  primitiveDesc
+  objectDesc
+</i></pre>
+
+
+<a name="9207"><!-- --></a>
+<pre><i>primitiveDesc:
+  prim_typecode fieldName
+</i></pre>
+
+
+<a name="10063"><!-- --></a>
+<pre><i>objectDesc:
+  obj_typecode fieldName className1
+</i></pre>
+
+
+<a name="10064"><!-- --></a>
+<pre><i>fieldName:
+  (utf)
+</i></pre>
+
+
+<a name="53757"><!-- --></a>
+<pre><i>className1:
+  (String)object             // String containing the field&#39;s type,
+</i>                             // in field descriptor format
+</pre>
+
+
+<a name="53759"><!-- --></a>
+<pre><i>classAnnotation:
+  endBlockData
+  contents endBlockData      // contents written by annotateClass
+</i></pre>
+
+
+<a name="53716"><!-- --></a>
+<pre><i>prim_typecode:
+  `B&#39;	// byte
+  `C&#39;	// char
+  `D&#39;	// double
+  `F&#39;	// float
+  `I&#39;	// integer
+  `J&#39;	// long
+  `S&#39;	// short
+  `Z&#39;	// boolean
+</i></pre>
+
+
+<a name="9114"><!-- --></a>
+<pre><i>obj_typecode:
+  `[`	// array
+  `L&#39;	// object
+</i></pre>
+
+
+<a name="4426"><!-- --></a>
+<pre><i>newArray:
+  TC_ARRAY classDesc newHandle (int)&lt;size&gt; values[size]
+</i></pre>
+
+
+<a name="4430"><!-- --></a>
+<pre><i>newObject:
+  TC_OBJECT classDesc newHandle classdata[]  // data for each class
+</i></pre>
+
+
+<a name="9475"><!-- --></a>
+<pre><i>classdata:
+  nowrclass                 // SC_SERIALIZABLE &amp; classDescFlag &amp;&amp;
+                            // !(SC_WRITE_METHOD &amp; classDescFlags)
+  wrclass objectAnnotation  // SC_SERIALIZABLE &amp; classDescFlag &amp;&amp;
+                            // SC_WRITE_METHOD &amp; classDescFlags
+  externalContents          // SC_EXTERNALIZABLE &amp; classDescFlag &amp;&amp;
+                            // !(SC_BLOCKDATA  &amp; classDescFlags
+  objectAnnotation          // SC_EXTERNALIZABLE &amp; classDescFlag&amp;&amp; 
+                            // SC_BLOCKDATA &amp; classDescFlags
+</i></pre>
+
+
+<a name="11092"><!-- --></a>
+<pre><i>nowrclass:
+  values                    // fields in order of class descriptor
+</i></pre>
+
+
+<a name="7942"><!-- --></a>
+<pre><i>wrclass:
+  nowrclass
+</i></pre>
+
+
+<a name="9749"><!-- --></a>
+<pre><i>objectAnnotation:
+  endBlockData
+  contents endBlockData     // contents written by writeObject
+                            // or writeExternal PROTOCOL_VERSION_2.
+</i></pre>
+
+
+<a name="10242"><!-- --></a>
+<pre><i>blockdata:
+  blockdatashort
+  blockdatalong
+</i></pre>
+
+
+<a name="10270"><!-- --></a>
+<pre><i>blockdatashort:
+  TC_BLOCKDATA (unsigned byte)&lt;size&gt; (byte)[size]
+</i></pre>
+
+
+<a name="9453"><!-- --></a>
+<pre><i>blockdatalong:
+  TC_BLOCKDATALONG (int)&lt;size&gt; (byte)[size]
+</i></pre>
+
+
+<a name="53766"><!-- --></a>
+<pre><i>endBlockData	:
+  TC_ENDBLOCKDATA
+</i></pre>
+
+
+<a name="53767"><!-- --></a>
+<pre><i>externalContent:          // Only parseable by readExternal
+  ( bytes)                // primitive data
+    object
+</i></pre>
+
+
+<a name="10234"><!-- --></a>
+<pre><i>externalContents:         // externalContent written by 
+  externalContent         // writeExternal in PROTOCOL_VERSION_1.
+  externalContents externalContent
+</i></pre>
+
+
+<a name="4452"><!-- --></a>
+<pre><i>newString:
+  TC_STRING newHandle (utf)
+  TC_LONGSTRING newHandle (long-utf)
+</i></pre>
+
+
+<a name="4456"><!-- --></a>
+<pre><i>prevObject
+  TC_REFERENCE (int)handle
+</i></pre>
+
+
+<a name="4460"><!-- --></a>
+<pre><i>nullReference
+  TC_NULL
+</i></pre>
+
+
+<a name="9611"><!-- --></a>
+<pre><i>exception:
+  TC_EXCEPTION reset (Throwable)object	 reset 
+</i></pre>
+
+
+<a name="9150"><!-- --></a>
+<pre><i>magic:
+  STREAM_MAGIC
+</i></pre>
+
+
+<a name="9153"><!-- --></a>
+<pre><i>version
+  STREAM_VERSION
+</i></pre>
+
+
+<a name="4487"><!-- --></a>
+<pre><i>values:          // The size and types are described by the
+                 // classDesc for the current object
+</i></pre>
+
+
+<a name="10151"><!-- --></a>
+<pre><i>newHandle:       // The next number in sequence is assigned
+                 // to the object being serialized or deserialized
+</i></pre>
+
+
+<a name="11119"><!-- --></a>
+<pre><i>reset:           // The set of known objects is discarded
+                 // so the objects of the exception do not
+                 // overlap with the previously sent objects 
+                 // or with objects that may be sent after 
+                 // the exception
+</i></pre>
+
+</pre></div>
+<a name="wp10152"> </a><h3 class="pHeading2">
+	6.4.2	Terminal Symbols and Constants
+</h3>
+<a name="wp9323"> </a><p class="pBody">
+The following symbols in <code class="cCode">java.io.ObjectStreamConstants</code> define the terminal and constant values expected in a stream.
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+	final static short STREAM_MAGIC = (short)0xaced;    
+	final static short STREAM_VERSION = 5;    
+	final static byte TC_NULL = (byte)0x70;    
+	final static byte TC_REFERENCE = (byte)0x71;    
+	final static byte TC_CLASSDESC = (byte)0x72;    
+	final static byte TC_OBJECT = (byte)0x73;    
+	final static byte TC_STRING = (byte)0x74;    
+	final static byte TC_ARRAY = (byte)0x75;    
+	final static byte TC_CLASS = (byte)0x76;    
+	final static byte TC_BLOCKDATA = (byte)0x77;    
+	final static byte TC_ENDBLOCKDATA = (byte)0x78;    
+	final static byte TC_RESET = (byte)0x79;    
+	final static byte TC_BLOCKDATALONG = (byte)0x7A;    
+	final static byte TC_EXCEPTION = (byte)0x7B;    
+	final static byte TC_LONGSTRING = (byte) 0x7C;    
+	final static byte TC_PROXYCLASSDESC = (byte) 0x7D;    
+	final static  int   baseWireHandle = 0x7E0000;<a name="wp10162"> </a>
+</pre></div>
+<a name="wp10163"> </a><p class="pBody">
+The flag byte <code class="cCode">classDescFlags</code> may include values of
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+	final static byte SC_WRITE_METHOD = 0x01; //if SC_SERIALIZABLE     
+	final static byte SC_BLOCK_DATA = 0x08;    //if SC_EXTERNALIZABLE    
+	final static byte SC_SERIALIZABLE = 0x02;    
+	final static byte SC_EXTERNALIZABLE = 0x04;<a name="wp9422"> </a>
+</pre></div>
+<a name="wp9895"> </a><p class="pBody">
+The flag <code class="cCode">SC_WRITE_METHOD</code> is set if the Serializable class writing the stream had a <code class="cCode">writeObject</code> method that may have written additional data to the stream. In this case a <code class="cCode">TC_ENDBLOCKDATA</code> marker is always expected to terminate the data for that class.
+</p>
+<a name="wp10223"> </a><p class="pBody">
+The flag <code class="cCode">SC_BLOCKDATA</code> is set if the <code class="cCode">Externalizable</code> class is written into the stream using <code class="cCode">STREAM_PROTOCOL_2</code>. By default, this is the protocol used to write <code class="cCode">Externalizable</code> objects into the stream in JDK&#8482; 1.2. JDK&#8482; 1.1 writes <code class="cCode">STREAM_PROTOCOL_1</code>.
+</p>
+<a name="wp9900"> </a><p class="pBody">
+The flag <code class="cCode">SC_SERIALIZABLE</code> is set if the class that wrote the stream extended <code class="cCode">java.io.Serializable</code> but not <code class="cCode">java.io.Externalizable</code>, the class reading the stream must also extend <code class="cCode">java.io.Serializable</code> and the default serialization mechanism is to be used.
+</p>
+<a name="wp9901"> </a><p class="pBody">
+The flag <code class="cCode">SC_EXTERNALIZABLE</code> is set if the class that wrote the stream extended <code class="cCode">java.io.Externalizable</code>, the class reading the data must also extend <code class="cCode">Externalizable</code> and the data will be read using its <code class="cCode">writeExternal</code> and <code class="cCode">readExternal</code> methods.
+</p>
+<a name="wp10128"> </a><h4 class="pHeading3">
+		Example
+</h4>
+<a name="wp8334"> </a><p class="pBody">
+Consider the case of an original class and two instances in a linked list:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+class List implements java.io.Serializable {    
+	int value;    
+	List next;    
+	public static void main(String[] args) {        
+		try {            
+			List list1 = new List();            
+			List list2 = new List();            
+			list1.value = 17;            
+			list1.next = list2;            
+			list2.value = 19;            
+			list2.next = null;            
+			
+			ByteArrayOutputStream o = new ByteArrayOutputStream();            
+			ObjectOutputStream out = new ObjectOutputStream(o);            
+			out.writeObject(list1);            
+			out.writeObject(list2);            
+			out.flush();            
+			...        
+		} catch (Exception ex) {            
+			ex.printStackTrace();        
+		}    
+	}
+}<a name="wp9963"> </a>
+</pre></div>
+<a name="wp9560"> </a><p class="pBody">
+The resulting stream contains:
+</p>
+<div class="pPreformatted"><pre class="pPreformatted">
+00: ac ed 00 05 73 72 00 04 4c 69 73 74 69 c8 8a 15 &gt;....sr..Listi...&lt;<a name="wp9983"> </a>
+10: 40 16 ae 68 02 00 02 49 00 05 76 61 6c 75 65 4c &gt;Z......I..valueL&lt;<a name="wp9774"> </a>
+20: 00 04 6e 65 78 74 74 00 06 4c 4c 69 73 74 3b 78 &gt;..nextt..LList;x&lt;<a name="wp9775"> </a>
+30: 70 00 00 00 11 73 71 00 7e 00 00 00 00 00 13 70 &gt;p....sq.~......p&lt;<a name="wp9776"> </a>
+40: 71 00 7e 00 03                                  &gt;q.~..&lt;<a name="wp9777"> </a>
+<a name="wp9754"> </a>
+</pre></div>
+
+    <p>&#160;</p>
+    <hr class="pHr" />
+    <table width="100%" summary="layout">
+      <tr><td align="left">
+        <a accesskey="c" href="serialTOC.html">Contents</a> | 
+	<a accesskey="p" href="version.html">Previous</a> | 
+        <a accesskey="n" href="security.html">Next</a>
+       </td>
+        <td align="right">
+          <span class="copyright">Java<font size="-2"><sup>TM</sup></font> Object Serialization Specification  </span>
+        </td>
+      </tr>
+    </table>
+
+    <p>&#160;</p>
+    <p class="copyright"><a 
+       href="copyright.html">Copyright</a> &#169;
+       2003 Sun Microsystems, Inc. All rights reserved.</p>
+  </body>
+</html>

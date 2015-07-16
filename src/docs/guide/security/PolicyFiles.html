@@ -1,0 +1,1277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+
+
+<HTML><HEAD><TITLE>
+
+Default Policy Implementation and Policy File Syntax
+
+</TITLE></HEAD>
+
+<BODY bgcolor="#ffffff">
+
+
+
+<center>
+
+<H1>Default Policy Implementation and Policy File Syntax</H1>
+
+
+
+<b>Last Modified:  <em>20 April 2002</em></b>
+
+</center>
+
+
+
+<p>The policy for a Java<SUP><FONT SIZE="-1">TM</FONT></SUP> 
+programming language application environment
+(specifying which permissions are available for code from various sources,
+and executing as various principals) is represented 
+by a Policy object. More specifically, it is represented by a
+<code>Policy</code> subclass providing an implementation
+of the abstract methods in the <code>Policy</code> class (which is 
+in the <code>java.security</code> package).
+
+<p>The source location for the policy information utilized by the
+Policy object is up to the Policy implementation.
+The Policy reference implementation obtains its
+information from static policy configuration files.
+<P>
+The rest of this document pertains to the Policy reference
+implementation and the syntax that must be used
+in policy files it reads.
+For information about using the <b>Policy Tool</b> to create
+a policy file (without needing to know the required syntax),
+see the Policy Tool documentation
+(<a href="../../tooldocs/solaris/policytool.html">for Solaris</a>) (<a href="../../tooldocs/windows/policytool.html">for Win32</a>).
+
+
+<p>Here is an outline for the rest of this document:
+
+<dl>
+<dt><dd><a href="#Changes">
+<b>Policy Changes in the Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, 
+Standard Edition, v 1.4</b>
+</a><dt><dd><a href="#DefaultImpl">
+<b> Default Policy Implementation</b>
+</a><dt><dd><a href="#DefaultLocs">
+<b>Default Policy File Locations</b>
+</a><dt><dd><a href="#ChangingDefault">
+<b>Changing the Policy Implementation</b>
+</a><dt><dd><a href="#FileSyntax">
+<b>Policy File Syntax</b>
+</a><dt><dd><a href="#Examples">
+<b>Policy File Examples</b>
+</a><dt><dd><a href="#PropertyExp">
+<b>Property Expansion in Policy Files</b>
+</a><dt><dd><a href="#GeneralExp">
+<b>General Expansion in Policy Files</b>
+</a><dt><dd><a href="#RelatedDoc">
+<b>Related Documentation</b>
+</a>
+</dl>
+<br>
+
+
+<H2><a name="Changes">Policy Changes in the 
+Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition, v 1.4</a></H2>
+
+<blockquote>
+
+<p>With the integration of Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Authentication
+and Authorization Service (JAAS) into the J2SDK, v 1.4, the 
+<code>java.security.Policy</code> API handles Principal-based queries,
+and the default policy implementation supports Principal-based 
+<code>grant</code> entries. Thus, access control can now be based
+not just on what code is running, but also on <i>who</i> 
+is running it. See other sections of this document for further
+information on principal-based <code>grant</code> entries.
+
+<blockquote>
+<hr>
+<B>Note:</B> Starting with this version (v 1.4),
+policy files used by the default policy implementation
+must be encoded in the UTF-8 encoding scheme.
+You can use the  
+<A HREF="../../tooldocs/tools.html#intl">native2ascii tool</A> 
+to assist with this conversion.
+<hr>
+</blockquote>
+
+The rest of this  
+section is relevant only for programmers who utilize 
+the Policy API. If you're not such a progammer, you can skip to 
+the next sections, 
+<a href="#DefaultImpl">Default Policy Implementation</a> and 
+<a href="#DefaultLocs">Default Policy File Locations</a>.
+
+<p>Policy-related API changes made in the J2SDK, v 1.4 include the following:
+
+<ul>
+<li> <a href="../../api/java/security/ProtectionDomain.html">
+<code>java.security.ProtectionDomain</code></a>
+     <blockquote>
+      A new constructor,
+      <a 
+href="../../api/java/security/ProtectionDomain.html#ProtectionDomain(java.se
+curity.CodeSource, java.security.PermissionCollection, java.lang.ClassLoader, 
+java.security.Principal[])">
+      <code>ProtectionDomain(CodeSource cs, PermissionCollection perms,
+      ClassLoader loader, Principal[] principals)</code></a>,
+      was added.  This new constructor creates a new 
+      <code>ProtectionDomain</code> qualified by the given 
+      <code>CodeSource</code>, <code>Permission</code>s, 
+      <code>ClassLoader</code>, and <code>Principal</code>s.
+     </blockquote>
+<li> <a href="../../api/java/security/Policy.html">
+<code>java.security.Policy</code></a>
+     <blockquote>
+      Two new methods were added:
+      <ol>
+      <li> <a 
+href="../../api/java/security/Policy.html#getPermissions(java.security.Prote
+ctionDomain)"><code>getPermissions(ProtectionDomain domain)</code></a>
+      evaluates the system policy
+      and returns a <code>PermissionCollection</code> object specifying the set
+      of permissions allowed given the characteristics of the
+      <code>ProtectionDomain</code>.
+      <li> <a 
+href="../../api/java/security/Policy.html#implies(java.security.ProtectionDo
+main, java.security.Permission)">
+<code>implies(ProtectionDomain domain, Permission permission)</code></a>
+      evaluates the system policy
+      for the permissions granted to the <code>ProtectionDomain</code> and 
+tests
+      whether the permission is granted.
+      </ol>
+     </blockquote>
+</ul>
+
+</blockquote>
+
+<H2><a name="DefaultImpl">Default Policy Implementation</a></H2>
+
+<blockquote>
+
+In the Policy reference implementation, the policy can be specified within one 
+or more policy configuration files. The configuration file(s) specify what 
+permissions are allowed for code from a specified code source,
+and executed by a specified principal. Each configuration file must be encoded in UTF-8. 
+
+<p>A policy file can be composed via a simple text editor, or via 
+the graphical <b>Policy Tool</b> utility. 
+
+<p>There is by default a single system-wide policy file, and a 
+single (optional) user policy file.
+
+<p>The Policy reference implementation is initialized the first time its 
+<code>getPermissions</code> method is called, or whenever its
+<code>refresh</code> method is called.
+Initialization involves parsing the policy configuration file(s)
+(see <a href = "#FileSyntax">Policy File Syntax</a>), and 
+then populating the Policy object. 
+
+</blockquote>
+
+
+<H2><a name="DefaultLocs">Default Policy File Locations</a></H2>
+
+<blockquote>
+
+<p>As mentioned previously, there is by default a single system-wide policy file, and a single user policy file.
+
+<p>The system policy file is by default located at
+
+<blockquote>
+<pre>
+<i>java.home</i>/lib/security/java.policy  (Solaris)
+<i>java.home</i>\lib\security\java.policy  (Win32)
+</pre>
+</blockquote>
+
+<p><B>Note:</B> <i><code>java.home</code></i> refers to the value of the system 
+property named "<code>java.home</code>", which specifies the directory that 
+houses the runtime environment -- either the <tt>jre</tt> 
+directory in the Java 2 SDK or the top-level directory of 
+the Java 2 Runtime Environment.
+
+<p>The system policy file is 
+meant to grant system-wide code permissions. 
+The <code>java.policy</code> file installed with the SDK grants all permissions
+to standard extensions, allows anyone to listen on un-privileged ports, and
+allows any code to read certain "standard" properties that are not security-sensitive, 
+such as the "<code>os.name</code>" and "<code>file.separator</code>" properties.
+
+<p>The user policy file is by default located at
+
+<blockquote>
+<pre>
+<i>user.home</i>/.java.policy  (Solaris)
+<i>user.home</i>\.java.policy  (Win32)
+</pre>
+</blockquote>
+
+<p><B>Note:</B> <i><code>user.home</code></i> refers to the value of the system 
+property named "<code>user.home</code>", which specifies the 
+user's home directory. On Win32 systems, 
+given user name <i><code>uName</code></i>, the "<code>user.home</code>"
+property value defaults to
+
+<blockquote>
+<pre>
+C:\Winnt\Profiles\uName on multi-user Windows NT systems
+C:\Windows\Profiles\uName on multi-user Windows 95 systems
+C:\Windows on single-user Windows 95 systems
+</pre>
+</blockquote>
+
+<p>When the Policy is initialized, the system policy is loaded in first, and 
+then the user policy is added to it. If neither policy is present, a built-in 
+policy is used.  This built-in policy is the same
+as the java.policy file installed with the JRE.
+
+<p>Policy file locations are specified in the security properties file, 
+which is located at
+
+<blockquote>
+<pre>
+<i>java.home</i>/lib/security/java.security  (Solaris)
+<i>java.home</i>\lib\security\java.security  (Win32)
+</pre>
+</blockquote>
+
+As noted above, <i><code>java.home</code></i> indicates the directory that houses 
+the runtime environment--either the <tt>jre</tt> directory in the 
+Java 2 SDK or the top-level directory of the Java 2 Runtime Environment.
+
+The policy file locations are specified as the values of properties 
+whose names are of the form
+
+<blockquote>
+<pre>
+policy.url.<i>n</i>
+</pre>
+</blockquote>
+
+where <i><code>n</code></i> is a number. You specify each such property 
+value in a line of the following form:
+
+<blockquote>
+<pre>
+policy.url.<i>n</i>=<i>URL</i>
+</pre>
+</blockquote>
+
+Here, <i><code>URL</code></i> is a URL specification.
+
+<p>For example, the default system and user policy 
+files are defined in the security properties file as
+
+<blockquote>
+<pre>
+policy.url.1=file:${java.home}/lib/security/java.policy
+policy.url.2=file:${user.home}/.java.policy
+</pre>
+</blockquote>
+
+<p>(See <a href = "#PropertyExp">Property Expansion</a> for
+information about specifying property values via a special syntax, such as 
+specifying the <i><code>java.home</code></i> property 
+value via <i><code>${java.home}</code></i>.)
+
+<p>You can actually specify a number of URLs 
+(including ones of the form "<code>http://</code>"), 
+and all the designated policy files will get loaded. You can also comment out or
+change the second one to disable reading the default user policy file.
+
+<p>The algorithm starts at <code>policy.url.1</code>, and keeps incrementing until it does not 
+find a URL. Thus if you have <code>policy.url.1</code> 
+and <code>policy.url.3</code>, <code>policy.url.3</code> will 
+never be read.
+
+<H3>Specifying an Additional Policy File at Runtime</H3>
+
+<blockquote>
+
+<p>It is also possible to specify an additional or a different policy file when 
+invoking execution of an application. This can be done via the 
+"<code>-Djava.security.policy</code>" command line argument, which sets the value of 
+the <i><code>java.security.policy</code></i> property. 
+For example, if you use
+
+<pre>
+    java -Djava.security.manager -Djava.security.policy=<i>someURL</i> SomeApp
+</pre>
+
+where <i><code>someURL</code></i> is a URL specifying 
+the location of a policy file, then the specified policy 
+file will be loaded in addition to all the policy files that are specified in the security properties file. 
+
+<p><B>Notes:</B>
+
+<ul>
+<li>The URL can be any regular URL or simply the name of a policy file 
+in the current directory, as in
+
+<pre>
+    java -Djava.security.manager -Djava.security.policy=mypolicy WriteFile
+</pre>
+<p>
+
+<li>The "<code>-Djava.security.manager</code>" argument ensures 
+that the default security manager is installed, and thus the application is 
+subject to policy checks. It is not required if the application <i><code>SomeApp</code></i>
+installs a security manager.
+</ul> 
+
+<p>If you use
+
+<pre>
+    java -Djava.security.manager -Djava.security.policy==<i>someURL</i> SomeApp
+</pre>
+
+(note the double equals) then <i>just</i> the specified policy file 
+will be used; all the ones indicated in the security properties
+file will be ignored.
+
+<p>If you want to pass a policy file to the appletviewer, then use a 
+"<code>-J-Djava.security.policy</code>" argument as follows:
+
+<pre>
+    appletviewer -J-Djava.security.policy=<i>someURL</i> myApplet
+</pre>
+
+<b>Note:</B>: The "<code>-Djava.security.policy</code>" policy file value will be 
+ignored (for both <code>java</code> and <code>appletviewer</code> commands) 
+if the "<code>policy.allowSystemProperty</code>" property in the security properties file 
+is set to false. The default is true.
+
+</blockquote>
+
+</blockquote>
+
+
+<H2><a name="ChangingDefault">Changing the Policy Implementation</a></H2>
+
+<blockquote>
+
+<p>An alternative policy class can be given to replace the Policy reference
+implementation class, as long as the former is a subclass of the abstract 
+Policy class and implements the <code>getPermissions</code> method 
+(and other methods as necessary).
+
+<p>The Policy reference implementation can be changed by editing the security 
+properties file, which is the
+<code>java.security</code> file in the <code>lib/security</code> 
+directory of the SDK.
+
+<p>One of the types of properties you can set in <code>java.security</code>
+is of the following form:
+
+<pre>
+    policy.provider=<i>PolicyClassName</i>
+</pre>
+
+<p><i><code>PolicyClassName</code></i> must specify the fully qualified name
+of the desired <code>Policy</code> implementation class. The default security properties 
+file entry for this property is the following:
+
+<pre>
+    policy.provider=sun.security.provider.PolicyFile
+</pre>
+
+<p>To customize, you can change the property value to specify another class, as in
+
+<pre>
+   policy.provider=com.mycom.MyPolicy
+</pre>
+
+</blockquote>
+
+
+
+<H2><a name="FileSyntax">Policy File Syntax</a></H2>
+
+<blockquote>
+
+<p>The policy configuration file(s) for an SDK installation
+specify what permissions (which types of system resource accesses) are
+allowed to code from a specified code source,
+and executed as a specified principal.
+ 
+<p>For an applet (or an application running under a security
+manager) to be allowed to perform secured actions (such as reading or 
+writing a file), the applet (or application) must be
+granted permission for that particular action.
+In the Policy reference implementation, that permission must be
+granted by a grant entry in a policy configuration file.
+See below and the <a href="spec/security-spec.doc.html"> 
+"Java Security Architecture Specification"</a>
+for more information.
+(The only exception is that code always automatically has permission to 
+read files from its same (URL) location, and subdirectories 
+of that location; it does not need explicit permission to do so.)
+
+<p>A policy configuration file essentially contains a list of entries. 
+It may contain a "keystore" entry, and contains zero or more "grant" entries.
+
+
+<a name=KeyStoreEntry><H3>Keystore Entry</H3></a>
+
+<blockquote>
+
+<p>A <i>keystore</i> is a database of private keys and their associated digital 
+certificates such as X.509 certificate chains authenticating the corresponding 
+public keys. 
+The <b>keytool</b> utility 
+(<a href="../../tooldocs/solaris/keytool.html">for Solaris</a>)
+(<a href="../../tooldocs/windows/keytool.html">for Win32</a>)
+is used to create and administer keystores. The keystore specified in a policy 
+configuration file is used to look up the public keys of the signers specified 
+in the grant entries of the file. A keystore entry must appear in a policy 
+configuration file if any grant entries specify signer aliases,
+or if any grant entries specify principal aliases (see below).
+
+<p>At this time, there can be only one <b>keystore entry</b> in the policy file 
+(others after the first one are ignored), and it can appear anywhere outside 
+the file's grant entries. It has the following syntax:
+
+<pre>
+    keystore "some_keystore_url", "keystore_type";
+</pre>
+
+where "some_keystore_url" specifies the URL location of the keystore,
+and "keystore_type" specifies the keystore type. 
+
+<p>The URL is relative to the policy file location. Thus if the policy file 
+is specified in the security properties file as:
+
+<pre>
+    policy.url.1=http://foo.bar.com/fum/some.policy
+</pre>
+
+and that policy file has an entry:
+
+<pre>
+    keystore ".keystore";
+</pre>
+
+then the keystore will be loaded from:
+
+<pre>
+    http://foo.bar.com/fum/.keystore
+</pre>
+
+The URL can also be absolute.
+
+<p>A <b>keystore type</b> defines the storage and data format of the 
+keystore information,
+and the algorithms used to protect private keys in the keystore and the
+integrity of the keystore itself. The default type supported by
+Sun Microsystems is a proprietary keystore type named "JKS".
+Thus, if the keystore type is "JKS", it does not need to be specified
+in the keystore entry.
+
+</blockquote>
+
+
+<H3>Grant Entries</H3>
+ 
+<blockquote>
+
+<p>Code being executed is always considered to come from a particular
+"code source" (represented by an object of type 
+<code>CodeSource</code>). 
+The code source includes not only the location (URL)
+where the code originated from, but also a reference 
+to the certificate(s) containing the public key(s) 
+corresponding to the private key(s) used to sign the code.
+Certificates in a code source are referenced by symbolic alias
+names from the user's keystore.  Code is also considered to
+be executed as a particular principal (represented by an
+object of type <code>Principal</code>), or group of principals.
+
+<p>Each <b>grant entry</b> includes one or more "permission entries"
+preceded by optional <code>codeBase</code>, <code>signedBy</code>,
+and principal name/value pairs that specify which code you want
+to grant the permissions.
+The basic format of a grant entry is the following:
+
+<pre>
+  grant signedBy "<i>signer_names</i>", codeBase "<i>URL</i>",
+        principal <i>principal_class_name</i> "<i>principal_name</i>",
+        principal <i>principal_class_name</i> "<i>principal_name</i>",
+        ... {
+
+      permission <i>permission_class_name</i> "<i>target_name</i>", "<i>action</i>", 
+          signedBy "<i>signer_names</i>";
+      permission <i>permission_class_name</i> "<i>target_name</i>", "<i>action</i>", 
+          signedBy "<i>signer_names</i>";
+      ...
+  };
+ 	
+</pre>
+
+All non-italicized items above must appear as is (although case 
+doesn't matter and some are optional, as noted below).
+Italicized items represent variable values.
+
+<p> A grant entry must begin with the word <code>grant</code>.
+
+
+<H3>The <code>SignedBy</code>, <code>Principal</code>, 
+and <code>CodeBase</code> Fields</H3>
+
+<blockquote>
+
+<p>The <code>signedBy</code>, <code>codeBase</code>, and
+<code>principal</code> values are optional,
+and the order of these fields does not matter. 
+
+<p>A <code>signedBy</code> 
+value indicates the alias for a certificate stored in the keystore.
+The public key within that certificate is used to verify the digital
+signature on the code; you grant
+the permission(s) to code signed by the private key corresponding
+to the public key in the keystore entry specified by the alias.
+
+<p>The <code>signedBy</code> value can be a comma-separated list of multiple
+aliases.  An example is "Adam,Eve,Charles", which means "signed by
+Adam and Eve and Charles"; the relationship is AND, not OR. To be
+more exact, a statement like "Code signed by Adam" means "Code in a
+class file contained in a JAR which is signed using the private key
+corresponding to the public key certificate in the keystore whose
+entry is aliased by Adam".
+
+<p>The <code>signedBy</code> field is optional in that, if it is omitted, 
+it signifies "any signer". It doesn't matter whether 
+the code is signed or not or by whom.
+
+<p> A principal value specifies a 
+<code>class_name</code>/<code>principal_name</code> 
+pair which must be present within the executing 
+threads principal set. The
+principal set is associated with the executing code by way of a
+Subject. The principal field is optional in that, if it is omitted,
+it signifies "any principals".
+
+<p><a name=keystoreAliasReplace><b>Note on KeyStore Alias Replacement:  </b></a>
+<p> If the principal class_name/principal_name pair is specified
+as a single quoted string, it is treated as a keystore alias.
+The keystore is consulted and queried (via the alias)
+for an X509 Certificate.  If one is found,
+the principal class_name is automatically treated as
+<code>javax.security.auth.x500.X500Principal</code>,
+and the <code>principal_name</code> is automatically treated as the
+subject distinguished name from the certificate.
+If an X509 Certificate mapping is not found,
+the entire grant entry is ignored.
+
+<p>A <code>codeBase</code> value indicates the code source location; 
+you grant the permission(s) to code from that location.
+An empty <code>codeBase</code> entry signifies
+"any code"; it doesn't matter where the code originates from.
+
+<p><B>Note:</B> a <code>codeBase</code> value is a URL and thus should always utilize 
+slashes (never backslashes) as the directory separator, even when 
+the code source is actually on a Win32 system. Thus, if the source
+location for code on a Win32 system is actually 
+<code>C:\somepath\api\</code>, then 
+the policy <code>codeBase</code> entry should look like:
+
+<pre>
+    grant codeBase "file:/C:/somepath/api/" {
+        ...
+    }
+</pre>
+
+The exact meaning of a <code>codeBase</code> value depends on the
+characters at the end. A <code>codeBase</code> with a trailing "/"
+matches all class files (not JAR files) in the specified directory.
+A <code>codeBase</code> with a trailing "/*" matches 
+all files (both class and JAR files) contained in that directory.
+A <code>codeBase</code> with a trailing "/-" matches 
+all files (both class and JAR files) in the directory and 
+recursively all files in subdirectories contained in that directory.
+The following table illustrates the different cases.
+
+<p>
+
+<table summary="codeBase values and meanings" border=1 cellpadding=5>
+<tr>
+<th>Codebase URL of  Downloaded Code</th>
+<th>Codebase URL in Policy</th>
+<th>Match?</th>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/</td>
+  <td>java.sun.com/people/gong</td>
+  <td><center>Y</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/</td>
+  <td>java.sun.com/people/gong/</td>
+  <td><center>Y</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/</td>
+  <td>java.sun.com/people/gong/*</td>
+  <td><center>Y</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/</td>
+  <td>java.sun.com/people/gong/-</td>
+  <td><center>Y</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/appl.jar</td>
+  <td>java.sun.com/people/gong/</td>
+  <td><center>N</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/appl.jar</td>
+  <td>java.sun.com/people/gong/-</td>
+  <td><center>Y</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/appl.jar</td>
+  <td>java.sun.com/people/gong/*</td>
+  <td><center>Y</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/appl.jar</td>
+  <td>java.sun.com/people/-</td>
+  <td><center>Y</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/appl.jar</td>
+  <td>java.sun.com/people/*</td>
+  <td><center>N</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/</td>
+  <td>java.sun.com/people/-</td>
+  <td><center>Y</center></td>
+</tr>
+
+<tr>
+  <td>java.sun.com/people/gong/</td>
+  <td>java.sun.com/people/*</td>
+  <td><center>N</center></td>
+</tr>
+
+</table>
+
+</blockquote>
+
+
+<H3>The Permission Entries</H3>
+
+<blockquote>
+
+<p> A <b>permission entry</b> must begin with the word 
+<code>permission</code>. 
+The word <code><i>permission_class_name</i></code> in the template above 
+would actually be a specific permission type, such as <code>java.io.FilePermission</code>
+or <code>java.lang.RuntimePermission</code>.
+
+<p>The "<i><code>action</code></i>" is required for
+many permission types, such as <code>java.io.FilePermission</code>
+(where it specifies what type of file access is permitted).
+It is not required for categories such as 
+<code>java.lang.RuntimePermission</code>
+where it is not necessary--you either have the 
+permission specified by the "<code><i>target_name</i></code>" 
+value following the <i><code>permission_class_name</code></i> 
+or you don't.
+
+<p>The <code>signedBy</code> name/value pair for a permission entry 
+is optional. If present, it indicates a signed permission. That is,
+the permission class itself must be signed by the given alias(es) in
+order for the permission to be granted. For example,
+suppose you have the following grant entry:
+
+<pre>
+  grant {
+      permission Foo "foobar", signedBy "FooSoft";
+  }
+</pre>
+
+<p>Then this permission of type <i>Foo</i> is granted if the 
+<code>Foo.class</code> permission was placed in a JAR file and the
+JAR file was signed by the private
+key corresponding to the public key in the certificate
+specified by the 
+"FooSoft" alias, or if <code>Foo.class</code> is a 
+system class, since system classes are not subject 
+to policy restrictions.
+
+<p>Items that appear in a permission entry must appear in the specified 
+order (<code>permission</code>, <i>permission_class_name</i>, 
+"<i>target_name</i>", "<i>action</i>", and 
+<code>signedBy</code> "<i>signer_names</i>"). 
+An entry is terminated with a semicolon.
+
+<p>Case is unimportant for the identifiers (<code>permission</code>, 
+<code>signedBy</code>, <code>codeBase</code>, etc.) but is 
+significant for the <i>permission_class_name</i>
+or for any string that is passed in as a value. 
+
+</blockquote>
+
+
+<H3>Note Regarding File Path Specifications on Win32 Systems</H3>
+
+<blockquote>
+
+<p><B>Note:</B> When you are specifying a <code>java.io.FilePermission</code>,
+the "<i><code>target_name</code></i>" is a file path. On Win32 systems, whenever you 
+directly specify a file path in a string (but not in a codeBase URL), 
+you need to include two backslashes 
+for each actual single backslash in the path, as in
+
+<pre>
+  grant {
+      permission java.io.FilePermission "C:\\users\\cathy\\foo.bat", "read";
+  };
+</pre>
+
+The reason this is necessary is because the strings are processed by a 
+tokenizer (<code>java.io.StreamTokenizer</code>), 
+which allows "<code>\</code>" to be used as an 
+escape string (for example, "<code>\n</code>" to indicate a new line)
+and which thus requires two backslashes to indicate a single backslash. 
+After the tokenizer has processed the above file path string, converting 
+double backslashes to single backslashes, the end result is 
+
+<pre>
+    "C:\users\cathy\foo.bat"
+</pre>
+
+</blockquote>
+
+</blockquote>
+
+</blockquote>
+
+
+
+<H2><a name="Examples">Policy File Examples</a></H2>
+
+<blockquote>
+
+<p>An example of two entries in a policy configuration file is
+<pre>
+  // If the code is signed by "Duke", grant it read/write access to all 
+  // files in /tmp:
+  grant signedBy "Duke" {
+      permission java.io.FilePermission "/tmp/*", "read,write";
+  };
+
+  // Grant everyone the following permission:
+  grant { 
+      permission java.util.PropertyPermission "java.vendor", "read";
+  };
+ </pre>
+
+<p>The contents of another sample policy configuration file appear below.
+  
+<pre>
+  grant signedBy "sysadmin", codeBase "file:/home/sysadmin/*" {
+      permission java.security.SecurityPermission "Security.insertProvider.*";
+      permission java.security.SecurityPermission "Security.removeProvider.*";
+      permission java.security.SecurityPermission "Security.setProperty.*";
+  };
+</pre>
+
+This specifies that <i>only</i> code that satisfies the following
+conditions can call methods in the Security class to 
+add or remove providers or to set Security properties:
+
+<ul>
+<li>The code was loaded from a signed 
+JAR file that is in the "<code>/home/sysadmin/</code>" directory
+on the local file system.
+<li>The signature can be verified using the public key
+referenced by the alias name "sysadmin" in the 
+keystore.
+</ul>
+
+<p>Either component of the code source (or both) may be missing. An 
+example where <code>codeBase</code> is missing is:
+
+<pre>
+  grant signedBy "sysadmin" {
+      permission java.security.SecurityPermission "Security.insertProvider.*";
+      permission java.security.SecurityPermission "Security.removeProvider.*";
+  };
+</pre>
+
+If this policy is in effect, code that comes in a JAR File signed by "sysadmin"
+can add/remove providers, regardless of where the JAR File originated
+from.
+
+<p>An example without a signer is:
+
+<pre>
+  grant codeBase "file:/home/sysadmin/-" {
+      permission java.security.SecurityPermission "Security.insertProvider.*";
+      permission java.security.SecurityPermission "Security.removeProvider.*";
+  };
+</pre>
+
+In this case, code that comes from anywhere beneath the "<code>/home/sysadmin/</code>"
+directory on the local filesystem can add/remove providers. The code does
+not need to be signed.
+
+<p>An example where neither <code>codeBase</code> nor 
+<code>signedBy</code> is included is:
+
+<pre>
+  grant {
+      permission java.security.SecurityPermission "Security.insertProvider.*";
+      permission java.security.SecurityPermission "Security.removeProvider.*";
+  };
+</pre>
+
+Here, with both code source components missing, any code (regardless of where
+it originated from, or whether or not it is signed, or who signed
+it) can add/remove providers.
+
+<p>The following represents a principal-based entry.
+
+<pre>
+  grant principal javax.security.auth.x500.X500Principal "cn=Alice" {
+      permission java.io.FilePermission "/home/Alice", "read, write";
+  };
+</pre>
+
+This permits any code executing as the X500Principal, 
+"<code>cn=Alice</code>",
+permission to read and write to "<code>/home/Alice</code>".
+
+<p>The following example shows a grant statement with both
+codesource and principal information.
+
+<pre>
+  grant codebase "http://www.games.com",
+        signedBy "Duke",
+        principal javax.security.auth.x500.X500Principal "cn=Alice" {
+      permission java.io.FilePermission "/tmp/games", "read, write";
+  };
+</pre>
+
+This allows code downloaded from "<code>www.games.com</code>", 
+signed by "<code>Duke</code>",
+and executed by "<code>cn=Alice</code>", permission to 
+read and write into
+the "<code>/tmp/games</code>" directory.
+
+<p>The following example shows a grant statement with
+KeyStore alias replacement:
+<pre>
+  keystore "http://foo.bar.com/blah/.keystore";
+
+  grant principal "alice" {
+      permission java.io.FilePermission "/tmp/games", "read, write";
+  };
+</pre>
+"<code>alice</code>" will be replaced by
+<blockquote>
+javax.security.auth.x500.X500Principal "cn=Alice"
+</blockquote>
+assuming the X.509 certificate associated with the keystore alias,
+<i><code>alice</code></i>, has a subject distinguished name 
+of "<code>cn=Alice</code>".
+This allows code executed by the X500Principal "<code>cn=Alice</code>"
+permission to read and write into the "<code>/tmp/games</code>" directory.
+
+</blockquote>
+
+<H2><a name="PropertyExp">Property Expansion in Policy Files</a></H2>
+
+<blockquote>
+
+Property expansion is possible in policy files and in the security properties file.
+
+<p>Property expansion is similar to expanding variables in a shell. That is, when a string like
+
+<pre>
+    ${some.property}
+</pre>
+
+appears in a policy file, or in the security properties file, it will be expanded 
+to the value of the system property. For example,
+
+<pre>
+    permission java.io.FilePermission "${user.home}", "read";
+</pre>
+
+will expand "<code>${user.home}</code>" to use the value of the "user.home" system 
+property. If that property's value is "<code>/home/cathy</code>", then the above is equivalent to
+
+<pre>
+    permission java.io.FilePermission "/home/cathy", "read";
+</pre>
+
+In order to assist in platform-independent policy files, you can also use the 
+special notation of "<code>${/}</code>", which is a shortcut for "<code>${file.separator}</code>". 
+This allows things like
+
+<pre>
+    permission java.io.FilePermission "${user.home}${/}*", "read";
+</pre>
+
+If the value of the "<code>user.home</code>" 
+property is <code>/home/cathy</code>, 
+and you are on Solaris, the above gets converted to:
+
+<pre>
+    permission java.io.FilePermission "/home/cathy/*", "read";
+</pre>
+
+If on the other hand the "<code>user.home</code>" 
+value is <code>C:\users\cathy</code>
+and you are on a Win32 system, the above gets converted to:
+
+<pre>
+    permission java.io.FilePermission "C:\users\cathy\*", "read";
+</pre>
+
+Also, as a special case, if you expand a property in a codebase, such as
+
+<pre>
+    grant codeBase "file:${java.home}/lib/ext/"
+</pre>
+
+then any file.separator characters will be automatically converted to <code>/</code>'s. 
+Thus on a Win32 system, the above would get converted to
+
+<pre>
+    grant codeBase "file:C:/jdk1.4/jre/lib/ext/"
+</pre>
+
+even if "<code>java.home</code>" is set to <code>C:\jdk1.4\jre</code>. Thus you don't need to use 
+<code>${/}</code> in codebase strings (and you shouldn't).
+
+<p>Property expansion takes place anywhere a double quoted string is allowed 
+in the policy file. This includes the <i>"<code>signer_names</code>"</i>, <i>"<code>URL</code>"</i>,
+<i>"<code>target_name</code>"</i>, and 
+<i>"<code>action</code>"</i> fields.
+
+<p>Whether or not property expansion is allowed is controlled by the value 
+of the  "<code>policy.expandProperties</code>" 
+property in the security properties 
+file. If the value of this property is true (the default), expansion is 
+allowed.
+
+<p><B>Note:</B> You can't use nested properties; 
+they will not work. For example, 
+
+<pre>
+    "${user.${foo}}"
+</pre>
+
+doesn't work, even if the "<code>foo</code>" property 
+is set to "<code>home</code>". 
+The reason is the property parser doesn't recognize nested properties; 
+it simply looks for the first "<code>${</code>", and then keeps looking until it finds 
+the first "<code>}</code>" and tries to interpret the result (in this case, "<code>${user.$foo}</code>")
+as a property, but fails if there is no such property.
+
+<p><B>Note:</B> If a property can't be expanded in a grant entry, permission 
+entry, or keystore entry, that entry is ignored. For example, if the 
+system property "<code>foo</code>" is not defined and you have:
+
+<pre>
+    grant codeBase "${foo}" {
+        permission ...;
+        permission ...;
+    };
+</pre>
+
+then all the permissions in this grant entry are ignored. If you have
+
+<pre>
+    grant {
+        permission Foo "${foo}";
+        permission Bar "barTarget";
+    };
+</pre>
+
+then only the "<code>permission Foo...</code>" entry is ignored. And finally, if you have
+
+<pre>
+    keystore "${foo}";
+</pre>
+
+then the keystore entry is ignored.
+
+
+<H3>Win32 Systems, File Paths, and Property Expansion</H3>
+
+<blockquote>
+
+As noted above, on Win32 systems, when you directly 
+specify a file path 
+in a string (but not in a codeBase URL), you need to include two backslashes 
+for each actual single backslash in the path, as in
+
+<pre>
+    grant {
+        permission java.io.FilePermission "C:\\users\\cathy\\foo.bat", "read";
+    };
+</pre>
+
+This is because the strings are processed by a tokenizer (<code>java.io.StreamTokenizer</code>),
+which allows "<code>\</code>" to be used as an escape string (e.g., "<code>\n</code>" to indicate a new line)
+and which thus requires two backslashes to indicate a single backslash. After the 
+tokenizer has processed the above file path string, converting double backslashes 
+to single backslashes, the end result is 
+
+<pre>
+    "C:\users\cathy\foo.bat"
+</pre>
+
+Expansion of a property in a string takes place after the tokenizer has processed 
+the string. Thus if you have the string
+
+<pre>
+    "${user.home}\\foo.bat"
+</pre>
+
+then first the tokenizer processes the string, converting the double backslashes 
+to a single backslash, and the result is
+
+<pre>
+    "${user.home}\foo.bat"
+</pre>
+
+Then the <code>${user.home}</code> property is expanded and the end result is
+
+<pre>
+    "C:\users\cathy\foo.bat"
+</pre>
+
+assuming the "<code>user.home</code>" value is <code>C:\users\cathy</code>. Of course, for 
+platform independence, it would be better if the string was initially 
+specified without any explicit slashes, i.e., using the <code>${/}</code> 
+property instead, as in
+
+<pre>
+    "${user.home}${/}foo.bat"
+</pre>
+
+</blockquote>
+</blockquote>
+
+<H2><a name="GeneralExp">General Expansion in Policy Files</a></H2>
+
+<blockquote>
+Generalized forms of expansion are also supported in policy files.
+For example, permission names may contain a string of the form:
+<blockquote>
+<pre>
+${{protocol:protocol_data}}
+</pre>
+</blockquote>
+
+If such a string occurs in a permission name,
+then the value in <i>protocol</i> determines the exact type
+of expansion that should occur, and <i>protocol_data</i> is used
+to help perform the expansion.  <i>protocol_data</i> may be empty,
+in which case the above string should simply take the form:
+<blockquote>
+<pre>
+${{protocol}}
+</pre>
+</blockquote>
+<p>
+There are two protocols supported in the default
+policy file implementation:
+<p>
+<ol>
+<li><code>${{self}}</code>
+	<p> The protocol, <b><code>self</code></b>, denotes a replacement
+	of the entire string, <code>${{self}}</code>, with one or more
+	principal class/name pairs.  The exact replacement
+	performed depends upon the contents of the
+	grant clause to which the permission belongs.
+
+	<p> If the grant clause does not contain any principal information,
+	the permission will be ignored (permissions containing
+	<code>${{self}}</code> in their target names are 
+      only valid in the context
+	of a principal-based grant clause).  For example, 
+      <code>BarPermission</code> 
+	will always be ignored in the following grant clause:
+
+	<pre>
+	    grant codebase "www.foo.com", signedby "duke" {
+		permission BarPermission "... ${{self}} ...";
+	    };
+	</pre>
+
+	If the grant clause contains principal information, 
+      <code>${{self}}</code>
+	will be replaced with that same principal information.
+	For example, <code>${{self}}</code> in 
+      <code>BarPermission</code> will be replaced with
+	<b><code>javax.security.auth.x500.X500Principal "cn=Duke"</code></b>
+	in the following grant clause:
+<blockquote>
+<pre>
+grant principal javax.security.auth.x500.X500Principal "cn=Duke" {
+    permission BarPermission "... ${{self}} ...";
+};
+</pre>
+</blockquote>
+
+	If there is a comma-separated list of principals in the grant
+	clause, then <code>${{self}}</code> will be replaced by the same
+	comma-separated list or principals.
+	In the case where both the principal class and name are
+	wildcarded in the grant clause, <code>${{self}}</code> is replaced
+	with all the principals associated with the <code>Subject</code>
+	in the current <code>AccessControlContext</code>.
+
+	<p> The following example describes a scenario involving both
+	<b><code>self</code></b> and
+	<a href=#keystoreAliasReplace><code>KeyStore</code> alias replacement</a>
+	together:
+<blockquote>
+<pre>
+keystore "http://foo.bar.com/blah/.keystore";
+
+grant principal "duke" {
+    permission BarPermission "... ${{self}} ...";
+};
+</pre>
+</blockquote>
+
+	In the above example, "<code>duke</code>" will first 
+      be expanded into 
+    <code><b>javax.security.auth.x500.X500Principal "cn=Duke"</b></code>
+	assuming the X.509 certificate associated with the 
+	<code>KeyStore</code> alias, "<code>duke</code>", has a 
+      subject distinguished name
+	of "<code>cn=Duke</code>".  Next, <code>${{self}}</code> 
+      will be
+	replaced with the same principal information that was just
+	expanded in the grant clause: <b><code>javax.security.auth.x500.X500Principal "cn=Duke"</code></b>.
+	
+	<p>
+
+<li><code>${{alias:<i>alias_name</i>}}</code>
+	<p> The protocol, <b><code>alias</code></b>, denotes a
+	</code>java.security.KeyStore</code> alias substitution.
+	The <code>KeyStore</code> used is the one specified
+	in the <a href=#KeyStoreEntry><code>KeyStore</code> entry</a>.
+	<i>alias_name</i> represents an alias into the <code>KeyStore</code>.
+	<code>${{alias:<i>alias_name</i>}}</code> is replaced with
+	<b><code>javax.security.auth.x500.X500Principal "DN"</code></b>,
+	where <i><code>DN</code></i> represents the subject 
+      distinguished name
+	of the certificate belonging to <i><code>alias_name</code></i>.
+	For example:
+
+<blockquote>
+<pre>
+keystore "http://foo.bar.com/blah/.keystore";
+
+grant codebase "www.foo.com" {
+    permission BarPermission "... ${{alias:duke}} ...";
+};
+</pre>
+</blockquote>
+
+	In the above example the X.509 certificate associated with the alias,
+	<i><code>duke</code></i>, is retrieved from the <code>KeyStore</code>,
+	<i><code>foo.bar.com/blah/.keystore</code></i>.  Assuming duke's certificate
+	specifies "<code>o=dukeOrg, cn=duke</code>" as the subject distinguished name,
+	then <code>${{alias:duke}}</code> is replaced with
+	<b><code>javax.security.auth.x500.X500Principal "o=dukeOrg, cn=duke"</code></b>.
+
+	<p> The permission entry is ignored under the following
+	error conditions:
+	<ul>
+	<li> The keystore entry is unspecified
+	<li> The <i><code>alias_name</code></i> is not provided
+	<li> The certificate for <i><code>alias_name</code></i> can not be retrieved
+	<li> The certificate retrieved is not an X.509 certificate
+	</ul>
+</ol>
+</blockquote>
+
+<h2><a name="RelatedDoc">Related Documentation</a></h2>
+
+<blockquote>
+
+<ul>
+
+<li><a href="permissions.html">Permissions in Java 2 SDK</a><p>
+
+<LI>Policy Tool 
+(<a href="../../tooldocs/solaris/policytool.html">for Solaris</a>) (<a href="../../tooldocs/windows/policytool.html">for Win32</a>)
+
+</ul>
+
+</blockquote>
+
+<p>
+
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+<TD>
+
+<P><FONT SIZE="-2">
+   <A HREF="../../relnotes/SMICopyright.html">Copyright &#169;</A> 1997-2002
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:java-security@sun.com">java-security@sun.com</a>. This is not a subscription list.
+   </FONT>
+
+</TD>
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+   <BR>
+   <FONT SIZE="+1">
+   <i>Java Software</i>
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+</BODY>
+
+</HTML>
+
+
+

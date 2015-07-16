@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Image I/O API Guide: 4 - Writing Image I/O Plug-ins
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="extending.fm5.html">PREV</a>
+ | NEXT <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Image I/O API Guide</i></td>
+</tr></table>
+<br>
+ 
+
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="999261"><i>4.6	</i> Writing Stream Plug-ins
+</a></h2>
+
+<blockquote>
+<a name="999215"><!-- --></a>
+The standard classes in the <code>javax.imageio.stream</code> package are able to create <code>ImageInputStream</code>s and <code>ImageOutputStream</code>s that:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="999220"><!-- --></a>
+Read from a <code>File</code>
+</li>
+<li>
+<a name="999221"><!-- --></a>
+Read from an <code>InputStream</code>, using a temporary <code>File</code> as a cache
+</li>
+<li>
+<a name="999222"><!-- --></a>
+Read from an <code>InputStream</code>, using a byte array in memory as a cache
+</li>
+<li>
+<a name="999225"><!-- --></a>
+Write to a <code>File</code>
+</li>
+<li>
+<a name="999228"><!-- --></a>
+Write to an <code>OutputStream</code>, using a temporary <code>File</code> as a cache
+</li>
+<li>
+<a name="999229"><!-- --></a>
+Write to an <code>OutputStream</code>, using a byte array in memory as a cache
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="999237"><!-- --></a>
+It is possible to write new implementations of <code>ImageInputStream</code> and InmageOutputStream that interface with other I/O primitives (for example, databases or future fast I/O interfaces). The <code>ImageInputStreamImpl</code> and <code>ImageOutputStreamImpl</code> classes provide a base for subclassing. Only a handful of methods are required to be implemented by the subclass, although it is possible to implement more for greater efficiency:<p>
+</blockquote>
+<blockquote>
+<ul><li>
+<a name="999242"><!-- --></a>
+<code>int read()</code>
+</li>
+<li>
+<a name="999250"><!-- --></a>
+<code>int read(byte[] b, int off, int len)</code>
+</li>
+<li>
+<a name="999251"><!-- --></a>
+<code>write(int b)</code>
+</li>
+<li>
+<a name="999252"><!-- --></a>
+<code>write(byte[] b, int off, int len)</code>
+</li>
+<li>
+<a name="999253"><!-- --></a>
+<code>seek(long pos)</code>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<a name="999254"><!-- --></a>
+<p>
+<a name="999226"><!-- --></a>
+<p>
+<a name="996883"><!-- --></a>
+<p>
+</blockquote>
+
+<br>
+<hr>
+<!-- Bug in Communicator w/font: NavBar text disappears for Times 14pt pref. -->
+<!-- font size="-1" --> <a href="imageio_guideTOC.fm.html">CONTENTS</a> | <a href="extending.fm5.html">PREV</a>
+ | NEXT <!-- | <a href="copyright.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="copyright.fm.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Suzette Pelouch -->
+<!-- Last updated: Fri Apr 27 11:23:03 2001 -->
+ 
+
+
+</body>
+</html>

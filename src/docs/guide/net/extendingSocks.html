@@ -1,0 +1,216 @@
+<HTML><HEAD><TITLE>
+Extending Sockets in JDK 1.1
+
+</TITLE></HEAD>
+<!-- Changed by: David Brown, 21-Aug-1996 -->
+<!-- Changed by: David Brown, 21-Aug-1996 -->
+<BODY>
+
+<H2>
+<IMG alt="Duke icon" SRC="images/duke4.gif" ALIGN=CENTER WIDTH=55 HEIGHT=68>
+Extending Sockets in JDK 1.1
+</H2>
+
+<P>
+Some of the improvements to the <code>java.net</code> classes
+in JDK 1.1 allow sockets (Socket/ServerSocket) to be non-final, 
+extendable classes. The basic goal is to allow extended sockets
+to be used whereever a base class Socket is used without rewriting 
+application code.  So for example an already-existing email client
+could be handed a subclass of Socket that does peer authentication
+or encryption, which the Socket subclass would handle transparently.
+Other examples include sockets that transparently use compression,
+or which add functionality such as mirroring traffic to multiple
+servers (e.g. using reliable ordered multicast).
+
+<P>
+This document has the following sections:  <UL>
+
+<LI> JDK 1.0:  <A HREF="#SocketImpl">SocketImpl</A>
+<LI> JDK 1.1:  <A HREF="#Non-Final">Non-Final Socket and ServerSocket Classes</A>
+<LI> Socket:  <A HREF="#Socket">How to extend Socket</A>
+<LI> ServerSocket:  <A HREF="#ServerSocket">How to extend ServerSocket</A>
+
+</UL>
+
+
+<!-- *********************************************************** -->
+<H2><HR WIDTH=50%>
+<A name="SocketImpl">
+JDK 1.0:  SocketImpl and SocketImplFactory </A>
+</H2>
+
+<P>
+JDK 1.0 allows licensees to extend socket functionality in
+one very particular way:  they can subclass
+<code> java.net.SocketImpl </code>, and provide an enhanced
+java.net.SocketImplFactory() which returns such classes as needed.
+<P>
+The SocketImpl/SocketImplFactory scheme is useful for, and was
+designed for, java
+apps/applications to be portable across environments that use
+different transport mechanisms. A client application that uses
+a java.net.Socket can work in the general case (where the runtime
+uses a PlainSocketImpl), as well as in environments where network
+connections must do something particular.  For example, a java program
+should be able to work behind a firewall where connections to the
+Internet must be done through a proxy protocol, like 
+<A HREF="http://www.socks.permeo.com/">SOCKS</A>, assuming the right
+kind of SocketImpl is set for the java runtime in that environment.  
+<P>
+Though the SocketImpl is useful for things like 
+transparently providing proxy support to java apps, its utility is limited 
+as a way to provide added functionality of network transport, or for layering
+other protocols on top of TCP.  Additionally, it's only possible to have a single
+type of SocketImpl installed for a java runtime, which limits large-scale
+applications.  It's cleaner and more intuitive to make ServerSocket and
+Socket extendable.  
+<P>
+Note that the SocketImpl mechanism is designed to
+be orthogonal to the functionality provided by a subclass of Socket:
+for example, a subclass of Socket that is capable of doing compression on 
+its streams would still want to use the system-default SocketImpl to get
+proxy support behind certain kinds of firewalls.  The system-default
+SocketImpl can be thought of as an extension of the transport layer that
+applications needn't be aware of, and subclasses of Socket/ServerSocket
+provide richer functionality at the application layer.
+
+<P>
+
+<A name="Non-Final"><H2><HR WIDTH=50%>Change in JDK 1.1</H2></A>
+<P>
+
+In JDK 1.1, Socket and ServerSocket are made non-final, which is a pretty simple
+change.  The one basic caveat is that subclasses do not have direct access to the 
+underlying SocketImpl in the base classes, primarily for security reasons.  But 
+other than that, subclasses of Socket/ServerSocket inherit and can override methods
+from their superclass.
+<P>
+The JDK changed by:  <UL>
+
+<LI>Removing the <code>final</code> modifier from the
+	<code>Socket</code> and 
+	<code>ServerSocket</code> classes.
+
+<LI>Reattaching that <code>final</code> modifier only to
+	methods where it is needed to avoid bypassing
+	security manager calls.
+
+<LI>Defining a new method in ServerSocket with signature:
+ <code>protected final void implAccept(Socket client)</code>
+	to use when initializing a newly accepted socket.
+
+<LI>Exposing a default <code>Socket</code> constructor so
+	that Socket subclasses could initialize their superclass without
+        doing an actual connection in the superclass.  This is also
+        required so that a ServerSocket subclasses can return the correct
+	Socket subclass from accept() (e.g., FooServerSocket.accept() returns
+	a FooSocket)
+
+</UL>
+
+<A name="Socket"><H2><HR WIDTH=50%>Changes to Socket</H2></A>
+<P>
+The public constructors to Socket of the general form:
+<PRE>
+	Socket(String host, int port) {
+	  ...
+	}
+</PRE>
+can be used by subclasses to initialize the superclass, but they will
+also create a system-default SocketImpl and connect it to the specified
+host, port.
+Socket also has two protected constructors to intialize the superclass
+without connecting the Socket:
+<PRE>
+	protected Socket() {
+	  /* install system-default SocketImpl */
+	  ...
+	}
+
+	protected Socket(SocketImpl impl) {
+	  this.impl = impl;
+	}
+</PRE>
+
+The first constructor installs a system-default SocketImpl (either from the
+factory or a PlainSocketImpl).  The second allows for a subclass of Socket
+to install its own impl if need be.  If the Socket subclass doesn't need the default
+SocketImpl, it's perfectly valid to use the second
+constructor and pass it null.  (But in this case the subclass should of course override 
+<B>all</B> the base class methods, since they all rely on the underlying SocketImpl).
+
+
+<!-- *********************************************************** -->
+<A name="ServerSocket"><H2><HR WIDTH=50%>Changes to ServerSocket</H2></A>
+<P>
+Subclasses of ServerSocket also have a protected constructor exposed to them
+that creates a default SocketImpl in the base class, but doesn't otherwise 
+initialize it (e.g., doesn't call impl.create(), impl.bind() or impl.listen()). 
+The public constructors of ServerSocket <B>will</B> initialize the underlying SocketImpl.
+
+<PRE>
+	protected ServerSocket() {
+	  /* install system-default SocketImpl */
+	  ...
+	}
+</PRE>
+
+The only other thing about extending ServerSocket that should be explained is how
+to override accept() when the underlying SocketImpl for Socket/ServerSocket isn't
+accesible to subclasses.  Since the base class <I>can</I> do this, ServerSocket has 
+a method to make the necessary calls on the underlying SocketImpl's on behalf of
+subclasses:
+<PRE>
+public class ServerSocket {
+	...
+	protected final void implAccept(Socket s) throws IOException {
+	   ...
+	   // on return from this call s will be connected to a client
+	}
+	...
+</PRE>
+
+Note that subclasses of Socket/ServerSocket that don't use a SocketImpl
+needn't use this method.  
+As an example of how this works, here's what some SSL code
+might look like.
+
+<PRE>
+<CODE>
+class SSLServerSocket extends ServerSocket {
+    ...
+    public Socket accept () throws IOException
+    {
+	SSLSocket s = new SSLSocket (certChain, privateKey);
+	// create an unconnected client SSLSocket, that we'll
+	// return from accept
+
+	implAccept (s);
+	s.handshake ();
+	return s;
+    }
+    ...
+}
+
+class SSLSocket extends java.net.Socket {
+    ...
+    public SSLSocket(CertChain c, PrivateKey k) {
+	super();
+	...
+    }
+    ...
+}
+</CODE>
+</PRE>
+
+
+<P><HR>
+Last Modified:  <em>21 August, 1996</em>
+<AUTHOR>
+<BR><A HREF="mailto:db@eng.sun.com">David Brownell</A>
+<BR><A HREF="mailto:brown@eng.sun.com">David Brown</A>
+</AUTHOR>
+
+</BODY></HTML>
+

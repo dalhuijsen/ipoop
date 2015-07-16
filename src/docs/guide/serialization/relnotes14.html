@@ -1,0 +1,187 @@
+<HTML>
+<HEAD>
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.02 [en] (X11; U; SunOS 5.6 sun4u) [Netscape]">
+   <TITLE>Serialization Release Notes</TITLE>
+<!-- Changed by: Susan Snyder,  3-Dec-1999 -->
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+&nbsp;
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR>
+<TD WIDTH="60"><IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 HEIGHT=88 WIDTH=52>&nbsp;</TD>
+
+<TD>
+<CENTER>
+<H1>
+Serialization Changes and Enhancements<br>
+<font size="-1">in J2SE<sup>TM</sup> 1.4</font></H1></CENTER>
+</TD>
+
+<TD width=15% ALIGN=center>
+   <font size="-1"><a href="../../index.html">
+	Documentation Contents </a>
+   </font>
+</TD>
+
+</TR>
+</TABLE>
+<!-- Body text begins here -->
+<blockquote>
+The following are enhancements to serialization in version 
+1.4 of the Java 2 Platform.  For a summary of enhancements 
+in previous releases, see <a href=relnotes.html><b>Enhancements 
+in Previous Releases</b></a>.
+<dl>
+<dt><b>Support for deserialization of unshared objects</b></dt>
+<dd>Serialization now provides extra support for deserialization of 
+objects which are known to be unshared in the data-serialization 
+stream.  The new support is provided by the following API additions 
+in package <tt>java.io</tt>:
+<blockquote>
+<font size="-1">
+<a href="../../api/java/io/ObjectInputStream.html#readUnshared()">
+<tt>ObjectInputStream.readUnshared()</tt></a><p>
+<a href="../../api/java/io/ObjectOutputStream.html#writeUnshared(java.lang.Object)"><tt>ObjectOutputStream.writeUnshared(Object obj)</tt></a><p>
+<a href="../../api/java/io/ObjectStreamField.html#ObjectStreamField(java.lang.String, java.lang.Class, boolean)"><tt>ObjectStreamField(String name, 
+Class type, boolean unshared)</tt></a>
+</font>
+</blockquote>
+    Previously, security-conscious programmers had to clone private internal
+    objects after deserializing them to guard against the possibility that
+    outside parties with access to the serialization stream could append
+    spurious back handles to the sensitive objects, resulting in extra
+    references to them during deserialization.  However, this solution slows
+    performance and wastes memory -- two objects must be created and a copy
+    operation invoked in order to ensure a unique reference to a single usable
+    object.  The new API additions provide a more efficient solution by
+    allowing receivers to invalidate "unshared" objects as they are read in,
+    making it impossible for third parties to dereference back-handles to those
+    objects occurring later in the stream.
+</dd>
+<p>
+
+<dt><b>Security permissions now required to override putFields, readFields</b></dt>
+<dd>
+Beginning with J2SE 1.4.0, ObjectOutputStream's 
+<a href="../../api/java/io/ObjectOutputStream.html#ObjectOutputStream(java.io.OutputStream)">public one-argument constructor</a> requires the
+"enableSubclassImplementation" SerializablePermission when invoked
+(either directly or indirectly) by a subclass which overrides
+<a href="../../api/java/io/ObjectOutputStream.html#putFields()"><tt>ObjectOutputStream.putFields</tt></a> or <a href="../../api/java/io/ObjectOutputStream.html#writeUnshared(java.lang.Object)"><tt>ObjectOutputStream.writeUnshared</tt></a>.
+<p>
+Also beginning with J2SE 1.4.0, ObjectInputStream's 
+<a href="../../api/java/io/ObjectInputStream.html#ObjectInputStream(java.io.InputStream)">public one-argument constructor</a> requires the
+"enableSubclassImplementation" SerializablePermission when invoked
+(either directly or indirectly) by a subclass which overrides
+<a href="../../api/java/io/ObjectInputStream.html#readFields()"><tt>ObjectInputStream.readFields</tt></a> or <a href="../../api/java/io/ObjectInputStream.html#readUnshared()"><tt>ObjectInputStream.readUnshared</tt></a>.
+<p>
+These changes will not affect the great majority of applications. 
+However, it will affect any ObjectInputStream/ObjectOutputStream
+subclasses which override the <tt>putFields</tt> or <tt>readFields</tt> 
+methods without also overriding the rest of the serialization infrastructure.
+</dd>
+<p>
+
+<dt><b>Support for class-defined readObjectNoData method</b></dt>
+<dd>
+In addition to supporting class-defined <tt>writeObject()</tt> 
+and <tt>readObject()</tt>
+methods, serialization now includes support for class-defined
+<tt>readObjectNoData()</tt> methods.  Each class-defined 
+<tt>readObjectNoData()</tt> method is required to have 
+the following signature:
+<font size="-1">
+<blockquote><pre>
+private void readObjectNoData() throws ObjectStreamException;
+</pre></blockquote>
+</font>
+The <tt>readObjectNoData()</tt> method is analogous to the class-defined 
+<tt>readObject()</tt> method, except that (if defined) it is called in 
+cases where the class descriptor for a superclass of the object being 
+deserialized (and hence the object data described by that class descriptor) 
+is not present in the serialization stream. More formally: 
+<blockquote>
+      If object O of class C is being deserialized, and S is a superclass of C
+      in the VM which is deserializing O, then <tt>S.readObjectNoData()</tt> 
+      is invoked by ObjectInputStream during the deserialization of O if 
+      and only if the following conditions are true:
+<ol>
+        <li>  S implements java.io.Serializable (directly or indirectly).
+
+        <li>  S defines an <tt>readObjectNoData()</tt> method with 
+          the signature listed above.
+
+        <li>  The serialization stream containing O does not include a class
+            descriptor for S among its list of superclass descriptors for C.
+</ol>
+</blockquote>
+Note that <tt>readObjectNoData()</tt> is never invoked in cases 
+where a class-defined <tt>readObject()</tt> method could be called, 
+though serializable class implementors can call 
+<tt>readObjectNoData()</tt> from within <tt>readObject()</tt> as a 
+means of consolidating initialization code.
+<p>
+See the class description in the API specification of <a href="../../api/java/io/ObjectInputStream.html">ObjectInputStream</a> for more information.
+</dd>
+<p>
+<dt><b>Bug fix: Deserialization fails for Class object of primitive type</b></dt>
+<dd>
+In previous releases, bug <a href="http://developer.java.sun.com/developer/bugParade/bugs/4171142.html">4171142</a> caused attempts 
+to deserialize Class objects of primitive types to fail with a 
+<tt>ClassNotFoundException</tt>.  The problem was that 
+<tt>ObjectInputStream.resolveClass()</tt> did not work for 
+ObjectStreamClass descriptors for primitive types.  This bug 
+is fixed in J2SE 1.4.0.
+</dd>
+<p>
+<dt><b>Bug fix: ObjectInputStream.resolveProxyClass can fail for non-public
+  interface cases</b></dt>
+<dd>
+In previous releases, <a href="../../api/java/io/ObjectInputStream.html#resolveProxyClass(java.lang.String[])"><tt>ObjectInputStream.resolveProxyClass</tt></a> would not always
+select the proper class loader to define the proxy class in if one or more
+of the proxy interfaces were non-public.  In this release,
+if <tt>ObjectInputStream.resolveProxyClass</tt> detects a non-public interface, it
+attempts to define the implementing proxy class in the same class loader as
+the interface (barring conflicts, in which case an exception is thrown),
+which is necessary in order for the proxy to implement the interface.
+</dd>
+<p>
+<dt><b>Bug fix: Invalid serialPersistentFields field name causes
+  NullPointerException</b></dt>
+<dd>In previous releases, bug <a href="http://developer.java.sun.com/developer/bugParade/bugs/4387368.html">4387368</a> caused NullPointerExceptions to be thrown
+when serializing objects which used default serialization but also declared
+serialPersistentField entries which did not map to actual class fields.
+Serialization will now throw InvalidClassExceptions in such cases (since it
+is never necessary to define such "unbacked" serialPersistentFields when
+using default serialization).
+</dd>
+<p>
+<dt><b>Bug fix: ClassNotFoundException in skipped objects causes 
+serialization to fail</b></dt>
+<dd>In previous releases, ClassNotFoundExceptions triggered by "skipped"
+objects--objects associated with fields not present in the classes loaded
+by the deserializing party--would cause deserialization of the entire
+object graph to fail, even though the skipped values would not be included
+in the graph.  This release of serialization addresses this problem by
+ignoring ClassNotFoundExceptions associated with such skipped objects, thus
+eliminating a class of unnecessary deserialization errors.  Other
+miscellaneous changes have also been made to improve the overall robustness
+of serialization with regards to ClassNotFoundExceptions encountered during
+deserialization.
+</dd>
+</dl>
+</blockquote>
+
+<!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE summary="layout" BORDER=0 WIDTH="100%" >
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../relnotes/SMICopyright.html">Copyright &copy;</A>
+2001 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:rmi-comments@java.sun.com">rmi-comments@java.sun.com</A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+</BODY>
+</HTML>

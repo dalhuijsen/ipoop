@@ -1,0 +1,292 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>JTree</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>JTree</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+    <h2>New JTree toggleClickCount Property</h2>
+        
+    <p>
+      JTree now provides a property for configuring how many mouse clicks 
+      are needed to expand/collapse a node.
+      See:
+<P>
+    
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JTree.html#TOGGLE_CLICK_COUNT_PROPERTY">public final static String TOGGLE_CLICK_COUNT_PROPERTY</a>
+<li><a href="../../../api/javax/swing/JTree.html#toggleClickCount">protected int toggleClickCount</a>
+<li><a href="../../../api/javax/swing/JTree.html#setToggleClickCount(int)">public void setToggleClickCount(int clickCount)</a>
+<li><a href="../../../api/javax/swing/JTree.html#getToggleClickCount()">public int getToggleClickCount()</a>
+</tt>
+</ul>
+
+    <h2>New JTree Properties: Anchor, LeadSelectionPath</h2>
+
+    <p>
+      The TreeSelectionModel maintains a set of selected paths. Most UIs also 
+      provide the notion of the lead path and the anchor path. The anchor 
+      path is used for gestures that extend the selection, and the lead is 
+      usually the path that was last added to the selection. The lead may also 
+      be manipulated independently such that it isn't always selected.  Motif 
+      does this, as do the control modifiers with the Java Look and 
+      Feel (aka Metal). Support for this 
+      was previously added in a private manner such that developers were not able to 
+      determine what the anchor/lead were. The new API will expose this to 
+      developers so that they can get the lead/anchor as well as programmatically 
+      modify it. Exposing methods will also make it so that developers are 
+      free to override the behavior in any way they see fit.
+<P>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JTree.html#LEAD_SELECTION_PATH_PROPERTY">public final static String LEAD_SELECTION_PATH_PROPERTY</a>
+<li><a href="../../../api/javax/swing/JTree.html#ANCHOR_SELECTION_PATH_PROPERTY">public final static String ANCHOR_SELECTION_PATH_PROPERTY</a>
+<li><a href="../../../api/javax/swing/JTree.html#setLeadSelectionPath(javax.swing.tree.TreePath)">public void setLeadSelectionPath(TreePath newPath)</a>
+<li><a href="../../../api/javax/swing/JTree.html#setAnchorSelectionPath(javax.swing.tree.TreePath)">public void setAnchorSelectionPath(TreePath newPath)</a>
+<li><a href="../../../api/javax/swing/JTree.html#getLeadSelectionPath()">public TreePath getLeadSelectionPath()
+</a>
+<li><a href="../../../api/javax/swing/JTree.html#getAnchorSelectionPath()">public TreePath getAnchorSelectionPath()</a>
+</a>
+</tt>
+</ul>
+
+    <h2>Exposed DefaultTreeCellRenderer.hasFocus as a Protected Field</h2>
+
+      <tt>DefaultTreeCellRenderer</tt> exposes almost all of the arguments passed in 
+      via the <tt>getTreeCellRendererComponent</tt> method as protected instance 
+      variables. This makes it easy for a subclass that wishes to only change 
+      painting, as the subclass only has to override paint, and not 
+      <tt>getTreeCellRendererComponent</tt> to track all the arguments themselves. The 
+      <tt>hasFocus</tt> argument (last argument) was private. The <tt>hasFocus</tt> instance 
+      variable is now protected vs private.
+
+    
+      <P>
+      In <code>javax.swing.tree.DefaultTreeCellRenderer</code> see: 
+
+
+    
+ <ul>
+<tt>
+<li>
+    <a href="../../../api/javax/swing/tree/DefaultTreeCellRenderer.html#hasFocus">protected boolean hasFocus</a>
+    </tt>
+</ul>
+
+
+    <h2>Added TreeSelectionEvent.isAddedPath()</h2>
+
+
+      TreeSelectionEvent encapsulates the delta of how the
+      TreeSelectionModel changed. That is, it will contain any paths
+      that have been added to the selection, as well as paths that have
+      been removed.  To determine if a particular path is new to the
+      selection model the <code>isAddedPath(TreePath)</code> method is
+      provided. The <code>valueChanged(TreeSelectionEvent)</code>
+      listener method usually takes the form of:
+
+    <pre>  
+TreePath[] paths = event.getPaths();
+for (int counter = paths.length - 1; counter &gt;= 0; counter--) {
+    if (event.isAddedPath(paths[counter])) ...
+}
+    </pre>
+
+    <p>
+      <tt>TreeSelectionEvent.isAddedPath(TreePath)</tt> has to iterate through the 
+      TreePaths to determine the index of the TreePath in its internal 
+      TreePath array, and then map that to a boolean to determine if it is a 
+      new path. To avoid the step of <tt>isAddedPath(TreePath)</tt> iterating through 
+      its TreePath array, <tt>isAddedPath(int)</tt> has been added.
+
+    <p>
+
+      In <code>javax.swing.event.TreeSelectionEvent</code> see:
+    <ul>
+<tt>
+<li>
+   <a href="../../../api/javax/swing/event/TreeSelectionEvent.html#isAddedPath(int)"> public boolean isAddedPath(int index)</a>
+  </li>
+</tt>
+</ul>
+
+    <h2>
+      New JTree expandsSelectedPaths Property and
+      removeDescendantSelectedPaths Method
+    </h2>
+
+      When the selection is programatically changed in a JTree, the selected 
+      items are made visible (visible meaning all the parent items are 
+      expanded). For certain applications this behavior is not desirable, eg 
+      say all nodes of a certain type should be selected regardless of their 
+      visibility. This behavior is implemented across JTree and BasicTreeUI, 
+      making it tricky to override this behavior. The public methods 
+      get/setExpandsSelectedPaths have been added to JTree. If set to false, 
+      when the selection changes the nodes are not made visible, the default 
+      is true.
+
+    <p>
+      The protected method removeDescendantSelectedPaths has also been added. 
+      This method is called whenever a node is removed/collapsed to remove any 
+      descendant selected paths. This provides a simple place for subclassers 
+      to override should they not want the selection to change when a node is 
+      removed/collapsed.
+      
+    <p>
+See:
+<tt>
+<ul>
+<li><a href="../../../api/javax/swing/JTree.html#EXPANDS_SELECTED_PATHS_PROPERTY">public final static String EXPANDS_SELECTED_PATHS_PROPERTY</a>
+<li><a href="../../../api/javax/swing/JTree.html#setExpandsSelectedPaths(boolean)">public void setExpandsSelectedPaths(boolean newValue)</a>
+<li><a href="../../../api/javax/swing/JTree.html#getExpandsSelectedPaths()">public boolean getExpandsSelectedPaths()</a>
+
+<li><a href="../../../api/javax/swing/JTree.html#removeDescendantSelectedPaths(javax.swing.tree.TreePath, boolean)">protected void removeDescendantSelectedPaths(TreePath path, boolean includePath)</a>
+</ul>
+
+</tt>
+
+
+    <h2>DefaultTreeSelectionModel.insureUniqueness now Obsolete</h2>
+
+    <p>
+      DefaultTreeSelectionModel has the protected method insureUniqueness. It 
+      would go through an array of TreePaths making sure there were no 
+      duplicates. The implementation has changed such that a Hashtable is used 
+      and this method is no longer needed, it has marked obsolete. The 
+      implementation is now empty, but still invoked as before.
+
+
+    <p>
+      Here's the API and spec for the changes to
+      <code>javax.swing.tree.DefaultTreeSelectionModel</code> 
+
+    <pre>
+    /**
+     * This method is obsolete and its implementation is now a noop. It's
+     * still called by setSelectionPaths and addSelectionPaths, but only
+     * for backwards compatibility.
+     */
+    <a href="../../../api/javax/swing/tree/DefaultTreeSelectionModel.html#insureUniqueness()">protected void insureUniqueness()</a>
+    </pre>
+
+
+
+
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1995-98
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

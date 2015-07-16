@@ -1,0 +1,171 @@
+<html>
+<head>
+<title>Proxy Configuration</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Proxy Configuration</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This section covers the following topics:</p>
+<ul>
+  <li><a href="#intro">Introduction</a>&nbsp; </li>
+  <li><a href="#how">How Java Plug-in Obtains Proxy Information</a>&nbsp; </li>
+  <li><a href="#direct">Direct Connection</a>&nbsp; </li>
+  <li><a href="#manual">Manual Proxy Configuration</a>&nbsp; </li>
+  <li><a href="#automatic">Automatic Proxy Configuration</a></li>
+</ul>
+<h2><a name="intro"></a>Introduction</h2>
+For enterprise customers it is important to be able to set up secure computing 
+environments within their companies, and proxy configuration is an essential part 
+of doing that. Proxy configuration acts as a security barrier; it ensures that 
+the proxy server monitors all traffic between the Internet and the intranet. This 
+is normally an integral part of security enforcement in corporate firewalls within 
+intranets. Enterprise customers who want to use Java Plug-in to deploy applets 
+on their intranet web pages may also set up proxy support. This support is required 
+for Java Plug-in to work in an intranet environment and can be set up through 
+the Java Plug-in Control Panel. 
+<p>The Control Panel provides three <a href="control_panel.html#proxies">proxy 
+  options</a>: 
+<ul>
+  <li>&quot;Use browser settings&quot;</li>
+  <li>Manual configuration through the Protocol-Address-Port table</li>
+  <li>&quot;Automatic proxy configuration URL&quot;</li>
+</ul>
+<p>If &quot;Use browser settings&quot; is selected, then proxy information is 
+  entered entirely through the browser. For Internet Explorer, go to Tools&gt;Internet 
+  Options ... and select the Connections tab and then LAN Settings ... ; for Netscape, 
+  go to Edit&gt;Preferences ... and select Advanced under Category and then Proxies. 
+  How this works and the three types of connections that can be set up through 
+  the browser&#151;Direct, Manual, and Automatic&#151;are described in the following 
+  sections. 
+<p>If you select manual configuration in the Control Panel, then you must enter 
+  in the table for each protocol the address and port for the proxy server. Note 
+  that you may select to exclude some hosts from requiring proxy servers by listing 
+  them in the field labeled &quot;No proxy host&quot;. 
+<p>If you select &quot;Automatic proxy configuration URL&quot;, then you must 
+  enter the URL for the location of the JavaScript called <code>FindProxyForURL(URL 
+  url)</code> that returns the proxy server to be used for a URL. Support for 
+  this script is the same as described below under <a href="#automatic">Automatic 
+  Proxy Configuration</a>. 
+<p>
+<h2> <a name="how"></a>How Java Plug-in Obtains Proxy Information From the Browser</h2>
+Because browsers on different platforms store proxy information differently, there 
+is no generic mechanism to obtain proxy information. Here's how Java Plug-in obtains 
+proxy information for three different browser-platform combinations: 
+<p><b>Internet Explorer on Win32: </b>IE stores proxy information in the same 
+  set of keys in the windows registry. Java Plug-in obtains this information directly. 
+</p>
+<p><b>Netscape Navigator on Win32: </b>Navigator 4 stores proxy information in 
+  the user preference file on the local machine. Java Plug-in reads and parses 
+  the user preference file to obtain the Navigator 4 proxy information. Netscape 
+  6 has an API for obtaining proxy information. <code>findProxyForURL(URL)</code> 
+  returns proxy configuration information for the <code>URL</code> passed to it.
+<p><b>Netscape Navigator on Solaris and Linux: </b>Navigator stores proxy information 
+  in a file in the local machine. Java Plug-in reads and parses this file to obtain 
+  the proxy information. For Netscape 6 the process is the same as described in 
+  the previous section. 
+<p>Java Plug-in obtains proxy information at startup time. If you change the proxy 
+  setting after Java Plug-in has started, you may force Java Plug-in to reload 
+  the proxy information from the browser through the <i><a href="console.html#debugging">p</a></i><a href="console.html#debugging"> 
+  option in the Java Console</a>. 
+<p>
+<h2> <a name="direct"></a>Direct Connection</h2>
+<p>Direct connection does not use a proxy. For certain situations, such as when 
+  mobile users connect to the company through a modem, direct connection to the 
+  intranet environment is required, and proxies should not be used in these cases. 
+</p>
+<h2> <a name="manual"></a>Manual Proxy Configuration</h2>
+Both Internet Explorer and Netscape Navigator support manual proxy configuration. 
+Users can specify the proxy server and port for each protocol. Users can also 
+specify one proxy server and port for all protocols. To minimize the workload 
+of the proxy server, some sites might bypass the proxy server completely when 
+a machine is connecting to another machine inside the intranet environment. To 
+do this, network administrators and users can specify the proxy server bypass 
+list in the browser's setting.&nbsp; 
+<p><b>Internet Explorer: </b>Java Plug-in recognizes and supports the proxy server 
+  and port setting associated with the protocol. IE supports various syntaxes 
+  in the proxy server bypass list, as follows:&nbsp; 
+<ul>
+  <li>IP address/hostname only</li>
+  <li>IP address/hostname with wildcard</li>
+  <li>IP address/hostname with protocol</li>
+</ul>
+<p>For example, if you specify <tt>"121.141.23.5;*.eng;http://*.com"</tt> in the 
+  proxy server bypass list, then the browser bypasses the proxy whenever one of 
+  the following occurs:&nbsp; </p>
+<ul>
+  <li><tt>"121.141.23.5"</tt> is requested</li>
+  <li>the URL hostname ends with <tt>".eng"</tt></li>
+  <li>the URL protocol is <tt>http</tt> and the URL hostname ends with <tt>".com"</tt></li>
+</ul>
+<p>Currently Java Plug-in supports the first two syntaxes in the proxy server 
+  bypass list in IE. IE also supports bypassing the proxy server for local (intranet) 
+  addresses without using the proxy server bypass list. Java Plug-in supports 
+  this option by bypassing the proxy server if the URL hostname is plain; i.e., 
+  the hostname contains no dot (.).&nbsp; </p>
+<p><b>Netscape Navigator:</b> Java Plug-in recognizes and supports the proxy server 
+  and port setting associated with the protocol. For example, if you specify <tt>".eng,.sun.com"</tt> 
+  in the proxy server bypass list in Navigator, it bypasses the proxy whenever 
+  the URL hostname ends with <tt>".eng"</tt> or <tt>".sun.com"</tt>. Java Plug-in 
+  fully supports this syntax in the proxy server bypass list in Navigator. 
+<p>For more information about manual proxy configuration in your browser, consult 
+  the user guide for your browser. 
+<p>
+<h2> <a name="automatic"></a>Automatic Proxy Configuration</h2>
+Automatic proxy configuration is supported in the browser by setting a particular 
+URL that contains a JavaScript file with <tt>.pac</tt> or <tt>.js</tt> extension. 
+This file contains a function called <tt>FindProxyForURL</tt> that contains the 
+logic to determine which proxy server to use when the browser receives a connection 
+request. This function is written by the system administrator for the particular 
+intranet environment. When the browser starts up, it recognizes the URL of the 
+JavaScript file and downloads the file to the local machine using direct connection. 
+Then whenever it needs to make a new connection, the browser executes the JavaScript 
+function <tt>FindProxyForURL</tt> in the file to obtain the proxy information 
+to set up the connection.&nbsp;
+<p><b>Internet Explorer: </b>During startup, Java Plug-in downloads the JavaScript 
+  file to the local machine using direct connection. Then whenever it needs to 
+  make a new connection, it executes the <tt>FindProxyForURL</tt> function to 
+  obtain the proxy information using the JavaScript engine in IE. 
+<p><b>Netscape Navigator: </b>During startup, Java Plug-in downloads the JavaScript 
+  file to the local machine using direct connection. Then whenever it needs to 
+  make a new connection, it executes the <tt>FindProxyForURL</tt> function to 
+  obtain the proxy information by using the JavaScript engine in Navigator. 
+<p>There are a number of JavaScript <i>helper</i> functions which can be called 
+  from the JavaScript function <tt>FindProxyForURL</tt>. Java Plug-in provides 
+  its own implementation of these functions to completely emulate the automatic 
+  proxy configuration. Regarding the implementation of these helper function, 
+  note the following: 
+<ul>
+  <li>Function <tt>dnsResolve</tt> always returns an empty string if the host 
+    is not an IP address</li>
+  <li>Function <tt>isResolvable</tt> always returns false if the host is not an 
+    IP address.</li>
+  <li>Function <tt>isInNet</tt> always returns false if the host is not an IP 
+    address.</li>
+</ul>
+<p>Note that executing the function <tt>FindProxyForURL</tt> always returns proxy 
+  information as a string. Java Plug-in extracts the setting in the following 
+  way : </p>
+<ul>
+  <li>If &quot;<code>DIRECT</code>&quot; is in the string, Java Plug-in assumes 
+    direct connection.</li>
+  <li>If &quot;<code>PROXY</code>&quot; is in the string, it uses the first proxy 
+    setting for the connection.</li>
+  <li>If &quot;<code>SOCKS</code>&quot; is in the string, it uses the SOCKS v4 
+    for the connection.</li>
+  <li>Otherwise, the proxy information in the string is incorrect. In this cases, 
+    Java Plug-in assumes direct connection.</li>
+</ul>
+<p>For more information about automatic proxy configuration in your browser, consult 
+  the user guide for your browser.</p>
+<p>&nbsp;</p>
+</body>
+</html>

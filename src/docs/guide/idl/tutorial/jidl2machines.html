@@ -1,0 +1,80 @@
+<HTML>
+<HEAD>
+
+   <TITLE>Java IDL: Running The "Hello World" Example on Two Machines</TITLE>
+  <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+<!-- last updated debbiec 4/2001-->
+
+
+<H1 ALIGN=CENTER>Java IDL: The "Hello World" Example on Two Machines</H1>
+
+
+<P>To enable the Hello World Tutorial to run on two machines, follow the steps as directed 
+in the <a href="../jidlExample.html">tutorial</a>, with the following changes.  This tutorial 
+was written for the Java (tm) 2 Platform, Standard Edition (J2Se(tm)), version 1.4.  In 
+this example, the client, stubs, and skeletons are located on the client machine, and the 
+server and name server are located on the server machine.  This scenario can be changed to 
+meet your needs and is provided simply as an introduction to one way to distribute an application across two machines.
+
+<OL>
+<LI>Create (as shown in the tutorial) and compile the <TT>Hello.idl</TT> file on the client machine:
+<PRE>   
+   idlj -fall Hello.idl
+</PRE>
+
+<LI>Create <tt>HelloClient.java</tt> on the <b>client</b> machine.  Compile the <TT>*.java</TT> files, 
+including the stubs and skeletons (which are in the directory <TT>HelloApp</TT>):
+<PRE>
+   javac *.java HelloApp/*.java
+</PRE>
+<P>
+<LI>Create <tt>HelloServer.java</tt> on the <b>server</b> machine.  Compile the <TT>.java</TT> files:
+<PRE>
+   javac *.java
+</PRE>
+<P>
+<LI>Start the Java Object Request Broker Daemon, <tt>orbd</tt>, which includes a Naming Service, on the server machine.  To do this on Unix:
+   
+<PRE>
+   orbd -ORBInitialPort 1050 -ORBInitialHost <em>servermachinename</em>&
+</PRE>
+<P>To do this on Windows:
+<PRE>
+   start orbd -ORBInitialPort 1050 -ORBInitialHost <em>servermachinename</em>
+</PRE>
+   
+ <P>Both <tt>-ORBInitialPort</tt> and <tt>-ORBInitialHost</tt> are required arguments on the <tt>orbd</tt> command line.  This example starts the name server on port <TT>1050</TT>, because on Solaris you must become root to start a process on a port under 1024.  If you want to use a different <em>nameserverport</em>, replace 1050 with the correct port number throughout this example. 
+<P>When using <tt>orbd</tt>, the ORBD must be run on the same machine as the machine on which the servers will be activated.  Another Naming Service, <tt>tnameserv</tt>, could be used if you prefer to run the Naming Service on a machine other than the machine on which the servers will be activated.
+<P>
+<LI>On the server machine, start the Hello server, as follows:
+<PRE>
+   java HelloServer -ORBInitialPort 1050
+</PRE>
+<P>If you used a different <em>nameserverport</em>, replace 1050 with the correct port 
+number.  You do not need to specify the <tt>-ORBInitialHost</tt> argument because the Hello server will be running on the same host as the name server in this example. If the Name Server were running on a different machine, you would specify which machine using the <tt>-ORBInitialHost nameserverhost</tt> argument.
+<P>
+<LI>On the client machine, run the Hello application client.  From a DOS prompt or shell, 
+type:<P>
+<PRE>
+   java HelloClient -ORBInitialHost <em>nameserverhost</em> -ORBInitialPort 1050
+</PRE>
+
+<P>Note that <em>nameserverhost</em> is the host on which the IDL name server is running. In this case, it is the server machine. 
+ 
+
+<P>If you used a different <em>nameserverport</em>, replace 1050 with the correct port 
+number.
+<P>
+<LI>Kill or stop <tt>orbd</tt> when finished.  The name server will continue to wait for invocations until it is explicitly stopped.
+</OL>
+
+
+
+<P><HR>
+<font size=-1 color=blue>Copyright Sun Microsystems 2001</font>
+<P>
+</BODY>
+</HTML>

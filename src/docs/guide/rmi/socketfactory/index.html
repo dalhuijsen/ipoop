@@ -1,0 +1,463 @@
+<HTML>
+<HEAD>
+   <TITLE> Using a Custom RMI Socket Factory </TITLE>
+<!-- Changed by: Ann Wollrath - JavaSoft East, 19-Dec-2001 -->
+<!-- Changed by: Ann Wollrath - SMI Software Development, 15-Jan-2002 -->
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+&nbsp;
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR>
+<TD WIDTH="60"><IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 HEIGHT=88 WIDTH=52>&nbsp;</TD>
+
+<TD>
+<UL>
+<CENTER>
+<H1>
+Using a Custom RMI Socket Factory</H1></CENTER>
+</UL>
+</TD>
+
+<TD width=15% ALIGN=center>
+   <font size="-1"><a href="../../../index.html">
+	Documentation Comments</a>
+   </font>
+</TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>This tutorial shows you the steps to follow to implement and use a
+custom RMI socket factory. A custom RMI socket factory is useful if
+(1) your RMI client and server need to use sockets that encrypt or
+compress data, and/or (2) your application requires different socket types
+for different remote objects.
+
+<P>Prior to the Java<sup><font size=-2>TM</font></sup> 2 SDK, v1.2
+release, it was possible to create and install a custom
+<code>java.rmi.server.RMISocketFactory</code> subclass used globally
+for all connections created by the RMI transport. It was not possible,
+however, to associate a different RMI socket factory on a per-object
+basis.&nbsp; For example in JDK<sup><font size=-2>TM</font></sup> v1.1.x,
+an RMI socket factory could not
+produce SSL sockets for one object and use the Java Remote Method
+Protocol (JRMP) directly over TCP for a different object in the same
+virtual machine. Also before 1.2, it was necessary to
+spawn an instance of the <code>rmiregistry</code> that used only your
+custom socket protocol.
+
+<P>As of the Java 2 SDK, v1.2 release, an RMI application can use
+a custom RMI socket factory on a per-object basis, download a
+client-side socket factory, and continue to use the default
+<code>rmiregistry</code>.
+
+<P>This tutorial has three parts:
+<BLOCKQUOTE>
+<UL>
+<LI>
+<A HREF="#1">Implementing a Custom RMI Socket Factory.</A></LI>
+
+<LI>
+<A HREF="#2">Using a Custom RMI Socket Factory in an Application.</A></LI>
+
+<LI>
+<A HREF="#3">Compiling and Running the Application.</A></LI>
+
+</UL> <P>The source code for this tutorial is available in the
+following formats:
+
+<UL>
+    <LI><A HREF="../archives/sockets.zip">sockets.zip</A>
+    <LI><A HREF="../archives/sockets.tar">sockets.tar</A>
+    <LI><A HREF="../archives/sockets.tar.Z">sockets.tar.Z</A>
+</UL>
+</BLOCKQUOTE>
+Many people are interested in secure communication between RMI clients
+and servers. For more information see <i><A HREF="SSLInfo.html">Using RMI with
+SSL</A></i>.
+
+<P>
+<HR>
+<H2>
+<A NAME="1"></A>Implementing a Custom RMI Socket Factory</H2>
+There are three steps to implementing a custom RMI socket factory:
+<OL>
+<LI>
+<A HREF="#11">Implement a custom <code>ServerSocket</code> and
+<code>Socket</code>.</A></LI>   
+
+<LI>
+<A HREF="#12">Implement a custom <code>RMIClientSocketFactory</code>.</A></LI>
+
+<LI>
+<A HREF="#13">Implement a custom <code>RMIServerSocketFactory</code>.</A></LI>
+</OL>
+
+<BLOCKQUOTE>
+<H3>
+<A NAME="11"></A>Step 1:<BR>
+Implement a custom <code>ServerSocket</code> and <code>Socket</code></H3>
+The type of socket to use is an application-specific decision.
+If your server sends or receives sensitive data, you might want a socket
+that encrypts the data.
+
+<P>For this example, the custom RMI socket factory will create sockets
+that perform simple XOR encryption. This type of encryption will protect
+data from a casual snooper sniffing packets on the wire, but is easily
+decoded by a knowledgeable cryptanalyst.
+
+
+<p>The custom XOR socket implementation includes the following
+sources.  XOR sockets use special input and output stream
+implementations to handle xor-ing the data written to or read from the
+socket. 
+<ul>
+<li><a href="code/XorInputStream.java"><code>XorInputStream.java</code></a>
+<li><a href="code/XorOutputStream.java"><code>XorOutputStream.java</code></a>
+<li><a href="code/XorServerSocket.java"><code>XorServerSocket.java</code></a>
+<li><a href="code/XorSocket.java"><code>XorSocket.java</code></a>
+</ul>
+
+<H3>
+<A NAME="12"></A>Step 2:<BR>
+Implement a custom <code>RMIClientSocketFactory</code></H3>
+
+The client-side RMI socket factory,
+<code>XorClientSocketFactory</code>, implements the&nbsp;
+<code>java.rmi.server.RMIClientSocketFactory</code>&nbsp; interface.
+The client socket factory needs to implement the
+<code>createSocket</code> method to return the approriate client
+socket instance, an <code>XorSocket</code>.  <p>The client socket
+factory must implement the <code>java.io.Serializable</code> interface
+so that instances can be serialized to clients.  It is also important
+to implement the <code>equals</code> and <code>hashCode</code> methods
+so that the RMI implementation will reuse the socket factory's
+connections to remote objects using equivalent factories.
+
+<pre>
+package examples.rmisocfac;
+
+import java.io.*;
+import java.net.*;
+import java.rmi.server.*;
+
+public class XorClientSocketFactory
+    implements RMIClientSocketFactory, Serializable {
+
+    private byte pattern;
+
+    public XorClientSocketFactory(byte pattern) {
+	this.pattern = pattern;
+    }
+    
+    public Socket createSocket(String host, int port)
+	throws IOException
+    {
+	return new XorSocket(host, port, pattern);
+    }
+    
+    public int hashCode() {
+	return (int) pattern;
+    }
+
+    public boolean equals(Object obj) {
+	return (getClass() == obj.getClass() &&
+		pattern == ((XorClientSocketFactory) obj).pattern);
+    }
+}
+</pre>
+
+<h3>
+<A NAME="13"></A>Step 3:<BR>
+Implement a custom <code>RMIServerSocketFactory</code></H3>
+The server-side RMI socket factory, <code>XorServerSocketFactory</code>,
+implements the&nbsp; <code>java.rmi.server.RMIServerSocketFactory</code>&nbsp;
+interface. The server socket factory needs to implement the
+<code>createServerSocket</code> method to return the appropriate
+server socket instance, an <code>XorServerSocket</code>.
+
+<P>The server socket factory does not need to implement the
+<code>Serializable</code> interface because server socket factory
+instances are not serialized to clients. The factory should implement
+the <code>equals</code> and <code>hashcode</code> methods so that the
+RMI implementation will reuse the socket factory's accept connection
+for equivalent factories.
+
+<pre>
+package examples.rmisocfac;
+
+import java.io.*;
+import java.net.*;
+import java.rmi.server.*;
+
+public class XorServerSocketFactory
+    implements RMIServerSocketFactory {
+
+    private byte pattern;
+
+    public XorServerSocketFactory(byte pattern) {
+	this.pattern = pattern;
+    }
+    
+    public ServerSocket createServerSocket(int port)
+	throws IOException
+    {
+	return new XorServerSocket(port, pattern);
+    }
+    
+    public int hashCode() {
+	return (int) pattern;
+    }
+
+    public boolean equals(Object obj) {
+	return (getClass() == obj.getClass() &&
+		pattern == ((XorServerSocketFactory) obj).pattern);
+    }
+
+}
+</pre>
+</blockquote>
+<HR>
+<H2>
+<A NAME="2"></A>Using a Custom Socket Factory in an Application</H2>
+There are only two more steps to complete when using a custom RMI socket
+factory for a remote object:
+<OL>
+<LI> 
+Write a server application that creates a remote object and exports it
+to use your custom <code>RMIClientSocketFactory</code> and
+<code>RMIServerSocketFactory</code>.  Store a reference to the remote
+object's stub in an RMI registry so that clients can look it up.
+<p>
+<LI>
+Write a client application that looks up the stub for the remote
+object and invokes a remote method.  The custom socket factories do
+not need to be referenced in the client application.  The client-side
+RMI socket factory will be downloaded to the client when the client
+looks up the stub for the remote object.
+</OL>
+<BLOCKQUOTE> <H3> Step 1:<BR> Write a server application</H3>
+
+If communication with a remote object requires the use of custom
+sockets, you need to inform the RMI runtime which custom socket
+factories to use when you export the remote object.  When your
+application exports the object specifying custom socket factories, the
+RMI runtime will use the corresponding custom
+<code>RMIServerSocketFactory</code> to create a server socket to
+accept incoming calls to the remote object.  Also, the RMI
+runtime will create a stub that refers to the corresponding custom
+<code>RMIClientSocketFactory</code>.  This client socket factory will
+be used to create connections upon initating a remote invocation to the
+remote object using the stub.
+
+
+<p> This example is similar to the example in the tutorial <a
+href="../getstart.doc.html"><i>Getting Started Using RMI</i></a>, but uses
+custom socket factories instead of the default sockets used by the RMI
+implementation.
+
+<p>The application uses the following <code>Hello</code> remote interface:
+
+<pre>
+package examples.rmisocfac;
+
+public interface Hello extends java.rmi.Remote {
+    String sayHello() throws java.rmi.RemoteException;
+}
+</pre>
+
+The server application creates a remote object implementing the <code>Hello</code>
+remote interface and exports the object to use custom socket factories
+using the
+<code>java.rmi.server.UnicastRemoteObject.exportObject</code> method
+that takes the custom socket factories as arguments.  Next, it creates
+a local registry and, in that registry, it binds a reference to the
+remote object's stub with the name "Hello".
+
+
+<pre>
+package examples.rmisocfac;
+
+import java.io.*;
+import java.rmi.*;
+import java.rmi.server.*;
+import java.rmi.registry.*;
+
+public class HelloImpl implements Hello {
+  
+    public HelloImpl() {}
+
+    public String sayHello() {
+        return  "Hello World!";
+    }
+  
+    public static void main(String args[]) {
+
+	if (System.getSecurityManager() == null) {
+	    System.setSecurityManager(new SecurityManager());
+	}
+	
+        byte pattern = (byte) 0xAC;
+	try {
+	    /*
+	     * Create remote object and export it to use
+	     * custom socket factories.
+	     */
+	    HelloImpl obj = new HelloImpl();
+	    RMIClientSocketFactory csf = new XorClientSocketFactory(pattern);
+	    RMIServerSocketFactory ssf = new XorServerSocketFactory(pattern);
+	    Hello stub =
+		(Hello) UnicastRemoteObject.exportObject(obj, 0, csf, ssf);
+	    
+	    /*
+	     * Create a registry and bind stub in registry.
+	     *
+	    LocateRegistry.createRegistry(2002);
+	    Registry registry = LocateRegistry.getRegistry(2002);	
+	    registry.rebind("Hello", stub);
+	    System.out.println("HelloImpl bound in registry");
+	    
+	} catch (Exception e) {
+	    System.out.println("HelloImpl exception: " + e.getMessage());
+	    e.printStackTrace();
+	}
+    }
+} 
+</pre>
+<H3>
+Step 2:<BR>
+Write a client application</H3>
+<p>
+The client application obtains a reference to the registry used by the
+server application. It then looks up the remote object's stub and
+invokes its remote method <code>sayHello</code>:
+
+<pre>
+package examples.rmisocfac;
+
+import java.rmi.*;
+import java.rmi.registry.*;
+
+public class HelloClient {
+
+    public static void main(String args[]) {
+
+	if (System.getSecurityManager() == null) {
+	    System.setSecurityManager(new SecurityManager());
+	}
+
+        try {
+	    Registry registry = LocateRegistry.getRegistry(2002);
+            Hello obj = (Hello) registry.lookup("Hello");
+            String message = obj.sayHello();
+            System.out.println(message);
+
+        } catch (Exception e) {
+	    System.out.println("HelloClient exception: " +
+                               e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+}
+</pre>
+</blockquote>
+<P>
+<HR>
+<H2>
+<A NAME="3"></A>Compiling and Running the Application</H2>
+
+<P>There are four steps to compile and run the application:
+<OL>
+	<LI><A HREF="#C1">Compile the remote interface, client, and
+	server classes</A>
+
+        <LI><A HREF="#C2">Run <code>rmic</code> on the implementation class</A>
+
+	<LI><A HREF="#C3">Start the server</A>
+
+	<LI><A HREF="#C4">Run the client</A>
+
+</OL>
+
+<blockquote>
+<P><A NAME="C1"></A><B><FONT SIZE=+1>Step 1:</FONT></B>
+<BR><B><FONT SIZE=+1>Compile the remote interface, client, and server classes
+</FONT></B>
+
+<pre>
+javac -d . Hello.java
+javac -d . HelloClient.java
+javac -d . HelloImpl.java
+javac -d . XorClientSocketFactory.java
+javac -d . XorInputStream.java
+javac -d . XorOutputStream.java
+javac -d . XorServerSocket.java
+javac -d . XorServerSocketFactory.java
+javac -d . XorSocket.java
+</pre>
+
+<P><A NAME="C2"></A><B><FONT SIZE=+1>Step 2:</FONT></B>
+<BR><B><FONT SIZE=+1>Run <code>rmic</code> on the implementation class</FONT></B>
+
+<pre>rmic -d . examples.rmisocfac.HelloImpl</pre>
+
+<P><A NAME="C3"></A><B><FONT SIZE=+1>Step 3:</FONT></B>
+<BR><B><FONT SIZE=+1>Start the server</FONT></B>
+
+<pre>java -Djava.security.policy=policy examples.rmisocfac.HelloImpl</pre>
+
+<P>The server output should look like this:
+
+<pre>
+      HelloImpl bound in registry
+</pre>
+<BR><p><A NAME="C4"></A><B><FONT SIZE=+1>Step 4:</FONT></B>
+<BR><B><FONT SIZE=+1>Run the client</FONT></B>
+
+<p>In another window start the client application making sure that
+the application classes are in the class path:
+
+<pre>java -Djava.security.policy=policy examples.rmisocfac.HelloClient</pre>
+
+
+<P>The client output should look like this:
+
+<pre>
+      Hello World!  </pre>
+
+<p><b><i>Note:</i></b> Both the server and client applications use a security policy
+file that grants permissions only to files in the local class path
+(the current directory).  The server application needs permission to
+accept connections, and both the server and client applications need
+permission to make connections.  The permission
+<code>java.net.SocketPermission</code> is granted to the specified
+codebase URL, a "file:" URL relative to the current directory.  This
+permission grants the ability to both accept connections from and
+make connections to any host on unprivileged ports (that is ports >= 1024).
+
+<pre>
+grant codeBase "file:." {
+
+    permission java.net.SocketPermission "*:1024-", "connect,accept";
+};
+</pre>
+
+<br>
+</blockquote>
+<P>
+
+
+<!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../../relnotes/SMICopyright.html">Copyright &copy;</A>
+2003 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:rmi-comments@java.sun.com"><code>rmi-comments@java.sun.com</code></A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+</BODY>
+</HTML>

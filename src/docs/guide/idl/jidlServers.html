@@ -1,0 +1,121 @@
+<HTML>
+<HEAD>
+   <TITLE>Java IDL: Developing Servers</TITLE>
+<!-- Changed by: vlc, 6/27/97, dbc 5/2001 -->
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H1 ALIGN=CENTER>Developing Servers</H1>
+<P><i>This document was not updated for the 
+J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> release.  If you downloaded
+ this document as part of the 
+J2SE<SUP><FONT SIZE="-2">TM</FONT></SUP> documentation bundle, check the
+Web site at <a href="http://java.sun.com/j2se/1.4.2/docs/guide/idl/jidlServers.html">
+http://java.sun.com/j2se/1.4.2/docs/guide/idl/jidlServers.html</a> for updates.</i>
+
+<P>
+<HR>
+
+<P>This topic introduces Java&nbsp;IDL support for servers of both persistent and 
+transient CORBA objects. 
+<P>
+<!--***************TRANSIENT AND PERSISTENT OBJECTS*************-->
+
+<A name="transient&persistent">
+<H2>Transient and Persistent Objects</H2></A>
+
+<P>A persistent CORBA object lives until it is explicitly
+destroyed. If a client has a reference to a persistent CORBA object,
+that reference can be used even if the object's server is not
+running -- an ORB daemon, ORBD,  will start the server when the ORB receives an
+invocation on the object.</P>
+
+<P>Starting with J2SE 1.4, Java IDL includes a Portable Object Adapter (POA), Object 
+Request Broker Daemon (ORBD), and the <tt>servertool</tt>.  These features enable <a 
+href="#persistent">persistent object servers</a> to be written using Java IDL!</P>
+
+<P>By contrast, a <a href="#transient">transient CORBA object</a> has the same 
+lifetime as the execution of
+the server process that creates it. When a server terminates, its
+transient objects disappear with it and any object references held by
+the client become invalid. Transient objects are often used
+to effect asynchronous, or callback communication between applications and
+objects. For example, suppose a timing service notifies a client application 
+when an interval expires; it could do so as follows:</P>
+
+<UL>
+   <LI>The timing service defines an interface for a notifier object
+   that includes an <TT>interval_expired()</TT> operation.<P>
+   
+   <LI>The timing service requires that a client pass a notifier
+   object to the timing service's <TT>set_interval()</TT> operation.<P>
+   
+   <LI>The timing service client application implements a transient object that
+   implements the notifier interface.<P>
+   
+   <LI>The client application creates and passes a notifier object
+   to the timing service.<P>
+   
+   <LI>When the interval expires, the timing service invokes the
+   notifier object's <TT>interval_expired()</TT> operation.<P>
+</UL>
+
+<P>The arrangement, in other words, is much like a callback in
+procedural programming.</P>
+
+
+
+
+<!--*******************PERSISTENT OBJECT SERVERS *****************-->
+<a name="persistent"></a>
+<H1>Persistent Object Servers</H1>
+
+<P>Starting with J2SE 1.4, Java IDL includes a Portable Object Adapter (POA), Object 
+Request Broker Daemon (ORBD), and the <tt>servertool</tt>.  These features enable 
+persistent object servers to be written using Java IDL!  The tutorial 
+<a href="jidlExample2.html">Hello World with persistent server</a> provides a version of the "Hello World" application 
+that utilizes a persistent object server.
+
+
+
+
+<a name="transient"></a>
+<H1>Transient Object Servers</H1>
+
+The <A HREF="jidlExample.html">Hello World example</A>
+includes a transient object server.
+
+
+<P><HR>
+<CENTER><P>
+<A href="jidlClients.html">Clients</A> | Servers | <A 
+href="jidlExceptions.html">Exceptions</A> | <A 
+href="jidlInitialization.html">Initialization</A> | <A 
+href="jidlNaming.html">Naming</A> 
+
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html"><IMAGE 
+SRC="images/1top_lt.gif"><BR>Home</A></TD>
+  <TD ALIGN=CENTER><A href="fund.html"><IMAGE 
+SRC="images/2fundamentals_lt.gif"><BR>Fundamentals</A></TD>  
+  <TD ALIGN=CENTER><A href="program.html"><IMAGE 
+SRC="images/3programming_lt.gif"><BR>Programming</A></TD>  
+  <TD ALIGN=CENTER><A href="reference.html"><IMAGE 
+SRC="images/4ref_lt.gif"><BR>References</A></TD>  
+  <TD ALIGN=CENTER><A href="examples.html"><IMAGE 
+SRC="images/4ex_lt.gif"><BR>Tutorial</A>
+</TD>
+</TR></TABLE>
+
+<HR><FONT
+SIZE="-2">
+<A HREF="http://www.sun.com/share/text/SMICopyright.html">Copyright
+&copy;</A></FONT><FONT SIZE="-2"> 1996, 1997 Sun Microsystems, Inc.,
+2550 Garcia Ave., Mtn. View, CA. 94043-1100 USA., All rights
+reserved.</FONT></P>
+</CENTER>
+</BODY>
+</HTML>

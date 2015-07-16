@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>klist - Kerberos tool</TITLE>
+</head>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>klist - <FONT SIZE="+1">Kerberos display entries in credentials
+cache and keytab</FONT></H1>
+
+<BLOCKQUOTE>
+  <P><CODE>klist</CODE> allows the user to view entries in the
+  local credentials cache and key table.</P>
+</BLOCKQUOTE>
+
+<H2>SYNOPSIS</H2>
+
+<BLOCKQUOTE>
+  <P><B><CODE>klist [ <A HREF="#commands">commands</A> ]</CODE></B></P>
+</BLOCKQUOTE>
+
+<H2>DESCRIPTION</H2>
+
+<BLOCKQUOTE>
+  <P><CODE>klist</CODE> displays the entries in the local credentials
+  cache and key table. After the user has modified the credentials
+  cache with <CODE>kinit</CODE> or modified the keytab with <CODE>ktab</CODE>,
+  the only way to verify the changes is to view the contents of
+  the credentials cache and/or keytab using <CODE>klist</CODE>.
+  <CODE>klist</CODE> does not change the Kerberos database.</P>
+</BLOCKQUOTE>
+
+
+<H2><A NAME="commands"></A>COMMANDS</H2>
+
+<BLOCKQUOTE>
+  <P><B>Usage: <CODE>klist [-c [-fe]] [-k [-tK]] [&lt;<I><em>name</em></I>&gt;]
+  [-help]</CODE></B></P>
+  <BLOCKQUOTE>
+<TABLE width="433" BORDER="1" CELLSPACING="2" CELLPADDING="2" summary="List of klist Command Line Option Names and Descriptions">
+
+<tr>
+<th>
+Command Option
+</th>
+<th>
+Description
+</th>
+</tr>
+      <TR>
+        <TD>
+        <CODE>-c</CODE></TD> 
+        <TD>
+        Specifes that the credential cache entries are to be listed.</TD> 
+      </TR>
+      <TR>
+        <TD>
+        <CODE>-k</CODE></TD> 
+        <TD>
+        Specifies that the key tab entries are to be listed.</TD> 
+      </TR>
+      <TR>
+        <TD>
+        <CODE>&lt;<I><em>name</em></I>&gt;</CODE></TD> 
+        <TD>
+        Specifies the credential cache name or the keytab name. If the
+        name is not specified default values for cache name and the keytab
+        are used. The default values for the cache and the keytab are
+        specified in the <A HREF="kinit.html">man
+        page for kinit</A>.</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="70">
+        <CODE>-help</CODE></TD> 
+        <TD WIDTH="354">
+        Displays instructions.</TD> 
+      </TR>
+    </TABLE></P>
+<P><TABLE WIDTH="433" BORDER="1" CELLSPACING="2" CELLPADDING="2"
+summary="klist Command Line Options and Descriptions for use with
+the -c option">
+<tr>
+<th COLSPAN="2">
+If the <CODE>-c</CODE> option is specified (options for credential
+cache):
+</th>
+</TR>
+
+      <TR>
+        <TD WIDTH="47">
+        &nbsp;<CODE>-f</CODE></TD> 
+        <TD WIDTH="377">
+        Shows credentials flags.</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="47">
+        <CODE>-e</CODE></TD> 
+        <TD WIDTH="377">
+        Shows the encryption type.</TD> 
+      </TR>
+    </TABLE></P>
+
+<P><TABLE WIDTH="433" BORDER="1" CELLSPACING="2" CELLPADDING="2"
+summary="klist Command Line Options and Descriptions for use with
+the -k option">
+<tr>
+<th COLSPAN="2">
+If the <CODE>-k</CODE> option is specified (options available
+for keytabs):
+</th>
+</TR>
+
+      <TR>
+        <TD WIDTH="45">
+        &nbsp;<CODE>-t</CODE></TD> 
+        <TD WIDTH="379">
+        Shows keytab entry timestamps.</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="45">
+        <CODE>-K</CODE></TD> 
+        <TD WIDTH="379">
+        Shows keytab entry DES keys.</TD> 
+      </TR>
+    </TABLE></P>
+
+  </BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H2>EXAMPLES</H2>
+
+<BLOCKQUOTE>
+  <DL>
+    <DT>List entries in the keytable specified including keytab entry
+    timestamps and DES keys:
+  </DL>
+  <BLOCKQUOTE>
+    <DL>
+      <DT><CODE>klist -k -t -K FILE:\temp\mykrb5cc</CODE>
+      <DT>&nbsp;
+    </DL>
+  </BLOCKQUOTE>
+  <DL>
+    <DT>List entries in the credentials cache specified including
+    credentials flag and address list:
+  </DL>
+  <BLOCKQUOTE>
+    <DL>
+      <DT><CODE>klist -c -f FILE:\temp\mykrb5cc</CODE>
+    </DL>
+  </BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<P>
+
+</BODY>
+</HTML>

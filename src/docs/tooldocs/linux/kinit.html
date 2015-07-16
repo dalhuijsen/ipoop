@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>kinit - Kerberos tool</TITLE>
+</head>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>kinit</H1>
+
+<BLOCKQUOTE>
+  <P>kinit is used to obtain and cache Kerberos ticket-granting
+  tickets. This tool is similar in functionality to the kinit tools
+  commonly found in other Kerberos implementations, such
+  as SEAM and MIT Reference implementations.</P>
+  <P>The user must be registered as a principal with the Key Distribution
+  Center (KDC) prior to running kinit.</P>
+</BLOCKQUOTE>
+
+<H2>SYNOPSIS</H2>
+
+<BLOCKQUOTE>
+  <P><B><CODE>kinit [ <A HREF="#commands">commands</A> ] &lt;principal
+  name&gt; <password></CODE></B></P>
+</BLOCKQUOTE>
+
+<H2>DESCRIPTION</H2>
+
+<BLOCKQUOTE>
+  <P>By default, for all Unix 
+  platforms a cache file named<CODE>/tmp/krb5cc_&lt;uid&gt;</CODE> 
+  will be generated. <CODE>&lt;uid&gt;</CODE> is the user identification number of 
+  the user logged into the system. For all other platforms, a cache
+  file named <CODE>&lt;USER_HOME&gt;/krb5cc_&lt;USER_NAME&gt;</CODE>
+  would be generated.</P>
+
+  <P><CODE>&lt;USER_HOME&gt;</CODE> is obtained from the <code>java.lang.System</code>
+  property <code>user.home</code>. <CODE>&lt;USER_NAME&gt;</CODE> is obtained
+  from <CODE>java.lang.System</CODE> property <code>user.name</code>. If <CODE>&lt;USER_HOME&gt;</CODE>
+  is null, the cache file would be stored in the current directory
+  that the program is running from. <CODE>&lt;USER_NAME&gt;</CODE>
+  is the operating system's login username. This username could 
+  be different than the user's principal name.
+
+  For example on Solaris, it could be <CODE>/home/duke/krb5cc_duke</CODE>,
+  in which <code>duke</code> is the <CODE>&lt;USER_NAME&gt;</CODE> and <CODE>/home/duke</CODE>
+  is the <CODE>&lt;USER_HOME&gt;</CODE>.</P>
+
+  <P>By default, the keytab name is retrieved from the Kerberos
+  configuration file. If the keytab name is not specifed in the Kerberos configuration
+  file, the name is assumed to be <CODE>&lt;USER_HOME&gt;/krb5.keytab</CODE></P>
+  <P>If you do not specify the password using the <CODE>password</CODE>
+  option on the command line, kinit will prompt you for the password.</P>
+  <BLOCKQUOTE>
+    <P><B>Note</B>: <CODE>password</CODE> is provided only for testing
+    purposes. Do not place your password in a script or provide your
+    password on the command line. Doing so will compromise your password.</P>
+  </BLOCKQUOTE>
+  <P>For more information see the 
+<A HREF="http://docs.sun.com/?q=kinit&p=/doc/816-0210/6m6nb7mck&a=view">man
+  pages for kinit</A>.</P>
+</BLOCKQUOTE>
+
+
+<H2><A NAME="commands"></A>COMMANDS</H2>
+
+<BLOCKQUOTE>
+  <P><B>Usage:<CODE> kinit -fp [-c &lt;<I><em>cache_name</em></I>&gt;] [-k] 
+   [-t &lt;<I><em>keytab_filename</em></I>&gt;]
+  [&lt;<I><em>principal</em></I>&gt;] [&lt;<I><em>password</em></I>&gt;] 
+  [-help]</CODE></B></P>
+
+  <BLOCKQUOTE>
+    <P><TABLE WIDTH="528" BORDER="1" CELLSPACING="2" CELLPADDING="2" summary="List of kinit Command Line Option Names and Descriptions">
+<tr>
+<th>
+Command Option
+</th>
+<th>
+Description
+</th>
+</tr>
+      <TR>
+        <TD WIDTH="35%">
+        <CODE>-f</CODE></TD> 
+        <TD WIDTH="65%">
+        Issue a forwardable ticket.</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="35%">
+        <CODE>-p</CODE></TD> 
+        <TD WIDTH="65%">
+        Issue a proxiable ticket.</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="35%">
+        <CODE>-c &lt;<I><em>cache_name</em></I>&gt;</CODE></TD> 
+        <TD WIDTH="65%">
+        The cache name (i.e., <CODE>FILE:/temp/mykrb5cc</code>).</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="35%">
+        <CODE>-k</CODE></TD> 
+        <TD WIDTH="65%">
+        Use keytab</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="35%">
+        <CODE>-t &lt;<I><em>keytab_filename</em></I>&gt;</CODE></TD> 
+        <TD WIDTH="65%">
+        The keytab name (i.e, <code>/home/duke/krb5.keytab</code>).</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="35%">
+        <CODE>&lt;<I><em>principal</em></I>&gt;</CODE></TD> 
+        <TD WIDTH="65%">
+        The principal name (i.e., <code>duke@java.sun.com</code>).</TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="35%">
+        <CODE>&lt;<I><em>password</em></I>&gt;</CODE></TD> 
+        <TD WIDTH="65%">
+        The principal's Kerberos password.<BR>
+        (DO NOT SPECIFY ON COMMAND LINE OR IN A SCRIPT.)
+        </TD> 
+      </TR>
+      <TR>
+        <TD WIDTH="35%">
+        <CODE>-help</CODE></TD> 
+        <TD WIDTH="65%">
+        Display instructions.
+        </TD> 
+      </TR>
+    </TABLE></P>
+  </BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H2>EXAMPLES</H2>
+
+<BLOCKQUOTE>
+  <P>Requesting credentials valid for authentication from the current
+  client host, for the default services, storing the credentials
+  cache in the default location (<CODE>/home/duke/krb5cc_duke</CODE>):</P>
+  <BLOCKQUOTE>
+    <P><CODE>kinit duke@JAVA.SUN.COM</CODE></P>
+  </BLOCKQUOTE>
+  <P>Requesting proxiable credentials for a different principal
+  and storing these credentials in a specified file cache:</P>
+  <BLOCKQUOTE>
+    <P><CODE>kinit -p -c FILE:/home/duke/credentials/krb5cc_cafebeef
+    cafebeef@JAVA.SUN.COM</CODE></P>
+  </BLOCKQUOTE>
+  <P>Requesting proxiable and forwardable credentials for a different
+  principal and storing these credentials in a specified file cache:</P>
+  <BLOCKQUOTE>
+    <P><CODE>kinit -f -p -c FILE:/home/duke/credentials/krb5cc_cafebeef
+    cafebeef@JAVA.SUN.COM</CODE></P>
+  </BLOCKQUOTE>
+  <P>Displaying the help menu for kinit:</P>
+  <BLOCKQUOTE>
+    <P><CODE>kinit -help</CODE></P>
+  </BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H2>SECURITY ALERT</H2>
+
+<BLOCKQUOTE>
+  <P>The <CODE>password</CODE> flag is for testing purposes only.
+  Do not specify your password on the command line. Doing so is
+  a security hole since an attacker could discover your password
+  while running the Unix <CODE>ps</CODE> command, for example.</BLOCKQUOTE>
+
+</BODY>
+</HTML>

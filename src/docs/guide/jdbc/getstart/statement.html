@@ -1,0 +1,230 @@
+<html><head><title></title></head>
+<body bgcolor=#ffffff>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="drivermanager.html">[Prev]</a> <a href="resultset.html">[Next]</a> 
+<hr><br>
+ 
+<a name="1000062"> </a>
+<h2> </a>Statement</a></h2>
+<p><a name="1006436"> </a>
+NOTE: The material in this chapter is based on <em>JDBC</em>tm<em> API Tutorial and Reference, Second Edition: Universal Data Access for the Java</em>tm<em> 2 Platform</em>, published by Addison Wesley as part of the Java series, ISBN 0-201-43328-1.
+</p><a name="996854"> </a>
+<h3>4.1	 Statement Overview</h3>
+<p><a name="996855"> </a>
+A <code>Statement</code> object is used to send SQL statements to a database. There are actually three kinds of <code>Statement</code> objects, all of which act as containers for executing SQL statements on a given connection: <code>Statement</code>, <code>PreparedStatement</code>, which inherits from <code>Statement</code>, and <code>CallableStatement</code>, which inherits from <code>PreparedStatement</code>. They are specialized for sending particular types of SQL statements; a <code>Statement</code> object is used to execute a simple SQL statement with no parameters, a <code>PreparedStatement</code> object is used to execute a precompiled SQL statement with or without IN parameters, and a <code>CallableStatement</code> object is used to execute a call to a database stored procedure. 
+</p><p><a name="998356"> </a>
+The <code>Statement</code> interface provides basic methods for executing statements and retrieving results. The <code>PreparedStatement</code> interface adds methods for dealing with IN parameters; the <code>CallableStatement</code> interface adds methods for dealing with OUT parameters.
+</p><p><a name="1002550"> </a>
+In the JDBC 2.0 core API, the <code>ResultSet</code> interface has a set of new <code>updateXXX</code> methods and other new related methods that make it possible to update table column values programmatically. This new API also adds methods to the <code>Statement</code> interface (and <code>PreparedStatement</code> and <code>CallableStatement</code> interfaces) so that update statements may be executed as a batch rather than singly.
+</p><a name="996886"> </a>
+<h4>4.1.1	 </a>Creating </a>Statement Objects</a></h4>
+<p><a name="996890"> </a>
+Once a connection to a particular database is established, that connection can be used to send SQL statements. </a>A <code>Statement</code> object is created with the <code>Connection</code> method </a><code>createStatement</code>, as in the following code fragment:
+</p><blockquote><pre>
+Connection con = DriverManager.getConnection(url, "sunny", "");
+Statement stmt = con.createStatement();
+
+</pre></blockquote><p><a name="999462"> </a>
+The SQL statement that will be sent to the database is supplied as the argument to one of the <code>execute</code> methods on a <code>Statement</code> object. This is demonstrated in the following example, which uses the method <code>executeQuery</code>:
+</p><blockquote><pre>
+ResultSet rs = stmt.executeQuery("SELECT a, b, c FROM Table2");
+</pre></blockquote><p><a name="1003672"> </a>
+The variable rs references a result set that cannot be updated and in which the cursor can move only forward, which is the default behavior for <code>ResultSet</code> objects. The JDBC 2.0 core API adds a new version of the method <code>Connection.createStatement</code> that makes it possible to create <code>Statement</code> objects that produce result sets that are scrollable and/or updatable.
+</p><a name="1003674"> </a>
+<h4>4.1.2	 </a>Executing Statements Using Statement Objects</h4>
+<p><a name="1000668"> </a>
+</a>The </a><code>Statement</a></code> interface provides three different methods for executing SQL statements: <code>executeQuery</code>, <code>executeUpdate</code>, and <code>execute</code>. The correct method to use is determined by what the SQL statement produces.
+</p><p><a name="998967"> </a>
+</a>The method </a><code>executeQuery</code> is designed for statements that produce a single result set, such as <code>SELECT</code> statements.
+</p><p><a name="998227"> </a>
+The method </a><code>executeUpdate</code> is used to execute <code>INSERT</code>, <code>UPDATE</code>, or </a><code>DELETE</code> statements and also SQL DDL (Data Definition Language) statements like <code>CREATE</code> <code>TABLE</code>, </a><code>DROP</code> <code>TABLE</code>, and <code>ALTER TABLE. </code>The effect of an <code>INSERT</code>, <code>UPDATE</code>, or <code>DELETE</code> statement is a modification of one or more columns in zero or more rows in a table. The return<em> </em>value of <code>executeUpdate</code> is an integer (referred to as the update count) that indicates the number of rows that were affected. For statements such as <code>CREATE</code> <code>TABLE</code> or <code>DROP</code> <code>TABLE</code>, which do not operate on rows, the return value of <code>executeUpdate</code> is always zero.
+</p><p><a name="1000686"> </a>
+The method </a><code>execute</code> is used to execute statements that return more than one result set, more than one update count, or a combination of the two. Because it is an advanced feature that the majority of programmers will never use, it is explained in its own section later in this overview.
+</p><p><a name="999296"> </a>
+All of the methods for executing statements close the calling <code>Statement</code> object's current result set if there is one open. This means that any processing of the current <code>ResultSet</code> object needs to be completed before a <code>Statement</code> object is re-executed.
+</p><p><a name="999297"> </a>
+</a>It should be noted that the </a><code>PreparedStatement</a></code> interface, which inherits all of the methods in the <code>Statement</code> interface, has its own versions of the methods <code>executeQuery</code>, </a><code>executeUpdate</a></code> and <code>execute</code>. <code>Statement</code> objects do not themselves contain an SQL statement; therefore, one must be provided as the argument to the <code>Statement.execute</code> methods. <code>PreparedStatement</code> objects do not supply an SQL statement as a parameter to these methods because they already contain a precompiled SQL statement. <code>CallableStatement</code> objects inherit the <code>PreparedStatement</code> forms of these methods. Supplying a parameter to the <code>PreparedStatement</code> or <code>CallableStatement</code> versions of these methods will cause an <code>SQLException</code> to be thrown.
+</p><a name="999265"> </a>
+<h4>4.1.3	 </a>Statement Completion</a></h4>
+<p><a name="999854"> </a>
+When a connection is in auto-commit mode, the statements being executed within it are committed or rolled back when they are completed. A statement is considered complete when it has been executed and all its results have been returned. For the method <code>executeQuery</code>, which returns one result set, the statement is completed when all the rows of the <code>ResultSet</code> object have been retrieved. For the method <code>executeUpdate</code>, a statement is completed when it is executed. In the rare cases where the method <code>execute</code> is called, however, a statement is not complete until all of the result sets or update counts it generated have been retrieved. 
+</p><p><a name="999859"> </a>
+</a>Some DBMSs treat each statement in a stored procedure as a separate statement; others treat the entire procedure as one compound statement. This difference becomes important when auto-commit is enabled because it affects when the method <code>commit</code> is called. In the first case, each statement is individually committed; in the second, all are committed together. 
+</p><a name="1000569"> </a>
+<h4>4.1.4	 Closing Statements</h4>
+<p><a name="1000572"> </a>
+<code>Statement</code> objects will be closed automatically by the Java garbage collector. Nevertheless, it is recommended as good programming practice that they be closed explicitly when they are no longer needed. This frees DBMS resources immediately and helps avoid potential memory problems.
+</p><a name="1006519"> </a>
+<h4>4.1.5	 SQL Escape Syntax in Statements </h4>
+<p><a name="1004825"> </a>
+<code></a>Statement</code> objects may contain SQL statements that use </a>SQL escape syntax. Escape syntax signals the driver that the code within it should be handled differently. When escape processing is enabled (by calling <code>Statement.setEscapeProcessing(true) </code>or <code>RowSet.setEscapeProcessing(true)</code>), the driver will scan for any </a>escape syntax and translate it into code that the particular database understands. This makes escape syntax DBMS-independent and allows a programmer to use features that might not otherwise be available.
+</p><p><a name="999485"> </a>
+An escape clause is demarcated by curly braces and a key word, which indicates the kind of escape clause.
+</p><blockquote><pre>
+	{keyword . . . parameters . . . }
+</pre></blockquote><p><a name="1004778"> </a>
+The following keywords are used to identify escape clauses:
+</p><ul><a name="1001266"> </a>
+<li><strong></a>escape   for LIKE escape characters</strong>
+The percent sign <a <B>percent sign (%) wildcard>(<code>%</code>) and underscore <a <B>underbar (_) wildcard>(<code>_</code>) characters work like wild cards in SQL <code>LIKE</code> clauses (<code>%</code> matches zero or more characters, and <code>_</code> matches exactly one character). </a>In order to interpret them literally, they can be preceded by a backslash (<code>\</code>), which is a special escape character in strings. </a>One can specify which character to use as the escape character by including the following syntax at the end of a query:
+<blockquote><pre>
+<code>	{escape 'escape-character'}
+</code></pre></blockquote><a name="999505"> </a>
+For example, the following query, using the backslash character as an escape character, finds identifier names that begin with an underbar.
+<blockquote><pre>
+stmt.executeQuery("SELECT name FROM Identifiers 
+      WHERE Id LIKE <code>'</code>\_%<code>'</code> {escape <code>'</code>\<code>'</code>}");
+
+</pre></blockquote>
+<li><strong>fn</strong> for scalar functions
+<p>
+Almost all DBMSs have numeric, string, time, date, system, and conversion functions on scalar values. One of these functions can be used by putting it in escape syntax with the keyword <code>fn</code> followed by the name of the desired function and its arguments. For example, the following code calls the function <code>concat</code> with two arguments to be concatenated:
+<blockquote><pre>
+	{fn concat("Hot", "Java")};
+</pre></blockquote><a name="999532"> </a>
+The name of the current database user can be obtained with the following syntax:
+<blockquote><pre>
+	{fn user()};
+</pre></blockquote><a name="999534"> </a>
+Scalar functions may be supported by different DBMSs with slightly different syntax, and they may not be supported by all drivers. Various <code>DatabaseMetaData</code> methods will list the functions that are supported. For example, the method <code>getNumericFunctions</code> returns a comma-separated list of the Open Group CLI names of numeric functions, the method <code>getStringFunctions</code> returns string functions, and so on.
+<a name="999537"> </a>
+The driver will either map the escaped function call into the appropriate syntax or implement the function directly itself. However, a driver is required to implement only those scalar functions that the DBMS supports.
+<p>
+<li><strong>d</strong>, <strong>t</strong>, and <strong>ts</strong> for date and time literals
+DBMSs differ in the syntax they use for date, time, and </a>timestamp literals. The JDBC API supports ISO standard format for the syntax of these literals, using an escape clause that the driver must translate to the DBMS representation. For example, a date is specified in a JDBC SQL statement with the following syntax:
+<blockquote><pre>
+	{d 'yyyy-mm-dd'}
+</pre></blockquote>
+In this syntax, <code>yyyy</code> is the year, <code>mm</code> is the month, and <code>dd</code> is the day. The driver will replace the </a>escape clause with the equivalent DBMS-specific representation. For example, the driver might replace <code>{d 1999-02-28}</code> with <code>'28-FEB-99'</code> if that is the appropriate format for the underlying database.
+</a>There</a> are analogous escape clauses for <code>TIME</code> and </a><code>TIMESTAMP</code>:
+<blockquote><pre>
+		{t 'hh:mm:ss'}
+		{ts 'yyyy-mm-dd hh:mm:ss.f . . .'}
+</pre></blockquote><a name="999565"> </a>
+The fractional seconds (<code>.f . . .</code>) portion of the <code>TIMESTAMP</code> can be omitted.
+<p>
+<li><strong>call</strong> or ?= <strong>call</strong> for stored procedures
+If a database supports stored procedures, they can be invoked from JDBC with the syntax shown below. Note that the square brackets (<code>[ ]</code>) indicate that what is between them is optional, and they are not part of the syntax.
+<blockquote><pre>
+	{call procedure_name[(?, ?, . . .)]}
+</pre></blockquote><p><a name="999572"> </a>
+or, where a procedure returns a result parameter:
+</p><blockquote><pre>
+	{? = call procedure_name[(?, ?, . . .)]}
+</pre></blockquote><a name="999570"> </a>
+Input arguments may be either literals or parameters.  See the section <a href="callablestatement.html#999937">"Numbering of Parameters" on page &#32;81</a> for more information.
+<a name="999578"> </a>
+One can call the method <code>DatabaseMetaData.supportsStoredProcedures</code> to see if the database supports stored procedures.
+<p>
+<li><strong>oj</strong> for outer joins
+<a name="999588"> </a>
+The syntax for an outer join is:
+<blockquote><pre>
+		{oj outer-join}
+</pre></blockquote><a name="999590"> </a>
+In this syntax, <code>outer-join</code> has the form
+<blockquote><pre>
+table {LEFT|RIGHT|FULL} OUTER JOIN {table | outer-join} 
+	ON search-condition
+</pre></blockquote><a name="999592"> </a>
+(Note that curly braces (<code>{}</code>) in the preceding line indicate that one of the items between them must be used; they are not part of the syntax.) The following <code>SELECT</code> statement uses the escape syntax for an outer join.
+<blockquote><pre>
+Statement stmt = con.createStatement("SELECT * FROM {oj TABLE1 
+	LEFT OUTER JOIN TABLE2 ON DEPT_NO = 003420930}"); 
+</pre></blockquote><a name="1001261"> </a>
+Outer joins are an advanced feature and are not supported by all DBMSs; consult the SQL grammar for an explanation of them. JDBC provides three <code>DatabaseMetaData</code> methods for determining the kinds of outer joins a driver supports: <code>supportsOuterJoins</code>, <code>supportsFullOuterJoins</code>, and <code>supportsLimitedOuterJoins</code>.
+<a name="1003665"> </a>
+<p><a name="999571"> </a>
+</ul>
+The method </a><code>Statement.setEscapeProcessing</code> turns escape processing on or off, with the default being on. A programmer might turn it off to cut down on processing time when performance is paramount, but it would normally be turned on. It should be noted that the method <code>setEscapeProcessing</code> does not work for <code>PreparedStatement</code> objects because the statement may have already been sent to the database before it can be called. See <a href="preparedstatement.html#996870">page 69</a>, the overview of the <code>PreparedStatement</code> interface, regarding precompilation.
+</p><a name="1000712"> </a>
+<h4>4.1.6	 Sending Batch Updates</h4>
+<p><a name="1002557"> </a>
+The </a>batch update facility provided by the JDBC 2.0 core API allows a <code>Statement</code> object to submit multiple update commands together as a single unit, or batch, to the underlying DBMS. This ability to submit multiple updates as a batch rather than having to send each update individually can improve performance greatly in some situations.
+</p><p><a name="1002562"> </a>
+The following code fragment demonstrates how to send a batch update to a database. In this example, a new row is inserted into three different tables in order to add a new employee to a company database. The code fragment starts by turning off the <code>Connection</code> object con's auto-commit mode in order to allow multiple statements to be sent together as a transaction. After creating the <code>Statement</code> object stmt, it adds three SQL <code>INSERT</code> <code>INTO</code> commands to the batch with the method </a><code>addBatch</code> and then sends the batch to the database with the method <code>executeBatch</code>. The code looks like this:
+</p><blockquote><pre>
+Statement stmt = con.createStatement();
+con.setAutoCommit(false);
+
+stmt.addBatch("INSERT INTO employees VALUES (1000, 'Joe Jones')");
+stmt.addBatch("INSERT INTO departments VALUES (260, 'Shoe')");
+stmt.addBatch("INSERT INTO emp_dept VALUES (1000, '260')");
+
+int [] updateCounts = stmt.executeBatch();
+
+</pre></blockquote><p><a name="1002595"> </a>
+Because the connection's auto-commit mode is disabled, the application is free to decide whether or not to commit the transaction if an error occurs or if some of the commands in the batch fail to execute. For example, the application may not commit the changes if any of the insertions fail, thereby avoiding the situation where employee information exists in some tables but not in others.
+</p><p><a name="1004730"> </a>
+In the JDBC 2.0 core API, a <code>Statement</code> object is created with an associated list of commands. This </a>list is empty to begin with; commands are added to the list with the <code>Statement</code> method <code>addBatch</code>. The commands added to the list must all return only a simple update count. If, for example, one of the commands is a query (a <code>SELECT</code> statement), which will return a result set, the method <code>executeBatch</code> will throw a <code>BatchUpdateException</code>. A <code>Statement</code> object's list of commands can be emptied by calling the method <code>clearBatch</code> on it.
+</p><p><a name="1002618"> </a>
+In the preceding example, the method <code>executeBatch</code> submits stmt's list of commands to the underlying DBMS for execution. The DBMS executes each </a>command in the order in which it was added to the batch and returns an update count for each command in the batch, also in order. If one of the commands does not return an update count, its return value cannot be added to the array of update counts that the method <code>executeBatch</code> returns. In this case, the method <code>executeBatch</code> will </a></a>throw a <code>BatchUpdateException</code>. This exception keeps track of the update counts for the commands that executed successfully before the error occurred, and the order of these update counts likewise follows the order of the commands in the batch.
+</p><p><a name="1002670"> </a>
+In the following code fragment, an application uses a <code>try</code>/<code>catch</code> block, and if a <code>BatchUpdateException</code> is thrown, it retrieves the exception's array of update counts to discover which commands in a batch update executed successfully before the <code>BatchUpdateException</code> object was thrown.
+</p><blockquote><pre>
+try {
+    stmt.addBatch("INSERT INTO employees VALUES (" +
+				"1000, 'Joe Jones')");
+	stmt.addBatch("INSERT INTO departments VALUES (260, 'Shoe')");
+	stmt.addBatch("INSERT INTO emp_dept VALUES (1000, '260')");
+
+	int [] updateCounts = stmt.executeBatch();
+
+} catch(BatchUpdateException b) {
+	System.err.println("Update counts of successful commands: ");
+	int [] updateCounts = b.getUpdateCounts();
+	for (int  i = 0; i &lt; updateCounts.length; i ++) {
+		System.err.print(updateCounts[i] + "  ");
+	}
+	System.err.println("");
+}
+
+</pre></blockquote><p><a name="1002714"> </a>
+If a printout was generated and looked similar to the following, the first two commands succeeded and the third one failed.
+</p><blockquote><pre>
+Update counts of successful commands:
+1  &#32;1
+
+</pre></blockquote>
+<p><a name="1002741"> </a>
+JDBC drivers are not required to support batch updates, so a particular driver might not implement the methods <code>addBatch</code>, <code>clearBatch</code>, and <code>executeBatch</code>. Normally a programmer knows whether a driver that he/she is working with supports batch updates, but if an application wants to check, it can call the <code>DatabaseMetaData</code> method <code>supportsBatchUpdates</code> to find out. In the following code fragment, a batch update is used only if the driver supports batch updates; otherwise, each update is sent as a separate statement. The connection's auto-commit mode is disabled so that in either case, all the updates are included in one transaction.
+</p><blockquote><pre>
+con.setAutoCommit(false);
+    if(dbmd.supportsBatchUpdates) {
+	stmt.addBatch("INSERT INTO . . .");
+	stmt.addBatch("DELETE . . .");
+	stmt.addBatch("INSERT INTO . . .");
+	. . .
+	stmt.executeBatch();
+} else {
+	System.err.print("Driver does not support batch updates; ");
+	System.err.println("sending updates in separate statements.");
+	stmt.executeUpdate("INSERT INTO . . .");
+	stmt.executeUpdate("DELETE . . .");
+	stmt.executeUpdate("INSERT INTO . . .");
+	. . .
+con.commit();
+</pre></blockquote><a name="1005624"> </a>
+<h4>4.1.7	 Giving Performance Hints</h4>
+<p><a name="1005625"> </a>
+The <code>Statement</code> interface contains two methods for giving performance </a>hints to the driver: <code>setFetchDirection</code> and </a><code>setFetchSize</code>. These methods are also available in the <code>ResultSet</code> interface and do exactly the same thing. The difference is that the <code>Statement</code> methods set the default for all of the <code>ResultSet</code> objects produced by a particular <code>Statement</code> object, whereas the <code>ResultSet</code> methods can be called any time during the life of the <code>ResultSet</code> object to change the fetch direction or the fetch size. See the section <a href="resultset.html#1011961">"Providing Performance Hints" on page &#32;54</a> for a full discussion of these methods.
+</p><p><a name="1003791"> </a>
+Both the <code>Statement</code> and <code>ResultSet</code> interfaces have the corresponding <code>get</code> methods: <code>getFetchDirection</code> and <code>getFetchSize</code>. If <code>Statement.getFetchDirection</code> is called before a fetch direction has been set, the value returned is implementation-specific, that is, it is up to the driver. The same is true for the method <code>Statement.getFetchSize</code>. 
+</p><a name="1003795"> </a>
+<h4>4.1.8	 Executing Special Kinds of Statements </a></a></a></h4>
+<p><a name="1003798"> </a>
+</a>The </a><code>execute</code> method should be used only when it is possible that a statement may return more than one <code>ResultSet</code> object, more than one update count, or a combination of <code>ResultSet</code> objects and update counts. </a>These multiple possibilities for results, though rare, are possible when one is executing certain stored procedures or dynamically executing an unknown SQL string (that is, unknown to the application programmer at compile time). For example, a user might execute a stored procedure (using a <code>CallableStatement</code> object), and that stored procedure could perform an update, then a select, then an update, then a select, and so on. In more typical situations, someone using a stored procedure will already know what it returns.
+</p><blockquote><pre>
+</pre></blockquote>
+<hr><br>
+ 
+<a href="GettingStartedTOC.fm.html">[Top]</a> <a href="drivermanager.html">[Prev]</a> <a href="resultset.html">[Next]</a> 
+<hr><br>
+
+
+
+<i><a href="copyright.html">Copyright</a> &#169; 1999, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

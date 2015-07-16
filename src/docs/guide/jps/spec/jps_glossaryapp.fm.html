@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Print Service API User Guide:  - JavaTM Print Service Glossary
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+ 
+<table summary="layout" width="100%"><tr>
+<td><!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="appendix_printGIF.fm.html">PREV</a>
+ | NEXT <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font --></td><td align=right><i>Java<sup><font size="-1">TM</font></sup></font> Print Service API User Guide</i></td>
+</tr></table>
+<br>
+ 
+<a name="1035337"><!-- --></a>
+<hr size="8" width="35%" align="left" noshade>
+
+<table summary="layout" border=0>
+<tr valign=bottom>
+<td valign=bottom>
+<U><h1><FONT FACE="ARIAL,HELVETICA,TIMES ROMAN" SIZE=-1>APPENDIX</FONT>
+G 
+</h1></U>
+</td>
+</tr>
+</table>
+
+<a name="1035348"><!-- --></a>
+<h1>
+Java<sup><font size="-2">TM</font></sup> Print Service Glossary
+</h1>
+<!--
+<hr size="1" width="100%" align="left" noshade>
+-->
+<br>
+<br>
+<br><dl>
+<a name="1035339"><!-- --></a>
+<p><dt><b>attribute	</b>
+
+<a name="1034677"><!-- --></a>
+<p><dl><dd>a description of: a capability of a <a href="jps_glossaryapp.fm.html#1034854"><em>print service</em></a>, a charactaristic of a <a href="jps_glossaryapp.fm.html#1034760"><em>doc</em></a>, an instruction for processing a doc or an entire <a href="jps_glossaryapp.fm.html#1034894"><em>print job</em></a>, or the state of a print job or printer. </dl>
+<a name="1034676"><!-- --></a>
+<p><dt><b>attribute category</b>
+
+<a name="1034755"><!-- --></a>
+<p><dl><dd>the name of the <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a> without its range of values. The Java Print Service represents the attribute category with a class, such as the OrientationRequested class. An instance of an attribute class, such as an OrientationRequested object, is an <a href="jps_glossaryapp.fm.html#1034741"><em>attribute value</em></a>.</dl>
+<a name="1034754"><!-- --></a>
+<p><dt><b>attribute set</b>
+
+<a name="1034742"><!-- --></a>
+<p><dl><dd>an <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a> collection that usually is restricted to contain only a certain kind of attribute. The Java Print Service defines a superinterface for all attribute sets called AttributeSet and an interface for each kind of attribute set. The kinds of attribute sets are: <a href="jps_glossaryapp.fm.html#1034680"><em>doc attribute set</em></a>, <a href="jps_glossaryapp.fm.html#1034850"><em>print request attribute set</em></a>, <a href="jps_glossaryapp.fm.html#1032149"><em>print job attribute set</em></a>, and <a href="jps_glossaryapp.fm.html#1034735"><em>print service attribute set</em></a>.</dl>
+<a name="1034741"><!-- --></a>
+<p><dt><b>attribute value</b>
+
+<a name="1034761"><!-- --></a>
+<p><dl><dd>one of the range of values that an <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a> supports. The Java Print Service represents each supported attribute with one of the attribute classes, such as the OrientationRequested class. The class itself is the <a href="jps_glossaryapp.fm.html#1034676"><em>attribute category</em></a>. An instance of the class, such as an OrientationRequested object, is the attribute value. The term attribute often refers to the attribute value because the value of an attribute implies the attribute itself.</dl>
+<a name="1034760"><!-- --></a>
+<p><dt><b>doc</b>
+
+<a name="1034652"><!-- --></a>
+<p><dl><dd>a piece of print data. the Java Print Service uses the Doc interface to represent a piece of print data.</dl>
+<a name="1032134"><!-- --></a>
+<p><dt><b>doc attribute	</b>
+
+<a name="1034681"><!-- --></a>
+<p><dl><dd>an <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a> that specifies a characteristic of an individual document and the <a href="jps_glossaryapp.fm.html#1034894"><em>print job</em></a> settings to be applied to an individual document. </dl>
+<a name="1034680"><!-- --></a>
+<p><dt><b>doc attribute set</b>
+
+<a name="1034834"><!-- --></a>
+<p><dl><dd>a collection of attributes that is restricted to only contain <a href="jps_glossaryapp.fm.html#1032134"><em>doc attribute</em></a>s.</dl>
+<a name="1034833"><!-- --></a>
+<p><dt><b>doc flavor</b>
+
+<a name="1034892"><!-- --></a>
+<p><dl><dd>a document type. The Java Print Service uses the DocFlavor class to represent a document type. A DocFlavor object encapsulates a String representing a MIME type, which indicates the format of the document, and a String representing a Java class, such as &#34;java.io.InputStream&#34;, that indicates how the document is sent to the printer.</dl>
+<a name="1034898"><!-- --></a>
+<p><dt><b>hash attribute set</b>
+
+<a name="1034899"><!-- --></a>
+<p><dl><dd>an <a href="jps_glossaryapp.fm.html#1034754"><em>attribute set</em></a> that can contain different kinds of <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a>s. The Java Print Service represents this attribute set with the HashAttributeSet class, which implements AttributeSet.</dl>
+<a name="1034894"><!-- --></a>
+<p><dt><b>print job</b>
+
+<a name="1034895"><!-- --></a>
+<p><dl><dd>a submitted <a href="jps_glossaryapp.fm.html#1034864"><em>print request</em></a>, which includes one or more pieces of print data and a set of processing instructions. The Java Print Service represents a print job with the DocPrintJob object, which is obtained from a <a href="jps_glossaryapp.fm.html#1034854"><em>print service</em></a>.</dl>
+<a name="1034713"><!-- --></a>
+<p><dt><b>print job attribute</b>
+
+<a name="1032147"><!-- --></a>
+<p><dl><dd>an <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a> that reports the status of a <a href="jps_glossaryapp.fm.html#1034894"><em>print job</em></a>. A client usually does not specify these attributes since these attributes describe the print job after the client has submitted it. To specify settings for a whole print job, the client instead uses the <a href="jps_glossaryapp.fm.html#1034715"><em>print request attribute</em></a>s. </dl>
+<a name="1032149"><!-- --></a>
+<p><dt><b>print job attribute set</b>
+
+<a name="1034865"><!-- --></a>
+<p><dl><dd>a collection of <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a>s that is restricted to only contain <a href="jps_glossaryapp.fm.html#1034713"><em>print job attribute</em></a>s.</dl>
+<a name="1034864"><!-- --></a>
+<p><dt><b>print request</b>
+
+<a name="1034716"><!-- --></a>
+<p><dl><dd>an unsubmitted <a href="jps_glossaryapp.fm.html#1034894"><em>print job</em></a>.</dl>
+<a name="1034715"><!-- --></a>
+<p><dt><b>print request attribute</b>
+
+<a name="1034848"><!-- --></a>
+<p><dl><dd>an <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a> that specifies a setting applied to a whole <a href="jps_glossaryapp.fm.html#1034894"><em>print job</em></a> and to all the documents in the print job. </dl>
+<a name="1034850"><!-- --></a>
+<p><dt><b>print request attribute set</b>
+
+<a name="1034855"><!-- --></a>
+<p><dl><dd>a collection of <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a>s that is restricted to only contain <a href="jps_glossaryapp.fm.html#1034715"><em>print request attribute</em></a>s.</dl>
+<a name="1034854"><!-- --></a>
+<p><dt><b>print service</b>
+
+<a name="1034851"><!-- --></a>
+<p><dl><dd>an interface that represents a particular printer and is a factory for <a href="jps_glossaryapp.fm.html#1034894"><em>print job</em></a>s.</dl>
+<a name="1032171"><!-- --></a>
+<p><dt><b>print service attribute</b>
+
+<a name="1034736"><!-- --></a>
+<p><dl><dd>an <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a> that describes a printer. An example of such an attribute is one that describes the printer&#39;s location.</dl>
+<a name="1034735"><!-- --></a>
+<p><dt><b>print service attribute set</b>
+
+<a name="1034875"><!-- --></a>
+<p><dl><dd>a collection of <a href="jps_glossaryapp.fm.html#1035339"><em>attribute</em></a>s that is restricted to only contain <a href="jps_glossaryapp.fm.html#1032171"><em>print service attribute</em></a>s.</dl>
+<a name="1034874"><!-- --></a>
+<p><dt><b>print-service lookup</b>
+
+<a name="1035014"><!-- --></a>
+<p><dl><dd>the action of attempting to locate a set of <a href="jps_glossaryapp.fm.html#1034854"><em>print service</em></a>s representing printers that can print a given set of print data according to a given set of processing instructions. A client uses the PrintServiceLookup class to perform this action.</dl>
+<a name="1035013"><!-- --></a>
+<p><dt><b>stream print service</b>
+
+<a name="1032175"><!-- --></a>
+<p><dl><dd>a <a href="jps_glossaryapp.fm.html#1034854"><em>print service</em></a> that prints data to a client-provided output stream.</dl>
+<a name="1022556"><!-- --></a>
+<p><dl><dd></dl>
+</dl>
+
+
+<br>
+<hr>
+<!-- font size="-1" --> <a href="JPSTOC.fm.html">CONTENTS</a> | <a href="appendix_printGIF.fm.html">PREV</a>
+ | NEXT <!-- | <a href="jps_glossaryapp.fm.html">INDEX</a>  -->
+<!-- /font -->
+
+<hr>
+<font size="-1"><i><A HREF="../../../relnotes/SMICopyright.html">Copyright</a> &#169 2001 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+
+
+</body>
+</html>
+

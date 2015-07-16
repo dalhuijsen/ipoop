@@ -1,0 +1,167 @@
+<html>
+<head>
+<title>AWT PixelGrabber API updates</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<h1>AWT PixelGrabber API updates</h1>
+<hr>
+<address>last updated: November 14, 1996</address>
+<h2>The Issue</h2>
+The AWT image facility provides ways to retrieve or create images from
+many sources and to automate the process of displaying those images on
+the screen.  The facility performs all of the required manipulations
+necessary on the image data behind an opaque external interface which
+shields users from all but the most abstract of image data information.
+<p>
+The interface provided is so opaque that in the initial development
+stages there was no direct way to access the pixel data of an image.
+The data could be accessed if a developer were willing to learn the
+intricacies of the complex ImageConsumer interface which is used by
+the image subsystem to communicate pixel data from image decoders to
+the screen, but most developers wanted an easier mechanism to get
+this data for the general case.
+<p>
+To satisfy this need a utility class was created to manage the
+ImageConsumer interface on behalf of the average developer who
+simply wanted to answer the question "What color is the pixel
+at location (x, y)?"
+The <a href="../../../../../api/java/awt/image/PixelGrabber.html">PixelGrabber</a>
+class provided the ability to snapshot a rectangular region of
+pixels directly from an image's source to a Java integer array.
+<p>
+Three primary oversights have been identified with the interface
+provided by this class:
+<ul>
+<li>The data must be grabbed and stored into the array in the default
+ARGB (alpha RGB) convenience format Java uses for describing colors.
+The conversion process to convert the raw pixels into this format
+can consume a large amount of time especially when the developer only
+really needs the color information for isolated pixels scattered
+throughout the region of interest.  Since the original ColorModel
+is discarded as the data is converted to the default representation,
+there is also no way to figure out what format the original data
+was in if that happens to be the desired goal of the process.
+<li>The developer must know what size array to create even before
+the data is snapshotted.  Since many images do not know their
+dimensions until they load their data from the source for the first
+time, there can be a race condition where the developer must track
+the image loading until the dimensions are delivered and then
+instantiate a PixelGrabber and point it at the image source before
+the pixel data is delivered so that no data is lost requiring the
+image source to reload from scratch.  Many developers would not
+even know how to best achieve this goal since the image progress
+is not very straightforward to track.
+<li>There was no way to start the grab operation without also
+waiting for the operation to complete and there was no way to
+stop the grab operation once started.
+</ul>
+
+<h2>The new PixelGrabber methods</h2>
+To enhance the capabilities of the PixelGrabber, new methods and
+constructors are being added:
+<pre>	<a href="../../../../../api/java/awt/image/PixelGrabber.html#PixelGrabber(java.awt.Image, int, int, int, int, boolean)">new PixelGrabber</a>(Image img,
+			 int x, int y, int w, int h,
+			 boolean forceRGB)
+	<a href="../../../../../api/java/awt/image/PixelGrabber.html#startGrabbing()">startGrabbing</a>()
+	<a href="../../../../../api/java/awt/image/PixelGrabber.html#abortGrabbing()">abortGrabbing</a>()
+	<a href="../../../../../api/java/awt/image/PixelGrabber.html#getWidth()">getWidth</a>()
+	<a href="../../../../../api/java/awt/image/PixelGrabber.html#getHeight()">getHeight</a>()
+	<a href="../../../../../api/java/awt/image/PixelGrabber.html#getPixels()">getPixels</a>()
+	<a href="../../../../../api/java/awt/image/PixelGrabber.html#getColorModel()">getColorModel</a>()
+</pre>
+
+<h2>Sample Code</h2>
+<p>Following is sample code showing the use of the new API to grab
+the pixels of an image of unknown dimensions in its original format:
+<pre>
+
+    import java.awt.*;
+    import java.awt.image.*;
+    import java.applet.*;
+
+    public class GrabExample extends Applet implements Runnable {
+    	Thread grab;
+	Image img;
+	PixelGrabber pg;
+
+	public void init() {
+	    img = getImage(getDocumentBase(), "theImage.gif");
+	    pg = new PixelGrabber(img, 0, 0, -1, -1, false);
+	    // In reality, the init method shouldn't be kicking off
+	    // heavyweight operations like an image download, but
+	    // this demonstrates use of the asynchronous grabbing...
+	    pg.startGrabbing();
+	}
+
+    	public void start() {
+	    grab = new Thread(this);
+	    grab.start();
+	}
+
+	public synchronized void stop() {
+	    grab.interrupt();
+	    grab = null;
+	}
+
+	public synchronized void run() {
+	    try {
+		pg.grabPixels();
+		repaint();
+	    } catch (InterruptedException e) {
+		System.err.println("grab was interrupted");
+		return;
+	    }
+	}
+
+	public void paint(Graphics g) {
+	    // Display some pixel values
+	    int status = pg.getStatus();
+	    if ((status & ABORT) != 0) {
+		g.drawString("Image grab was aborted", 10, 100);
+	    } else if ((status & ALLBITS) != 0) {
+		g.drawString("Image grab is complete", 10, 100);
+	    } else if ((status & FRAMEBITS) != 0) {
+		g.drawString("Frame grab is complete", 10, 100);
+	    } else if ((status & SOMEBITS) != 0) {
+		g.drawString("Image grab is under way", 10, 100);
+	    }
+	    if ((status & (WIDTH|ALLBITS|FRAMEBITS)) != 0) {
+		FontMetrics fm = g.getFontMetrics();
+		String caption = "First 3 pixels: ";
+		int x = 10;
+		int w = pg.getWidth();
+		Object pix = pg.getPixels();
+		ColorModel cm = pg.getColorModel();
+
+		g.drawString(caption, x, 50);
+		x += fm.stringWidth(caption);
+		if (pix instanceof byte[]) {
+		    for (int i = 0; i < Math.min(3, w); i++) {
+			String s = Integer.toString(((byte[])pix)[i]&0xff, 16);
+			g.drawString(s, x, 50);
+			x += fm.stringWidth(s + " ");
+		    }
+		} else {
+		    for (int i = 0; i < Math.min(3, w); i++) {
+			String s = Integer.toString(((int[])pix)[i], 16);
+			g.drawString(s, x, 50);
+			x += fm.stringWidth(s + " ");
+		    }
+		}
+	    }
+	}
+    }
+</pre>
+
+<hr><br>
+
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1996, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

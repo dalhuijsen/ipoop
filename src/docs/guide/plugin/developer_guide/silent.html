@@ -1,0 +1,141 @@
+<html>
+<head>
+<title>Silent Installation</title>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Silent Installation</h1>
+<hr>
+<form name="form1" >
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<p><br>
+  This section includes the following topics:</p>
+<ul>
+  <li><a href="#intro">Introduction</a> </li>
+  <li><a href="#running">Running InstallShield in Silent Mode: Installation</a></li>
+  <li><a href="#uninstalling">Running InstallShield in Silent Mode: Uninstalling</a></li>
+  <li><a href="#creating">Creating a Log File</a></li>
+</ul>
+<table width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr> 
+    <td> 
+      <p><b><font size="+1"><u>Notes</u></font></b></p>
+      <ol>
+        <li>This chapter applies to 32-bit Windows and silent installation of 
+          the Java Runtime Environment (JRE).</li>
+        <li>It is intended for: 
+          <ul>
+            <li> system administrators who want to deploy Java Plug-in and the 
+              JRE on multiple PCs in the Intranet environment without user interaction;</li>
+            <li>companies with products that require the JRE, which they can silently 
+              install with their product.</li>
+          </ul>
+        </li>
+      </ol>
+    </td>
+  </tr>
+</table>
+<h2><a name="intro"></a>Introduction</h2>
+Java<font size="-2"><sup>TM</sup></font> 2 Platform Runtime Environment (JRE) 
+installations are built using InstallShield Developer 7, which is based on Microsoft 
+Window Installer. This product contains built-in support for silent or unattended 
+installations. This document tells how to silently install the JRE. Refer to&nbsp; 
+<a href="http://support.installshield.com/">http://support.installshield.com/</a> 
+for complete information about silent installations. 
+<p>
+<h2><a name="running"></a>Running InstallShield in Silent Mode: Installation</h2>
+<p>Here is the command line for installing in silent mode: 
+<blockquote>
+  <p><code>&lt;jre&gt;.exe /s /v&quot;/qn [ADDLOCAL=jrecore[,extra][,other_US] 
+    | ALL] [IEXPLORER=1] [NETSCAPE6=1] [MOZILLA=1] [INSTALLDIR=&lt;drive&gt;:\&lt;install_path&gt;][REBOOT=Suppress]&quot;</code> 
+  </p>
+</blockquote>
+<p>where 
+<p><code>&lt;jre&gt;.exe</code> is the single executable installer for the Java 
+  Runtime Environment (JRE); <code>ADDLOCAL</code>, if used, is either <code>jrecore[,extra][,other_US]</code> 
+  or <code>ALL</code>; <code>IEXPLORER=1</code>, if used, indicates that the Plug-in 
+  should be registered with the Internet Explorer browser; <code>NETSCAPE6=1</code>, 
+  if used, indicates that the Plug-in should be registered with Netscape 6 or 
+  later browsers; <code>MOZILLA=1</code> indicates that the Plug-in should be 
+  registered with Mozilla 1.1 and later browsers; <code>INSTALLDIR</code>, if 
+  used, specifies the drive and path of the installation; and <code>REBOOT=Suppress</code>, 
+  if used, indicates that if locked files are encountered the computer should 
+  not be rebooted. 
+<p>If <code>ADDLOCAL=jrecore[,extra][,other_US]</code> is used, 
+<blockquote>
+  <p><code>jrecore</code> indicates the core of the JRE will be installed;</p>
+  <p><code>extra</code> (optional) indicates additional Fonts, Colors, and Soundbank 
+    will be installed;</p>
+  <p><code>other</code> (optional) indicates locale-specific <code>.jar</code> 
+    files will be installed.</p>
+</blockquote>
+<p>If <code>ADDLOCAL=ALL</code> is used, then all the features will be installed. 
+<p>If <code>ADDLOCAL</code> is not used, then only the recommended features will 
+  be installed: <code>jrecore</code> will be installed; <code>extra</code> will 
+  not be installed; <code>other</code> will be installed only if l10n support, 
+  other than English, is installed.
+<p>If <code>INSTALLDIR</code> is not specified, the installation will go into 
+  <code>C:\Program Files\java\j2re1.4.2</code> (default location).
+<p>
+<table width="90%" border="1" cellpadding="5" align="center" bgcolor="#FFFFCC" cellspacing="0">
+  <tr> 
+    <td> 
+      <p><b><font size="+1"><u>Note</u></font></b></p>
+      <p>The command is case sensitive and there must be no spaces in the features 
+        listed with <code>ADDLOCAL</code>.</p>
+    </td>
+  </tr>
+</table>
+<h3>Examples</h3>
+<p>Suppose the JRE installer is <code>j2re-1_4_2-bin-b18-windows-i586-05_mar_2003.exe</code>; 
+  you want to install the JRE core and additional Fonts, Colors and Soundbank; 
+  and you want to register the Plug-in with Netscape 7 and Mozilla 1.3. Then the 
+  command would be: 
+<blockquote>
+  <p><code>j2re-1_4_2-bin-b18-windows-i586-05_mar_2003.exe /s /v&quot;/qn ADDLOCAL=jrecore,extra 
+    NETSCAPE=1 MOZILLA=1&quot;</code> </p>
+</blockquote>
+<p>Or suppose you want all features to be installed; you only want to register 
+  the Plug-in with Internet Explorer; and you want the installation on the <code>D</code> 
+  drive at <code>java\jre</code>. Then the command line could be simply: 
+<blockquote>
+  <p><code>j2re-1_4_2-bin-b18-windows-i586-05_mar_2003.exe /s /v&quot;/qn ADDLOCAL=ALL 
+    IEXPLORER=1 INSTALLDIR=D:\java\jre&quot;</code> </p>
+</blockquote>
+<p>You may find it convenient to use the "<code>start /w</code>" command, as that 
+  will cause MS-DOS to wait until the install is complete. For example: 
+<blockquote> 
+  <p><code>start /w j2re-1_4_2-bin-b18-windows-i586-05_mar_2003.exe /s /v&quot;/qn 
+    ADDLOCAL=ALL IEXPLORER=1 INSTALLDIR=D:\java\jre&quot;</code></p>
+</blockquote>
+<h2><a name="uninstalling"></a>Running 
+  InstallShield in Silent Mode: Uninstalling</h2>
+<p>This is the command line for uninstalling in silent mode:</p>
+<blockquote> 
+  <p><code>&lt;jre&gt;.exe /s /v&quot;/qn [REBOOT=Suppress]&quot; /x</code></p>
+</blockquote>
+<p>where <code>&lt;jre&gt;.exe</code> is the single executable installer for the 
+  JRE and <code>REBOOT=Suppress</code>, if used, indicates that if locked files 
+  are encountered the computer should not be rebooted.</p>
+<h3>Example</h3>
+<blockquote>
+  <p><code>j2re-1_4_2-bin-b18-windows-i586-05_mar_2003.exe /s /v&quot;/qn REBOOT=Suppress&quot; 
+    /x</code></p>
+</blockquote>
+<h2><a name="creating"></a>Creating a Log File</h2>
+<p>If you want to create a log file describing the installation, add <code>/L 
+  C:\&lt;path&gt;setup.log</code> to the command. Note that this comes within 
+  the quote marks (&quot;&quot;). For example: 
+<blockquote> <code>j2re-1_4_2-bin-b18-windows-i586-05_mar_2003.exe /s/v&quot;/qn 
+  ADDLOCAL=ALL /L C:\&lt;path&gt;setup.log</code>&quot; </blockquote>
+<p>This will cause the log to be written to the <code>setup.log</code> file. 
+<p>To verify if a silent installation succeeded, scroll to the end of the log 
+  file.
+<p>&nbsp;</p>
+</body>
+</html>

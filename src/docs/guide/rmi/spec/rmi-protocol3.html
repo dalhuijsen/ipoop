@@ -1,0 +1,207 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 10 - RMI Wire Protocol
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-protocol2.html">PREV</a>
+ | <a href="rmi-protocol4.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="5112"><i>	10.2	</i> RMI Transport Protocol
+</a></h2>
+
+
+<blockquote>
+<a name="3250"><!-- --></a>
+	The wire format for RMI is represented by a <em>Stream</em>. The terminology adopted here reflects a client perspective. <em>Out</em> refers to output messages and <em>In</em> refers to input messages. The contents of the transport header are <em>not</em> formatted using object serialization. 
+
+<P>
+<DL>
+	<DT>
+	<b><em>Stream:</em></b>
+		<P>
+		<DD>
+		<em>Out</em>
+		<P>
+		<em>In</em>
+		</DD>
+	</DT>
+</DL>
+<p>
+<a name="5719"><!-- --></a>
+		The input and output streams used by RMI are paired. Each <em>Out</em> stream has a corresponding <em>In</em> stream. An <em>Out</em> stream in the grammar maps to the output stream of a socket (from the client&#39;s perspective). An <em>In</em> stream (in the grammar) is paired with the corresponding socket&#39;s input stream. Since output and input streams are paired, the only header information needed on an input stream is an acknowledgment as to whether the protocol is understood; other header information (such as the magic number and version number) can be implied by the context of stream pairing.<p>
+</blockquote>
+<br>
+<h3>
+<a name="3252"><!-- --></a>
+<i>	10.2.1	</i> Format of an Output Stream
+</h3>
+
+<blockquote>
+<a name="3253"><!-- --></a>
+An output stream in RMI consists of transport <em>Header</em> information followed by a sequence of <em>Messages</em>. Alternatively, an output stream can contain an invocation embedded in the HTTP protocol.<p>
+<a name="3254"><!-- --></a>
+
+
+<P>
+<DL>
+	<DT><em>Out:</em>
+		<DD>
+		<BR><em>Header Messages</em>
+		<BR><em>HttpMessage</em>
+		</DD>
+	<DT><BR><em>Header:</em>
+		<DD>
+		<BR><em>0x4a 0x52 0x4d 0x49</em><em> Version Protocol</em>
+		</DD>
+	<DT><BR><em>Version:</em>
+		<DD>
+		<BR><em>0x00 0x01</em>
+		</DD>
+	<DT><BR><em>Protocol:</em>
+		<DD>
+		<BR><em>StreamProtocol</em>
+		<BR><em>SingleOpProtocol</em>
+		<BR><em>MultiplexProtocol</em>
+		</DD>
+	<DT><BR><em>StreamProtocol:</em>
+		<DD>
+		<BR><em>0x4b</em>
+		</DD>
+	<DT><BR><em>SingleOpProtocol:</em>
+		<DD>
+		<BR><em>0x4c</em>
+		</DD>
+	<DT><BR><em>MultiplexProtocol:</em>
+		<DD>
+		<BR><em>0x4d</em>
+		</DD>
+	<DT><BR><em>Messages:</em>
+		<DD>
+		<BR><em>Message</em>
+		<BR><em>Messages Message</em>
+		</DD>
+	</DT>
+</DL>
+<p>
+
+ 
+<p>
+<a name="3258"><!-- --></a>
+The <em>Messages</em> are wrapped within a particular protocol as specified by <em>Protocol</em>. For the <em>SingleOpProtocol</em>, there may only be one <em>Message</em> after the <em>Header</em>, and there is no additional data that the <em>Message</em> is wrapped in. The <em>SingleOpProtocol</em> is used for invocation embedded in HTTP requests, where interaction beyond a single request and response is not possible.<p>
+<a name="3966"><!-- --></a>
+For the <em>StreamProtocol</em> and the <em>MultiplexProtocol</em>, the server must respond with a a byte <em>0x4e</em> acknowledging support for the protocol, and an <em>EndpointIdentifier</em> that contains the host name and port number that the server can see is being used by the client. The client can use this information to determine its host name if it is otherwise unable to do that for security reasons. The client must then respond with another <em>EndpointIdentifier</em> that contains the client&#39;s default endpoint for accepting connections. This can be used by a server in the <em>MultiplexProtocol</em> case to identify the client.<p>
+<a name="3967"><!-- --></a>
+For the <em>StreamProtocol</em>, after this endpoint negotiation, the <em>Messages</em> are sent over the output stream without any additional wrapping of the data. For the <em>MultiplexProtocol</em>, the socket connection is used as the concrete connection for a multiplexed connection, as described in <a href="rmi-protocol7.html">Section&#160;10.6, &#34;RMI&#39;s Multiplexing Protocol</a>.&#34; Virtual connections initiated over this multiplexed connection consist of a series of <em>Messages</em> as described below.<p>
+<a name="3965"><!-- --></a>
+There are three types of output messages: <em>Call</em>, <em>Ping</em> and <em>DgcAck</em>. A <em>Call</em> encodes a method invocation. A <em>Ping</em> is a transport-level message for testing liveness of a remote virtual machine. A <em>DGCAck</em> is an acknowledgment directed to a server&#39;s distributed garbage collector that indicates that remote objects in a return value from a server have been received by the client.
+
+<P>
+<DL>
+	<DT><em>Message:</em>
+		<DD>
+		<BR><em>Call</em>
+		<BR><em>Ping</em>
+		<BR><em>DgcAck</em>
+		</DD>
+	<DT><BR><em>Call:</em>
+		<DD>
+		<BR><em>0x50</em><em> CallData</em>
+		</DD>
+	<DT><BR><em>Ping:</em>
+		<DD>
+		<BR><em>0x52</em>
+		</DD>
+	<DT><BR><em>DgcAck:</em>
+		<DD>
+		<BR><em>0x54</em><em> UniqueIdentifier</em>
+		</DD>
+	</DT>
+</DL>
+<p>
+ 
+</blockquote>
+<br>
+<h3>
+<a name="4598"><!-- --></a>
+<i>	10.2.2	</i> 	Format of an Input Stream
+</h3>
+
+<blockquote>
+<a name="3264"><!-- --></a>
+There are currently three types of input messages: <em>ReturnData</em>, <em>HttpReturn</em> and <em>PingAck</em>. <em>ReturnData</em> is the result of a &#34;normal&#34; RMI call. An <em>HttpReturn</em> is a return result from an invocation embedded in the HTTP protocol. A <em>PingAck</em> is the acknowledgment for a <em>Ping</em> message.<p>
+<a name="3265"><!-- --></a>
+
+
+<P>
+<DL>
+	<DT><em>In:</em>
+		<DD>
+		<BR><em>ProtocolAck Returns</em>
+		<BR><em>ProtocolNotSupported</em>
+		<BR><em>HttpReturn</em>
+		</DD>
+	<DT><BR><em>ProtocolAck:</em>
+		<DD>
+		<BR><em>0x4e</em>
+		</DD>
+	<DT><BR><em>ProtocolNotSupported:</em>
+		<DD>
+		<BR><em>0x4f</em>
+		</DD>
+	<DT><BR><em>Returns:</em>
+		<DD>
+		<BR><em>Return</em>
+		<BR><em>Returns Return</em>
+		</DD>
+	<DT><BR><em>Return:</em>
+		<DD>
+		<BR><em>ReturnData</em>
+		<BR><em>PingAck</em>
+		</DD>
+	<DT><BR><em>ReturnData:</em>
+		<DD>
+		<BR><em>0x51</em><em> ReturnValue</em>
+		</DD>
+	<DT><BR><em>PingAck:</em>
+		<DD>
+		<BR><em>0x53</em>
+		</DD>
+	</DT>
+</DL>
+<p>
+</blockquote>
+
+</ul>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-protocol2.html">PREV</a>
+ | <a href="rmi-protocol4.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Monday, October 7, 2002 -->
+ 
+
+
+</body>
+</html>

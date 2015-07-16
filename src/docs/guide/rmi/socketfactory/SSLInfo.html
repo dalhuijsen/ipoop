@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.02 [en] (X11; U; SunOS 5.6 sun4u) [Netscape]">
+   <TITLE>Using RMI with SSL</TITLE>
+<!-- Changed by: Ann Wollrath - JavaSoft East, 19-Dec-2001 -->
+<!-- Changed by: Ann Wollrath - SMI Software Development, 15-Jan-2002 -->
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<CENTER>
+<H1>
+<FONT SIZE=+3>Using RMI with SSL</FONT></H1></CENTER>
+
+<HR>
+
+<P>Many have asked how an RMI application can make remote invocations
+over secure SSL connections.  Below are some questions and answers
+about using RMI with SSL.   
+<p>
+Q1: Is it possible to use RMI with SSL?
+<BLOCKQUOTE>
+<P>A1: Yes, it is possible, due to RMI enhancements available in the Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK, Standard Edition, v1.2 (Java 2 SDK).
+</BLOCKQUOTE>
+<P>Q2: How do I use RMI with SSL?
+<BLOCKQUOTE>
+<P>A2: The version of RMI included in the Java 2 SDK enables the RMI
+developer to use custom socket factories for RMI-based communication.
+An application can export
+a remote object to use an RMI socket factory that creates sockets of
+the desired type (for example, SSL sockets).  Using this technique, an
+RMI application can use SSL socket communication instead of the
+default socket communication.  For further details on using custom
+socket factories, see the tutorial: <A
+HREF="index.html"><i>Using a Custom RMI Socket
+Factory</A></i>.   
+</BLOCKQUOTE>
+
+<P>Q3: Where can I find a pure Java programming language implementation of SSL?
+
+<BLOCKQUOTE>
+<P>A3: Java 2 SDK, v1.4 includes the <a href="http://java.sun.com/products/jsse/">
+Java Secure Socket Extension (JSSE)</a>
+API which provides an implementation of SSL sockets. See the
+<i><a href="../../security/jsse/JSSERefGuide.html">JSSE Reference Guide</a></i>
+for more detailed information on the features and benefits of JSSE.
+</BLOCKQUOTE>
+
+<P>Q4: Where can I find an example using RMI with SSL?
+
+<BLOCKQUOTE>
+<P>A4: There is an RMI/SSL example bundled with the
+<a href="../../security/jsse/samples/index.html">JSSE code examples</a>.
+The RMI example illustrates how to use SSL-based connections
+for RMI calls to a remote object.  This is achieved by exporting a
+remote object to use a custom RMI socket factory that creates SSL sockets.
+
+</BLOCKQUOTE>
+
+<!-- Body text ends here --><!-- ============================================================== -->
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER=0 WIDTH="100%" SUMMARY="layout">
+<TR VALIGN=TOP>
+<TD><FONT SIZE=-2><A HREF="../../../relnotes/SMICopyright.html">Copyright &copy;</A>
+2003 <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A> All Rights
+Reserved.</FONT>&nbsp;
+<BR><FONT SIZE=-1>Please send comments to: <A HREF="mailto:rmi-comments@java.sun.com"><code>rmi-comments@java.sun.com</code></A>&nbsp;</FONT></TD>
+
+<TD ALIGN=RIGHT><IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 HEIGHT=30 WIDTH=64>&nbsp;
+</TR>
+</TABLE>
+</BODY>
+</HTML>

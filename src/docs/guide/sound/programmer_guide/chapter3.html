@@ -1,0 +1,206 @@
+<html><head><title></title>
+</head>
+<body bgcolor=#ffffff>
+<hr>
+<h1>Chapter 3: Accessing Audio System Resources</h1>
+<hr>
+<form name="form1">
+  <select name="menu1" onChange="Eminem_jumpMenu('parent',this,1)">
+    <SCRIPT SRC="menu_script.js" language="JavaScript"></SCRIPT>
+  </select>
+</form>
+<table summary="layout" width="80%" border="0" cellpadding="5" align="center">
+  <tr bgcolor="#CCCCCC"> 
+    <td> 
+      <p><font size="+2"><b><font size="+1">Notes:</font></b></font> </p>
+      <ol>
+        <li>For Linux, <code>Port</code> is currently not implemented in the Sun 
+          reference implementation of JavaSound. (See <a href="http://developer.java.sun.com/developer/bugParade/bugs/4384401.html">http://developer.java.sun.com/developer/bugParade/bugs/4384401.html</a>.)</li>
+        <li>Looping a portion of a <code>Clip</code> from a start point to an 
+          end point doesn't work. (See <a href="http://developer.java.sun.com/developer/bugParade/bugs/4386052.html">http://developer.java.sun.com/developer/bugParade/bugs/4386052.html</a>.)</li>
+      </ol>
+    </td>
+  </tr>
+</table>
+<p><a name="113096"> </a>
+The Java<font size="-1"><sup>TM</sup></font> Sound API takes a flexible approach to system configuration. Different sorts of audio devices (mixers) can be installed on a computer. The API makes few assumptions about what devices have been installed and what their capabilities are. Instead, it provides ways for the system to report about the available audio components, and ways for your program to access them.
+</p><p><a name="113098"> </a>
+This section shows how your program can learn what sampled-audio resources have been installed on the computer, and how it can gain access to the available resources. Among other things, the resources include mixers and the various types of lines owned by the mixers.
+</p><a name="113101"> </a>
+<h3> The AudioSystem Class</h3>
+<p><a name="113103"> </a>
+The <code>AudioSystem</code> class acts as a clearinghouse for audio components, including built-in services and separately installed services from third-party providers. <code>AudioSystem</code> serves as an application program's entry point for accessing these installed sampled-audio resources. You can query the <code>AudioSystem</code> to learn what sorts of resources have been installed, and then you can obtain access to them. For example, an application program might start out by asking the <code>AudioSystem</code> class whether there is a mixer that has a certain configuration, such as one of the input or output configurations illustrated earlier in the discussion of lines. From the mixer, the program would then obtain data lines, and so on.
+</p><p><a name="113105"> </a>
+Here are some of the resources an application program can obtain from the <code>AudioSystem</code>:
+</p><ul><a name="113107"> </a>
+<li>Mixers
+<a name="113109"> </a>
+<blockquote>A system typically has multiple mixers installed. There is usually at least one for audio input and one for audio output. There might also be mixers that don't have I/O ports but instead accept audio from an application program and deliver the mixed audio back to the program. The <code>AudioSystem</code> class provides a list of all of the installed mixers.</blockquote>
+<a name="113111"> </a>
+<li>Lines
+<a name="113113"> </a>
+<blockquote>Even though every line is associated with a mixer, an application program can get a line directly from the <code>AudioSystem</code>, without dealing explicitly with mixers.</blockquote>
+<a name="113115"> </a>
+<li>Format conversions
+<a name="113117"> </a>
+    <blockquote>An application program can use format conversions to translate 
+      audio data from one format to another. Conversions are described in Chapter 
+      7, "<a href="chapter7.html">Using Files and Format Converters</a>."</blockquote>
+<a name="113119"> </a>
+<li>Files and streams
+<a name="113121"> </a>
+    <blockquote>The <code>AudioSystem</code> class provides methods for translating 
+      between audio files and audio streams. It can also report the file format 
+      of a sound file and can write files in different formats. These facilities 
+      are discussed in Chapter 7, "<a href="chapter7.html">Using Files and Format 
+      Converters</a>."</blockquote>
+</ul><a name="113123"> </a>
+<h3> Information Objects</h3>
+<p><a name="113125"> </a>
+Several classes in the Java Sound API provide useful information about associated interfaces. For example, <code>Mixer.Info</code> provides details about an installed mixer, such as the mixer's vendor, name, description, and version. <code>Line.Info</code> obtains the class of a specific line. Subclasses of <code>Line.Info</code> include <code>Port.Info</code> and <code>DataLine.Info</code>, which obtain details relevant to a specific port and data line, respectively. Each of these classes is described further in the appropriate section below. It's important not to confuse the <code>Info</code> object with the mixer or line object that it describes.
+</p><a name="113128"> </a>
+<h3> Getting a Mixer</h3>
+<p><a name="113130"> </a>
+Usually, one of the first things a program that uses the Java Sound API needs to do is to obtain a mixer, or at least one line of a mixer, so that you can get sound into or out of the computer. Your program might need a specific kind of mixer, or you might want to display a list of all the available mixers so that the user can select one. In either case, you need to learn what kinds of mixers are installed. <code>AudioSystem</code> provides the following method:
+</p><blockquote><pre>    static Mixer.Info[] getMixerInfo() 
+</pre></blockquote>
+Each <code>Mixer.Info</code> object returned by this method identifies one type of mixer that is installed. (Usually a system has at most one mixer of a given type. If there happens to be more than one of a given type, the returned array still only has one <code>Mixer.Info</code> for that type.) An application program can iterate over the <code>Mixer.Info</code> objects to find an appropriate one, according to its needs. The <code>Mixer.Info</code> includes the following strings to identify the kind of mixer:
+<p></p><ul><a name="113136"> </a>
+<li>Name
+<a name="113309"> </a>
+<li>Version
+<a name="113312"> </a>
+<li>Vendor
+<a name="113139"> </a>
+<li>Description
+<p><a name="113141"> </a>
+</ul>
+These are arbitrary strings, so an application program that needs a specific mixer must know what to expect and what to compare the strings to. The company that provides the mixer should include this information in its documentation. Alternatively, and perhaps more typically, the application program will display all the <code>Mixer.Info</code> objects' strings to the user and let the user choose the corresponding mixer.
+<p></p><p><a name="113143"> </a>
+Once an appropriate mixer is found, the application program invokes the following <code>AudioSystem</code> method to obtain the desired mixer: 
+</p>
+<blockquote><pre>    static Mixer getMixer(Mixer.Info info) 
+</pre></blockquote>
+What if your program needs a mixer that has certain capabilities, but it doesn't need a specific mixer made by a specific vendor? And what if you can't depend on the user's knowing which mixer should be chosen? In that case, the information in the <code>Mixer.Info</code> objects won't be of much use. Instead, you can iterate over all the <code>Mixer.Info</code> objects returned by get<code>MixerInfo</code>, get a mixer for each by invoking <code>getMixer</code>, and query each mixer for its capabilities. For example, you might need a mixer that can write its mixed audio data to a certain number of target data lines simultaneously. In that case, you would query each mixer using this Mixer method:
+<p></p>    <code>int </code>getMaxLines<code>(Line.Info info) 
+</code><p><a name="115024"> </a>
+Here, the <code>Line.Info</code> would specify a <code>TargetDataLine</code>. The <code>Line.Info</code> class is discussed in the next section. 
+</p><a name="113154"> </a>
+<h3> Getting a Line of a Desired Type</h3>
+<p><a name="113156"> </a>
+There are two ways to get a line: 
+</p><ul><a name="113157"> </a>
+<li>Directly from the <code>AudioSystem</code> object
+<a name="113158"> </a>
+  <li>From a mixer that you have already obtained from the <code>AudioSystem</code> 
+    object (see "<a href="chapter3.html#113128">Getting a Mixer</a>," in this 
+    chapter) 
+</ul><a name="113159"> </a>
+<h4> Getting a Line Directly from the AudioSystem</h4>
+<p><a name="113161"> </a>
+Let's assume you haven't obtained a mixer, and your program is a simple one that really only needs a certain kind of line; the details of the mixer don't matter to you. You can use the <code>AudioSystem</code> method: 
+</p>
+<blockquote><pre>    static Line getLine(Line.Info info)
+</pre></blockquote>
+which is analogous to the <code>getMixer</code> method discussed above. Unlike <code>Mixer.Info</code>, the <code>Line.Info</code> used as an argument doesn't store textual information to specify the desired line. Instead, it stores information about the class of line desired.
+<p></p><p><a name="114553"> </a>
+<code>Line.Info</code> is an abstract class, so you use one of its subclasses (<code>Port.Info</code> or <code>DataLine.Info</code>) to obtain a line. The following code excerpt uses the <code>DataLine.Info</code> subclass to obtain and open a target data line:
+</p>
+<blockquote><pre>TargetDataLine line;
+DataLine.Info info = new DataLine.Info(TargetDataLine.class, 
+    format); // format is an AudioFormat object
+if (!AudioSystem.isLineSupported(info)) {
+    // Handle the error.
+    }
+    // Obtain and open the line.
+try {
+    line = (TargetDataLine) AudioSystem.getLine(info);
+    line.open(format);
+} catch (LineUnavailableException ex) {
+   	// Handle the error.
+    //... 
+}
+</pre></blockquote>
+This code obtains a <code>TargetDataLine</code> object without specifying any attributes other than its class and its audio format. You can use analogous code to obtain other kinds of lines. For a <code>SourceDataLine</code> or a <code>Clip</code>, just substitute that class for <code>TargetDataLine</code> as the class of the line variable, and also in the first argument to the <code>DataLine.Info</code> constructor. 
+<p></p><p><a name="113191"> </a>
+For a <code>Port</code>, you can use static instances of <code>Port.Info</code>, in code like the following:
+<blockquote><pre>
+if (AudioSystem.isLineSupported(Port.Info.MICROPHONE)) {
+    try {
+        line = (Port) AudioSystem.getLine(
+            Port.Info.MICROPHONE);
+    }
+}
+</pre></blockquote>
+Note the use of the method <code>isLineSupported</code> to see whether the mixer even has a line of the desired type. 
+<p></p>
+<p><a name="113199"> </a> Recall that a source line is an input to a mixer&#151;namely, 
+  a <code>Port</code> object if the mixer represents an audio-input device, and 
+  a <code>SourceDataLine</code> or <code>Clip</code> object if the mixer represents 
+  an audio-output device. Similarly, a target line is an output of the mixer: 
+  a <code>Port</code> object for an audio-output mixer, and a <code>TargetDataLine</code> 
+  object for an audio-input mixer. What if a mixer doesn't connect to any external 
+  hardware device at all? For example, consider an internal or software-only mixer 
+  that gets audio from an application program and delivers its mixed audio back 
+  to the program. This kind of mixer has <code>SourceDataLine</code> or <code>Clip</code> 
+  objects for its input lines and <code>TargetDataLine</code> objects for its 
+  output lines. </p>
+<p><a name="113201"> </a>
+You can also use the following <code>AudioSystem</code> methods to learn more about source and target lines of a specified type that are supported by any installed mixer:
+<blockquote><pre>
+    static Line.Info[] getSourceLineInfo(Line.Info info)
+    static Line.Info[] getTargetLineInfo(Line.Info info)
+</pre></blockquote>
+Note that the array returned by each of these methods indicates unique types of lines, not necessarily all the lines. For example, if two of a mixer's lines, or two lines of different mixers, have identical <code>Line.Info</code> objects, the two lines will represented by only one <code>Line.Info</code> in the returned array.
+<p></p><a name="113208"> </a>
+<h4> Getting a Line from a Mixer</h4>
+<p><a name="113210"> </a>
+The <code>Mixer</code> interface includes variations on the <code>AudioSystem</code> access methods for source and target lines, described above. These <code>Mixer</code> methods include ones that take <code>Line.Info</code> arguments, just as <code>AudioSystem's</code> methods do. However, <code>Mixer</code> also includes these variants, which take no arguments:
+</p><blockquote><pre><code>    Line.Info[] getSourceLineInfo() 
+</code><code>    Line.Info[] getTargetLineInfo() 
+</code><p><a name="113215"> </a>
+</pre></blockquote>
+These methods return arrays of all the <code>Line.Info</code> objects for the particular mixer. Once you've obtained the arrays, you can iterate over them, calling <code>Mixer's</code> <code>getLine</code> method to obtain each line, followed by <code>Line's</code> <code>open</code> method to reserve use of each line for your program.
+<p></p><a name="113216"> </a>
+<h3> Selecting Input and Output Ports</h3>
+<p><a name="113217"> </a>
+The previous section, regarding how to obtain a line of a desired type, applies to ports as well as other types of lines. You can obtain all of the source (i.e., input) and target (i.e, output) ports by passing a <code>Port.Info</code> object to the <code>AudioSystem</code> (or <code>Mixer</code>) methods <code>getSourceLineInfo</code> and <code>getTargetLineInfo</code> that take a <code>Line.Info</code> argument. You then iterate over the returned array of objects and invoke Mixer's <code>getLine</code> method to get each port.
+</p>
+<p><a name="113219"> </a> You can then open each <code>Port</code> by invoking 
+  <code>Line's</code> <code>open</code> method. Opening a port means you turn 
+  it on&#151;that is, you allow sound to come in or out the port. Similarly, you 
+  can close ports that you don't want sound to travel through, because some ports 
+  might already be open before you even obtain them. Some platforms leave all 
+  ports on by default; or a user or system administrator might have selected certain 
+  ports to be on or off, using another application program or operating-system 
+  software. </p>
+<p><a name="113220"> </a>
+<strong>Warning:</strong> If you want to select a certain port and make sure that the sound is actually going in or out the port, you can open the port as described. However, this can be considered user-hostile behavior! For example, a user might have the speaker port turned off so as not to disturb her co-workers. She would be rather upset if your program suddenly overrode her wishes and started blaring music. As another example, a user might want to be assured that his computer's microphone is never turned on without his knowledge, to avoid eavesdropping. In general, it is recommended not to open or close ports unless your program is responding to the user's intentions, as expressed through the user interface. Instead, respect the settings that the user or the operating system has already selected.
+</p><p><a name="113221"> </a>
+It isn't necessary to open or close a port before the mixer it's attached to will function correctly. For example, you can start playing back sound into an audio-output mixer, even though all its output ports are closed. The data still flows into the mixer; the playback isn't blocked. The user just won't hear anything. As soon as the user opens an output port, the sound will be audible through that port, starting at whatever point in the media the playback has already reached.
+</p><p><a name="113222"> </a>
+Also, you don't need to access the ports to learn whether the mixer has certain ports. To learn whether a mixer is actually an audio-output mixer, for example, you can invoke <code>getTargetLineInfo</code> to see whether it has output ports. There's no reason to access the ports themselves unless you want to change their settings (such as their open-or-closed state, or the settings of any controls they might have).
+</p><a name="113223"> </a>
+<h3> Permission to Use Audio Resources</h3>
+<p><a name="115642"> </a>
+The Java Sound API includes an <code>AudioPermission</code> class that indicates what kinds of access an applet (or an application running with a security manager) can have to the sampled-audio system. Permission to record sound is controlled separately. This permission should be granted with care, to help prevent security risks such as unauthorized eavesdropping. By default, applets and applications are granted permissions as follows:
+</p><ul><a name="115643"> </a>
+<li>An <em>applet</em> running with the applet security manager can play, but not record, audio.
+<a name="115633"> </a>
+<li>An <em>application</em> running with no security manager can both play and record audio.
+<a name="115637"> </a>
+<li>An application running with the default security manager can play, but not record, audio.
+<p><a name="115653"> </a>
+</ul>
+In general, applets are run under the scrutiny of a security manager and aren't permitted to record sound. Applications, on the other hand, don't automatically install a security manager, and are able to record sound. (However, if the default security manager is invoked explicitly for an application, the application isn't permitted to record sound.) 
+<p></p><p><a name="115660"> </a>
+Both applets and applications can record sound even when running with a security manager if they have been granted explicit permission to do so.
+</p><p><a name="113244"> </a>
+If your program doesn't have permission to record (or play) sound, an exception will be thrown when it attempts to open a line. There is nothing you can do about this in your program, other than to catch the exception and report the problem to the user, because permissions can't be changed through the API. (If they could, they would be pointless, because nothing would be secure!) Generally, permissions are set in one or more policy configuration files, which a user or system administrator can edit using a text editor or the Policy Tool program. 
+</p>
+<p><a name="115710"> </a> For more information on security and permissions, see 
+  "Security Architecture" and "Policy Permissions" in the <a href="../../security/">Security</a> 
+  guide and the specialized trail on security in the <a href="../../../../../../docs/books/tutorial/">Java 
+  Tutorial</a>. </p>
+<p>&nbsp;</p></body>
+</html>

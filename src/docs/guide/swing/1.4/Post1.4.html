@@ -1,0 +1,374 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>Swing Changes Since Java 2 SDK, v1.4</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+<TD>
+
+<center>
+
+<h2>Swing Changes Since Java<sup><font size=-2>TM</font></sup> 2
+SDK, Standard Edition, v 1.4</h2>
+
+</center>
+
+</TD>
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../index.html">Project Swing</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+<p>The <a href="../SwingChanges.html">Swing Changes and New Features for
+Java 2 SDK, Standard Edition, v 1.4</a> document describes changes
+for all the 1.4.* releases.  This document provides links to changes
+specific to the 1.4.1 and 1.4.2 releases.
+
+<H2>Changes for the Incremental Release, Java 2 SDK, S.E., v1.4.1</H2>
+
+<p>For Swing, this release primarily features bugfixes.
+Bugs that have been fixed include:
+
+<p>Focus related bugs:
+<ul>
+<li><a href="../SwingChanges.html#4632782">4632782: JPopupMenu
+     may now be prevented from taking focus</a>
+<li><a href="../SwingChanges.html#4628933">4628933: Heavy weight
+     windows may lose focus when running on some versions of Microsoft
+     Windows with a remote display application</a>
+<li><a href="../SwingChanges.html#4659800">4659800: Default button
+     should follow the focus on Microsoft Windows look and feel
+<li><a href="../SwingChanges.html#JTabbedPane">JTabbedPane and
+    Focus Clarification</a>
+</ul>
+
+<p>Drag and drop related bugs:
+<ul>
+<li><a href="dnd.html#4513715">4513715: Drop no longer clobbers
+     selected text</a>
+<li><a href="dnd.html#4513638">4513638: Cut/copy/drag fixed for
+     JEditorPane with RTFEditorKit</a>
+<li><a href="dnd.html#DefaultSupport">Import/export behavior has 
+    changed for the JEditorPane component</a>
+</ul>
+
+<p>Miscellaneous:
+<ul>
+<li><a href="../SwingChanges.html#4532517">4532517: Workaround for
+     input verifier bug</a>
+<li><a href="../SwingChanges.html#4668963">4419964, 4668963: Metal look and
+    feel can now pick up font sizes from the desktop on
+    Microsoft Windows</a>
+<li><a href="../SwingChanges.html#4615396">4615396: Some locales
+    will only honor font size from the desktop</a>
+<li><a href="../SwingChanges.html#4668511">4668511: Deadlock in
+    JColorChooser
+<li><a href="../SwingChanges.html#4218431">4218431: Document that
+    multiple file selection is supported in JFileChooser</a>
+</ul>
+
+<a name=1.4.2>
+<H2>Changes for the Incremental Release, Java 2 SDK, S.E., v1.4.2</H2>
+</a>
+
+<p>In addition to many bugfixes, this release features these new
+enhancements:
+
+<h3>JFileChooser Performance Enhancements</h3>
+<blockquote>
+<P> The bugtraq reports that correspond to this change are: <A
+href="http://developer.java.sun.com/developer/bugParade/bugs/4679673.html">
+      4679673</A> and
+<a href="http://developer.java.sun.com/developer/bugParade/bugs/4712307.html">
+     4712307</a>.
+
+<p>This release features many performance improvements to
+<code>JFileChooser</code>. In some situations, 
+<code>JFileChooser</code> now performs 300 times faster.
+</blockquote>
+
+<h3><a name=xp>Windows XP look and feel</a></h3>
+<blockquote>
+<p>
+Release 1.4.2 introduces support for
+the standard Microsoft Windows XP appearance as the
+default when running on the Windows XP platform.
+This look and feel automatically
+appears if your app is using Swing's
+<code>WindowsLookAndFeel</code> class (either by way of
+<code>UIManager.getSystemLookAndFeelClassName()</code>
+or by explicitly using 
+<code>com.sun.java.swing.plaf.windows.WindowsLookAndFeel</code>)
+on a machine running the Windows XP operating system. The
+following example illustrates the preferred way of setting the
+look and feel to match that of the native platform:
+</p>
+<pre>
+  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+</pre>
+<p>
+If you prefer your Swing app to look like a classic Windows app
+you can turn of the XP look using the system property
+<code>swing.noxp=true</code>. This is typically used as a
+command line parameter, eg:
+</p>
+<pre>
+  java -Dswing.noxp=true -jar SwingSet2.jar
+</pre>
+<p>Note that the <code>swing.noxp</code> property may
+not be supported in future releases.
+</blockquote>
+
+<h3><a name=gtk>GTK+ look and feel</a></h3>
+<blockquote>
+<p>
+Release 1.4.2 introduces a look and feel based on
+<a href="http://www.gtk.org">GTK+ 2.0</a>.
+In order to get this look and feel you
+need to explicitly ask for it by way of 
+<code>UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")</code>
+or by defining the system property <code>swing.defaultlaf</code>
+to be
+<code>com.sun.java.swing.plaf.gtk.GTKLookAndFeel</code>. In 1.5
+we will make
+<code>UIManager.getSystemLookAndFeelClassName()</code> return
+this look and feel when appropriate.
+</p>
+
+    <p>
+      The GTK+ look and feel can be customized by way of <a
+							   href="http://developer.gnome.org/doc/API/2.0/gtk/gtk-Resource-Files.html">resource files</a>.
+      Swing's GTK+ look and feel uses the following algorithm to locate
+      the resource files:
+    </p>
+    <ol>
+      <li>
+	If the system property <code>swing.gtkthemefile</code>
+	exists, parse it and stop, for example: <code>java
+	  -Dswing.gtkthemefile=/tmp/customTheme -jar SwingSet2.jar</code>.
+      <li>
+	If the file <code>user.home/.gtkrc-2.0</code> exists, parse it
+	and continue.
+      <li>
+	Determine the user selected theme name (THEMENAME) by way of
+	the desktop property <code>gnome.net/ThemeName</code> which is
+	determined using <a
+			    href="http://www.freedesktop.org/standards/xsettings-spec">XSETTINGS</a>. If this property is null, use
+	<code>Default</code> as THEMENAME.
+	<ol>
+	  <li>
+	    If the file
+	    <code>user.home/.themes/THEMENAME/gtk-2.0/gtkrc</code>
+	    exists parse it and stop.
+	  <li>
+	    If the system property <code>swing.gtkthemedir</code>
+	    exists and the file
+	    <code>swing.gtkthemedir/THEMENAME/gtk-2.0/gtkrc</code>
+	    exists, parse it and stop.
+	  <li>
+	    If the system property <code>swing.gtkthemedir</code>
+	    doesn't exist and the file
+	    <code>/usr/share/themes/THEMENAME/gtk-2.0/gtkrc</code>
+	    exists, parse it and stop.
+	  <li>
+	    Lastly if <code>swing.gtkthemedir</code> is defined parse
+	    <code>swing.gtkthemedir/THEMENAME/gtk/gtkrc</code>,
+	    otherwise parse
+	    <code>/usr/share/themes/THEMENAME/gtk/gtkrc</code>.
+	</ol>
+    </ol>
+
+    <p>
+      One way GTK+ can be customized is by way of a
+      <a href="http://developer.gnome.org/doc/API/2.0/gtk/GtkStyle.html">theme
+      engine</a>. A handful of engines exist. 
+      In 1.4.2, Swing supports theme files for <code>Default</code>,
+      <code>pixmap</code>, and <code>bluecurve</code>
+      engines. We are 
+      investigating ways to open up the API to allow for the creation of
+      additional GTK engines. Visit <a
+href="http://www.themes.org">http://www.themes.org</a> for examples.
+    </p>
+
+<p>
+GTK+ allows for specifying fonts in two ways: using an
+<a href="http://www.x-docs.org/XLFD/xlfd.pdf">XLFD</a> or
+using a <a href="http://www.pango.org/">pango</a> string. Pango
+provides for facilities similar to the composite Fonts on the
+Java platform, that is, a font that consists of a number of different fonts for
+different code points. Because pango's composite fonts do not
+exactly match Java's composite fonts, a Swing app with the
+<code>GTKLookAndFeel</code> will not exactly match a native GTK+
+app. We are investigating ways to deal with this. One option is
+to replace your pango font file with a version equivalent to
+Java's font.properties file. Additionally we
+currently ignore XLFDs and pass Pango strings (after mapping
+sans to sansserif and monospace to monospaced) directly to a
+<code>java.awt.Font</code>.
+</p>
+
+<p>
+GTK+ does not provide  MDI (<code>JInternalFrame</code>) capabilities nor does it directly
+support theming of top level windows, rather that is left up to
+the WindowManager. For Swing's MDI classes we support theming
+by way of <a href="http://www.gnome.org/softwaremap/projects/metacity/">
+Metacity</a>. We currently only support the <code>Crux</code>
+and <code>Bluecurve</code> themes. If we can not locate either
+of these themes we fall back to our own custom theme. You can
+use the system property <code>swing.metacitythemename</code> to
+name a particular theme to use, otherwise we will look in
+<code>user.dir/.gconf/apps/metacity/general/%gconf.xml</code> to
+determine the name of theme and look in
+<code>/usr/share/themes/THEMENAME/metacity-1/metacity-theme-1.xml</code>
+or <code>/usr/gnome/share/themes/THEMENAME/metacity-1/metacity-theme-1.xml</code>
+for the actual resource file. The following example shows how to trigger
+Swing to use a specific metacity theme:
+</p>
+<pre>
+  java -Dswing.metacitythemename=Bluecurve -jar SwingSet2.jar
+</pre>
+
+<p>
+GTK+ resource files allow for customizing a number of look and
+feel options beyond the look. In 1.4.2 we support the
+primary style configurations (fg, bg, base ..), gtk-font-name,
+gtk-icon-sizes, stock icons (for optionpane), focus-line-width,
+focus-padding, focus-line-pattern, internal-padding, shadow-type
+(for menubars), and trough-border.
+</p>
+
+<p>
+GTK provides a mechanism for which running applications can pick
+up a theme change and automatically update the UI, this will be
+supported in a future version of Swing's GTK look and feel.
+</p>
+
+<h4>GTK Incompatabilities</h4>
+<p>
+Correctly supporting a GTK+ look and feel posed a number of
+challenges to Swing's current architecture. In Swing an opaque
+component ALWAYS paints its background by way of
+ComponentUI's update method, in GTK+ a nonopaque component may or
+may not paint the background, depending upon the engine. To
+correctly mirror GTK+ a number of Components that previously were
+opaque have been made nonopaque (by way of the ComponentUI
+subclass's installUI method). Additionally because the look of a
+component can change based on the containment hierarchy the
+opacity may change after the constructor has completed. A
+ramification of this is that if you invoke setOpaque() on a
+component, it may change out from under you. We will fix this in
+the next release.
+</p>
+<p>
+GTK+ calls into the engine to paint border decorations before
+the actual contents of the widget are painted. Some engines, most
+notably the pixmap engine, rely on this ordering to correctly
+render decorations behind the contents. In Swing the border is
+rendered after the widget contents are painted. In the
+GTKLookAndFeel we install a Border only to provide space, and
+let the UI do the actual rendering of the border decorations as
+part of the paint method. The ramification of this is that if
+you install a Border on a widget with the GTKLookAndFeel you
+will likely not get the effect you are after. Again, we are
+investigating alternatives and will provide a better solution in
+the next release.
+</p>
+</blockquote>
+      
+<h3>1.4.2 Bugs</h3>
+<blockquote>
+One bug worth mentioning:
+<ul>
+<li><a href="../SwingChanges.html#4759306">4759306:
+     JColorChooser.setPreviewPanel does not remove the old one.</a>
+</ul>
+</blockquote>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>.
+  This is not a subscription list.
+   </FONT>
+</TD>
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+

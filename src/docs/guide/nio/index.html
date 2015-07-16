@@ -1,0 +1,317 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>New I/O APIs</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+<h1>New I/O APIs</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+<blockquote>
+The new I/O (NIO) APIs introduced in v 1.4
+provide new features and improved
+performance in the areas of buffer management,
+scalable network and file I/O,
+character-set support,
+and
+regular-expression matching.
+The NIO APIs supplement the I/O facilities in the
+<a href="../io/index.html"><code>java.io</code> package</a>.
+
+
+<h3>Features</h3>
+
+The NIO APIs include the following features:
+
+<UL>
+<li> Buffers for data of primitive types
+<li> Character-set encoders and decoders
+<li> A pattern-matching facility based on Perl-style regular expressions
+<li> Channels, a new primitive I/O abstraction
+<li> A file interface that supports locks and memory mapping
+<LI> A multiplexed, non-blocking I/O facility for writing scalable servers
+</UL>
+
+
+<h3>Examples</h3>
+
+<ul>
+<li><a href="example/index.html">NIO Examples</a></li>
+</ul>
+
+<h3>API References</h3>
+
+New packages, classes, and interfaces:
+<UL>
+<LI><a href="../../api/java/nio/package-summary.html"><code>java.nio</code></a> package: 
+Buffers, which are used throughout the NIO APIs.
+</LI>
+
+<LI><a href="../../api/java/nio/channels/package-summary.html"><code>java.nio.channels</code></a> package: 
+Channels and selectors.
+</LI>
+
+<LI><a href="../../api/java/nio/charset/package-summary.html"><code>java.nio.charset</code></a> package: 
+Character encodings.
+</LI>
+
+<LI><a href="../../api/java/nio/channels/spi/package-summary.html"><code>java.nio.channels.spi</code></a> package: 
+Service-provider classes for channels.
+</LI>
+
+<LI><a href="../../api/java/nio/charset/spi/package-summary.html"><code>java.nio.charset.spi</code></a> package: 
+Service-provider classes for charsets.
+</LI>
+
+<LI><a href="../../api/java/util/regex/package-summary.html"><code>java.util.regex</code></a> package:
+Classes for matching character sequences against
+patterns specified by regular expressions.
+</LI>
+<LI><a href="../../api/java/lang/CharSequence.html"><code>java.lang.CharSequence</code></a> interface: The interface implemented by objects 
+that can be passed as arguments
+to methods in the <code>java.util.regex</code> package.
+The <code>String</code>, <code>StringBuffer</code>,
+and <code>java.nio.CharBuffer</code>
+classes implement this interface.
+</LI>
+</ul>
+
+<p>
+<b>Note:</b>
+The new <a href="../../api/java/net/InetSocketAddress.html"><code>InetSocketAddress</code></a> 
+and
+<a href="../../api/java/net/SocketAddress.html"><code>SocketAddress</code></a> classes,
+while not strictly part of the NIO APIs,
+are used by them.
+
+<p>
+
+Revised classes and interfaces:
+<UL>
+<LI>In the
+<a href="../../api/java/io/FileInputStream.html"><code>FileInputStream</code></a> and
+<a href="../../api/java/io/FileOutputStream.html"><code>FileOutputStream</code></a>
+classes,
+<code>getChannel</code> methods have been added 
+to return the underlying <code>FileChannel</code> object, and
+the <code>close</code> methods have been revised 
+to close the underlying channel.
+
+<LI>Similarly, in the
+<a href="../../api/java/io/RandomAccessFile.html"><code>RandomAccessFile</code></a> class,
+a <code>getChannel</code> method has been added and
+the <code>close</code> method has been revised 
+to close the underlying channel.
+The <code>RandomAccessFile</code> constructors now support
+the mode characters <tt>"s"</tt> and <tt>"d"</tt> 
+to allow the specification, at file-open time,
+of synchronous writes or synchronous-data writes. 
+
+<LI>In the
+<a href="../../api/java/io/InputStreamReader.html"><code>InputStreamReader</code></a>
+and 
+<a href="../../api/java/io/OutputStreamWriter.html"><code>OutputStreamWriter</code></a> classes,
+constructors have been added that take a stream
+and a <code>Charset</code> object,
+and the <code>getEncoding</code> methods have been revised 
+to return the historical name of the encoding being used.
+Constructors to 
+<code>InputStreamReader</code> and 
+<code>OutputStreamWriter</code>
+have been added
+that take existing 
+<code>CharsetDecoder</code> and 
+<code>CharsetEncoder</code> objects, respectively. 
+
+
+<LI>In the
+<a href="../../api/java/lang/String.html"><code>String</code></a> class,
+two <code>split</code> methods are new.
+The <code>subSequence</code> method has been added,
+as required by the 
+<code>CharSequence</code> interface
+that <code>String</code> now implements.
+Three additional methods have been added:
+<code>matches</code>,
+<code>replaceAll</code>, and
+<code>replaceFirst</code>. 
+
+<LI>In the
+<a href="../../api/java/lang/StringBuffer.html"><code>StringBuffer</code></a> class,
+the <code>subSequence</code> method has been added,
+as required by the 
+<code>CharSequence</code> interface
+that <code>StringBuffer</code> now implements.
+
+<LI>In the
+<a href="../../api/java/lang/Thread.html"><code>Thread</code></a> class,
+the <code>interrupt</code> method has been revised
+to interrupt threads blocked in channel-I/O operations.
+
+<LI>In the
+<a href="../../api/java/net/DatagramSocket.html"><code>DatagramSocket</code></a> class,
+the <code>receive</code> and <code>send</code> methods
+have been revised
+to throw a
+<code>java.nio.channels.IllegalBlockingModeException</code>
+if the socket has a channel and the channel is in
+non-blocking mode.
+The <code>close</code> method
+now closes the socket's channel,
+if it has one,
+and the new <code>getChannel</code> method 
+returns the underlying channel, if any.
+<LI>In the
+<a href="../../api/java/net/ServerSocket.html"><code>ServerSocket</code></a> class,
+the <code>accept</code>
+and <code>implAccept</code> methods
+have been revised to throw a
+<code>java.nio.IllegalBlockingModeException</code>
+if the socket has a channel and the channel is in
+non-blocking mode.
+The <code>getChannel</code> method has been added
+and <code>close</code> revised, 
+for the same reasons as in <code>DatagramSocket</code>.
+<LI>In the
+<a href="../../api/java/net/Socket.html"><code>Socket</code></a> class,
+the <code>getInputStream</code>
+and <code>getOutputStream</code> 
+methods have been revised
+to delegate all I/O operations 
+to the socket's channel,
+if it has one.
+The <code>connect</code> methods have been revised to throw a
+<code>java.nio.IllegalBlockingModeException</code>
+if the socket has a channel and the channel is in
+non-blocking mode.
+The <code>getChannel</code> method has been added
+and <code>close</code> revised,
+for the same reasons as in <code>DatagramSocket</code>.
+</UL>
+
+<p>
+Three new functions have been added to the 
+Java Native Interface (JNI)
+to support direct buffers.
+For information, see
+<a href="../jni/jni-14.html">JNI Enhancements in v 1.4</a>.
+</p>
+
+
+
+<h3>For More Information</h3>
+
+<UL>
+<LI> <a href="http://java.sun.com/j2se/1.4/nio/index.html">New I/O: Additional Documentation</a>
+<LI> <a href="../intl/encoding.doc.html">Supported Encodings</a>
+
+<LI><a href="http://java.sun.com/aboutJava/communityprocess/final-draft/jsr051/index.html">JSR-51: New I/O APIs for the Java Platform</a>
+(Note: v 1.4 has a subset of the changes proposed in this
+specification request.)
+</UL>
+</blockquote>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+    <FONT SIZE="-1">
+
+    Please send comments to:
+    <a href="mailto:java-io@java.sun.com">java-io@java.sun.com</a>
+
+    </FONT>
+
+
+
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+</BODY>
+
+</HTML>

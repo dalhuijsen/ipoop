@@ -1,0 +1,189 @@
+<html>
+<head>
+<title>AWT image scaling API</title>
+</head>
+<BODY BGCOLOR="#FFFFFF">
+ 
+<h1>AWT image scaling API</h1>
+<hr>
+<address>last updated: October 30, 1996</address>
+<h2>The Issue</h2>
+Java has provided a number of mechanisms to scale an image automatically
+at the time that the drawImage() is called.  These mechanisms have caused
+a bit of confusion since the exact behavior was not well documented and
+the particular implementation chosen for the reference port behaved in a
+way that differed from most programmer's expectations.
+<p>
+In particular, when images are displayed on the screen, the Image data
+is converted to a format which matches the color capabilities of the
+screen.
+The original image data is not stored persistently, only the converted
+screen data is stored by the screen representations.
+If the data for the image is needed for some other purpose (such as
+filtering the data for a new image), then the raw data has to be
+reloaded from the original source.
+<dl>
+<dd>Note that the original data is stored in a cache in case it
+is needed immediately after the first time it is loaded for a secondary
+purpose.  If a single image is run through several filters, then the
+subsequent filtered images will often be able to use the cached converted
+data without having to reload the image file from the source, but this
+cached data cannot be relied on in general.
+</dl>
+When the image is scaled using one of the drawImage method variants
+that allows the specification of a width and height, a separate screen
+representation is created for each size that is drawn.  Furthermore,
+since scaling an image after it has been dithered for output on an 8-bit
+screen results in very poor quality output, the scaling is always done
+from the original image data.  Even if the screen is 24 bits deep and
+thus the screen representation contains the original image data with
+no conversion loss the implementation is not smart enough to use the
+local copy and contacts the original source of the image anyway.
+<p>
+Another drawback of storing a separate image representation for each
+size drawn is the amount of memory consumed.  The strategy of keeping
+a separate representation for each size drawn is meant to optimize
+rendering speed since the data is all ready to be copied to the
+screen byte for byte.  This strategy ends up backfiring since the
+speed gain by having the scaled size precalculated often is more than
+offset by the pain and inconvenience of having to wait while the scaled
+variant is loaded and converted, especially if the image data needs to
+be reloaded over a slow network.  Also, if the image is being drawn at
+many different sizes which will never be repeated the memory used to
+cache the scaled representations is wasted.
+<p>
+In short, there is no programmer control over whether or not the
+scaled version of the image is cached for subsequent rendering and
+whether or not the image scaling is done immediately or in the
+background.
+<p>
+Another issue which has bothered developers is that there is no way
+to create a new object which represents a scaled view of an existing
+image.
+An Image object can be scaled by supplying new width and height
+parameters to the drawImage call, but there is no way to encapsulate
+that information into an Image object so that by passing around that
+Image object, the desired size image will be drawn.
+
+<h2>The new image scaling API and behavior</h2>
+To resolve this problem a new strategy will be adopted for the
+drawImage methods that scale an image.
+In 1.1, all scaling by drawImage will be done "on the fly" at
+rendering time from the full sized screen representation.
+<p>
+There are two primary drawbacks of this change.
+<ol>
+<li>
+Using the new drawImage to scale the image will take slightly longer
+than before since the pixel reordering will have to be performed at
+render time.
+<li>
+The quality of the scaled images will be reduced on 8-bit screens due
+to the fact that the pixel reordering will be performed after the
+dithering process.
+</ol>
+<p>
+As it turns out, the first problem is much less dramatic than was
+originally feared.
+In the past couple of years processors have become very fast especially
+in comparison to the speeds of memory systems.
+As a result image scaling performance is mostly limited by memory
+access speed and the calculations necessary to determine which is
+the next pixel to copy to the screen for the particular scaling
+desired are not very noticeable compared to the work of moving
+the data to the screen.
+<p>
+The quality issue could have been a major problem.
+With the 8-bit color conversion code used in JDK implementations prior
+to 1.1 images degraded dramatically if they were scaled after dithering.
+Fortunately, new color conversion algorithms have been developed for
+1.1 which increase the quality of the resulting dithered image so much
+that the results of scaling the dithered representations are typically
+as good, if not better than the results of the 1.0.2 images which were
+dithered after scaling.
+<p>
+Still, even though the implementation of image scaling was beefed up in
+1.1 enough to make render-time on-the-fly scaling possible, there will
+be cases where the programmer wants every possible measure taken to
+improve the quality of the scaled image.
+To allow the programmer to choose when explicit scaling should be performed
+up front instead of at rendering time, two new filter classes will be
+available and a new convenience method will be added to the AWT Image
+class in 1.1.
+These same APIs can be used by programmers to create a new Image object
+representing a scaled version of that image encapsulated into its own
+Image object.
+The new image scaling classes are:
+<pre>	<a href="../../../../../api/java/awt/image/ReplicateScaleFilter.html">java.awt.image.ReplicateScaleFilter</a>
+	<a href="../../../../../api/java/awt/image/AreaAveragingScaleFilter.html">java.awt.image.AreaAveragingScaleFilter</a>
+</pre>
+The new method in the Image class is:
+<pre>	<a href="../../../../../api/java/awt/Image.html#getScaledInstance(int, int, int)">getScaledInstance(int width, int height, int hints)</a>
+</pre>
+The hints parameter controls what kind of algorithm is used to scale the
+image.
+There are hints which refer to specific algorithms to be used and there 
+are more abstract hints which indicate whether or not to optimize the
+operation for speed or quality.
+The current set of legal values for the hints parameter are:
+<pre>Image.SCALE_DEFAULT</pre>
+<dl><dd>
+Use the default scaling algorithm (which may be chosen based on the
+user's configuration)
+</dl>
+<pre>Image.SCALE_FAST</pre>
+<dl><dd>
+Choose a scaling algorithm to optimize speed more than smoothness
+of the scaled image
+</dl>
+<pre>Image.SCALE_SMOOTH</pre>
+<dl><dd>
+Choose a scaling algorithm to optimize smoothness of the scaled image
+more than speed
+</dl>
+<pre>Image.SCALE_REPLICATE</pre>
+<dl><dd>
+Use the algorithm implemented by the ReplicateScaleFilter
+</dl>
+<pre>Image.SCALE_AREA_AVERAGING</pre>
+<dl><dd>
+Use the algorithm implemented by the AreaAveragingScaleFilter
+</dl>
+
+<h2>Sample Code</h2>
+Following is sample code showing the use of the new API to scale an
+image:
+<pre>
+
+    import java.awt.*;
+    import java.applet.*;
+
+    public class ImgScaleExample extends Applet {
+	Image img, img2;
+    	public void init() {
+	    img = getImage(getDocumentBase(), "foo.gif");
+	    img2 = img.getScaledInstance(100, 100, Image.SCALE_DEFAULT);
+	}
+
+	public void paint(Graphics g) {
+	    // Draw the full size image
+	    g.drawImage(img, 0, 0, this);
+	    // Draw the scaled version of the image
+	    g.drawImage(img2, 10, 10, this);
+	    // Now draw a scaled version of the scaled image
+	    g.drawImage(img2, 110, 10, 50, 50, this);
+	}
+    }
+</pre>
+
+<hr><br>
+
+<address>
+Send feedback to:<a href="mailto:java-awt@java.sun.com">java-awt@java.sun.com</a>
+</address>
+
+<i>Copyright &#169; 1996, Sun Microsystems, Inc.   All rights
+reserved.</i>
+
+</body>
+</html>

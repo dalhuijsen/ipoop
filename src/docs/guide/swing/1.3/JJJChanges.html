@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>JButton, JCheckBox, JRadioButton</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+           <h1>JButton, JCheckBox, JRadioButton </h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="SwingChanges.html">Other Swing Changes</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+<blockquote>
+
+
+
+
+    <h2>New JCheckBox borderPaintedFlat Property</h2>
+
+      JCheckBox is often used as a cell renderer in tables and lists. 
+      The specifications for the Java Look and Feel (codenamed Metal)
+      and the Windows Look and Feel specify that the
+      check box be rendered with a 2D flat border rather than a 3D 
+      border when used as a cell renderer. The borderPaintedFlat property has
+      been added to enable this behavior.
+<P>
+See:
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/JCheckBox.html#BORDER_PAINTED_FLAT_CHANGED_PROPERTY">public static final String BORDER_PAINTED_FLAT_CHANGED_PROPERTY</a>
+<li><a href="../../../api/javax/swing/JCheckBox.html#setBorderPaintedFlat(boolean)">public void setBorderPaintedFlat(boolean b)</a>
+<li><a href="../../../api/javax/swing/JCheckBox.html#isBorderPaintedFlat()">public boolean isBorderPaintedFlat()</a> 
+</tt>
+</ul>
+
+    <h2>Add DefaultButtonModel getGroup Method</h2>
+
+
+      This was an oversite of the original implementation. Unfortunately,
+      since ButtonModel is an interface, this property cannot be added to
+      it. It has instead been added to DefaultButtonModel, which should
+      help most developers who want this.
+<P>
+See:
+
+<ul>
+<tt>
+<li><a href="../../../api/javax/swing/DefaultButtonModel.html#getGroup()">public ButtonGroup getGroup()</a>
+</tt>
+</ul>
+
+
+
+
+
+
+
+
+
+</blockquote>
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../../relnotes/SMICopyright.html">Copyright &#169;</A> 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+
+  Please send comments to: <a href="mailto:swing-feedback@java.sun.com">swing-feedback@java.sun.com</a>. This is not a subscription list.
+
+
+   </FONT>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+
+
+</TR>
+
+</TABLE>
+
+
+
+</BODY>
+
+</HTML>
+
+
+

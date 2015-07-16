@@ -1,0 +1,361 @@
+<html>
+<head>
+<title>Networking IPv6 User Guide</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+<hr>
+<h1>Networking IPv6 User Guide for J2SDK/JRE 1.4</h1>
+<hr>
+<p>This document covers the following topics:</p>
+<ul>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#supported">Supported Operating Systems</a></li>
+  <li><a href="#special">Special IPv6 Address Types</a></li>
+  <li><a href="#ipv6-related">IPv6-Related System Properties</a></li>
+  <li><a href="#dual">Dual-Stack Node</a></li>
+  <li><a href="#java">Java Application Impact</a></li>
+  <li><a href="#ipv6-networking">IPv6 Networking Properties</a></li>
+</ul>
+<h2><a name="overview"></a>Overview </h2>
+<p>With the J2SDK/JRE 1.4 release, IPv6 support has been added to Java Networking. 
+  This will make J2SE compliant with the following standards (RFCs):</p>
+<ul>
+  <li>RFC2373: IPv6 Addressing Architecture; </li>
+  <li>RFC 2553: BasicSocket Interface Extensions for IPv6; </li>
+  <li>RFC 2732: Format for Literal IPv6 Addresses in URLs. </li>
+</ul>
+<p>Since the J2SDK does not support raw sockets, RFC 2292 (: Advanced Sockets 
+  API for IPv6) is not supported in this release.</p>
+<p>Other interesting features of IPv6, such as tunneling, autoconfiguration of 
+  addresses, mobile IP, etc., are not supported at the Java API level, as they 
+  are handled automatically by the underlying OS or system support.</p>
+<h2><a name="supported"></a>Supported Operating Systems</h2>
+<p>The following operating systems are supported in this release:</p>
+<ul>
+  <li>Solaris 8 and up</li>
+  <li>Linux kernel 2.1.2 and up (RedHat 6.1 and up) </li>
+</ul>
+<h4>Notes on Linux</h4>
+<ol>
+  <li><font size="+1"></font>It is recommended to use Linux kernel 2.4.0 and higher 
+    releases, as IPv6 support is better in those releases.</li>
+  <li>With Linux, you need to install an IPv6-enabled kernel or rebuild the kernel 
+    with IPv6 options enabled. (Up until Kernel 2.4.2, the IPv6 implementation 
+    is marked as &quot;experimental.&quot;) In addition, you will need to install 
+    several network utilities. For detailed information, refer to <a href="http://www.bieringer.de/linux/IPv6/IPv6-HOWTO/IPv6-HOWTO.html">http://www.bieringer.de/linux/IPv6/IPv6-HOWTO/IPv6-HOWTO.html</a></li>
+</ol>
+<h4>Notes on Windows</h4>
+<p>J2SE<sup><font size="-2">TM</font></sup> 1.4 does not support IPv6 
+on Microsoft Windows. Microsoft has
+released an IPv6 Technology Previous for Windows 2000 but this
+is a limited seperate stack implementation. A complete dual 
+IPv4/IPv6 stack implementation for Microsoft Windows is not expected 
+to be released until 2002 or later.</p>
+<h2><a name="special"></a>Special IPv6 Address Types </h2>
+<h4>Unspecified address (:: corresponding to 0.0.0.0 in IPv4)</h4>
+<p>This is also called <i>anylocal</i> or <i>wildcard</i> address. If a socket 
+  is bound to an IPv6 anylocal address on a dual-stack machine, it can accept 
+  both IPv6 and IPv4 traffic; if it is bound to an IPv4 (IPv4-mapped) anylocal 
+  address, it can only accept IPv4 traffic. We always try to bind to IPv6 anylocal 
+  address on a dual-stack machine unless a related system property is set to use 
+  IPv4 Stack.</p>
+<p>When bound to <code>::</code>, method <a href="../../../api/java/net/ServerSocket.html#accept()"><tt>ServerSocket.accept</tt></a> 
+  will accept connections from both IPv6 or IPv4 hosts. The Java platform API 
+  currently has no way to specify to accept connections only from IPv6 hosts.</p>
+<p> Applications can enumerate the interfaces using <a href="../../../api/java/net/NetworkInterface.html"><tt>NetworkInterface</tt></a> 
+  and bind a <a href="../../../api/java/nio/channels/ServerSocketChannel.html"><tt>ServerSocketChannel</tt></a> 
+  to each IPv6 address, and then use a selector from the <a href="../../../api/java/nio/package-summary.html">New 
+  I/O API</a> to accept connections from these sockets. </p>
+<table summary="layout" width="80%" border="0" cellpadding="5" bgcolor="#CCCCCC" align="center">
+  <tr>
+    <td>
+      <p align="left"><b><font size="+1">Note:</font></b> The option discussed 
+        below is introduced in Draft-ietf-ipngwg-rfc2553bis-03.txt. It will be 
+        supported in the Java 2 platform when it becomes a standard.</p>
+      </td>
+  </tr>
+</table>
+<p>However, there is a new socket option that changes the above behaviour. Draft-ietf-ipngwg-rfc2553bis-03.txt 
+  has introduced a new IP level socket option, IPV6_V6ONLY. This socket option 
+  restricts AF_INET6 sockets to IPv6 communications only. Normally, AF_INET6 sockets 
+  may be used for both IPv4 and IPv6 communications. Some applications may want 
+  to restrict their use of an AF_INET6 socket to IPv6 communications only. For 
+  these applications the IPV6_V6ONLY socket option is defined. When this option 
+  is turned on, the socket can be used to send and receive IPv6 packets only. 
+  By default this option is turned off.</p>
+<h4>Loopback address (::1 corresponding to 127.0.0.1 in IPv4)</h4>
+<p>Packets with the loopback address must never be sent on a link or forwarded 
+  by an IPv6 router. There are two separate loopback addresses for IPv4 and IPv6 
+  and they are treated as such.</p>
+<p>IPv4 and IPv6 addresses are separate address spaces except when it comes to 
+  &quot;::&quot;.</p>
+<h4>Compatibility address ::w.x.y.z</h4>
+<p>This is used for hosts and routers to dynamically tunnel IPv6 packets over 
+  IPv4 routing infrastructure. It is meaningful for OS kernel and routers. Java 
+  provides a utility method to test it.</p>
+<h4>IPv4-mapped address ::ffff:w.x.y.z</h4>
+<p>This is an IPv6 address that is used to represent an IPv4 address. It allows 
+  the native program to use the same address data structure and also the same 
+  socket when communicating with both IPv4 and IPv6 nodes. Thus, on a dual-stack 
+  node with IPv4-mapped address support, an IPv6 application can talk to both 
+  IPv4 and IPv6 peer. The OS will do the underlying plumbing required to send 
+  or receive an IPv4 datagram and to hand it to an IPv6 destination socket, and 
+  it will synthesize an IPv4-mapped IPv6 address when needed.</p>
+<p>For Java, it is used for internal representation; it has no functional role. 
+  Java will never return an IPv4-mapped address. It understands IPv4-mapped address 
+  syntax, both in byte array and text representation. However, it will be converted 
+  into an IPv4 address.</p>
+<h2><a name="ipv6-related"></a>IPv6-Related System Properties</h2>
+<p>On dual stack machines, system properties are provided for setting the preferred 
+  protocol stack&#151;IPv4 or IPv6&#151;as well as the preferred<br>
+  address family types&#151;inet4 or inet6.</p>
+<p>IPv6 stack is preferred by default, since on a dual-stack machine IPv6 socket 
+  can talk to both IPv4 and IPv6 peers. </p>
+<p>This setting can be changed through the <code>java.net.preferIPv4Stack=&lt;true|false&gt;</code> 
+  system property.</p>
+<p>By default, we would prefer IPv4 addresses over IPv6 addresses, i.e., when 
+  querying the name service (e.g., DNS service), we would return Ipv4 addresses 
+  ahead of IPv6 addresses. There are two reasons for this choice: </p>
+<ol>
+  <li>There are some applications that expect an IPv4 address textual format, 
+    i.e. &quot;%d.%d.%d.%d&quot;. Using an IPv4 address minimizes the surprises; 
+  </li>
+  <li>Using IPv4 address, we can use one call (with an IPv6 socket) to reach either 
+    a legacy IPv4-only service, or an IPv6 service (unless the IPv6 service is 
+    on a Ipv6 only node).</li>
+</ol>
+<p>This setting can be changed through the system property <code>java.net.preferIPv6Addresses=&lt;true|false&gt;</code></p>
+
+<!--
+
+<p>(diagram)</p>
+
+-->
+
+<h2><a name="dual"></a>Dual-Stack Node</h2>
+<p>For many years, if not forever, there will be a mix of IPv6 and IPv4 nodes 
+  on the Internet. Thus compatibility with the large installed base of IPv4 nodes 
+  is crucial for the success of the transition from IPv4 to IPv6. Dual stack, 
+  defined in RFC 1933, is one of the main mechanisms for guaranteeing a smooth 
+  transition. The other mechanism is IPv6 packet tunneling, which is relevant 
+  to the J2SDK only through the IPv4-compatible address. The former is the most 
+  relevant piece to the J2SDK. A dual stack includes implementations of both versions 
+  of the Internet Protocol, IPv4 and IPv6.</p>
+<p>A general property of a dual-stack node is that an IPv6 socket can communicate 
+  both with an IPv4 and IPv6 peer at the transport layer (TCP or UDP) . At the 
+  native level, the IPv6 socket communicates with an IPv4 peer through an IPv4-mapped 
+  IPv6 address. However, unless a socket checks for the peers address type, it 
+  won't know whether it is talking to an IPv4 or an IPv6 peer. All the internal 
+  plumbing and conversion of address types is done by the dual-protocol stack.</p>
+<p><font size="+1"><b>Note:</b></font> IPv4-mapped address has significance only 
+  at the implementation of a dual-protocol stack. It is used to <i>fake</i> (i.e., 
+  appear in the same format as) an Ipv6 address to be handed over to an IPv6 socket. 
+  At the conceptual level it has no role; its role is limited at the Java API 
+  level. Parsing of an IPv4-mapped address is supported, but an IPv4-mapped address 
+  is never returned.</p>
+<p><!--An example follows:
+
+(needs to be fille in) --></p>
+<h2><a name="java"></a>Java Application Impact</h2>
+<ol>
+  <li>There should be no change in Java application code if everything has been 
+    done appropriately. I.e., there are no direct references to IPv4 literal addresses; 
+    instead, hostnames are used.</li>
+  <li>All the address or socket type information is encapsulated in the Java networking 
+    API.</li>
+  <li>Through setting system properties, address type and/or socket type preferences 
+    can be set. </li>
+  <li>For new applications Ipv6-specific new classes and APIs can be used.</li>
+</ol>
+<h4>communication scenarios: </h4>
+<table summary="communication scenarios" border="1" cellpadding="5">
+<thead>
+  <tr align="center" valign="middle"> 
+    <th bgcolor="#CCCCCC"><b><font size="+1">(Nodes)</font></b></th>
+    <th bgcolor="#CCCCCC"><b><font size="+1">V4 Only</font></b></th>
+    <th bgcolor="#CCCCCC"><b><font size="+1">V4/V6</font></b></th>
+    <th bgcolor="#CCCCCC"><b><font size="+1">V6 Only</font></b></th>
+  </tr>
+  </thead>
+  <tr align="center" valign="middle"> 
+    <td bgcolor="#CCCCCC"><b><font size="+1">V4 Only</font></b></td>
+    <td>x</td>
+    <td>x</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr align="center" valign="middle"> 
+    <td bgcolor="#CCCCCC"><b><font size="+1">V4/V6</font></b></td>
+    <td>x</td>
+    <td>x</td>
+    <td>x</td>
+  </tr>
+  <tr align="center" valign="middle"> 
+    <td bgcolor="#CCCCCC"><b><font size="+1">V6 Only</font></b></td>
+    <td>&nbsp;</td>
+    <td>x</td>
+    <td>x</td>
+  </tr>
+</table>
+<p>Top row and left column represent various node types attempting to communicate. 
+  An x indicates that these nodes can communicate with each other.</p>
+<h4>UDP<br>
+  scenario 1:</h4>
+<p>Either host1 or host2 can be a native application. </p>
+<h4>host1 is server, host2 is client</h4>
+<p>If host2 wants to talk to host1, it will create a V6 socket. It then looks 
+  up the IP address for host1. Since host1 only has a v4 protocol stack, it will 
+  only have IPv4 records in the name lookup service. So host2 will try to reach 
+  host1 using an IPv4-mapped address. An IPv4 packet will be sent by host2, and 
+  host1 will think it is communicating with a v4 client.</p>
+<h4>host1 is client, host2 is server</h4>
+<p>If host2 is the server, it will first create a v6-type socket (by default), 
+  then it will wait for connections. Since host1 supports v4 only, it creates 
+  a v4-type socket. They resolves the name for host2. It only gets v4 address 
+  for host2, since it doesn't understand IPv6 address. So it connects to host2 
+  using v4 address. A v4 packet will be sent on the wire. On host2, the dual stack 
+  will convert the v4 packet into a v6 packet with a v4-mapped address in it and 
+  hand it over to the v6 socket. The server application will handle it as if it 
+  is a connection from a v6 node.</p>
+<p><!--scenario 2: Java v4/v6 and v4/v6
+
+(comming soon)
+
+scenario 3: Java v4/v6 and v6
+
+(coming soon) --></p>
+<h2><a name="class"></a>Class Changes</h2>
+<h4><code>InetAddress</code></h4>
+<p>This class represents an IP address. It provides address storage, name-address 
+  translation methods, address conversion methods, as well as address testing 
+  methods. In J2SE 1.4, this class is extended to support both IPv4 and IPv6 addresses. 
+  Utility methods are added to check address types and scopes. The two types of 
+  addresses, IPv4 and IPv6, can be distinguished by the Java type <code>Inet4Address</code> 
+  and <code>Inet6Address</code>.</p>
+<p>Two new subclasses of <code>InetAddress</code> are created: <code>Inet4Address</code> 
+  and <code>Inet6Address</code>. V4- and V6-specific state and behaviors are implemented 
+  in these two subclasses. Due to Java's object-oriented nature, an application 
+  normally only needs to deal with <code>InetAddress</code> class&#151;through 
+  polymorphism it will get the correct behavior. Only when it needs to access 
+  protocol-family-specific behaviors, such as in calling an IPv6-only method, 
+  or when it cares to know the class types of the IP address, will it ever become 
+  aware of <code>Inet4Address</code> and <code>Inet6Address</code>.</p>
+<p>The new methods introduced are:</p>
+<blockquote>
+  <p><code>InetAddress:<br>
+    isAnyLocalAddress<br>
+    isLoopbackAddress<br>
+    isLinkLocalAddress<br>
+    isSiteLocalAddress<br>
+    isMCGlobal<br>
+    isMCNodeLocal<br>
+    isMCLinkLocal<br>
+    isMCSiteLocal<br>
+    isMCOrgLocal<br>
+    getCanonicalHostName<br>
+    getByAddr</code></p>
+</blockquote>
+<h4><code>Inet6Address:<br>
+  isIPv4CompatibleAddress</code></h4>
+<p><!--(need to say something here) --></p>
+<h4><code>InetAddress</code> and Different Naming services</h4>
+<p>Prior to 1.4, <code>InetAddress</code> utilized the system configured name 
+  service to resolve host names. In 1.4, we have added a Java DNS provider through 
+  JNDI for alternative name lookups. You can tell the J2SDK to use this provider 
+  by setting up a few system properties. These system properties are documented 
+  in the Java system properties section. In the future, we plan to provide a generic 
+  service provider framework so that you can write your own name service providers. 
+</p>
+<h4>A Word on Serialization</h4>
+<p>All IPv4 addresses are represented in Java as <code>Inet4Address</code> objects. 
+  They are serialized as <code>InetAddress</code> objects, and deserialized from 
+  <code>InetAddress</code> to <code>Inet4Address</code> to keep backward compatibility. 
+  IPv6 addresses are represented as <code>Inet6Address</code> and are serialized 
+  as such.</p>
+<h4><code>Socket</code>, <code>ServerSocket</code>, and <code>DatagramSocket</code></h4>
+<p>Due to the object-oriented nature of Java, the address types and storage structures 
+  are not exposed at the socket API level, so no new APIs are needed. The existing 
+  socket APIs handle both IPv4 and IPv6 traffic.</p>
+<p>The selection of which stack to use depends upon the following:</p>
+<ol>
+  <li>The underlying OS support; </li>
+  <li>The user's stack preference property setting.</li>
+</ol>
+<p>All supported Ipv6 socket options have a IPv4 counterparts. Thus no new APIs 
+  were added to support IPv6 socket options. Instead, the old APIs are overloaded 
+  to support both V4 and V6 socket options.</p>
+<h4><code>MulticastSocket</code> </h4>
+<p>Again all the socket options APIs are overloaded to support IPv6 multicast 
+  socket options. </p>
+<p>We have added two new APIs to set/get network interfaces in addition to the 
+  existing <code>MulticastSocket.setInterface</code>/<code>MulticastSocket.getInterface</code> 
+  that takes/returns an <code>InetAddress</code> instance. The two existing methods 
+  are used to set or retrieve the network interface used by the current <code>MulticastSocket</code> 
+  to send multicast packets (i.e., equivalent to <code>IP_MULTICAST_IF</code> 
+  in native socket option). For IPv4, the interface was indicated by an IP address. 
+  Thus we can use the equivalent <code>InetAddress</code> in Java. They will continue 
+  to work with IPv6 multicast socket. However, in IPv6, according to RFC 2553, 
+  the interface should be indicated using an interface index. To better support 
+  the concept of a network interface, we introduced a new class, <code>NetworkInterface</code>. 
+  It encapsulate the data representing the state of the network interface, including 
+  name and IP addresses and some basic manipulation methods. Thus we have introduced 
+  two new methods for setting the outgoing interface for multicast socket: <code>setNetworkInterface</code> 
+  and <code>getNetworkInterface</code>. They take or return a <code>NetworkInterface</code> 
+  object. These new methods can be used with both v4 and v6 multicast. </p>
+<p>Methods have also been added for joining and leaving a multicast group on a 
+  network interface. This was previously unavailable in the Java API.</p>
+<blockquote>
+  <p><code>MulticastSocket:<br>
+    NetworkInterface getNetworkInterface()<br>
+    setNetworkInterface(NetworkInterface netIf)<br>
+    joinGroup(SocketAddress mcastaddr,NetworkInterface netIf)<br>
+    leaveGroup(SocketAddress mcastaddr,NetworkInterface netIf)</code></p>
+</blockquote>
+<h4><code>URL</code>, <code>URI</code> parsers</h4>
+<p>Literal IP addresses can be used in URL/URIs. However, since colon (<code>:</code>) 
+  is used in existing URL/URI specifications to separate host from port, using 
+  literal IPv6 representation in URL/URIs without modification will fail in parsing. 
+  Thus for specifying literal IPv6 addresses in URL/URIs, RFC 2732 was created. 
+  The parsing of URL/URI has been updated to be compliant with RFC 2732.</p>
+<h4>SocketPermission</h4>
+<p>Since <code>SocketPermission</code> utilizes URLs, its implementation has been 
+  updated to be compliant with RFC 2732.</p>
+<p><code>codebase</code>, used in defining a permission, is a variant of URL. 
+  As such, it should follow URL formats and conventions. RFC 2732 format is used 
+  for URL and <code>codebase</code>; RFC 2373 format is used everywhere else. 
+</p>
+<h2><a name="ipv6-networking"></a>IPv6 Networking Properties<br>
+</h2>
+<h3><code>java.net.preferIPv4Stack (default: false)</code></h3>
+<p>If IPv6 is available on the operating system, the underlying native socket 
+  will be an IPv6 socket. This allows Java(tm) applications to connect too, and 
+  accept connections from, both IPv4 andIPv6 hosts.</p>
+<p>If an application has a preference to only use IPv4 sockets, then this property 
+  can be set to true. The implication is that the application will not be able 
+  to communicate with IPv6 hosts.</p>
+<h3><code>java.net.preferIPv6Addresses (default: false)</code></h3>
+<p>If IPv6 is available on the operating system, the default preference is to 
+  prefer an IPv4-mapped address over an IPv6 address. This is for backward compatibility 
+  reasons&#151;for example, applications that depend on access to an IPv4-only 
+  service, or applications that depend on the %d.%d.%d.%d representation of an 
+  IP address.<br>
+  This property can be set to try to change the preferences to use IPv6 addresses 
+  over IPv4 addresses. This allows applications to be tested and deployed in environments 
+  where the application is expected to connect to IPv6 services.</p>
+<h3>JNDI DNS service provider settings:</h3>
+<h3><code>sun.net.spi.nameservice.provider.&lt;n&gt;=&lt;default|dns,sun|...&gt;</code></h3>
+<p>Specifies the name service provider that you can use. By default, Java will 
+  use the system-configured, name-lookup mechanism, such as file, nis, etc. You 
+  can specify your own by setting this option. <code>&lt;n&gt;</code> takes the 
+  value of a positive number and it indicates the precedence order: a small number 
+  takes higher precendence over a bigger number. In 1.4 , we have provided one 
+  DNS name service provider through JNDI, which is called <code>dns,sun</code>.</p>
+<h3><code>sun.net.spi.nameservice.nameservers=&lt;server1_ipaddr,server2_ipaddr 
+  ...&gt;</code></h3>
+<p>You can specify a comma separated list of IP addresses that point to the DNS 
+  servers you want to use.</p>
+<h3><code>sun.net.spi.nameservice.domain=&lt;domainname&gt;</code></h3>
+<p>This property specifies the default DNS domain name, e.g., <code>eng.sun.com</code>.</p>
+<p></p><p></P>
+<p>&nbsp;</p></body>
+</html>

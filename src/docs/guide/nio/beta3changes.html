@@ -1,0 +1,829 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+
+     <TITLE>NIO Beta 3 Changes</TITLE>
+
+</HEAD>
+
+
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+<h1>
+NIO APIs:
+<br>
+Beta 3 Changes
+</h1>
+
+
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="index.html">New I/O APIs</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+
+<!-- Body text begins here -->
+
+<blockquote>
+
+
+
+This document describes how the NIO APIs in the Beta 3 release of J2SE v 1.4 
+differ from those in Beta 2.
+The most significant change is a redesign of
+the
+<tt><A HREF="../../api/java/nio/charset/package-summary.html">java.nio.charset</A></tt>
+package to address the performance problems
+of the original design.  A number of small adjustments have been made to the
+<tt><A HREF="../../api/java/util/regex/package-summary.html">java.util.regex</A></tt>
+package to bring it into nearly perfect
+alignment with the regular-expression language implemented in Perl 5.  The
+remaining changes are in response to feedback received from the community and
+issues raised within the Expert Group.
+</p>
+
+<p>
+The changes are summarized by area:
+</p>
+
+<ul>
+<li> <a href="#buffers">Buffers</a>
+<li> <a href="#files">Files</a>
+<li> <a href="#select">Selectors, selectable channels, and selection keys</a>
+<li> <a href="#charsets">Charsets</a>
+<li> <a href="#regexp">Regular expressions</a>
+<li> <a href="#other">Other</a>
+</ul>
+
+<a name="buffers">
+<p><b><i>Buffers</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- b999 -->
+  Added <A
+HREF="../../api/java/nio/ByteBuffer.html#hasArray()"><CODE>hasArray</CODE></A>, <A
+HREF="../../api/java/nio/ByteBuffer.html#array()"><CODE>array</CODE></A>, and <A
+HREF="../../api/java/nio/ByteBuffer.html#arrayOffset()"><CODE>arrayOffset</CODE></A>
+methods to all of the
+  concrete buffer classes.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+
+
+
+  </p></li>
+
+  <li><p> <!-- b006 -->
+  Revised the specification of the <A
+HREF="../../api/java/nio/MappedByteBuffer.html"><CODE>MappedByteBuffer</CODE></A> class
+to say
+  that an attempt to access an inaccessible region of a mapped byte buffer
+will
+  either return an arbitrary value (if reading) or have no visible effect (if
+  writing); it will also cause an unspecified exception to be thrown either at
+ the time of access or at some later time.  (This is consistent with Sun's
+  current implementation.)
+
+
+
+  </p></li>
+
+  <li><p> <!-- b007 -->
+  Changed the static <tt>CharBuffer.wrap(String,int,int)</tt> and
+  <tt>CharBuffer.wrap(String)</tt> methods to take a <A
+HREF="../../api/java/lang/CharSequence.html"><CODE>CharSequence</CODE></A> rather
+  than a <A HREF="../../api/java/lang/String.html"><CODE>String</CODE></A>.
+  </p></li>
+
+  <li><p> <!-- b008 -->
+  Added the <A
+HREF="../../api/java/nio/ByteOrder.html#nativeOrder()"><CODE>ByteOrder.nativeOrder</CODE></A> method,
+  which is useful when setting up direct buffers that will be manipulated by
+  native code.
+  </p></li>
+
+  <li><p> <!-- b023 -->
+  Added <tt>order</tt> methods to each of the non-byte buffer classes
+  (<A HREF="../../api/java/nio/CharBuffer.html"><CODE>CharBuffer</CODE></A>, <A
+HREF="../../api/java/nio/ShortBuffer.html"><CODE>ShortBuffer</CODE></A>, <A
+HREF="../../api/java/nio/IntBuffer.html"><CODE>IntBuffer</CODE></A>,
+  <A HREF="../../api/java/nio/LongBuffer.html"><CODE>LongBuffer</CODE></A>, <A
+HREF="../../api/java/nio/FloatBuffer.html"><CODE>FloatBuffer</CODE></A>, and <A
+HREF="../../api/java/nio/DoubleBuffer.html"><CODE>DoubleBuffer</CODE></A>).
+  </p></li>
+</ul>
+<a name="files">
+<p><b><i>Files</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- f011 -->
+  Added the mode characters <tt>"s"</tt> and <tt>"d"</tt> to the <A
+HREF="../../api/java/io/RandomAccessFile.html"><CODE>RandomAccessFile</CODE></A>
+  constructors to allow the specification, at file-open time, of synchronous
+  writes or synchronous-data writes.
+
+
+
+  </p></li>
+
+  <li><p> <!-- f012 -->
+  Replaced the integer <tt>FileChannel.MAP&#95;&#123;RO,RW,COW}</tt> constants
+ with the typesafe enumeration <A
+HREF="../../api/java/nio/channels/FileChannel.MapMode.html"><CODE>FileChannel.MapMode</CODE></A>.
+  </p></li>
+</ul>
+
+<a name="select">
+<p><b><i>Selectors, selectable channels, and selection keys</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- s001 -->
+  Restricted the <tt>socket()</tt> methods in the socket-channel classes to
+return
+  objects that do not not define any more public methods than those declared
+in
+  the corresponding <tt><A
+HREF="../../api/java/net/package-summary.html">java.net</A></tt> socket class.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4497675.html">4497675</a>)
+
+
+
+
+  </p></li>
+
+  <li><p> <!-- s002 -->
+  Added API to allow the retrieval of the provider that created a channel or a
+ selector: Added provider arguments to the protected constructors of the
+  <A
+HREF="../../api/java/nio/channels/DatagramChannel.html"><CODE>DatagramChannel</CODE></A>, <A
+HREF="../../api/java/nio/channels/ServerSocketChannel.html"><CODE>ServerSocketChannel</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/SocketChannel.html"><CODE>SocketChannel</CODE></A>, <A
+HREF="../../api/java/nio/channels/Pipe.SourceChannel.html"><CODE>Pipe.SourceChannel</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/Pipe.SinkChannel.html"><CODE>Pipe.SinkChannel</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/spi/AbstractSelectableChannel.html"><CODE>AbstractSelectableChannel</CODE></A>, and
+  <A
+HREF="../../api/java/nio/channels/spi/AbstractSelector.html"><CODE>AbstractSelector</CODE></A> classes; added <tt>provider()</tt> methods
+  to the <A
+HREF="../../api/java/nio/channels/SelectableChannel.html"><CODE>SelectableChannel</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/spi/AbstractSelectableChannel.html"><CODE>AbstractSelectableChannel</CODE></A>,
+  <A HREF="../../api/java/nio/channels/Selector.html"><CODE>Selector</CODE></A>, and <A
+HREF="../../api/java/nio/channels/spi/AbstractSelector.html"><CODE>AbstractSelector</CODE></A>
+  classes.  These changes are required for writing provider-independent
+channel
+  adaptors.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4497675.html">4497675</a>)
+
+  </p></li>
+
+  <li><p> <!-- s003 -->
+  Changed the <A
+HREF="../../api/java/nio/channels/ServerSocketChannel.html#accept()"><CODE>ServerSocketChannel.accept</CODE></A> method to return a
+  <A
+HREF="../../api/java/nio/channels/SocketChannel.html"><CODE>SocketChannel</CODE></A>
+rather than a <A HREF="../../api/java/net/Socket.html"><CODE>Socket</CODE></A>.  The
+fact
+  that it returned a socket was confusing to many developers.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4497675.html">4497675</a>)
+
+  </p></li>
+
+  <li><p> <!-- s004 -->
+  Removed the extraneous <tt>DatagramChannel.open(int port)</tt> method and
+the <tt>int</tt>
+  argument to the <A
+HREF="../../api/java/nio/channels/spi/SelectorProvider.html#openDatagramChannel()"><CODE>SelectorProvider.openDatagramChannel</CODE></A> method.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4497675.html">4497675</a>)
+
+  </p></li>
+
+  <li><p> <!-- s013 -->
+  Revised the specification of <A
+HREF="../../api/java/nio/channels/SelectionKey.html"><CODE>SelectionKey</CODE></A> to
+say that the
+  <A
+HREF="../../api/java/nio/channels/SelectionKey.html#attach(java.lang.Object)"><CODE>attach</CODE></A> and
+  <A
+HREF="../../api/java/nio/channels/SelectionKey.html#attachment()"><CODE>attachment</CODE></A> methods are
+  thread-safe.
+
+
+
+  </p></li>
+
+  <li><p> <!-- s014 -->
+  Added a three-argument
+  <A
+HREF="../../api/java/nio/channels/SelectableChannel.html#register(java.nio.channels.Selector, int, java.lang.Object)"><CODE>register</CODE></A> method to <A
+HREF="../../api/java/nio/channels/SelectableChannel.html"><CODE>SelectableChannel</CODE></A> so that an initial
+  (or new) attachment can be specified when registering a channel with a
+  selector.
+
+
+
+  </p></li>
+
+  <li><p> <!-- s016 -->
+  Removed direct support of timeouts from all socket channels, and removed
+  <tt>TimeoutException</tt>.  Timeouts are still supported via the associated
+socket
+  adaptors, which implement timeouts with per-thread cached selectors.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4487459.html">4487459</a>)
+
+  </p></li>
+
+  <li><p> <!-- s017 -->
+  Changed the <A
+HREF="../../api/java/nio/channels/DatagramChannel.html#connect(java.net.SocketAddress)"><CODE>connect</CODE></A> method of
+  <A
+HREF="../../api/java/nio/channels/DatagramChannel.html"><CODE>DatagramChannel</CODE></A>
+to be <tt>void</tt> rather than return a
+  <tt>boolean</tt> since datagram channels don't support (or even need)
+  non-blocking connect operations.
+  </p></li>
+
+  <li><p> <!-- s018 -->
+  Removed the shutdown methods from <A
+HREF="../../api/java/nio/channels/SocketChannel.html"><CODE>SocketChannel</CODE></A>,
+since
+  they are already provided (though in slightly different form) by the
+  <A HREF="../../api/java/net/Socket.html"><CODE>java.net.Socket</CODE></A> class.
+  </p></li>
+
+  <li><p> <!-- s019 -->
+  Added <tt>isOpen</tt> methods to <A
+HREF="../../api/java/nio/channels/Selector.html"><CODE>Selector</CODE></A> and
+  <A
+HREF="../../api/java/nio/channels/spi/AbstractSelector.html"><CODE>AbstractSelector</CODE></A>.  Added
+  <A
+HREF="../../api/java/nio/channels/spi/AbstractSelector.html#close()"><CODE>close</CODE></A> and
+  <A
+HREF="../../api/java/nio/channels/spi/AbstractSelector.html#implCloseSelector()"><CODE>implCloseSelector</CODE></A>
+  methods to <A
+HREF="../../api/java/nio/channels/spi/AbstractSelector.html"><CODE>AbstractSelector</CODE></A>.
+  </p></li>
+
+  <li><p> <!-- s020 -->
+  Added a static <A
+HREF="../../api/java/nio/channels/SocketChannel.html#open(java.net.SocketAddress)"><CODE>open(SocketAddress remote)</CODE></A> convenience method to
+  <A
+HREF="../../api/java/nio/channels/SocketChannel.html"><CODE>SocketChannel</CODE></A>.
+
+
+
+  </p></li>
+
+  <li><p> <!-- s025 -->
+  Clarified the specification of the <A
+HREF="../../api/java/nio/channels/Selector.html#wakeup()"><CODE>Selector.wakeup</CODE></A> method to say that the wakeup state is cleared by any
+  selection operation, including an invocation of
+  <A
+HREF="../../api/java/nio/channels/Selector.html#selectNow()"><CODE>selectNow</CODE></A>.
+ </p></li>
+</ul>
+
+<a name="charsets">
+<p><b><i>Charsets</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- u999 -->
+  Defined the <A
+HREF="../../api/java/nio/charset/CoderResult.html"><CODE>CoderResult</CODE></A> class, a
+typesafe enumeration for
+  reporting coder results.  The
+  <A HREF="../../api/java/nio/charset/CharsetEncoder.html#encode(java.nio.CharBuffer,
+java.nio.ByteBuffer, boolean)"><CODE>encode</CODE></A> and
+  <A HREF="../../api/java/nio/charset/CharsetDecoder.html#decode(java.nio.ByteBuffer,
+java.nio.CharBuffer, boolean)"><CODE>decode</CODE></A> methods, as well as the
+<tt>flush</tt> methods, now return instances of this
+  class rather than throw exceptions.  This change supports coders that are
+  easier to use and reason about, and are significantly faster.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+  </p></li>
+
+  <li><p> <!-- u999 -->
+  Renamed <i>substitution</i> to <i>replacement</i>, which is more in line
+with
+  the Unicode specification (and is also easier to spell).  The replacement is
+ returned by the <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#replacement()"><CODE>replacement</CODE></A>
+  method and changed by the <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#replaceWith(byte[])"><CODE>replaceWith</CODE></A> method.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+  </p></li>
+
+  <li><p> <!-- u999 -->
+  Generalized the handling of replacements so that separate actions can be
+  specified for malformed-input <i>vs.</i> unmappable-character errors.  The
+  action to be taken when an error is encountered is specified by an instance
+  of the <A
+HREF="../../api/java/nio/charset/CodingErrorAction.html"><CODE>CodingErrorAction</CODE></A> class, which is a simple typesafe
+  enumeration.  The actions are specified via the
+  <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#onMalformedInput(java.nio.charset.CodingErrorAction)"><CODE>onMalformedInput</CODE></A> and
+  <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#onUnmappableCharacter(java.nio.charset.CodingErrorAction)"><CODE>onUnmappableCharacter</CODE></A>
+  methods; their current values can be retrieved via the
+  <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#malformedInputAction()"><CODE>malformedInputAction</CODE></A>
+  and <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#unmappableCharacterAction()"><CODE>unmappableCharacterAction</CODE></A> methods.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+
+
+
+  </p></li>
+
+  <li><p> <!-- u999 -->
+  Defined <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#charset()"><CODE>charset</CODE></A>
+methods in the
+  coder classes so that the charset that created a coder can be retrieved from
+ the coder itself.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+  </p></li>
+
+  <li><p> <!-- u999 -->
+  Added protected methods to better support subclasses:
+  <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#implReset()"><CODE>implReset</CODE></A>,
+  <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#implFlush(java.nio.ByteBuffer)"><CODE>implFlush</CODE></A>,
+  <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#implReplaceWith(byte[])"><CODE>implReplaceWith</CODE></A>,
+  <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#implOnMalformedInput(java.nio.charset.CodingErrorAction)"><CODE>implOnMalformedInput</CODE></A>,
+  and <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#implOnUnmappableCharacter(java.nio.charset.CodingErrorAction)"><CODE>implOnUnmappableCharacter</CODE></A>.  These
+methods are invoked by the corresponding
+  public methods after the public methods validate coder state and any
+  arguments.  Their default implementations do nothing.  The
+<tt>implReset</tt> and
+  <tt>implFlush</tt> methods were also required in order to implement coder
+state
+  checking, <i>i.e.</i> the throwing of illegal-argument exceptions when a
+  coder is used in a manner contrary to the specified coding-operation
+  sequence.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+
+
+
+  </p></li>
+
+  <li><p> <!-- u999 -->
+  Cleaned up the API for auto-detecting charsets in
+  <A
+HREF="../../api/java/nio/charset/CharsetDecoder.html"><CODE>CharsetDecoder</CODE></A> by
+adding the
+  <A
+HREF="../../api/java/nio/charset/CharsetDecoder.html#isAutoDetecting()"><CODE>isAutoDetecting</CODE></A> and
+  <A
+HREF="../../api/java/nio/charset/CharsetDecoder.html#isCharsetDetected()"><CODE>isCharsetDetected</CODE></A> methods
+  and making <A
+HREF="../../api/java/nio/charset/CharsetDecoder.html#detectedCharset()"><CODE>detectedCharset</CODE></A>
+  an optional operation.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+  </p></li>
+
+  <li><p> <!-- u999 -->
+  Defined the <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html#isLegalReplacement(byte[])"><CODE>isLegalReplacement</CODE></A> method in <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html"><CODE>CharsetEncoder</CODE></A> so
+that a
+  replacement can be tested for validity without causing an exception to be
+  thrown.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+
+
+
+  </p></li>
+
+  <li><p> <!-- u999 -->
+  Revised <A
+HREF="../../api/java/nio/charset/UnmappableCharacterException.html"><CODE>UnmappableCharacterException</CODE></A> to report the number
+  of input units that denote the unmappable character.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4503732.html">4503732</a>)
+
+
+
+
+  </p></li>
+
+  <li><p> <!-- u005 -->
+  Added the convenience methods <A
+HREF="../../api/java/nio/charset/Charset.html#decode(java.nio.ByteBuffer)"><CODE>Charset.decode(ByteBuffer)</CODE></A>,
+  <A
+HREF="../../api/java/nio/charset/Charset.html#encode(java.nio.CharBuffer)"><CODE>Charset.encode(CharBuffer)</CODE></A>, and
+  <A
+HREF="../../api/java/nio/charset/Charset.html#encode(java.lang.String)"><CODE>Charset.encode(String)</CODE></A>.
+
+
+
+  </p></li>
+
+  <li><p> <!-- u015 -->
+  Changed the default error actions of <A
+HREF="../../api/java/nio/charset/CharsetDecoder.html"><CODE>CharsetDecoder</CODE></A>
+and
+  <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html"><CODE>CharsetEncoder</CODE></A> to
+be to report both malformed-input and
+  unmappable-character errors.  This does not affect coding operations
+  performed by pre-Merlin APIs, which continue to replace erroneous input
+  rather than report it.
+
+
+
+  </p></li>
+
+  <li><p> <!-- u021 -->
+  Added constructors to <A
+HREF="../../api/java/io/InputStreamReader.html"><CODE>InputStreamReader</CODE></A> and
+  <A
+HREF="../../api/java/io/OutputStreamWriter.html"><CODE>OutputStreamWriter</CODE></A>
+that take existing
+  <A
+HREF="../../api/java/nio/charset/CharsetDecoder.html"><CODE>CharsetDecoder</CODE></A>
+and <A
+HREF="../../api/java/nio/charset/CharsetEncoder.html"><CODE>CharsetEncoder</CODE></A>
+  objects, respectively.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4426480.html">4426480</a>)
+
+  </p></li>
+</ul>
+
+<a name="regexp">
+<p><b><i>Regular expressions</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- r999 -->
+  Removed the conditional construct <tt>(?(cond)yes|no)</tt>, since this is
+only an
+  experimental feature in Perl.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Removed <tt>&lt;</tt> and <tt>&gt;</tt> as metacharacters since they
+conflicted too easily
+  with commonly-used tokens in HTML and XML.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Removed vertical tab and form feed as line terminators.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Added a new <A
+HREF="../../api/java/util/regex/Pattern.html#UNIX_LINES"><CODE>Pattern.UNIX_LINES</CODE></A> mode, and the corresponding
+  pattern flag <tt>(?d)</tt>, that recognizes only newlines (</tt>'\n'</tt>)
+as line
+  terminators.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Interpret dangling brackets (</tt>&nbsp;]&nbsp;</tt>) and braces
+  (</tt>&nbsp;&#125;&nbsp;</tt>) as literals, as Perl does.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Changed the way back references are parsed to more closely match the way
+Perl
+  interprets them.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Removed the cut operator (</tt>!</tt>), since this is not supported by Perl.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Added the <A
+HREF="../../api/java/util/regex/Pattern.html#COMMENTS"><CODE>Pattern.COMMENTS</CODE></A>
+mode, and the corresponding
+  Perl-style pattern flag <tt>(?x)</tt>, in which whitespace and comments can
+be
+  embedded in a regular expression.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Revised the character-class syntax to support the union and intersection of
+  character classes via union (</tt>[X&#91;Y]]</tt>), intersection
+(</tt>[X&amp;&amp;Y]</tt>),
+  and complement (</tt>[^X]).
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Changed the <tt>^</tt> metacharacter so that it will not match after the
+final line
+  terminator, since it does not do so in Perl.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Revised all group constructs starting with <tt>(?</tt> so that they are
+treated as
+  pure groups and do not capture text.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4482696.html">4482696</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Added the <tt>\G</tt> boundary matcher.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4470527.html">4470527</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Added <A
+HREF="../../api/java/util/regex/Matcher.html#find(int)"><CODE>Matcher.find(int
+startAt)</CODE></A>.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4474290.html">4474290</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Changed the replacement-string syntax in the <A
+HREF="../../api/java/util/regex/Matcher.html"><CODE>Matcher</CODE></A> class
+  from <tt>$(n)</tt> to <tt>$n</tt>, and defined the escaping of <tt>$</tt> to
+be more like Perl's.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4479128.html">4479128</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Revised the <tt>split</tt> methods in <A
+HREF="../../api/java/util/regex/Pattern.html#split(java.lang.CharSequence,
+int)"><CODE>Pattern</CODE></A> and
+  <A HREF="../../api/java/lang/String.html#split(java.lang.String,
+int)"><CODE>String</CODE></A> to match Perl's behavior.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4497806.html">4497806</a>)
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Revised the block/category syntax to match Perl's <tt>\p&#123;Foo}</tt> and
+  <tt>\P&#123;Foo}</tt> syntax.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4495089.html">4495089</a>)
+
+
+
+
+  </p></li>
+
+  <li><p> <!-- r999 -->
+  Revised the names of the POSIX character classes to match the capitalized
+  names used by Perl.
+
+(<a
+href="http://developer.java.sun.com/developer/bugParade/bugs/4495089.html">4495089</a>)
+
+  </p></li>
+
+  <li><p> <!-- r009 -->
+  Added <A
+HREF="../../api/java/lang/String.html#matches(java.lang.String)"><CODE>String.matches(regex)</CODE></A>, a more
+  convenient way to invoke
+  <A HREF="../../api/java/util/regex/Pattern.html#matches(java.lang.String,
+java.lang.CharSequence)"><CODE>Pattern.matches(regex,
+  input)</CODE></A>.
+  </p></li>
+
+  <li><p> <!-- r010 -->
+  Added <A HREF="../../api/java/lang/String.html#replaceAll(java.lang.String,
+java.lang.String)"><CODE>String.replaceAll(regex,
+  repl)</CODE></A>, a more convenient way to invoke
+  <A
+HREF="../../api/java/util/regex/Matcher.html#replaceAll(java.lang.String)"><CODE>Matcher.replaceAll(repl)</CODE></A>.
+  </p></li>
+
+  <li><p> <!-- r022 -->
+  Added <tt>replaceFirst(regex, repl)</tt> methods to both
+  <A HREF="../../api/java/lang/String.html#replaceFirst(java.lang.String,
+java.lang.String)"><CODE>String</CODE></A> and
+  <A
+HREF="../../api/java/util/regex/Matcher.html#replaceFirst(java.lang.String)"><CODE>Matcher</CODE></A>.
+  </p></li>
+
+  <li><p> <!-- r026 -->
+  Added description, pattern, and index properties to
+  <A
+HREF="../../api/java/util/regex/PatternSyntaxException.html"><CODE>PatternSyntaxException</CODE></A>.
+  </p></li>
+</ul>
+
+<a name="other">
+<p><b><i>Other</i></b></p>
+</a>
+<ul>
+
+  <li><p> <!-- x024 -->
+  Improved invocation chaining: Revised the methods
+  <A
+HREF="../../api/java/nio/channels/DatagramChannel.html#connect(java.net.SocketAddress)"><CODE>DatagramChannel.connect</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/DatagramChannel.html#disconnect()"><CODE>DatagramChannel.disconnect</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/FileChannel.html#position(long)"><CODE>FileChannel.position(long)</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/FileChannel.html#truncate(long)"><CODE>FileChannel.truncate(long)</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/SelectableChannel.html#configureBlocking(boolean)"><CODE>SelectableChannel.configureBlocking</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/SelectionKey.html#interestOps(int)"><CODE>SelectionKey.interestOps(int)</CODE></A>,
+  <A
+HREF="../../api/java/nio/channels/Selector.html#wakeup()"><CODE>Selector.wakeup</CODE></A>,
+  <A
+HREF="../../api/java/util/regex/Matcher.html#appendReplacement(java.lang.StringBuffer,
+java.lang.String)"><CODE>Matcher.appendReplacement</CODE></A>,
+  <A
+HREF="../../api/java/util/regex/Matcher.html#reset()"><CODE>Matcher.reset()</CODE></A>,
+and
+  <A
+HREF="../../api/java/util/regex/Matcher.html#reset(java.lang.CharSequence)"><CODE>Matcher.reset(java.lang.CharSequence)</CODE></A> to return the object
+  upon which they are invoked.  Revised <A
+HREF="../../api/java/util/regex/Matcher.html#appendTail(java.lang.StringBuffer)"><CODE>Matcher.appendTail</CODE></A> to return the string-buffer object passed to it.
+  </p></li>
+</ul>
+
+
+</blockquote>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2001
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+</BODY>
+
+</HTML>

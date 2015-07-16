@@ -1,0 +1,271 @@
+<!doctype html public "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>Design of Shutdown Hooks API</title>
+
+</head>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR>
+
+<TD WIDTH="60">
+
+   <IMG SRC="../../images/javalogo52x88.gif" ALT="Java" BORDER=0 WIDTH=52 HEIGHT=88>
+
+</TD>
+
+
+
+<TD>
+
+<center>
+
+<h1>Design of the Shutdown Hooks API</h1>
+
+</center>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT VALIGN=TOP>
+
+   <font size="-1"><a href="../../index.html">Documentation Contents</a></font>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+<blockquote>
+The following Q&A addresses some of the design issues of the 
+Shutdown Hooks API.
+<p>
+<b>Isn't this what <tt>runFinalizersOnExit</tt> is for?</b>
+<p>
+<blockquote>
+You can use the <a
+href="../../api/java/lang/Runtime.html#runFinalizersOnExit(boolean)">
+<tt>Runtime.runFinalizersOnExit</tt></a> method, or the equivalent method in
+the <a href="../../api/java/lang/System.html#runFinalizersOnExit(boolean)">
+<tt>System</tt></a> class, to schedule actions to take place when the VM shuts
+down due to exit.  This technique does not, however, work for
+termination-triggered shutdowns.  It is also is inherently unsafe, and in fact
+these methods were <a
+href="../misc/threadPrimitiveDeprecation.html">
+deprecated</a> in version 1.2 of the Java<sup><font size=-2>TM</font></sup>&nbsp;2 Platform.
+</blockquote>
+<p>
+
+<b>Why don't you provide information as to why the VM is shutting
+down?</b>
+<p>
+<blockquote>
+On some platforms a native process can't distinguish a shutdown due to exit
+from a shutdown due to termination.  Other platforms provide much richer
+capabilities, in some cases including notification of system suspension and
+restart or of imminent power failure.  In short, it's impossible to generalize
+such information in a portable way.
+</blockquote>
+<p>
+
+<b>Will shutdown hooks be run if the VM crashes?</b>
+<p>
+<blockquote>
+If the VM crashes due to an error in native code then no guarantee can be made
+about whether or not the hooks will be run.
+</blockquote>
+
+<p><b>Why are shutdown hooks run concurrently?
+ Wouldn't it make more sense to run them in reverse order of registration?
+</b>
+<p>
+<blockquote>
+Invoking shutdown hooks in their reverse order of registration is certainly
+intuitive, and is in fact how the C runtime library's <tt>atexit</tt> procedure
+works.  This technique really only makes sense, however, in a single-threaded
+system.  In a multi-threaded system such as Java platform the order in which hooks are
+registered is in general undetermined and therefore implies nothing about which
+hooks ought to be run before which other hooks.  Invoking hooks in any
+particular sequential order also increases the possibility of deadlocks.  Note
+that if a particular subsystem needs to invoke shutdown actions in a particular
+order then it is free to synchronize them internally.
+</blockquote>
+
+<p><b>Why are hooks just threads, and unstarted ones at that? 
+Wouldn't it be simpler to use <tt>Runnable</tt> objects, or Beans-style
+event and listener patterns?
+</b>
+<p>
+<blockquote>
+The approach taken here has two advantages over the more obvious, and more
+frequently suggested, callback-oriented designs based upon <tt>Runnable</tt>
+objects or Beans-style event listeners.
+
+<p> First, it gives the user complete control over the thread upon which a
+shutdown action is executed.  The thread can be created in the proper thread
+group, given the correct priority, context, and privileges, and so forth.
+
+<p> Second, it simplifies both the specification and the implementation by
+isolating the VM from the hooks themselves.  If shutdown actions were executed
+as callbacks then a robust implementation would wind up having to create a
+separate thread for each hook anyway in order for them to run concurrently.
+The specification would also have to include explicit language about how the
+threads that execute the callbacks are created.
+</blockquote>
+
+<p><b>Aren't threads pretty expensive things to keep around, 
+especially if they won't be started until the VM shuts down?</b>
+<p>
+<blockquote>
+Most implementations of the Java platform don't actually allocate resources to a thread until
+it's started, so maintaining a set of unstarted threads is actually very cheap.
+If you look at the internals of <tt>java.lang.Thread</tt> you can
+see that its various constructors just do security checks and initialize
+private fields.  The native <tt>start()</tt> method does the real work of
+allocating a thread stack, etc., to get things going.
+</blockquote>
+
+<p><b>What about Personal and Embedded Java? 
+Won't starting threads during shutdown be too expensive on those
+platforms?</b>
+<p>
+<blockquote>
+This API may not be suitable for the smaller Java platforms.  Threads in 
+the Java 2 Platform 
+carry more information than threads in JDK 1.1 and p/eJava.  A thread has a
+class loader, it may have some inherited thread-local variables, and, in the
+case of GUI apps, it may be associated with a specific application context.
+Threads will come to carry even more information as the platform evolves; for
+example, the security team is planning to introduce a notion of per-thread user
+identity in their upcoming authentication framework.
+
+<p> Because of all this contextual information, shutdown hooks would be harder
+to write and maintain if they were just <tt>Runnable</tt> objects or
+Beans-style event listeners.  Suppose that a <tt>Runnable</tt> shutdown hook,
+or an equivalent event listener, needed a specific bit of thread-contextual
+information in order to carry out its operations.  Such information could be
+saved in some shared location before the hook is registered.  While this is
+merely awkward, suppose further that threads acquire some new type of
+contextual information in a future release.  If an operation invoked by the
+hook also evolves to need that information then the code that registers the
+hook would have to be amended to save that information as well.  Making hooks
+be threads instead of <tt>Runnable</tt>s or event listeners insulates them from
+this sort of future change.
+</blockquote>
+
+<p><b>Okay, but won't I have to write a lot of code 
+just to register a simple shutdown hook?</b>
+<p>
+<blockquote>
+No.  Simple shutdown hooks can often be written as anonymous inner classes, as
+in this example:
+
+<blockquote><pre>
+Runtime.getRuntime().addShutdownHook(new Thread() {
+    public void run() { database.close(); }
+});
+</pre></blockquote>
+
+This idiom is fine as long as you'll never need to cancel the hook, in which
+case you'd need to save a reference to the hook when you create it.
+</blockquote>
+
+<p><b>What about security? 
+Can an untrusted applet register a shutdown hook?</b>
+<p>
+<blockquote>
+If there is a security manager installed then the <tt>addShutdownHook</tt> and
+<tt>removeShutdownHook</tt> methods check that the caller's security context
+permits <tt>RuntimePermission("shutdownHooks")</tt>.  An untrusted applet will
+not have this permission, and will therefore not be able to register or
+de-register a shutdown hook.
+</blockquote>
+
+<p><b>What happens if a shutdown hook throws an exception 
+and the exception is not caught?
+</b>
+<p>
+<blockquote>
+Uncaught exceptions are handled in shutdown hooks just as in any other thread,
+by invoking the <tt>uncaughtException</tt> method of the thread's
+<tt>ThreadGroup</tt> object.  The default implementation of this method prints
+the exception's stack trace to <tt>System.err</tt> and terminates the thread.
+Note that uncaught exceptions do not cause the VM to exit; this happens only
+when all non-daemon threads have finished or when the <tt>Runtime.exit</tt>
+method is invoked.
+</blockquote>
+
+<p><b>Why did you add the <tt>Runtime.halt</tt> method? 
+Isn't it pretty dangerous?</b>
+<p>
+<blockquote>
+The new <tt>halt</tt> method is certainly powerful, and it should be used with
+the utmost caution.  It's provided so that applications can insulate themselves
+from shutdown hooks that deadlock or run for inordinate amounts of time.  It
+also allows applications to force a quick exit in situations where that is
+necessary.
+</blockquote>
+
+<p><b>What happens if finalization-on-exit is enabled? 
+Will finalizers be run before, during, or after shutdown hooks?</b>
+<p>
+<blockquote>
+Finalization-on-exit processing is done after all shutdown hooks have finished.
+Otherwise a hook may fail if some live objects are finalized prematurely.
+</blockquote>
+
+</blockquote>
+
+<!-- Body text ends here -->
+
+<!-- ============================================================== -->
+
+<HR SIZE=3 NOSHADE>
+
+
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+
+
+<TD>
+
+<P><FONT SIZE="-2">
+
+   <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 1999
+
+   <A HREF="http://www.sun.com/">Sun Microsystems, Inc.</A>
+
+    All Rights Reserved.</FONT></P>
+
+</TD>
+
+
+
+<TD ALIGN=RIGHT>
+
+   <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+
+   <BR>
+
+   <FONT SIZE="+1">
+
+   <i>Java Software</i>
+
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+
+</body>
+</html>

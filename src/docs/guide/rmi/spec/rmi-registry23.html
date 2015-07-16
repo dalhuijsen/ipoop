@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 6 - Registry Interfaces
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-registry22.html">PREV</a>
+ | <a href="rmi-registry24.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a <h2><a name="6378"><i>	6.2	</i> The <code>LocateRegistry</code> Class
+</a></h2>
+
+<blockquote>
+<a name="6545"><!-- --></a>
+The class <code>java.rmi.registry.LocateRegistry</code> is used to obtain a reference (construct a stub) to a bootstrap remote object registry on a particular host (including the local host), or to create a remote object registry that accepts calls on a specific port.<p>
+<a name="6766"><!-- --></a>
+The registry implements a simple flat naming syntax that associates the name of a remote object (a string) with a remote object reference. The name and remote object bindings are not remembered across server restarts.<p>
+<a name="6667"><!-- --></a>
+Note that a <code>getRegistry</code> call does not actually make a connection to the remote host. It simply creates a local reference to the remote registry and will succeed even if no registry is running on the remote host. Therefore, a subsequent method invocation to a remote registry returned as a result of this method may fail.<p>
+</blockquote><blockquote><pre>package java.rmi.registry;
+
+public final class LocateRegistry {
+
+	public static Registry getRegistry()
+		throws java.rmi.RemoteException {...}
+	public static Registry getRegistry(int port)
+		throws java.rmi.RemoteException {...}
+	public static Registry getRegistry(String host)
+		throws java.rmi.RemoteException {...}
+	public static Registry getRegistry(String host, int port)
+		throws java.rmi.RemoteException {...}
+	public static Registry getRegistry(String host, int port,
+                                           RMIClientSocketFactory csf)
+		throws RemoteException {...}
+	public static Registry createRegistry(int port)
+		throws java.rmi.RemoteException {...}
+	public static Registry createRegistry(int port,
+		                              RMIClientSocketFactory csf, 
+		                              RMIServerSocketFactory ssf) 
+		throws RemoteException {...}
+}
+
+
+</pre></blockquote><blockquote>
+<a name="6738"><!-- --></a>
+The first four <code>getRegistry</code> methods return a reference to a registry on the current host, current host at a specified <em>port</em>, a specified <em>host,</em> or at a particular <em>port</em> on a specified <em>host</em>. What is returned is the remote stub for the registry with the specified host and port information.<p>
+<a name="6761"><!-- --></a>
+The fifth <code>getRegistry</code> method (that takes an <code>RMIClientSocketFactory</code> as one of its arguments), returns a locally created remote stub to the remote object <code>Registry</code> on the specified <em>host</em> and <em>port</em>. Communication with the remote registry whose stub is constructed with this method will use the supplied <code>RMIClientSocketFactory</code>, <em>csf</em>, to create <code>Socket</code> connections to the registry on the remote host and port.<p>
+</blockquote>
+<blockquote>
+<blockquote><hr noshade size="1">
+<b><a name="6750">Note - </a></b>A registry returned from the <CODE>getRegistry</CODE> method is a specially constructed stub that contains a well-known object identifier. Passing a registry stub from one JVM to another is not supported (it may or may not work depending on the implementation). Use the <CODE>LocateRegistry.getRegistry</CODE> methods to obtain the appropriate registry for a host. 
+<hr noshade size="1">
+</blockquote>
+</blockquote>
+<blockquote>
+<a name="6746"><!-- --></a>
+The <code>createRegistry</code> method creates and exports a registry on the local host on the specified <em>port</em>. <p>
+<a name="6690"><!-- --></a>
+The second <code>createRegistry</code> method allows more flexibility in communicating with the registry. This call creates and exports a <code>Registry</code> on the local host that uses custom socket factories for communication with that registry. The registry that is created listens for incoming requests on the given <em>port</em> using a <code>ServerSocket</code> created from the supplied <code>RMIServerSocketFactory</code>. A client that receives a reference to this registry will use a <code>Socket</code> created from the supplied <code>RMIClientSocketFactory</code>.<p>
+</blockquote>
+<blockquote>
+<blockquote><hr noshade size="1">
+<b><a name="4584">Note - </a></b>Starting a registry with the <code>createRegistry</code> method does not keep the server process alive. 
+<hr noshade size="1">
+</blockquote>
+</blockquote>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-registry22.html">PREV</a>
+ | <a href="rmi-registry24.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>

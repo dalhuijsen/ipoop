@@ -1,0 +1,216 @@
+<HTML>
+<HEAD>
+  <TITLE>4 Fundamentals</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<P><TABLE summary="layout" WIDTH="100%" BORDER="0" CELLSPACING="2" CELLPADDING="0">
+  <TR>
+    <TD>
+    <A HREF="jndiTOC.html">CONTENTS</A> | <A HREF="jndi.3.html">PREV</A>
+    | <A HREF="jndi.5.html">NEXT</A></TD> 
+    <TD ALIGN="RIGHT">
+    <I><FONT COLOR="#707070">JNDI API</FONT></I></TD> 
+  </TR>
+</TABLE><HR ALIGN=LEFT SIZE="8" WIDTH="35%" NOSHADE></P>
+
+<H2 CLASS="chapter"><A NAME="pgfId=996751"></A>4. <A NAME="37442"></A>Fundamentals</H2>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=996752"></A>A directory service
+  provides access to diverse kinds of information about users and
+  resources in a network environment. It uses a naming system for
+  the purpose of identifying and organizing directory objects to
+  represent this information. A directory object provides an association
+  between attributes and values. Thus, a directory service enables
+  information to be organized in a hierarchical manner to provide
+  a mapping between human understandable names and directory objects.</P>
+</BLOCKQUOTE>
+
+<DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=996754"></A>4.1 Naming -- The
+Foundation</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=996755"></A>A fundamental facility
+  in any computing system is the naming service - the means by
+  which names are associated with objects, and by which objects
+  are found given their names. In traditional systems, the naming
+  service is seldom a separate service. It is usually integrated
+  with another service, such as a file system, directory service,
+  database, desktop, mail system, spreadsheet, or calendar. For
+  example, a file system includes a naming service for files and
+  directories; a spreadsheet has a naming service for cells and
+  macros.</P>
+  <P CLASS="body"><A NAME="pgfId=996759"></A>The computing environment
+  of an enterprise typically consists of several naming services.
+  There are naming services that provide contexts for naming common
+  entities in an enterprise such as organizations, physical sites,
+  human users and computers. Naming services are also incorporated
+  in applications offering services such as file service, mail
+  service, printer service, and so on. From a user's perspective,
+  there exist several natural and logical relationships between
+  these naming services. For example, it is natural to think of
+  naming a variety of services such as files, mail, appointment
+  calendar, and so on, in the context of a user. It is also natural
+  to think of a user in the context of a department, within a division
+  of an enterprise. Meaningful names can be composed using useful
+  arrangements of naming services reflecting these relationships.</P>
+  <P CLASS="body"><A NAME="pgfId=996760"></A>Every name is generated
+  by a set of syntactic rules called a naming convention. An atomic
+  name is an indivisible component of a name, as defined by the
+  naming convention.</P>
+  <P CLASS="body"><A NAME="pgfId=996761"></A>A compound name represents
+  a sequence of zero or more atomic names composed according to
+  the naming convention.</P>
+  <P CLASS="body"><A NAME="pgfId=996762"></A>For example, in UNIX
+  pathnames, atomic names are ordered from left to right, and are
+  delimited by slash (`/') characters. The UNIX pathname <CODE>usr/local/bin</CODE>
+  is a compound name representing the sequence of atomic names,
+  <CODE>usr</CODE> , <CODE>local</CODE> , and <CODE>bin</CODE>
+  . In names from the Internet Domain Name System (DNS), atomic
+  names are ordered from right to left, and are delimited by dot
+  (`.') characters. Thus, the DNS name sales.Wiz.COM is a compound
+  name representing the sequence of atomic names, <CODE>COM</CODE>
+  , <CODE>Wiz</CODE> , <CODE>sales</CODE> .</P>
+  <P CLASS="body"><A NAME="pgfId=996763"></A>The association of
+  an atomic name with an object is called a binding.</P>
+  <P CLASS="body"><A NAME="pgfId=996764"></A>A context is an object
+  whose state is a set of bindings with distinct atomic names.
+  Every context has an associated naming convention. A context
+  provides a lookup (resolution) operation that returns an object,
+  and may provide operations such as for binding names, unbinding
+  names, listing bound names. An atomic name in one context object
+  can be bound to another context object of the same type, called
+  a subcontext, giving rise to compound names.</P>
+  <P CLASS="body"><A NAME="pgfId=996766"></A>Resolution of compound
+  names proceeds by looking up each successive atomic component
+  in each successive context. The reader will find a familiar model
+  in UNIX file naming, where directories serve as contexts, and
+  pathnames may be compound names.</P>
+  <P CLASS="body"><A NAME="pgfId=996767"></A>A naming system is
+  a connected set of contexts of the same type (having the same
+  naming convention) and providing the same set of operations with
+  identical semantics.</P>
+  <P CLASS="body"><A NAME="pgfId=996768"></A>A namespace is the
+  set of all names in a naming system.</P>
+  <P CLASS="body"><A NAME="pgfId=996769"></A>A composite name is
+  a name that spans multiple naming systems. It consists of an
+  ordered list of zero or more components. Each component is a
+  name from the namespace of a single naming system.</P>
+  <P CLASS="body"><A NAME="pgfId=996770"></A>For example, the name
+  <CODE>jurassic.eng:/export/home/jdoe/.signature</CODE> is a composite
+  name representation made up of a host name jurassic.eng from
+  a host namespace, and the file name <CODE>/export/home/jdoe/.signature</CODE>
+  from a UNIX file namespace. Another example is the Internet URL
+  <CODE>http://www.moon.org/public/index.html</CODE> , which is
+  a composite name representation made up of the scheme-id http
+  from the &quot;URL scheme-id&quot; namespace, <CODE>www.moon.org</CODE>
+  which is the DNS name of the machine on which the web server
+  is running, and <CODE>public/index.html</CODE> which is a file
+  name from a file namespace.</P>
+  <P CLASS="body"><A NAME="pgfId=996771"></A>Every name is interpreted
+  relative to some context, and every naming operation is performed
+  on a context object. A client can obtain an initial context object
+  that provides a starting point for resolution of names.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=996772"></A>4.2 Directory Objects</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=996773"></A>The primary function
+  of a naming system is to map names to objects. The objects can
+  be of any type. A <EM>directory object</EM> is a particular type
+  of object that is used to represent the variety of information
+  in a computing environment. A directory object can have associated
+  with it attributes. An attribute has an identifier and a set
+  of values.</P>
+  <P CLASS="body"><A NAME="pgfId=997397"></A>A directory object
+  provides operations for creating attributes, adding, removing,
+  and modifying attributes associated with the directory object.
+  If we make a directory object also be a naming context, we can
+  represent trees of directory information where the interior nodes
+  not only behave like naming contexts but also contain attributes.</P>
+  <P CLASS="body"><A NAME="pgfId=996919"></A><A HREF="#18691" 
+  CLASS="XRef">The Example of a Composite Namespace</A> figure
+  is an example used for illustrating several things.</P>
+  <DIV>
+  <H4 CLASS="FigureTitle"><A NAME="pgfId=997498"></A><A NAME="18691"></A>Example
+  of a Composite Namespace</H4>
+  <P><DIV><IMG SRC="jndi-2.gif" alt="The following context describes this graphic" WIDTH="505" HEIGHT="610" NATURALSIZEFLAG="3" ALIGN="BOTTOM"> </DIV></P>
+</BLOCKQUOTE>
+
+<UL>
+  <UL>
+    <LI CLASS="bullet"><A NAME="pgfId=996776"></A>There can be multiple
+    naming systems that can be represented by a composite namespace.
+    In this case, DNS is used as the global naming system; one division
+    uses NDS, while a second division uses LDAP.
+    <LI CLASS="bullet"><A NAME="pgfId=996777"></A>Each namespace
+    has interior nodes that represent naming contexts, which may
+    be directory objects as well. Leaf nodes can be objects of any
+    type.
+    <LI CLASS="bullet"><A NAME="pgfId=996778"></A>The InitialContext
+    is configured to have bindings to useful starting contexts in
+    different naming and directory systems.
+    <LI CLASS="bullet"><A NAME="pgfId=996779"></A>Applications just
+    see a composite namespace. They can access any type of object
+    bound in any naming system in this arrangement.
+    <LI CLASS="bullet"><A NAME="pgfId=997471"></A>Services can incorporate
+    their own namespaces which appear as first-class citizens in
+    JNDI.
+    <LI CLASS="bullet"><A NAME="pgfId=997472"></A>Arbitrary directory
+    services can be added and accessed without requiring client applications
+    to be changed.
+  </UL>
+</UL>
+
+</DIV></DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=996782"></A>4.3 URLs and Composite
+Names</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998588"></A>Uniform Resource
+  Locators (URLs) are special composite names whose syntax are
+  determined by the URL's definition. Clients of JNDI can use URLs
+  to refer to arbitrary types of objects. For example, a client
+  can use <CODE>nfs://nfs.sun.com/export/jndi/src/README</CODE>
+  to refer to a file object that is being accessed using the Network
+  File System (NFS) protocol. Similarly, a client can perform directory
+  operations on a directory object in an LDAP server using the
+  URL <CODE>ldap://ldap.widget.com/cn=Jonathan,ou=marketing</CODE>
+  .</P>
+  <P CLASS="body"><A NAME="pgfId=998683"></A>To support composite
+  names in general, JNDI defines a composite name syntax and utilities
+  for processing composite names. This allows clients of JNDI to
+  refer to objects using names that span multiple namespaces.</P>
+</BLOCKQUOTE>
+
+</DIV><DIV>
+
+<H3 CLASS="section"><A NAME="pgfId=998686"></A>4.4 Events</H3>
+
+<BLOCKQUOTE>
+  <P CLASS="body"><A NAME="pgfId=998689"></A>As the naming/directory
+  service plays an increasingly important role in the computing
+  environment, the need to provide administration and monitoring
+  tools to help manage changes in the service also increases. For
+  such tools and other applications, the traditional request/response
+  style of interaction needs to be augmented with an asynchronous
+  notification model that allows applications to register interest
+  in changes in the service.</P>
+</BLOCKQUOTE>
+
+</DIV>
+
+<P><HR ALIGN=LEFT><A HREF="jndiTOC.html">CONTENTS</A> | <A 
+HREF="jndi.3.html">PREV</A> | <A HREF="jndi.5.html">NEXT</A><HR ALIGN=LEFT><I><FONT
+ SIZE="-2"><A HREF="../../../../relnotes/SMICopyright.html">Copyright</A>
+&COPY;1997-1999 Sun Microsystems, Inc. All Rights Reserved.</FONT></I>
+
+</BODY>
+</HTML>

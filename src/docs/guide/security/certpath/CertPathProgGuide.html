@@ -1,0 +1,2904 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+	<TITLE>Java(TM) Certification Path API Programmer's Guide</TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice/5.2 (Solaris Sparc)">
+	<META NAME="CREATED" CONTENT="20000511;14234200">
+	<META NAME="CHANGEDBY" CONTENT=" ">
+	<META NAME="CHANGED" CONTENT="20000825;10500800">
+	<STYLE>
+	<!--
+		TD P { margin-bottom: 0in }
+		H2 { margin-top: 0in; margin-bottom: 0in }
+		H4 { margin-top: 0.17in; margin-bottom: 0in }
+		P { margin-bottom: 0in }
+	-->
+	</STYLE>
+</HEAD>
+<BODY>
+<H2 ALIGN=CENTER>Java<font size=-1><sup>TM</sup></font> Certification Path
+API Programmer's Guide</H2>
+<center>Author: Sean Mullan<br><br>
+<I>Last Modified: 11 February 2003</I></center></h4>
+<HR>
+<H2 STYLE="margin-left: 0.39in; margin-right: 0.39in; margin-bottom: 0in">
+<A HREF="#Changes">Changes in J2SE 1.4.2</A></H2>
+<H2 STYLE="margin-left: 0.39in; margin-right: 0.39in; margin-bottom: 0in">
+<A HREF="#Overview">Overview</A></H2>
+<H4 STYLE="margin-left: 0.79in; margin-right: 0.79in; margin-top: 0in">
+<a href="#Ack">Acknowledgments<br></a>
+<A HREF="#Who">Who Should Read This Document<BR></A><A HREF="#RelatedDocs">Related
+Documentation<BR></A><A HREF="#Introduction">Introduction</A></H4>
+<H2 STYLE="margin-left: 0.39in; margin-right: 0.39in">
+<A HREF="#CoreClasses">Core Classes and Interfaces</A></H2>
+<H3 STYLE="margin-left: 0.79in; margin-right: 0.79in; margin-top: 0in">
+<A HREF="#CommonClasses">Basic Classes</A></H3>
+<UL>
+	<UL>
+		<UL>
+			<LI><P><A HREF="#CertPath">The
+			CertPath Class</A> 
+			<LI><P><A HREF="#CertificateFactory">The
+			CertificateFactory Class</A> 
+			<LI><P><A HREF="#CertPathParameters">The
+			CertPathParameters Interface</A></P>
+		</UL>
+	</UL>
+</UL>
+<H3 STYLE="margin-left: 0.79in; margin-right: 0.79in; margin-top: 0in; margin-bottom: 0in">
+<A HREF="#ValidationClasses">Certification Path Validation Classes</A></H3>
+<UL>
+	<UL>
+		<UL>
+			<LI><P><A HREF="#CertPathValidator">The
+			CertPathValidator Class</A> 
+			</P>
+			<LI><P><A HREF="#CertPathValidatorResult">The
+			CertPathValidatorResult Interface</A></P>
+		</UL>
+	</UL>
+</UL>
+<H3 STYLE="margin-left: 0.79in; margin-right: 0.79in; margin-top: 0in; margin-bottom: 0in">
+<A HREF="#BuildingClasses">Certification Path Building Classes</A></H3>
+<UL>
+	<UL>
+		<UL>
+			<LI><P><A HREF="#CertPathBuilder">The
+			CertPathBuilder Class</A> 
+			</P>
+			<LI><P><A HREF="#CertPathBuilderResult"><SPAN STYLE="font-style: normal">The
+			CertPathBuilderResult Interface</SPAN></A></P>
+		</UL>
+	</UL>
+</UL>
+<H3 STYLE="margin-left: 0.79in; margin-right: 0.79in; margin-top: 0in; margin-bottom: 0in">
+<A HREF="#StorageClasses">Certificate/CRL Storage Classes</A></H3>
+<UL>
+	<UL>
+		<UL>
+			<LI><P><A HREF="#CertStore">The
+			CertStore Class</A> 
+			</P>
+			<LI><P><A HREF="#CertStoreParameters">The
+			CertStoreParameters Interface</A> 
+			</P>
+			<UL>
+				<LI><P><A HREF="#LDAPCertStoreParameters">The
+				LDAPCertStoreParameters Class</A> 
+				</P>
+				<LI><P><A HREF="#CollectionCertStoreParameters">The
+				CollectionCertStoreParameters Class</A> 
+				</P>
+			</UL>
+			<LI><P><A HREF="#CertSelector">The
+			CertSelector and CRLSelector Interfaces</A> 
+			</P>
+			<UL>
+				<LI><P><A HREF="#X509CertSelector">The
+				X509CertSelector Class</A> 
+				</P>
+				<LI><P><A HREF="#X509CRLSelector">The
+				X509CRLSelector Class</A></P>
+			</UL>
+		</UL>
+	</UL>
+</UL>
+<H2 STYLE="margin-left: 0.39in; margin-right: 0.39in">
+<A HREF="#PKIXClasses">PKIX Classes</A></H2>
+<UL>
+	<UL>
+		<LI><P><A HREF="#TrustAnchor">The
+		TrustAnchor Class</A> 
+		<LI><P><A HREF="#PKIXParameters">The
+		PKIXParameters Class</A> 
+		</P>
+		<LI><P><A HREF="#PKIXCertPathValidatorResult">The
+		PKIXCertPathValidatorResult Class</A></P>
+		<li><p><a href="#PolicyNode">The PolicyNode Interface and
+		PolicyQualifierInfo Class</a></p>
+		<LI><P><A HREF="#PKIXBuilderParameters">The
+		PKIXBuilderParameters Class</A> 
+		</P>
+		<LI><P><A HREF="#PKIXCertPathBuilderResult">The
+		PKIXCertPathBuilderResult Class</A> 
+		</P>
+		<LI><P><A HREF="#PKIXCertPathChecker">The
+		PKIXCertPathChecker Class</A> 
+		</P>
+	</UL>
+</UL>
+<H2 STYLE="margin-left: 0.39in; margin-right: 0.39in">
+<A HREF="#ServiceProvider">Implementing a Service Provider</A></H2>
+<H2 STYLE="margin-left: 0.39in; margin-right: 0.39in">
+<A HREF="#AppA">Appendix A: Standard Names</A></H2>
+<H2 STYLE="margin-left: 0.39in; margin-right: 0.39in">
+<A HREF="#AppB">Appendix B: The "SUN" Provider</A></H2>
+<HR>
+
+<H2><A NAME="Changes"></A>Changes in J2SE 1.4.2</H2>
+Several enhancements have been made to the CertPath 
+implementation in the SUN provider:
+<ul>
+<li>Compliance with <A HREF="http://www.ietf.org/rfc/rfc3280.txt">RFC 3280</A>.
+<P>
+<li>Performance improvements. Several changes were made to
+improve the speed of validations. The performance improvement 
+depends on the usage scenario; however, validations 
+may be twice as fast as before. As part of these performance
+enhancements, the LDAP CertStore has been equipped with a cache. For details 
+see <A HREF="#AppB">Appendix B: The "SUN" Provider</A>. 
+<P>
+<li>Limited support for the <code>CRLDistributionPoints</code> extension. For 
+backwards compatibility, it is disabled by default. 
+See <A HREF="#AppB">Appendix B: The "SUN" Provider</A> for more 
+information and instructions on how to enable it.
+</ul>
+
+<!--Comment out this section 8-08-02
+
+<H2><A NAME="Changes"></A>Changes since J2SE 1.4 Beta</H2>
+<ul>
+<li>Changed the <code>TrustAnchor(X509Certificate, byte[])</code> constructor
+to not throw <code>InvalidAlgorithmParameterException</code> and declared it 
+to throw <code>IllegalArgumentException</code> instead (only in javadoc since
+it is a <code>RuntimeException</code>).
+<li>Changed the <code>TrustAnchor(String, PublicKey, byte[])</code> constructor 
+to not throw <code>InvalidAlgorithmParameterException</code> and declared it 
+to throw <code>IllegalArgumentException</code> instead. Also changed it to 
+throw an <code>IllegalArgumentException</code> if the <code>caName</code> 
+parameter is incorrectly specified.
+<li>Marked <code>PolicyQualifierInfo</code> class final.
+<li>Marked the <code>getTrustedCert</code>, <code>getCAName</code>,
+<code>getCAPublicKey</code>, and <code>getNameConstraints</code> methods of 
+<code>TrustAnchor</code> final.
+<li>Removed the <code>isImmutable</code> method of <code>PolicyNode</code>
+and required that all instances be immutable.
+<li>Changed the constructors of <code>PKIXCertPathValidatorResult</code> and 
+<code>PKIXCertPathBuilderResult</code> to not throw 
+<code>InvalidParameterException</code> if the <code>policyTree</code> parameter 
+is not immutable (since <code>PolicyNode</code> instances are now always 
+immutable).
+<li>Changed the specification of the <code>setMaxPathLength</code> method of
+<code>PKIXBuilderParameters</code> to be consistent with the PKIX certificate
+profile defined in 
+<A HREF="http://www.ietf.org/rfc/rfc3280.txt">RFC 3280</A>. 
+Also changed the method to throw an <code>InvalidParameterException</code> 
+(a <code>RuntimeException</code>) if the <code>maxPathLength</code> parameter 
+is out of range.
+<li>Clarified that an X.509 <code>CertPath</code> should not include the
+<code>TrustAnchor</code> certificate.
+<li>Added a new standard encoding format for X.509 <code>CertPath</code>s:
+<b>PkiPath</b>.
+</ul>
+-->
+<H2><A NAME="Overview"></A>Overview</H2>
+<P>The Java<SUP><FONT SIZE="-2">TM</FONT></SUP> Certification Path API
+consists of classes and interfaces for handling certification paths
+(also known as &quot;certificate chains&quot;). A certification path
+is an ordered list of certificates. If a certification path meets
+certain validation rules, it may be used to securely establish the
+mapping of a public key to a subject. 
+</P>
+<P>This API defines interfaces and
+abstract classes for creating, building, and validating certification
+paths.&nbsp; Implementations may be plugged in using a provider-based
+interface. The API is based on the <A HREF="../CryptoSpec.html#ProviderArch">Cryptographic
+Service Provider architecture,</A> described in the <A HREF="../CryptoSpec.html">Java
+Cryptography Architecture Document</A>. 
+</P>
+<P>The API also includes algorithm-specific classes for building and 
+validating X.509 certification
+paths according to the PKIX standards. The PKIX standards are
+developed by the <A HREF="http://www.ietf.org/html.charters/pkix-charter.html">
+IETF PKIX working group</A>.
+</P>
+<P>This API is being reviewed using the 
+<a href="http://jcp.org/en/home/index">Java Community 
+Process<SUP><FONT SIZE="-2">SM</FONT></SUP></a> program as 
+Java<SUP><FONT SIZE="-2">TM</FONT></SUP> Specification Request (JSR) 000055.
+The API is included in the Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK,
+Standard Edition (J2SDK), v 1.4. Please refer to the 
+<a href="http://java.sun.com/aboutJava/communityprocess/final-draft/jsr055/index.html">
+JSR 055 Home Page</a> for more information on the JSR and the latest status.
+<blockquote>
+<H2><A NAME="Ack"></A>Acknowledgments</H2>
+The author would like to thank the individuals who contributed to the 
+Certification Path API and provided useful comments and technical advice.
+Special thanks to the members of the Sun Microsystems Laboratories 
+team who designed and developed the Certification Path API which provided 
+the basis of the work for the Java Community Process. This team includes
+Anne Anderson, Yassir Elley, Geoff Goodell, Steve Hanna, Sean Mullan, 
+Radia Perlman, and Seth Proctor. 
+<p>The expert group helped improve and refine the 
+API using the Java Community Process and includes the following members:
+<ul>
+<li>Peter Hesse, CygnaCom Solutions, An Entrust Technologies Company
+<li>Sean Mullan, Sun Microsystems (Specification Lead)
+<li>Anthony Nadalin, IBM
+<li>Bob Naugle, Bluestone Software
+<li>Hemma Prafullchandra, VeriSign
+<li>Ming Yung, DSTC
+</ul>
+Maxine Erlund, Steve Hanna, Phil Rosenzweig and Bob Sproull of 
+Sun Microsystems provided leadership and vision. The members of the 
+Java Security, Networking and Naming Group of Sun Microsystems contributed invaluable 
+comments and support, especially Sharon Liu, Jeff Nisewanger, Gary Ellison,
+and Andreas Sterbenz.
+Helpful comments and advice were received from many in the technical 
+community, especially Mary Dageforde, Edward Dobner, Tom Gindin, Jan Luehe, 
+David Kuehr-McLaren, Parag Salvi, Alexei Semidetnov, and Yanni Zhang.
+
+<H2><A NAME="Who"></A>Who Should Read This Document</H2>
+This document is intended for two classes of experienced
+developers: 
+<OL>
+	<LI><P>those who want to design secure
+	applications that build or validate certification paths. 
+	<LI><P>those who want to write a service provider implementation for 
+	building or validating certification paths.
+	</OL>
+<H2><A NAME="RelatedDocs"></A>Related Documentation</H2>
+This document assumes you have already read the following
+documents (available online at
+<A HREF="../index.html">http://java.sun.com/j2se/1.4/docs/guide/security/index.html</A>):
+	<UL>
+		<LI><P><A HREF="../cert3.html">X.509
+		Certificates and Certificate Revocation Lists (CRLs)</A>
+		</P>
+		<LI><P><A HREF="../CryptoSpec.html">Java
+		Cryptography Architecture</A> 
+		</P>
+		<LI><P><A HREF="../HowToImplAProvider.html">How
+		to Implement a Provider for the Java Cryptography Architecture</A> 
+		</P>
+	</UL>
+<H2><A NAME="Introduction"></A>
+Introduction</H2>
+<P>Users of public
+key applications and systems must be confident that a subject's
+public key is genuine, i.e., that the associated private key is owned
+by the subject. Public key certificates are used to establish this
+trust. A <B>public key (or identity)</B> <B>certificate</B> is a
+binding of a public key to an identity, which is digitally signed by
+the private key of another entity, often called a <B>Certification
+Authority</B> (CA). We shall use the term CA to refer to an entity
+that signs a certificate for the remainder of this section. 
+</P>
+<P>If the user does
+not have a trusted copy of the public key of the CA that signed the
+subject's public key certificate, then another public key certificate
+vouching for the signing CA is required. This logic can be applied
+recursively, until a chain of certificates (or <B>a certification
+path</B>) is discovered from a <SPAN STYLE="font-weight: medium">trust
+anchor</SPAN> or a<B> </B><SPAN STYLE="font-weight: medium">most-trusted
+CA</SPAN> to the target subject (commonly referred to as the 
+<b>end-entity</b>). 
+The <B>most-trusted CA </B>is usually
+specified by a certificate issued to a CA that the user directly
+trusts. <SPAN STYLE="font-weight: medium">In</SPAN> general, a
+certification path is an ordered list of certificates, usually
+comprised of the end-entity's public key certificate and zero or more
+additional certificates. A certification path typically has one or
+more encodings, allowing it to be safely transmitted across networks
+and to different operating system architectures. 
+</P>
+<P>Figure 1
+illustrates a certification path from a most-trusted CA's public key
+(CA 1) to the target subject (Alice). The certification path establishes
+trust in Alice's public key through an intermediate CA named CA2.</P>
+<BLOCKQUOTE><BR><BR>
+</BLOCKQUOTE>
+<BLOCKQUOTE STYLE="font-style: normal"><IMG SRC="cp.gif" alt="The previous context describes this image" NAME="Graphic1" ALIGN=LEFT WIDTH=767 HEIGHT=196 BORDER=0><BR CLEAR=LEFT><B>Figure
+1: </B><SPAN STYLE="font-weight: medium">Certification Path</SPAN></BLOCKQUOTE>
+<P>A certification
+path must be validated before it can be relied on to establish trust
+in a subject's public key. Validation can consist of various checks
+on the certificates contained in the certification path, such as
+verifying the signatures and checking that each certificate has not
+been revoked. The PKIX standards define an algorithm for validating
+certification paths consisting of X.509 certificates. 
+</P>
+<P>Often a user may
+not have a certification path from a most-trusted CA to the subject.
+Providing services to build or discover certification paths is an
+important feature of public key enabled systems. 
+<a href="http://www.ietf.org/rfc/rfc2587.txt">RFC 2587</a> defines an
+LDAP (Lightweight Directory Access Protocol) schema definition which 
+facilitates the discovery of X.509 certification paths using the LDAP 
+directory service protocol. 
+</P>
+<P>Building and
+validating certification paths is an important part of many standard
+security protocols such as SSL/TLS, S/MIME, and IPSEC.&nbsp; The 
+<B>Java<SUP><FONT SIZE="-2">TM</FONT></SUP>
+Certification Path API</B> provides a set of classes and interfaces
+for developers who need to integrate this functionality into
+their applications. This API benefits two types of developers: those
+who need to write service provider implementations for a specific
+certification path building or validation algorithm; and those who need 
+to access standard algorithms for creating, building, and validating 
+certification paths in an implementation-independent manner.</P>
+</blockquote>
+<H2><A NAME="CoreClasses"></A>Core
+Classes and Interfaces</H2>
+<P>The core classes of the Java
+Certification Path API consist of interfaces and classes that support
+certification path functionality in an algorithm- and implementation
+-independent manner. The API also includes a set of algorithm-specific
+classes for the PKIX standards that are discussed in the section
+titled <A HREF="#PKIXClasses">PKIX Classes</A>. The API builds on and
+extends the existing Java<SUP><FONT SIZE=-2>TM</FONT></SUP> 2 SDK,
+Standard Edition (J2SDK) <code>java.security.cert</code> 
+package for handling certificates. The core classes can be broken up 
+into 4 class categories: Basic, Validation, Building, and Storage: 
+</P>
+<UL>
+	<LI><P><A HREF="#CommonClasses">Basic
+	Certification Path Classes</A> 
+	</P>
+	<UL>
+		<LI><P><code>CertPath</code>,
+		<code>CertificateFactory</code>,
+		<code>CertPathParameters</code>
+		</P>
+	</UL>
+	<LI><P><A HREF="#ValidationClasses">Certification
+	Path Validation Classes</A> 
+	</P>
+	<UL>
+		<LI><P><code>CertPathValidator</code>,
+		<code>CertPathValidatorResult</code> 
+		</P>
+	</UL>
+	<LI><P><A HREF="#BuildingClasses">Certification
+	Path Building Classes</A> 
+	</P>
+	<UL>
+		<LI><P><code>CertPathBuilder</code>,
+		<code>CertPathBuilderResult</code> 
+		</P>
+	</UL>
+	<LI><P><A HREF="#StorageClasses">Certificate/CRL
+	Storage Classes</A> 
+	</P>
+	<UL>
+		<LI><P><code>CertStore</code>,
+		<code>CertStoreParameters</code>,
+		<code>CertSelector</code>, <code>CRLSelector</code>
+				</P>
+	</UL>
+</UL>
+<P>The following sections describe the
+most commonly used methods of each class and interface. Usage
+examples for some of the classes are interspersed throughout the
+guide. The complete reference documentation for the relevant
+Certification Path API classes can be found in: 
+</P>
+<UL>
+	<LI><P><A HREF="../../../api/java/security/cert/package-summary.html"><TT>java.security.cert</TT>
+	package summary</A> 
+	</P>
+</UL>
+<p>Most of the classes and interfaces in the CertPath API are not
+thread-safe. However, there are some exceptions which will be noted 
+in this guide and the API specification. Multiple threads that need to 
+access a single non-thread-safe object concurrently should synchronize 
+amongst themselves and provide the necessary locking. Multiple threads 
+each manipulating separate objects need not synchronize.
+<H2><A NAME="CommonClasses"></A>Basic
+Certification Path Classes</H2>
+<P>The basic certification path classes
+provide fundamental functionality for encoding and representing
+certification paths. The key basic class in the Java Certification
+Path API is <TT>CertPath</TT>, which encapsulates the universal
+aspects shared by all types of certification paths. An application
+uses an instance of the <TT>CertificateFactory</TT> class to create a
+<TT>CertPath</TT> object. 
+</P>
+<H2><A NAME="CertPath"></A>The CertPath
+Class</H2>
+<P>The <TT>CertPath</TT> class is an
+abstract class for certification paths. It defines the functionality
+shared by all certification path objects. Various certification path
+types can be implemented by subclassing the <TT>CertPath</TT> class,
+even though they may have different contents and ordering schemes.
+All <TT>CertPath</TT> objects are serializable, immutable and 
+thread-safe and share the following characteristics: 
+</P>
+<UL>
+    <LI><P>A type <BR><BR>This corresponds
+	to the type of the certificates in the certification path, for
+	example: X.509. The type of a <TT>CertPath</TT> is obtained using
+	the method: <BR><BR><pre>    public String getType()</pre></P>
+	<P>See Appendix A in the 
+        <A HREF="../CryptoSpec.html#AppA">
+	Java Cryptography Architecture API Specification &amp; Reference </a>
+ 	for information about standard certificate types.<br><br>
+    <LI><P>A list of certificates <BR><BR>The
+	<TT>getCertificates</TT> method returns the list of certificates in
+	the certification path: &nbsp; <BR><BR>
+	<pre>    public abstract List getCertificates()</pre>
+	This method returns a <TT>List</TT> of
+	zero or more <TT>java.security.cert.Certificate</TT> objects. The 
+        returned <code>List</code>
+	and the <code>Certificates</code>
+	contained within it are immutable, in order to protect the contents
+	of the <TT>CertPath</TT> object. 
+	</P>
+	The ordering of the certificates
+	returned depends on the type. By convention, the certificates in a
+	<TT>CertPath</TT> object of type X.509 are ordered starting with the 
+	target certificate and ending with a certificate issued by the trust 
+	anchor. That is, the issuer of one certificate is the subject of the
+   	following one. The certificate representing the <code>TrustAnchor</code>
+	should not be included in the certification path. Unvalidated 
+	X.509 <TT>CertPath</TT>s may not follow this convention. PKIX
+	<TT><A HREF="#CertPathValidator">CertPathValidator</A></TT>s will
+	detect any departure from these conventions that cause the 
+	certification path to be invalid and throw a 
+	<TT>CertPathValidatorException</TT>. 
+<!-- (The next paragraph confuses readers - too many details too early.
+      Perhaps mention this later in the PKIXCertPathValidatorResult section)
+	<p>In addition, an X.509
+	<code>CertPath</code> may not contain the most-trusted CA certificate
+        used to anchor the path. However, the <code>getTrustedCert</code> method of 
+        a <code><a href="#PKIXCertPathValidatorResult">PKIXCertPathValidatorResult</a></code>
+        returns the most-trusted CA certificate (or <code>null</code> if not applicable)
+        used by a PKIX <code>CertPathValidator</code> to anchor the path. The PKIX 
+        classes are discussed more in the <A HREF="#PKIXClasses">PKIX Classes</A> 
+	section.--><br><br>
+    <LI><P>One or more encodings <BR><BR>Each
+	<code>CertPath</code> object supports one
+	or more encodings. These are external encoded forms for the
+	certification path, used when a standard representation of the path
+	is needed outside the Java Virtual Machine (as when transmitting the
+	path over a network to some other party). Each path can be encoded
+	in a default format, the bytes of which are returned using the
+	method:<BR><BR><pre>    public abstract byte[] getEncoded()</pre>
+	Alternatively, the
+	<TT>getEncoded(String)</TT> method returns a specific supported encoding by
+	specifying the encoding format as a <TT>String </TT>(ex: &quot;PKCS7&quot;).
+	A list of <A HREF="#AppA">standard encoding formats</A> are
+	defined in Appendix A. <BR><BR>
+	<pre>    public abstract byte[] getEncoded(String encoding)</pre>
+	Also, the <TT>getEncodings</TT> method returns an
+	iterator over the supported encoding format <TT>String</TT>s (the
+	default encoding format is returned first): <BR><BR>
+	<pre>    public abstract Iterator getEncodings()</pre></P>
+</UL>
+<p>All <code>CertPath</code> objects are also <code>Serializable</code>. 
+<code>CertPath</code> objects are resolved into an alternate 
+<code><a href="../../../api/java/security/cert/CertPath.CertPathRep.html">CertPathRep</a></code> object during 
+serialization. This allows a <code>CertPath</code> object to be serialized 
+into an equivalent representation regardless of its underlying implementation.
+<P><code>CertPath</code> objects are
+generated from an encoded byte array or list of <code>Certificate</code>s
+using a <code><A HREF="#CertificateFactory">CertificateFactory</A></code>.
+Alternatively, a <code>CertPathBuilder</code>
+may be used to try to find a <code>CertPath</code>
+from a most-trusted CA to a particular subject. Once a <code>CertPath</code>
+object has been created, it may be validated by passing it to the
+<code>validate</code> method of
+<code>CertPathValidator</code>. Each of
+these concepts are explained in more detail in subsequent sections.</P>
+<H2><A NAME="CertificateFactory"></A>The
+CertificateFactory Class</H2>
+<P>The <TT><A HREF="../CryptoSpec.html#CertificateFactory">CertificateFactory</A></TT>
+class is an <A HREF="../CryptoSpec.html#Engine">engine
+class</A> that defines the functionality of a certificate factory.
+In releases prior to J2SDK, v 1.4 it was used to generate 
+<code>Certificate</code> and <code>CRL</code> objects. It has been enhanced 
+in J2SDK, v 1.4 to also be used to generate certification path
+(<TT><A HREF="#CertPath">CertPath</A></TT>) objects.
+A <TT>CertificateFactory</TT> should not be confused with a
+<TT>CertPathBuilder</TT>. A <TT><A HREF="#CertPathBuilder">CertPathBuilder</A></TT>
+(discussed later) is used to discover or find a certification path
+when one does not exist. In contrast, a <TT>CertificateFactory</TT>
+is used when a certification path has already been discovered and the
+caller needs to instantiate a <TT>CertPath</TT> object from its
+contents which exist in a different form such as an encoded byte array 
+or an array of <code>Certificate</code>s. 
+</P>
+<blockquote>
+	<H3>
+	Creating a CertificateFactory Object</H3>
+	<P>See the <A HREF="../CryptoSpec.html#CertificateFactory"><code>CertificateFactory</code></A>
+	section in the Java Cryptography Architecture for details on
+	creating a <code>CertificateFactory</code>
+	object.</P>
+	<H3>
+	Generating CertPath Objects</H3>
+	<P>A <TT>CertificateFactory</TT>
+	instance generates <TT>CertPath</TT> objects from a <code>List</code>
+	of <TT>Certificate</TT> objects or from an <code>InputStream</code>
+	that contains the encoded form of a <code>CertPath</code>.
+	Just like a <code>CertPath</code>, each
+	<TT>CertificateFactory</TT> supports a default encoding format for
+	certification paths (ex: PKCS#7). To generate a <code>CertPath</code>
+	object and initialize it with the data read from an input stream (in
+	the default encoding format), use the <TT>generateCertPath</TT>
+	method: 
+	</P>
+	<pre>    public final CertPath generateCertPath(InputStream inStream)</pre>
+	<P>or from a particular encoding
+	format: 
+	</P>
+ 	<pre>
+    public final CertPath generateCertPath(InputStream inStream, 
+    					   String encoding)</pre>
+	<P>To find out what encoding formats
+	are supported, use the <TT>getCertPathEncodings</TT> method (the
+	default encoding is returned first):</P>
+	<pre>    public final Iterator getCertPathEncodings()</pre>
+	<P>To generate a certification path
+	object from a <TT>List</TT> of <TT>Certificate</TT> objects, use the
+	following method: 
+	</P>
+	<pre>    public final CertPath generateCertPath(List certificates)</pre>
+	<P>A <code>CertificateFactory</code>
+	always returns <TT>CertPath</TT> objects that consist of
+	<code>Certificate</code>s that are of the
+	same type as the factory. For example, a <TT>CertificateFactory</TT>
+	of type X.509 returns <TT>CertPath</TT> objects consisting of
+	certificates that are an instance of
+	<TT>java.security.cert.X509Certificate</TT>. 
+	</P>
+	<P>The following code sample
+	illustrates generating a certification path from a PKCS#7 encoded
+	certificate reply stored in a file: 
+	</P>
+	<pre>
+    // open an input stream to the file
+    FileInputStream fis = new FileInputStream(filename);
+    // instantiate a CertificateFactory for X.509
+    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+    // extract the certification path from
+    // the PKCS7 SignedData structure
+    CertPath cp = cf.generateCertPath(fis, "PKCS7");
+    // print each certificate in the path
+    List certs = cp.getCertificates();
+    Iterator i = certs.iterator();
+    while (i.hasNext()) {
+        X509Certificate cert = (X509Certificate) i.next();
+        System.out.println(cert);
+    }
+	</pre>
+	Here's another code sample that fetches a certificate chain from
+        a <code>KeyStore</code> and converts it to a <code>CertPath</code> 
+	using a <code>CertificateFactory</code>:
+	<pre>
+    // instantiate a KeyStore with type JKS
+    KeyStore ks = KeyStore.getInstance("JKS");
+    // load the contents of the KeyStore
+    ks.load(new FileInputStream("./keystore"),
+    	"password".toCharArray());
+    // fetch certificate chain stored with alias "sean"
+    Certificate[] certArray = ks.getCertificateChain("sean");
+    // convert chain to a List
+    List certList = Arrays.asList(certArray);
+    // instantiate a CertificateFactory for X.509
+    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+    // extract the certification path from
+    // the List of Certificates
+    CertPath cp = cf.generateCertPath(certList);
+	</pre>
+
+</blockquote>
+<P STYLE="margin-left: 0.47in">Note
+that there is an existing method in <code>CertificateFactory</code>
+named <code>generateCertificates</code>
+that parses a sequence of <code>Certificate</code>s.
+For encodings consisting of multiple certificates, use
+<code>generateCertificates</code> when you
+want to parse a collection of possibly unrelated certificates.
+Otherwise, use <code>generateCertPath</code>
+when you want to generate a <code>CertPath</code>
+and subsequently validate it with a <code>CertPathValidator</code>
+(discussed later).
+</P>
+    <H2><A NAME="CertPathParameters"></A>The CertPathParameters Interface</H2>
+    <P>The <TT>CertPathParameters</TT> interface is a transparent 
+    representation of the set of parameters used with a particular 
+    certification path builder or validation algorithm. Its main purpose is to 
+    group (and provide type safety for) all certification path parameter 
+    specifications. The <code>CertPathParameters</code> interface extends the 
+    <code>Cloneable</code> interface and defines a <code>clone()</code>
+    method that does not throw an exception. All concrete implementations of 
+    this interface should implement and override the <code>Object.clone()</code> 
+    method, if necessary. This allows applications to clone any 
+    <code>CertPathParameters</code> object.</P>
+    <P>Objects implementing the <TT>CertPathParameters</TT> interface are passed 
+    as arguments to methods of the 
+    <TT><A HREF="#CertPathValidator">CertPathValidator</A></TT> and 
+    <TT><A HREF="#CertPathBuilder">CertPathBuilder</A></TT> classes. Typically,
+    a concrete implementation of the <code>CertPathParameters</code> interface
+    will hold a set of input parameters specific to a particular certification
+    path build or validation algorithm. For example, the 
+    <code>PKIXParameters</code> class is an implementation of the 
+    <code>CertPathParameters</code> interface that holds a set of
+    input parameters for the PKIX certification path validation
+    algorithm. One such parameter is the set of most-trusted CAs that the
+    caller trusts for anchoring the validation process. This parameter among
+    others is discussed in more detail in the section discussing the
+    <code><a href=#PKIXParameters>PKIXParameters</a></code> class.
+
+<H2><A NAME="ValidationClasses"></A>Certification
+Path Validation Classes</H2>
+<P>The Java Certification Path API
+includes classes and interfaces for validating certification paths.
+An application uses an instance of the <TT>CertPathValidator</TT>
+class to validate a <TT>CertPath</TT> object. If successful, the
+result of the validation algorithm is returned in an object
+implementing the <TT>CertPathValidatorResult</TT> interface. 
+</P>
+<H2><A NAME="CertPathValidator"></A>
+The CertPathValidator Class</H2>
+<P>The
+<TT>CertPathValidator</TT> class is an <A HREF="../CryptoSpec.html#Engine">engine
+class</A> used to validate a certification path.</P>
+<blockquote>
+<H3>
+Creating a CertPathValidator Object</H3>
+<P>As with all
+engine classes, the way to get a <TT>CertPathValidator</TT> object
+for a particular validation algorithm is to
+call one of the <TT>getInstance</TT> static factory methods on the
+<TT>CertPathValidator</TT> class: 
+</P>
+<pre>
+	public static CertPathValidator getInstance(String algorithm)
+    	public static CertPathValidator getInstance(String algorithm, 
+						    String provider)
+    	public static CertPathValidator getInstance(String algorithm, 
+						    Provider provider)
+</pre>
+The <code>algorithm</code> parameter is the name of a certification
+path validation algorithm (for example, "PKIX"). Standard 
+<code>CertPathValidator</code> algorithm names are listed in
+<a href=#CPVAlgs>Appendix A</a>.
+<H3>
+Validating a Certification Path</H3>
+<P>Once a
+<TT>CertPathValidator</TT> object is created, paths can be validated
+by calling the <TT>validate</TT> method, passing it the certification
+path to be validated and a set of algorithm-specific parameters:
+</P>
+<pre>
+	public final CertPathValidatorResult 
+	    	validate(CertPath certPath, CertPathParameters params)
+		throws CertPathValidatorException, 
+		       InvalidAlgorithmParameterException
+</pre>
+<P>If the
+validation algorithm is successful, the result is returned in an
+object implementing the <TT><A HREF="#CertPathValidatorResult">CertPathValidatorResult</A></TT>
+interface. Otherwise, a <TT>CertPathValidatorException</TT> is
+thrown. The <TT>CertPathValidatorException</TT> contains methods that
+return the <TT>CertPath</TT>, and if relevant, the index of the certificate that
+caused the algorithm to fail and the root exception or
+cause of the failure. 
+</P>
+<P>Note that the <TT>CertPath</TT>
+and <code>CertPathParameters</code> passed to the <TT>validate</TT> 
+method must be of a type that is supported by the validation algorithm. 
+Otherwise, an <code>InvalidAlgorithmParameterException</code> is thrown.
+For example, a <TT>CertPathValidator</TT> instance that implements the PKIX
+algorithm validates <TT>CertPath</TT> objects of type X.509 and
+<code>CertPathParameters</code> that are an instance of <code>PKIXParameters</code>.</P>
+</blockquote>
+<H2><A NAME="CertPathValidatorResult"></A>
+The CertPathValidatorResult Interface</H2>
+<P>The
+<TT>CertPathValidatorResult</TT> interface is a transparent
+representation of the successful result or output of a certification path
+validation algorithm. Its main purpose is to group (and provide type
+safety for) all validation results. Like the <code>CertPathParameters</code>
+interface, <code>CertPathValidatorResult</code>
+extends <code>Cloneable</code> and defines
+a <code>clone()</code> method that does not
+throw an exception. This allows applications to clone any
+<code>CertPathValidatorResult</code>
+object. 
+</P>
+<P>Objects
+implementing the <TT>CertPathValidatorResult</TT> interface are
+returned by the <TT>validate</TT> method of 
+<TT><A HREF="#CertPathValidator">CertPathValidator</A></TT>
+(only when successful; otherwise a 
+<code>CertPathValidatorException</code> is thrown with a description of
+the failure).
+Typically, a concrete implementation of the <code>CertPathValidatorResult</code> 
+interface will hold a set of output parameters specific to a particular 
+certification path validation algorithm. For example, the 
+<code>PKIXCertPathValidatorResult</code> class is an implementation of the 
+<code>CertPathValidatorResult</code> interface which contains methods to 
+get the output parameters of the PKIX certification path validation algorithm. 
+One such parameter is the valid policy tree. This parameter among others is 
+discussed in more detail in the section discussing the 
+<code><a href=#PKIXCertPathValidatorResult>PKIXCertPathValidatorResult</a></code> 
+class. 
+<p>Here's a simplified code sample that illustrates how to create a 
+<code>CertPathValidator</code> and use it to validate a certification path.
+The sample assumes that the <code>CertPath</code> and 
+<code>CertPathParameters</code> objects which are passed to the 
+<code>validate</code> method have been previously created; a more complete
+example will be illustrated in the section describing the PKIX classes.
+<pre>
+    // create CertPathValidator that implements the "PKIX" algorithm
+    CertPathValidator cpv = null;
+    try {
+        cpv = CertPathValidator.getInstance("PKIX");
+    } catch (NoSuchAlgorithmException nsae) {
+	System.err.println(nsae);
+	System.exit(1);
+    }
+    // validate certification path ("cp") with specified parameters ("params")
+    try {
+        CertPathValidatorResult cpvResult = cpv.validate(cp, params);
+    } catch (InvalidAlgorithmParameterException iape) {
+	System.err.println("validation failed: " + iape);
+	System.exit(1);
+    } catch (CertPathValidatorException cpve) {
+	System.err.println("validation failed: " + cpve);
+	System.err.println("index of certificate that caused exception: "
+		+ cpve.getIndex());
+	System.exit(1);
+    }
+</pre>
+<H2><A NAME="BuildingClasses"></A>Certification
+Path Building Classes</H2>
+<P>The Java Certification Path API
+includes classes for building (or discovering) certification paths.
+An application uses an instance of the <TT>CertPathBuilder</TT> class
+to build a <TT>CertPath</TT> object. If successful, the result of the
+build is returned in an object implementing the <TT>CertPathBuilderResult</TT>
+interface. 
+</P>
+<H2><A NAME="CertPathBuilder"></A>
+The CertPathBuilder Class</H2>
+<P>The
+<TT>CertPathBuilder</TT> class is an <A HREF="../CryptoSpec.html#Engine">engine
+class</A> used to build a certification path. 
+</P>
+<blockquote>
+<H3>
+Creating a CertPathBuilder Object</H3>
+<P>As with all
+engine classes, the way to get a <TT>CertPathBuilder</TT> object for
+a particular build algorithm is to call one of the
+<TT>getInstance</TT> static factory method on the <TT>CertPathBuilder</TT>
+class: 
+</P>
+<pre>
+	public static CertPathBuilder getInstance(String algorithm)
+	public static CertPathBuilder getInstance(String algorithm, 
+						  String provider)
+    	public static CertPathBuilder getInstance(String algorithm, 
+					          Provider provider)
+</pre>
+The <code>algorithm</code> parameter is the name of a certification
+path builder algorithm (for example, "PKIX"). Standard 
+<code>CertPathBuilder</code> algorithm names are listed in
+<a href=#CPBAlgs>Appendix A</a>.
+<H3>
+Building a Certification Path</H3>
+<P>Once a
+<TT>CertPathBuilder</TT> object is created, paths can be constructed
+by calling the <TT>build</TT> method, passing it an
+algorithm-specific parameter specification:
+</P>
+<pre>
+	public final CertPathBuilderResult build(CertPathParameters params)
+		throws CertPathBuilderException, 
+		       InvalidAlgorithmParameterException
+</pre>
+<P>If the build
+algorithm is successful, the result is returned in an object
+implementing the <TT><A HREF="#CertPathBuilderResult">CertPathBuilderResult</A></TT>
+interface. Otherwise, a <TT>CertPathBuilderException</TT> is thrown
+containing information about the failure; for example, the underlying
+exception (if any) and an error message.</P>
+<P>Note that the <code>CertPathParameters</code> passed to the <TT>build</TT> 
+method must be of a type that is supported by the build algorithm. 
+Otherwise, an <code>InvalidAlgorithmParameterException</code> is thrown.
+</blockquote>
+</blockquote>
+<H2><A NAME="CertPathBuilderResult"></A>
+The CertPathBuilderResult Interface</H2>
+<P>The
+<TT>CertPathBuilderResult</TT> interface is a transparent
+representation of the result or output of a certification path
+builder algorithm. This interface contains a method to return the
+certification path that has been successfully built: 
+</P>
+<pre>
+	public CertPath getCertPath()
+</pre>
+<P>The purpose of
+the <TT>CertPathBuilderResult</TT> interface is to group (and provide
+type safety for) all build results. Like the
+<code>CertPathValidatorResult</code>
+interface, <code>CertPathBuilderResult</code>
+extends <code>Cloneable</code> and defines
+a <code>clone()</code> method that does not
+throw an exception. This allows applications to clone any
+<code>CertPathBuilderResult</code> object. 
+</P>
+<P>Objects
+implementing the <TT>CertPathBuilderResult</TT> interface are
+returned by the <TT>build</TT> method of <TT><A HREF="#CertPathBuilder">CertPathBuilder</A></TT>.</P>
+<p>Here's a simplified code sample that illustrates how to create a 
+<code>CertPathBuilder</code> and use it to build a certification path.
+The sample assumes that the <code>CertPathParameters</code> object which is 
+passed to the <code>build</code> method has been previously created; a more 
+complete example will be illustrated in the section describing the PKIX 
+classes.
+<pre>
+    // create CertPathBuilder that implements the "PKIX" algorithm
+    CertPathBuilder cpb = null;
+    try {
+        cpb = CertPathBuilder.getInstance("PKIX");
+    } catch (NoSuchAlgorithmException nsae) {
+	System.err.println(nsae);
+	System.exit(1);
+    }
+    // build certification path using specified parameters ("params")
+    try {
+        CertPathBuilderResult cpbResult = cpb.build(params);
+        CertPath cp = cpbResult.getCertPath();
+        System.out.println("build passed, path contents: " + cp);
+    } catch (InvalidAlgorithmParameterException iape) {
+	System.err.println("build failed: " + iape);
+	System.exit(1);
+    } catch (CertPathBuilderException cpbe) {
+	System.err.println("build failed: " + cpbe);
+	System.exit(1);
+    }
+</pre>
+<H2><A NAME="StorageClasses"></A>Certificate/CRL
+Storage Classes</H2>
+<P>The Java Certification Path API also
+includes the <code>CertStore</code> class
+for retrieving certificates and CRLs from a repository. This is
+useful because it allows a caller to specify the repository a
+<TT>CertPathValidator</TT> or <TT>CertPathBuilder</TT> implementation
+should use to find certificates and CRLs (see the <TT>addCertStores</TT>
+method of <TT><A HREF="#PKIXParameters">PKIXParameters</A></TT> for
+an example).
+</P>
+<P>A <TT>CertPathValidator</TT> implementation may use the <TT>CertStore</TT> 
+object that the caller specifies as a callback mechanism to fetch
+CRLs for performing revocation checks. Similarly, a <code>CertPathBuilder</code>
+may use the <code>CertStore</code> as a callback mechanism to fetch 
+certitificates and, if performing revocation checks, CRLs.
+</P>
+<H2><A NAME="CertStore"></A>
+The CertStore Class</H2>
+<P>The <TT>CertStore</TT>
+class is an <A HREF="../CryptoSpec.html#Engine">engine
+class</A> used to provide the functionality of a certificate and
+certificate revocation list (CRL) repository. It can be used by
+<TT><A HREF="#CertPathBuilder">CertPathBuilder</A></TT> and
+<TT><A HREF="#CertPathValidator">CertPathValidator</A></TT>
+implementations to find certificates and CRLs or as a general purpose
+certificate and CRL retrieval mechanism. 
+</P>
+<P>Unlike the
+<code>java.security.KeyStore</code> class,
+which provides access to a cache of private keys and trusted
+certificates, a <code>CertStore</code> is
+designed to provide access to a potentially vast repository of
+untrusted certificates and CRLs. For example, an LDAP implementation
+of <code>CertStore</code> provides access
+to certificates and CRLs stored in one or more directories using the
+LDAP protocol. 
+<p>
+All public methods of CertStore objects are thread-safe. That is, multiple 
+threads may concurrently invoke these methods on a single 
+<code>CertStore</code> object (or more than one) with no ill effects. 
+This allows a <code>CertPathBuilder</code> to search for a CRL while
+simultaneously searching for further certificates, for instance.
+</P>
+<blockquote>
+<H3>
+Creating a CertStore Object</H3>
+<P>As with all
+engine classes, the way to get a <TT>CertStore</TT> object for a
+particular repository type is to call one of the
+<TT>getInstance</TT> static factory methods on the <TT>CertStore</TT>
+class: 
+</P>
+<pre>
+	public static CertStore getInstance(String type, 
+		CertStoreParameters params)
+	public static CertStore getInstance(String type,
+		CertStoreParameters params, String provider)
+	public static CertStore getInstance(String type,
+		CertStoreParameters params, Provider provider)
+</pre>
+The <code>type</code> parameter is the name of a certificate
+repository type (for example, "LDAP"). Standard 
+<code>CertStore</code> types are listed in <a href=#CSTypes>Appendix A</a>.
+<P>The initialization parameters (<code>params</code>) are specific to the 
+repository type. For example, the initialization parameters for a 
+server-based repository may include the hostname and the port of the server. 
+An <code>InvalidAlgorithmParameterException</code> is thrown if the
+parameters are invalid for this <code>CertStore</code> type. The
+<code>getCertStoreParameters</code> method returns
+the <code>CertStoreParameters</code> that were used to initialize
+a <code>CertStore</code>:
+<pre>
+	public final CertStoreParameters getCertStoreParameters()
+</pre>
+<H3>
+Retrieving Certificates</H3>
+<P>Once you have
+created a <TT>CertStore</TT> object, you can retrieve
+certificates from the repository using the <TT>getCertificates</TT>
+method. This method takes a <TT><A HREF="#CertSelector">CertSelector</A></TT>
+(discussed in more detail later) object as an argument, which specifies a 
+set of selection criteria for determining which certificates should be 
+returned: 
+</P>
+<pre>
+	public final Collection getCertificates(CertSelector selector) 
+		throws CertStoreException
+</pre>
+<P>This method
+returns a <TT>Collection</TT> of <TT>java.security.cert.Certificate</TT>
+objects that satisfy the selection criteria. An empty <TT>Collection</TT>
+is returned if there are no matches. A <code>CertStoreException</code>
+is usually thrown if an unexpected error condition is encountered,
+such as a communications failure with a remote repository.</P>
+<P>For some
+<TT>CertStore</TT> implementations, it may not be feasible to search
+the entire repository for certificates or CRLs that match the
+specified selection criteria. In these instances, the <TT>CertStore</TT>
+implementation may use information that is specified in the selectors
+to locate certificates and CRLs. For instance, an LDAP <TT>CertStore</TT>
+may not search all entries in the directory. Instead, it may just
+search entries that are likely to contain the certificates it is
+looking for. If the <TT>CertSelector</TT> provided does not provide
+enough information for the LDAP <TT>CertStore</TT> to determine which
+entries it should look in, the LDAP <TT>CertStore</TT> may throw a
+<TT>CertStoreException</TT>.</P>
+<H3>
+Retrieving CRLs</H3>
+<P>You can also
+retrieve CRLs from the repository using the <TT>getCRLs</TT> method.
+This method takes a <TT><A HREF="#CertSelector">CRLSelector</A></TT>
+(discussed in more detail later) object as an argument, which specifies a 
+set of selection criteria for determining which CRLs should be returned: 
+</P>
+<pre>
+	public final Collection getCRLs(CRLSelector selector) 
+		throws CertStoreException
+</pre>
+<P>This method
+returns a <TT>Collection</TT> of <TT>java.security.cert.CRL</TT>
+objects that satisfy the selection criteria. An empty <TT>Collection</TT>
+is returned if there are no matches. 
+</P>
+</blockquote>
+<H2><A NAME="CertStoreParameters"></A>
+The CertStoreParameters Interface</H2>
+<P>The
+<TT>CertStoreParameters</TT> interface is a transparent
+representation of the set of parameters used with a particular
+<code>CertStore</code>.
+Its main purpose is to
+group (and provide type safety for) all certificate storage parameter
+specifications. The <code>CertStoreParameters</code> interface extends the
+<code>Cloneable</code> interface and defines a <code>clone</code> method that
+does not throw an exception. Implementations of this interface should implement
+and override the <code>Object.clone()</code> method, if necessary. This allows
+applications to clone any <code>CertStoreParameters</code> object.
+</P>
+<P>Objects
+implementing the <TT>CertStoreParameters</TT> interface are passed as
+arguments to the <TT>getInstance</TT> method of the <TT>CertStore</TT>
+class. Two classes implementing the <TT>CertStoreParameters</TT>
+interface are defined in this API: the <TT><A HREF="#LDAPCertStoreParameters">LDAPCertStoreParameters</A></TT>
+and the <TT><A HREF="#CollectionCertStoreParameters">CollectionCertStoreParameters</A></TT>
+classes. 
+</P>
+<blockquote>
+<H3><A NAME="LDAPCertStoreParameters"></A>
+The LDAPCertStoreParameters Class</H3>
+<P>The
+<TT>LDAPCertStoreParameters</TT> class is an implementation of the
+<TT>CertStoreParameters</TT> interface and holds a set of minimal
+initialization parameters (host and port number of the directory
+server) for retrieving certificates and CRLs from a <code>CertStore</code>
+of type <B>LDAP</B>.
+</P>
+<P>Please refer to
+the <TT><A HREF="../../../api/java/security/cert/LDAPCertStoreParameters.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">LDAPCertStoreParameters</SPAN></SPAN></A></TT>
+API documentation for more detailed information on this class. 
+</P>
+<H3><A NAME="CollectionCertStoreParameters"></A>
+The CollectionCertStoreParameters Class</H3>
+<P>The
+<TT>CollectionCertStoreParameters</TT> class is an implementation of
+the <TT>CertStoreParameters</TT> interface and holds a set of
+initialization parameters for retrieving certificates and CRLs from a
+<code>CertStore</code> of type <B>Collection</B>. 
+</P>
+<P>Please refer to
+the <TT><A HREF="../../../api/java/security/cert/CollectionCertStoreParameters.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">CollectionCertStoreParameters</SPAN></SPAN></A></TT>
+API documentation for more detailed information on this class.</P>
+</blockquote>
+<H2><A NAME="CertSelector"></A>
+The CertSelector and CRLSelector Interfaces</H2>
+<P>The <TT>CertSelector</TT>
+and <TT>CRLSelector</TT> interfaces are a specification of the set of
+criteria for selecting certificates and CRLs from a collection or
+large group of certificates and CRLs. The interfaces group and
+provide type safety for all selector specifications. Each selector interface
+extends <code>Cloneable</code> and defines
+a <code>clone()</code> method that does not
+throw an exception. This allows applications to clone any
+<code>CertSelector</code> or <code>CRLSelector</code>
+object.</P>
+<P>The <TT>CertSelector</TT>
+and <TT>CRLSelector</TT> interfaces each define a method named <TT>match</TT>.
+The <TT>match</TT> method takes a <TT>Certificate</TT> or <TT>CRL</TT>
+object as an argument and returns <TT>true</TT> if the object
+satisfies the selection criteria. Otherwise, it returns <TT>false</TT>.
+The <TT>match</TT> method for the <TT>CertSelector</TT> interface is
+defined as follows: 
+</P>
+<pre>
+	public boolean match(Certificate cert)
+</pre>
+<P>and for the
+<TT>CRLSelector</TT> interface: 
+</P>
+<pre>
+	public boolean match(CRL crl)
+</pre>
+<P>Typically, objects
+implementing these interfaces are passed as parameters to the
+<code>getCertificates</code> and <code>getCRLs</code>
+methods of the <code>CertStore</code>
+class. These methods return a <code>Collection</code>
+of <code>Certificate</code>s or <code>CRL</code>s
+from the <code>CertStore</code> repository
+that match the specified selection criteria. <code>CertSelector</code>s
+may also be used to specify the validation constraints on a target 
+or end-entity certificate in a certification path (see for example, the
+<code><a href="../../../api/java/security/cert/PKIXParameters.html#setTargetCertConstraints(java.security.cert.CertSelector)">PKIXParameters.setTargetCertConstraints</a></code> method.
+</P>
+<H3><A NAME="X509CertSelector"></A>
+The X509CertSelector Class</H3>
+<P>The
+<TT>X509CertSelector</TT> class is an implementation of the
+<TT>CertSelector</TT> interface that defines a set of criteria for
+selecting X.509 certificates. An <TT>X509Certificate</TT> object must
+match <I>all</I> of the specified criteria to be selected by the
+<TT>match</TT> method. The selection criteria are designed to be used
+by a <TT>CertPathBuilder</TT> implementation to discover potential
+certificates as it builds an X.509 certification path. 
+</P>
+<p>For example, the <code>setSubject</code> 
+method of <code>X509CertSelector</code> allows a PKIX 
+<code>CertPathBuilder</code> to filter out <code>X509Certificate</code>s 
+that do not match the issuer name of the preceding 
+<code>X509Certificate</code> in a partially completed chain.
+By setting this and other criteria in an
+<code>X509CertSelector</code> object, a
+<code>CertPathBuilder</code> is able to
+discard irrelevant certificates and more easily find an X.509
+certification path that meets the requirements specified in the
+<code>CertPathParameters</code> object.</P>
+<P>Please refer to
+<a href="http://www.ietf.org/rfc/rfc3280.txt">
+http://www.ietf.org/rfc/rfc3280.txt</a> 
+for definitions of the X.509 certificate extensions mentioned in this section. 
+</P>
+<blockquote>
+<H3>
+Creating an X509CertSelector Object</H3>
+<P>An
+<TT>X509CertSelector</TT> object is created by calling the default
+constructor: 
+</P>
+<pre>
+	public X509CertSelector()
+</pre>
+<P>No criteria are
+initially set (any <code>X509Certificate</code>
+will match).</P>
+<H3>
+Setting Selection Criteria</H3>
+<P>The selection
+criteria allow a caller to match on different components of an X.509
+certificate. A few of the methods for setting selection criteria are
+described here. Please refer to the <TT><A HREF="../../../api/java/security/cert/X509CertSelector.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">X509CertSelector</SPAN></SPAN></A></TT>
+API documentation for details on the other methods. 
+</P>
+<P>The <TT>setIssuer</TT>
+methods set the issuer criterion: 
+</P>
+<pre>
+	public void setIssuer(String issuerDN)
+	public void setIssuer(byte[] issuerDN)
+</pre>
+<P>The specified
+distinguished name (in <a href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a> 
+String or ASN.1 DER encoded form)
+must match the issuer distinguished name in the certificate. If null,
+any issuer distinguished name will do. 
+</P>
+<P>Similarly, the
+<TT>setSubject</TT> methods set the subject criterion: 
+</P>
+<pre>
+	public void setSubject(String subjectDN)
+	public void setSubject(byte[] subjectDN)
+</pre>
+<P>The specified
+distinguished name (in RFC 2253 String or ASN.1 DER encoded form)
+must match the subject distinguished name in the certificate. If null,
+any subject distinguished name will do. 
+<P>The
+<TT>setSerialNumber</TT> method sets the serialNumber criterion: 
+</P>
+<pre>
+	public void setSerialNumber(BigInteger serial)
+</pre>
+<P>The specified
+serial number must match the certificate serial number in the
+certificate. If null, any certificate serial number will do. 
+</P>
+<P>The
+<TT>setAuthorityKeyIdentifier</TT> method sets the
+authorityKeyIdentifier criterion: 
+</P>
+<pre>
+	public void setAuthorityKeyIdentifier(byte[] authorityKeyID)
+</pre>
+<P>The certificate
+must contain an Authority Key Identifier extension matching the
+specified value. If null, no check will be done on the
+authorityKeyIdentifier criterion. 
+</P>
+<P>The
+<TT>setCertificateValid</TT> method sets the certificateValid
+criterion: 
+</P>
+<pre>
+	public void setCertificateValid(Date certValid)
+</pre>
+<P>The specified
+date must fall within the certificate validity period for the
+certificate. If null, any date is valid. 
+</P>
+<P>The <TT>setKeyUsage</TT>
+method sets the keyUsage criterion: 
+</P>
+<pre>
+	public void setKeyUsage(boolean[] keyUsage)
+</pre>
+<P>The
+certificate's Key Usage Extension must allow the specified key usage
+values (those which are set to true). If null, no keyUsage check will
+be done. 
+</P>
+<H3>
+Getting Selection Criteria</H3>
+<P>The current
+values for each of the selection criteria can be retrieved using an
+appropriate <TT>get</TT> method. Please refer to the <TT><A HREF="../../../api/java/security/cert/X509CertSelector.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">X509CertSelector</SPAN></SPAN></A></TT>
+API documentation for further details on these methods.</P>
+<H3>Example</H3>
+<P>Here is an
+example of retrieving X.509 certificates from an LDAP <TT>CertStore</TT>
+with the <TT>X509CertSelector</TT> class. 
+</P>
+<P>First, we create the <code>LDAPCertStoreParameters</code>
+object that we will use to initialize the <code>CertStore</code> object 
+with the hostname and port of the LDAP server:
+<pre>
+	LDAPCertStoreParameters lcsp = new 
+		LDAPCertStoreParameters("ldap.sun.com", 389);
+</pre>
+<P>Next, create
+the <TT><A HREF="#CertStore">CertStore</A></TT> object, and pass
+it the <code>LDAPCertStoreParameters</code> object, as in the following 
+statement: 
+</P>
+<pre>
+	CertStore cs = CertStore.getInstance("LDAP", lcsp);
+</pre>
+<P>This call
+creates a <TT>CertStore</TT> object that retrieves certificates and
+CRLs from an LDAP repository using the schema defined in RFC 2587.
+</P>
+<P>The following block of code establishes an <code>X509CertSelector</code>
+to retrieve all unexpired (as of the current date and time)
+end-entity certificates issued to a particular subject with 1) a key
+usage that allows digital signatures, and 2) a subject alternative
+name with a specific email address: 
+</P>
+<pre>
+	X509CertSelector xcs = new X509CertSelector();
+	// select only unexpired certificates
+	xcs.setCertificateValid(new Date());
+	// select only certificates issued to
+	// 'CN=alice, O=xyz, C=us'
+	xcs.setSubject("CN=alice, O=xyz, C=us");
+	// select only end-entity certificates
+	xcs.setBasicConstraints(-2);
+	// select only certificates with a digitalSignature
+	// keyUsage bit set (set the first entry in the
+	// boolean array to true)
+	boolean[] keyUsage = {true};
+	xcs.setKeyUsage(keyUsage);
+	// select only certificates with a subjectAltName of
+	// 'alice@xyz.com' (1 is the integer value of 
+	// an RFC822Name)
+	xcs.addSubjectAlternativeName(1, "alice@xyz.com");
+</pre>
+<P>Then we pass the
+selector to the <TT>getCertificates</TT> method of our <TT>CertStore</TT>
+object that we previously created: 
+</P>
+<pre>
+	Collection certs = cs.getCertificates(xcs);
+</pre>
+<p>A PKIX <code>CertPathBuilder</code> may use similar code to help discover
+and sort through potential certificates by discarding those that do not 
+meet validation constraints or other criteria.
+</blockquote>
+<H3><A NAME="X509CRLSelector"></A>
+The X509CRLSelector Class</H3>
+<P>The
+<TT>X509CRLSelector</TT> class is an implementation of the
+<TT>CRLSelector</TT> interface that defines a set of criteria for
+selecting X.509 CRLs. An <TT>X509CRL</TT> object must match <I>all</I>
+of the specified criteria to be selected by the <TT>match</TT>
+method. The selection criteria are designed to be useful to a
+<TT>CertPathValidator</TT> or <TT>CertPathBuilder</TT> implementation
+that must retrieve CRLs from a repository to check the revocation status
+of certificates in an X.509 certification path. 
+</P>
+<P>For example, the
+<code>setDateAndTime</code> method of
+<code>X509CRLSelector</code> allows a PKIX
+<code>CertPathValidator</code> to filter
+out <code>X509CRL</code>s that have been
+issued after or expire before the time indicated. By setting this and
+other criteria in an <code>X509CRLSelector</code>
+object, it allows the <code>CertPathValidator</code>
+to discard irrelevant CRLs and more easily check if a certificate
+has been revoked.</P>
+<P>Please refer to
+<a href="http://www.ietf.org/rfc/rfc3280.txt">http://www.ietf.org/rfc/rfc3280.txt</a> 
+for definitions of the X.509 CRL fields and extensions mentioned in 
+this section. 
+</P>
+<blockquote>
+<H3>
+Creating an X509CRLSelector Object</H3>
+<P>An
+<TT>X509CRLSelector</TT> object is created by calling the default
+constructor: 
+</P>
+<pre>
+	public X509CRLSelector()
+</pre>
+<P>No criteria are
+initially set (any <code>X509CRL</code>
+will match). 
+</P>
+<H3>
+Setting Selection Criteria</H3>
+<P>The selection
+criteria allow a caller to match on different components of an X.509
+CRL. Most of the methods for setting selection criteria are
+described here. Please refer to the <TT><A HREF="../../../api/java/security/cert/X509CRLSelector.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">X509CRLSelector</SPAN></SPAN></A></TT>
+API documentation for details on the remaining methods. 
+</P>
+<P>The
+<TT>setIssuerNames</TT> method sets the issuerNames criterion: 
+</P>
+<pre>
+	public void setIssuerNames(Collection names)
+</pre>
+<P>The issuer
+distinguished name in the CRL must match at least one of the
+specified distinguished names. Each entry of the <TT>names</TT>
+argument is either a <TT>String</TT> or a byte array (representing
+the name, in RFC 2253 or ASN.1 DER encoded form, respectively). If
+null, any issuer distinguished name will do. 
+</P>
+<P>The
+<TT>setMinCRLNumber</TT> and <TT>setMaxCRLNumber</TT> methods set the
+minCRLNumber and maxCRLNumber criterion: 
+</P>
+<pre>
+	public void setMinCRLNumber(BigInteger minCRL)
+	public void setMaxCRLNumber(BigInteger maxCRL)
+</pre>
+<P>The CRL must
+have a CRL Number extension whose value is greater than or equal to
+the specified value if the <TT>setMinCRLNumber</TT> method is called,
+and less than or equal to the specified value if the <TT>setMaxCRLNumber</TT>
+method is called. If the value passed to one of these methods is
+null, the corresponding check is not done. 
+</P>
+<P>The
+<TT>setDateAndTime</TT> method sets the dateAndTime criterion:</P>
+<pre>
+	public void setDateAndTime(Date dateAndTime)
+</pre>
+<P>The specified
+date must be equal to or later than the value of the thisUpdate
+component of the CRL and earlier than the value of the nextUpdate
+component. If null, no dateAndTime check will be done. 
+</P>
+<P>The
+<TT>setCertificateChecking</TT> method sets the certificate whose
+revocation status is being checked: 
+</P>
+<pre>
+	public void setCertificateChecking(X509Certificate cert)
+</pre>
+<P>This is not a
+criterion. Rather, it is optional information that may help a
+<code>CertStore</code> find CRLs that would
+be relevant when checking revocation for the specified certificate.
+If null is specified, then no such optional information is provided.
+An application should always call this method when checking
+revocation for a particular certificate, as it may provide the
+<code>CertStore</code> with more
+information for finding the correct CRLs and filtering out
+irrelevant ones.</P>
+<H3>
+Getting Selection Criteria</H3>
+<P>The current
+values for each of the selection criteria can be retrieved using an
+appropriate <TT>get</TT> method. Please refer to the <TT><A HREF="../../../api/java/security/cert/X509CRLSelector.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">X509CRLSelector</SPAN></SPAN></A></TT><B><I>
+</I></B>API documentation for further details on these methods.</P>
+<H3>Example</H3>
+<P>Creating an
+<TT>X509CRLSelector</TT> to retrieve CRLs from an LDAP repository is
+similar to the <TT>X509CertSelector</TT> example. Suppose we want to
+retrieve all current (as of the current date and time) CRLs issued by
+a specific CA and with a minimum CRL number. First, we create an
+<TT><A HREF="#X509CRLSelector">X509CRLSelector</A></TT> object and
+call the appropriate methods to set the selection criteria: 
+</P>
+<pre>
+	X509CRLSelector xcrls = new X509CRLSelector();
+	// select CRLs satisfying current date and time
+	xcrls.setDateAndTime(new Date());
+	// select CRLs issued by 'O=xyz, C=us'
+	xcrls.addIssuerName("O=xyz, C=us");
+	// select only CRLs with a CRL number at least '2'
+	xcrls.setMinCRLNumber(new BigInteger(&quot;2&quot;));
+</pre>
+<P>Then we pass the
+selector to the <TT>getCRLs</TT> method of our <TT>CertStore</TT>
+object (created in the <TT>X509CertSelector</TT> example): 
+</P>
+<pre>
+	Collection crls = cs.getCRLs(xcrls);
+</pre>
+</blockquote>
+<H2><A NAME="PKIXClasses"></A>PKIX
+Classes</H2>
+<P>The Java Certification Path API also
+includes a set of algorithm-specific classes modelled for use with the PKIX
+certification path validation algorithm defined in
+<A HREF="http://www.ietf.org/rfc/rfc3280.txt">RFC 3280</A>: 
+<I>Public Key Infrastructure 
+Certificate and Certificate Revocation List (CRL) Profile</I>.
+<blockquote>
+<H3><A NAME="TrustAnchor"></A>The
+TrustAnchor Class</H3>
+<p>This class represents a "most-trusted CA", which is used as a trust anchor 
+for validating X.509 certification paths. A most-trusted CA
+includes the public key of the CA, the CA's name, and any constraints upon 
+the set of paths which may be validated using this key.
+These parameters can be specified in the form of a trusted 
+<code>X509Certificate</code> or as individual parameters.
+<p>All <code>TrustAnchor</code> objects are immutable and thread-safe. 
+That is, multiple threads may concurrently invoke the methods defined
+in this class on a single <code>TrustAnchor</code> object (or more than one) 
+with no ill effects. Requiring <code>TrustAnchor</code> objects to be 
+immutable and thread-safe allows them to be passed around to various pieces 
+of code without worrying about coordinating access. 
+<p>Note that although this class is described as a PKIX class it may
+be used with other X.509 certification path validation algorithms.
+<blockquote>
+<H3>
+Creating a TrustAnchor Object</H3>
+<P>To instantiate a
+<code>TrustAnchor</code> object, a
+caller must specify &quot;the most-trusted CA&quot; as a trusted
+<code>X509Certificate</code> or public key and distinguished name pair.
+The caller may also optionally specify name constraints that are
+applied to the trust anchor by the validation algorithm during 
+initialization. Note that support for name constraints on trust anchors is 
+not required by the PKIX algorithm, therefore a PKIX 
+<code>CertPathValidator</code> or <code>CertPathBuilder</code> may choose 
+not to support this parameter and instead throw an exception. Use one of 
+the following constructors to create a <code>TrustAnchor</code> object:
+<pre>
+	public TrustAnchor(X509Certificate trustedCert, 
+		byte[] nameConstraints)
+	public TrustAnchor(String caName, PublicKey pubKey, 
+		byte[] nameConstraints)
+</pre>
+<p>The <code>nameConstraints</code> parameter is specifed as a byte array
+containing the ASN.1 DER encoding of a NameConstraints extension. An
+<code>IllegalArgumentException</code> is thrown if the name
+constraints cannot be decoded (are not formatted correctly).
+<H3>
+Getting Parameter Values</H3>
+<p>Each of the parameters can be retrieved using a corresponding get method:
+<pre>
+	public final X509Certificate getTrustedCert()
+	public final String getCAName()
+	public final PublicKey getCAPublicKey()
+	public final byte[] getNameConstraints()
+</pre>
+Note that the <code>getTrustedCert</code> method returns <code>null</code>
+if the trust anchor was specified as a public key and name pair. Likewise,
+the <code>getCAName</code> and <code>getCAPublicKey</code> methods return
+<code>null</code> if the trust anchor was specified as an
+<code>X509Certificate</code>.
+</blockquote>
+<H3><A NAME="PKIXParameters"></A>The
+PKIXParameters Class</H3>
+<P>This class (which
+implements the <TT><A HREF="#CertPathParameters">CertPathParameters</A></TT>
+interface) specifies the set of input parameters defined by the PKIX
+certification path validation algorithm. It also includes a few
+additional useful parameters.</P>
+<P>An X.509
+<code>CertPath</code> object and a
+<TT>PKIXParameters</TT> object are passed as arguments to the
+<TT>validate</TT> method of a <TT><A HREF="#CertPathValidator">CertPathValidator</A></TT>
+instance implementing the PKIX algorithm. The <code>CertPathValidator</code>
+uses the parameters to initialize the PKIX certification path
+validation algorithm.</P>
+<blockquote>
+<H3>
+Creating a PKIXParameters Object</H3>
+<P>To instantiate a
+<code>PKIXParameters</code> object, a
+caller must specify &quot;the most-trusted CA(s)&quot; as defined by
+the PKIX validation algorithm. The most-trusted CAs can be specified
+using one of two constructors:
+<pre>
+	public PKIXParameters(Set trustAnchors) 
+	    throws InvalidAlgorithmParameterException
+	public PKIXParameters(KeyStore keystore)
+	    throws KeyStoreException, InvalidAlgorithmParameterException
+</pre>
+<p>The first constructor allows the caller to specify the most-trusted CAs 
+as a <code>Set</code> of <code>TrustAnchor</code> objects. Alternatively, 
+a caller can use the second constructor and specify a 
+<code>KeyStore</code> instance containing trusted certificate entries, each 
+of which will be considered as a most-trusted CA.
+<H3>
+Setting Parameter Values</H3>
+<P>Once a
+<TT>PKIXParameters</TT> object has been created, a caller can set (or
+replace the current value of) various parameters. A few of the
+methods for setting parameters are described here. Please refer to
+the <TT><A HREF="../../../api/java/security/cert/PKIXParameters.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">PKIXParameters</SPAN></SPAN></A></TT>
+API documentation for details on the other methods. 
+</P>
+<P>The
+<TT>setInitialPolicies</TT> method sets the initial policy
+identifiers, as specified by the PKIX validation algorithm. 
+The elements of the <TT>Set</TT>
+are object identifiers (OIDs) represented as a <TT>String</TT>.
+If the <code>initialPolicies</code> parameter is null or not set,
+any policy is acceptable:</P>
+<pre>
+	public void setInitialPolicies(Set initialPolicies)
+</pre>
+<P>The <TT>setDate</TT>
+method sets the time for which the validity of the path should be
+determined. If the <TT>date</TT> parameter
+is not set or is null, the current date is used: 
+</P>
+<pre>
+	public void setDate(Date date)
+</pre>
+<P>The
+<TT>setPolicyMappingInhibited</TT> method sets the value of the
+policy mapping inhibited flag. The default value for the flag, if not
+specified, is false: 
+</P>
+<pre>
+	public void setPolicyMappingInhibited(boolean val)
+</pre>
+<P>The
+<TT>setExplicitPolicyRequired</TT> method sets the value of the
+explicit policy required flag. The default value for the flag, if not
+specified, is false: 
+</P>
+<pre>
+	public void setExplicitPolicyRequired(boolean val)
+</pre>
+<P>The
+<TT>setAnyPolicyInhibited</TT> method sets the value of the
+any policy inhibited flag. The default value for the flag, if not
+specified, is false: 
+</P>
+<pre>
+	public void setAnyPolicyInhibited(boolean val)
+</pre>
+<P>The
+<TT>setTargetCertConstraints</TT> method allows the caller to set
+constraints on the target or end-entity certificate. For example, the caller can
+specify that the target certificate must contain a specific subject
+name. The constraints are specified as a <code>CertSelector</code>
+object. If the <code>selector</code> parameter is null or not set, 
+no constraints are defined on the target certificate: 
+</P>
+<pre>
+	public void setTargetCertConstraints(CertSelector selector)
+</pre>
+<P>The
+<TT>setCertStores</TT> method allows a caller to specify a <code>List</code>
+of <TT>CertStore</TT> objects that will be used by a PKIX
+implementation of <TT>CertPathValidator</TT>
+to find CRLs for path validation.
+This provides an extensible mechanism for specifying where to locate
+CRLs. The <TT>setCertStores</TT> method takes a <code>List</code>
+of <TT>CertStore</TT> objects as a parameter. The first <TT>CertStore</TT>s
+in the list may be preferred to those that appear later. 
+</P>
+<pre>
+	public void setCertStores(List stores)
+</pre>
+<P>The
+<TT>setCertPathCheckers</TT> method allows a caller to extend the
+PKIX validation algorithm by creating implementation-specific
+certification path checkers. For example, this mechanism can be used
+to process private certificate extensions. The <TT>setCertPathCheckers</TT>
+method takes a list of <TT><A HREF="#PKIXCertPathChecker">PKIXCertPathChecker</A></TT>
+(discussed later) objects as a parameter:</P>
+<pre>
+	public void setCertPathCheckers(List checkers)
+</pre>
+<P>The
+<TT>setRevocationEnabled</TT> method allows a caller to disable
+revocation checking. Revocation checking is enabled by default, since
+it is a required check of the PKIX validation algorithm. However,
+PKIX does not define how revocation should be checked. An
+implementation may use CRLs or OCSP, for example. This method allows
+the caller to disable the implementation's default revocation
+checking mechanism if it is not appropriate. A different revocation
+checking mechanism can then be specified by calling the
+<TT>setCertPathCheckers</TT> method, and passing it a
+<code>PKIXCertPathChecker</code> that
+implements the alternate mechanism.</P>
+<pre>
+	public void setRevocationEnabled(boolean val)
+</pre>
+<P>The
+<TT>setPolicyQualifiersRejected</TT> method allows a caller to enable
+or disable policy qualifier processing. When a <TT>PKIXParameters</TT>
+object is created, this flag is set to <TT>true</TT>. This setting
+reflects the most common (and simplest) strategy for processing
+policy qualifiers. Applications that want to use a more sophisticated
+policy must set this flag to <TT>false</TT>.</P>
+<pre>
+	public void setPolicyQualifiersRejected(boolean qualifiersRejected)
+</pre>
+<H3>
+Getting Parameter Values</H3>
+<P>The current
+values for each of the parameters can be retrieved using an
+appropriate <TT>get</TT> method. Please refer to the <TT><A HREF="../../../api/java/security/cert/PKIXParameters.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">PKIXParameters</SPAN></SPAN></A></TT>
+API documentation for further details on these methods. 
+</P>
+</blockquote>
+<H3><A NAME="PKIXCertPathValidatorResult"></A>
+The PKIXCertPathValidatorResult Class</H3>
+<P>This class
+(which implements the <TT><A HREF="#CertPathValidatorResult">CertPathValidatorResult</A></TT>
+interface) represents the result of the PKIX certification path
+validation algorithm.&nbsp; It holds the valid policy tree
+and subject public key resulting from the validation algorithm, and
+includes methods (<code>getPolicyTree()</code> and <code>getPublicKey()</code>)
+for returning them. Instances of <TT>PKIXCertPathValidatorResult</TT> are 
+returned by the <TT>validate</TT> method of 
+<TT><A HREF="#CertPathValidator">CertPathValidator</A></TT>
+objects implementing the PKIX algorithm. 
+</P>
+<P>Please refer to
+the <TT><A HREF="../../../api/java/security/cert/PKIXCertPathValidatorResult.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">PKIXCertPathValidatorResult</SPAN></SPAN></A></TT>
+API documentation for more detailed information on this class.</P>
+<H3><A NAME="PolicyNode"></A>
+The PolicyNode Interface and PolicyQualifierInfo Class</H3>
+<p>The PKIX validation algorithm defines several outputs related to
+certificate policy processing. Most applications will not need to use these
+outputs, but all providers that implement the PKIX validation or building
+algorithm must support them.
+<p>The <code>PolicyNode</code> interface represents a node of a valid policy tree
+resulting from a successful execution of the PKIX certification path validation. An
+application can obtain the root of a valid policy tree using the <code>getPolicyTree</code>
+method of <code>PKIXCertPathValidatorResult</code>. Policy Trees are discussed in
+more detail in the 
+<a href="http://www.ietf.org/rfc/rfc3280.txt">
+PKIX Certificate and CRL Profile</a>. 
+
+<p>The <code>getPolicyQualifiers</code> method of <code>PolicyNode</code> returns
+a <code>Set</code> of <code>PolicyQualifierInfo</code> objects, each of which
+represents a policy qualifier contained in the Certificate Policies extension of
+the relevant certificate that this policy applies to.
+<p>Most applications will not need to examine the valid policy tree and
+policy qualifiers. 
+They can achieve their policy processing goals by setting the
+policy-related parameters in <code>PKIXParameters</code>. However, the valid 
+policy tree is available for more sophisticated applications, especially
+those that process policy qualifiers. 
+<p>Please refer to the <code><a href="../../../api/java/security/cert/PolicyNode.html">
+PolicyNode</a></code> and <code><a href="../../../api/java/security/cert/PolicyQualifierInfo.html">
+PolicyQualifierInfo</a></code> API documentation for more detailed information on
+these classes.
+<H3>Example of Validating a Certification
+Path using the PKIX algorithm</H3>
+<P>This is an
+example of validating a certification path with the PKIX validation
+algorithm. The example ignores most of the exception handling and assumes 
+that the certification path and public key of the trust anchor have already 
+been created. 
+<p>First, create the 
+<TT><A HREF="#CertPathValidator">CertPathValidator</A></TT>,
+as in the following line: 
+</P>
+<pre>
+    CertPathValidator cpv = CertPathValidator.getInstance(&quot;PKIX&quot;);
+</pre>
+<P>The next step is
+to create a <TT><A HREF="#TrustAnchor">TrustAnchor</A></TT>
+object. This will be used as an anchor for validating the certification 
+path. In this example, the most-trusted CA is specified as
+a public key and name (name constraints are not applied and are specified 
+as <code>null</code>): 
+<pre>
+    TrustAnchor anchor = new TrustAnchor("O=xyz,C=us", pubkey, null);
+</pre>
+<P>The next step is
+to create a <TT><A HREF="#PKIXParameters">PKIXParameters</A></TT>
+object. This will be used to populate the parameters used by the PKIX
+algorithm.&nbsp;In this example, we pass to the constructor a 
+<code>Set</code> containing a single element - the 
+<code>TrustAnchor</code> we created in the previous step:
+</P>
+<pre>
+    PKIXParameters params = new PKIXParameters(Collections.singleton(anchor));
+</pre>
+<P>Next, we
+populate the parameters object with constraints or other parameters
+used by the validation algorithm. In this example, we enable the
+explicitPolicyRequired flag and specify a set of initial policy OIDs
+(the contents of the set are not shown):
+</P>
+<pre>
+    // set other PKIX parameters here
+    params.setExplicitPolicyRequired(true);
+    params.setInitialPolicies(policyIds);
+</pre>
+<P>The final step is
+to validate the certification path using the input parameter set we
+have created: 
+</P>
+<pre>
+    try {
+        PKIXCertPathValidatorResult result =
+            (PKIXCertPathValidatorResult) cpv.validate(certPath, params);
+        PolicyNode policyTree = result.getPolicyTree();
+        PublicKey subjectPublicKey = result.getPublicKey();
+    } catch (CertPathValidatorException cpve) {
+        System.out.println("Validation failure, cert[" 
+            + cpve.getIndex() + "] :" + cpve.getMessage());
+    }
+</pre>
+<P>If the validation algorithm
+is successful, the policy tree and subject public key resulting from
+the validation algorithm are obtained using the <code>getPolicyTree</code>
+and <code>getPublicKey</code> methods of <code>PKIXCertPathValidatorResult</code>.
+<P>Otherwise, a
+<TT>CertPathValidatorException</TT> is thrown and the caller can
+catch the exception and print some details about the failure, such as
+the error message and the index of the certificate that caused the failure.
+<H3><A NAME="PKIXBuilderParameters"></A>The
+PKIXBuilderParameters Class</H3>
+<P>This class (which
+extends the <TT><A HREF="#PKIXParameters">PKIXParameters</A></TT>
+class) specifies the set of parameters to be used with
+<A HREF="#CertPathBuilder"><TT>CertPathBuilder</TT>s</A> that build
+certification paths validated against the PKIX certification path
+validation algorithm. 
+</P>
+<P>A
+<TT>PKIXBuilderParameters</TT> object is passed as an argument to the
+<TT>build</TT> method of a <TT><A HREF="#CertPathBuilder">CertPathBuilder</A></TT>
+instance implementing the PKIX algorithm. All PKIX <TT>CertPathBuilder</TT>s
+<I>must</I> return certification paths which have been validated
+according to the PKIX certification path validation algorithm. 
+<p>Please note that
+the mechanism that a PKIX <code>CertPathBuilder</code> uses to validate a
+constructed path is an implementation detail. For example, an 
+implementation might attempt to first build a path with minimal validation 
+and then fully validate it using an instance of a PKIX 
+<code>CertPathValidator</code>, whereas a more efficient implementation 
+may validate more of the path as it is building it, and backtrack to 
+previous stages if it encounters validation failures or dead-ends.
+</P>
+<blockquote>
+<H3>
+Creating a PKIXBuilderParameters Object</H3>
+<P>Creating a
+<TT>PKIXBuilderParameters</TT> object is similar to creating a
+<TT>PKIXParameters</TT> object. However, a caller <I>must</I> specify
+constraints on the target or end-entity certificate when creating a
+<TT>PKIXBuilderParameters</TT> object. These constraints should
+provide the <code>CertPathBuilder</code>
+with enough information to find the target certificate. The
+constraints are specified as a <code>CertSelector</code>
+object. Use one of the following constructors to create a
+<TT>PKIXBuilderParameters</TT> object: 
+</P>
+<pre>
+	public PKIXBuilderParameters(Set trustAnchors, 
+		CertSelector targetConstraints)
+		throws InvalidAlgorithmParameterException
+	public PKIXBuilderParameters(KeyStore keystore, 
+		CertSelector targetConstraints) 
+		throws KeyStoreException, InvalidAlgorithmParameterException
+						
+</pre>
+<H3>
+Getting/Setting Parameter Values</H3>
+<P>The
+<TT>PKIXBuilderParameters</TT> class inherits all of the parameters
+that can be set in the <TT>PKIXParameters</TT> class. In addition,
+the <TT>setMaxPathLength</TT> method can be called to place a limit
+on the maximum number of certificates in a certification path: 
+</P>
+<pre>
+	public void setMaxPathLength(int maxPathLength)
+</pre>
+<P>The
+<TT>maxPathLength</TT> parameter specifies the maximum number of 
+non-self-issued intermediate certificates that may exist in a certification 
+path. A <TT>CertPathBuilder</TT> instance implementing the PKIX algorithm
+must not build paths longer than the length specified. If the value
+is 0, the path can only contain a single certificate. If
+the value is -1, the path length is unconstrained (i.e., there is no
+maximum). The default maximum path length, if not specified, is 5.
+This method is useful to prevent the <code>CertPathBuilder</code> from 
+spending resources and time constructing long paths that may or may not 
+meet the caller's requirements.</P>
+<P>If any of the CA
+certificates in the path contain a Basic Constraints extension, the
+value of the pathLenConstraint component of the extension overrides
+the value of the&nbsp; <TT>maxPathLength</TT> parameter whenever the
+result is a certification path of smaller length. There is also a 
+corresponding <code>getMaxPathLength</code> method for retrieving this 
+parameter:
+<pre>
+	public int getMaxPathLength()
+</pre>
+<P>Also, the <TT>setCertStores</TT> method (inherited from the
+<code>PKIXParameters</code> class) is typically used by a
+PKIX implementation of <TT>CertPathBuilder</TT> to find 
+Certificates for path construction as well as finding CRLs for path 
+validation. This provides an extensible mechanism for specifying where to 
+locate Certificates and CRLs. 
+</P>
+</blockquote>
+<H3><A NAME="PKIXCertPathBuilderResult"></A>
+The PKIXCertPathBuilderResult Class</H3>
+<P>This class
+(which extends the <TT>PKIXCertPathValidatorResult</TT> class and
+implements the <TT><A HREF="#CertPathBuilderResult">CertPathBuilderResult</A></TT>
+interface) represents the successful result of the PKIX certification path
+construction algorithm.&nbsp; Instances of <TT>PKIXCertPathBuilderResult</TT>
+are returned by the <TT>build</TT> method of <TT><A HREF="#CertPathBuilder">CertPathBuilder</A></TT>
+objects implementing the PKIX algorithm. 
+</P>
+<P>The <TT>getCertPath</TT>
+method of a <TT>PKIXCertPathBuilderResult</TT> instance always
+returns a <TT>CertPath</TT> object validated using the PKIX
+certification path validation algorithm. The returned <TT>CertPath</TT>
+object does not include the most-trusted CA certificate that may have
+been used to anchor the path. Instead, use the <code>getTrustAnchor</code>
+method to get the <code>Certificate</code>
+of the most-trusted CA. 
+</P>
+<P>Please refer to
+the <TT><A HREF="../../../api/java/security/cert/PKIXCertPathBuilderResult.html"><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">PKIXCertPathBuilderResult</SPAN></SPAN></A></TT>
+API documentation for more detailed information on this class.</P>
+<H3>Example of Building a Certification
+Path using the PKIX algorithm</H3>
+<P>This is an
+example of of building a certification path validated against the
+PKIX algorithm. Some details have been left out, such as exception
+handling, and the creation of the trust anchors and certificates for
+populating the <code>CertStore</code>. 
+<p>First, create the <TT><A HREF="#CertPathBuilder">CertPathBuilder</A></TT>,
+as in the following example: 
+</P>
+<pre>
+    CertPathBuilder cpb = CertPathBuilder.getInstance(&quot;PKIX&quot;);
+</pre>
+<P>This call
+creates a <TT>CertPathBuilder</TT> object that returns paths
+validated against the PKIX algorithm.
+</P>
+<P>The next step is
+to create a <TT><A HREF="#PKIXBuilderParameters">PKIXBuilderParameters</A></TT>
+object. This will be used to populate the PKIX parameters used by the
+<TT>CertPathBuilder</TT>: 
+</P>
+<pre>
+    // Create parameters object, passing it a Set of
+    // trust anchors for anchoring the path
+    // and a target subject DN.
+    X509CertSelector targetConstraints = new X509CertSelector();
+    targetConstraints.setSubject("CN=alice,O=xyz,C=us");
+    PKIXBuilderParameters params = 
+        new PKIXBuilderParameters(trustAnchors, targetConstraints);
+</pre>
+<P>The next step is
+to specify the <TT>CertStore</TT> that the <TT>CertPathBuilder</TT>
+will use to look for certificates and CRLs. For this example, we will
+populate a Collection <TT>CertStore</TT> with the certificates and
+CRLs: 
+</P>
+<pre>
+    CollectionCertStoreParameters ccsp = 
+	new CollectionCertStoreParameters(certsAndCrls);
+    CertStore store = CertStore.getInstance("Collection", ccsp);
+    params.addCertStore(store);
+</pre>
+<P>The next step is
+to build the certification path using the input parameter set we have
+created: 
+</P>
+<pre>
+    try {
+        PKIXCertPathBuilderResult result = 
+	    (PKIXCertPathBuilderResult) cpb.build(params);
+        CertPath cp = result.getCertPath();
+    } catch (CertPathBuilderException cpbe) {
+	System.out.println("build failed: " + cpbe.getMessage());
+    }
+</pre>
+<P>If the <code>CertPathBuilder</code>
+cannot build a path that meets the supplied parameters it will throw
+a <TT>CertPathBuilderException</TT>. Otherwise, the validated
+certification path can be obtained from the <TT>PKIXCertPathBuilderResult</TT>
+using the <code>getCertPath</code> method.
+</P>
+<pre>
+</pre>
+<H3><A NAME="PKIXCertPathChecker"></A>The
+PKIXCertPathChecker Class</H3>
+<P>This section
+describes a powerful class that allows a user to extend a PKIX
+<TT>CertPathValidator</TT> or <TT>CertPathBuilder</TT>
+implementation. This is an advanced feature that most users will not
+need to understand. However, anyone implementing a PKIX service
+provider should read this section.</P>
+<P>The
+<TT>PKIXCertPathChecker</TT> class is an abstract class that executes
+one or more checks on an X.509 certificate. Developers should create
+concrete implementations of the <TT>PKIXCertPathChecker</TT> class
+when it is necessary to dynamically extend a PKIX <TT>CertPathValidator</TT>
+or <TT>CertPathBuilder</TT> implementation at runtime. The following
+are a few examples of when a <TT>PKIXCertPathChecker</TT>
+implementation is useful:</P>
+<UL><UL>
+	<LI><P>If the revocation mechanism
+	supplied by a PKIX <TT>CertPathValidator</TT> or <TT>CertPathBuilder</TT>
+	implementation is not adequate. For example, a developer might
+	implement a <TT>PKIXCertPathChecker</TT> that uses OCSP (
+	<a href="http://www.ietf.org/rfc/rfc2560.txt">RFC 2560</a>)
+	to check that certificates have not been revoked.</P>
+	<LI><P>If the user wants to recognize
+	certificates containing a critical private extension. Since the
+	extension is private, it will not be recognized by the PKIX
+	<TT>CertPathValidator</TT> or <TT>CertPathBuilder</TT>
+	implementation and a <TT>CertPathValidatorException</TT> will be
+	thrown. In this case, a developer can implement a
+	<TT>PKIXCertPathChecker</TT> that recognizes and processes the
+	critical private extension.</P>
+	<LI><P>If the developer wants to record
+	information about each certificate processed for debugging or
+	display purposes.</P>
+	<LI><P>If the user wants to reject
+	certificates with certain policy qualifiers.</P>
+</UL></UL>
+<P>The
+<TT>setCertPathCheckers</TT> method of the <TT>PKIXParameters</TT>
+class allows a user to pass a <code>List</code>
+of <TT>PKIXCertPathChecker</TT> objects to a PKIX <TT>CertPathValidator</TT>
+or <TT>CertPathBuilder</TT> implementation. Each of the
+<TT>PKIXCertPathChecker</TT> objects will be called in turn, for each
+certificate processed by the PKIX <TT>CertPathValidator</TT> or
+<TT>CertPathBuilder</TT> implementation.</P>
+<blockquote>
+<H3>Creating and using a
+PKIXCertPathChecker Object</H3>
+<P>The
+<TT>PKIXCertPathChecker</TT> class does not have a public
+constructor. This is intentional, since creating an instance of
+<TT>PKIXCertPathChecker</TT> is an implementation-specific issue. For
+example, the constructor for a <TT>PKIXCertPathChecker</TT>
+implementation that uses OCSP to check a certificate's revocation
+status may require the hostname and port of the OCSP server:</P>
+<pre>
+	PKIXCertPathChecker checker = new OCSPChecker(&quot;ocsp.sun.com&quot;, 1321);
+</pre>
+<P>Once the checker
+has been instantiated, it can be added as a parameter using the
+<TT>addCertPathChecker</TT> method of the <TT>PKIXParameters</TT>
+class: 
+</P>
+<pre>
+	params.addCertPathChecker(checker);
+</pre>
+<P>Alternatively, a
+<TT>List</TT> of checkers can be added using the <TT>setCertPathCheckers</TT>
+method of the <TT>PKIXParameters</TT> class.</P>
+<H3>
+Implementing a PKIXCertPathChecker Object</H3>
+<P>The
+<TT>PKIXCertPathChecker</TT> class is abstract. It has four methods
+(<TT>check</TT>, <TT>getSupportedExtensions</TT>, <TT>init</TT>, and
+<TT>isForwardCheckingSupported</TT>) that all concrete subclasses
+must implement. 
+</P>
+<P>Implementing a
+<TT>PKIXCertPathChecker</TT> may be trivial or complex. A
+<TT>PKIXCertPathChecker</TT> implementation can be stateless or
+stateful. A stateless implementation does not maintain state between
+successive calls of the <TT>check</TT> method. For example, a
+<TT>PKIXCertPathChecker</TT> that checks that each certificate
+contains a particular policy qualifier is stateless. In contrast, a
+stateful implementation does maintain state between successive calls
+of the <TT>check</TT> method. The <TT>check</TT> method of a stateful
+implementation usually depends on the contents of prior certificates
+in the certification path. For example, a <TT>PKIXCertPathChecker</TT>
+that processes the NameConstraints extension is stateful.</P>
+<P>Also, the order
+in which the certificates processed by a service provider
+implementation are presented (passed) to a <TT>PKIXCertPathChecker</TT>
+is very important, especially if the implementation is stateful.
+Depending on the algorithm used by the service provider, the
+certificates may be presented in <I>reverse</I> or <I>forward</I>
+order. A reverse ordering means that the certificates are ordered
+from the most trusted CA (if present) to the target subject, whereas
+a forward ordering means that the certificates are ordered from the
+target subject to the most trusted CA. The order must be made known
+to the <TT>PKIXCertPathChecker</TT> implementation, so that it knows
+how to process consecutive certificates.</P>
+<blockquote>
+<H4>Initializing a
+PKIXCertPathChecker Object</H4>
+<P>The <TT>init</TT>
+method initializes the internal state of the checker:</P>
+<pre>
+	public abstract void init(boolean forward)
+</pre>
+<P>All stateful
+implementations should clear or initialize any internal state in the
+checker. This prevents a service provider implementation from calling
+a checker that is in an uninitialized state. It also allows stateful
+checkers to be reused in subsequent operations without
+reinstantiating them. The <TT>forward</TT> parameter indicates the
+order of the certificates presented to the <TT>PKIXCertPathChecker</TT>.
+If <TT>forward</TT> is <TT>true</TT>, the certificates are presented
+from target to trust anchor; if <TT>false</TT>, from trust anchor to
+target. 
+</P>
+<H4>Forward
+Checking</H4>
+<P>The
+<TT>isForwardCheckingSupported</TT> method returns a <TT>boolean</TT>
+that indicates if the <TT>PKIXCertPathChecker</TT> supports forward
+checking:</P>
+<pre>
+	public abstract boolean isForwardCheckingSupported()
+</pre>
+<P>All
+<TT>PKIXCertPathChecker</TT> implementations <I>must</I><SPAN STYLE="font-style: normal">
+support reverse checking. A <TT>PKIXCertPathChecker</TT>
+implementation </SPAN><I>may</I><SPAN STYLE="font-style: normal">
+support forward checking.</SPAN></P>
+<p>Supporting forward checking improves the efficiency of
+<code>CertPathBuilder</code>s that build forward, since it allows
+paths to be checked as they are built. However, some stateful
+<code>PKIXCertPathChecker</code>s may find it difficult or impossible
+to support forward checking.
+<H4>Supported
+Extensions</H4>
+<P>The
+<TT>getSupportedExtensions</TT> method returns an immutable <TT>Set</TT>
+of OID <TT>String</TT>s for the X.509 extensions that the
+<TT>PKIXCertPathChecker</TT> implementation supports (i.e.,
+recognizes, is able to process):</P>
+<pre>
+	public abstract Set getSupportedExtensions()
+</pre>
+<P>The method
+should return <TT>null</TT> if no extensions are processed. All
+implementations should return the <TT>Set</TT> of OID <TT>String</TT>s
+that the <TT>check</TT> method may process.</P>
+<p>A <code>CertPathBuilder</code> can use this information to
+identify certificates with unrecognized critical extensions, even
+when performing a forward build with a <code>PKIXCertPathChecker</code>
+that does not support forward checking.
+<H4>Executing the
+Check</H4>
+<P>The following
+method executes a check on the certificate: 
+</P>
+<pre>
+	public abstract void 
+	        check(Certificate cert, Collection unresolvedCritExts)
+        	throws CertPathValidatorException
+</pre>
+<P>The
+<TT>unresolvedCritExts</TT> parameter contains a collection of OIDs
+as <TT>String</TT>s. These OIDs represent the set of critical
+extensions in the certificate that have not yet been resolved by the
+certification path validation algorithm. Concrete implementations of
+the <TT>check</TT> method should remove any critical extensions that
+it processes from the <TT>unresolvedCritExts</TT> parameter. 
+</P>
+<P>If the
+certificate does not pass the check(s), a <TT>CertPathValidatorException</TT>
+should be thrown. 
+</P>
+<H4>Cloning a
+PKIXCertPathChecker 
+</H4>
+<P>The
+<TT>PKIXCertPathChecker</TT> class implements the <TT>Cloneable</TT>
+interface. All stateful <TT>PKIXCertPathChecker</TT> implementations
+must override the <TT>clone</TT> method if necessary. The default
+implementation of the <TT>clone</TT> method calls the <TT>Object.clone</TT>
+method, which performs a simple clone by copying all fields of the
+original object to the new object. A stateless implementation should
+not override the <TT>clone</TT> method. However, all stateful
+implementations must ensure that the default <TT>clone</TT> method is
+correct, and override it if necessary. For example, a
+<TT>PKIXCertPathChecker</TT> that stores state in an array must
+override the <TT>clone</TT> method to make a copy of the array,
+rather than just a reference to the array. 
+</P>
+<P>The reason that
+<TT>PKIXCertPathChecker</TT> objects are <TT>Cloneable</TT> is to
+allow a PKIX <TT>CertPathBuilder</TT> implementation to efficiently
+backtrack and try another path when a potential certification path
+reaches a dead end or point of failure. In this case, the
+implementation is able to restore prior path validation states by
+restoring the cloned objects.</P>
+</blockquote>
+<H3>Example</H3>
+<P>This is an
+example of a stateless <TT>PKIXCertPathChecker</TT> implementation.
+It checks if a private extension exists in a certificate and
+processes it according to some rules. 
+</P>
+<pre>
+	import java.security.cert.Certificate;
+	import java.security.cert.X509Certificate;
+	import java.util.Collection;
+	import java.util.Collections;
+	import java.util.Set;
+	import java.security.cert.PKIXCertPathChecker;
+	import java.security.cert.CertPathValidatorException;
+
+	public class MyChecker extends PKIXCertPathChecker {
+	    private static Set supportedExtensions =
+	        Collections.singleton(&quot;2.16.840.1.113730.1.1&quot;);
+
+	    /*
+ 	     * Initialize checker
+	     */
+	    public void init(boolean forward) 
+		throws CertPathValidatorException {
+		// nothing to initialize
+	    }
+
+	    public Set getSupportedExtensions() {        
+		return supportedExtensions;
+	    }
+
+	    public boolean isForwardCheckingSupported() {
+		return true;
+	    }
+
+	    /*
+	     * Check certificate for presence of Netscape's
+	     * private extension
+	     * with OID &quot;2.16.840.1.113730.1.1&quot;
+	     */
+	    public void check(Certificate cert, 
+			      Collection unresolvedCritExts)
+		throws CertPathValidatorException 
+	    {
+		X509Certificate xcert = (X509Certificate) cert;
+	        byte[] ext = 
+		    xcert.getExtensionValue(&quot;2.16.840.1.113730.1.1&quot;);
+		if (ext == null)
+		    return;
+
+		//
+	      // process private extension according to some 
+		// rules - if check fails, throw a 
+		// CertPathValidatorException ...
+		// {insert code here}
+
+		// remove extension from collection of unresolved 
+		// extensions (if it exists)
+		if (unresolvedCritExts != null)
+		    unresolvedCritExts.remove(&quot;2.16.840.1.113730.1.1&quot;);
+	    }
+	}
+</pre>
+
+<H3>
+How a PKIX Service Provider implementation should use a
+PKIXCertPathChecker</H3>
+<P>Each
+<TT>PKIXCertPathChecker</TT> object must be initialized by a service
+provider implementation before commencing the build or validation
+algorithm, for example:</P>
+<pre>
+	List checkers = params.getCertPathCheckers();
+	ListIterator li = checkers.listIterator();
+	while (li.hasNext()) {
+	    PKIXCertPathChecker checker = (PKIXCertPathChecker) li.next();
+	    checker.init(false);
+	}
+</pre>
+<P>For each
+certificate that it validates, the service provider implementation
+must call the <TT>check</TT> method of each <TT>PKIXCertPathChecker</TT>
+object in turn, passing it the certificate and any remaining
+unresolved critical extensions:</P>
+<pre>
+	ListIterator li = checkers.listIterator();
+	while (li.hasNext()) {   
+	    PKIXCertPathChecker checker = (PKIXCertPathChecker) li.next();
+	    checker.check(cert, unresolvedCritExts);
+	}
+</pre>
+<P>If any of the
+<TT>check</TT>s throw a <TT>CertPathValidatorException</TT>, a
+<code>CertPathValidator</code> implementation should terminate the validation
+procedure. However, a <TT>CertPathBuilder</TT> implementation may
+simply log the failure and continue to search for other potential
+paths. If all of the <TT>check</TT>s are successful, the service
+provider implementation should check that all critical extensions
+have been resolved and if not, consider the validation to have failed. 
+For example:</P>
+<pre>
+	if (unresolvedCritExts != null &&
+	    !unresolvedCritExts.isEmpty())
+	{
+            // note that a CertPathBuilder may have an enclosing
+            // try block to catch the exception below and continue on error
+	    throw new CertPathValidatorException
+		("Unrecognized Critical Extension");
+	}
+</pre>
+</P>
+<P>As discussed in
+the previous section, a <TT>CertPathBuilder</TT> implementation may
+need to backtrack when a potential certification path reaches a dead
+end or point of failure. Backtracking in this context implies
+returning to the previous certificate in the path and checking for
+other potential paths. If the <TT>CertPathBuilder</TT> implementation
+is validating the path as it is building it, it will need to restore
+the previous state of each <TT>PKIXCertPathChecker</TT><SPAN STYLE="font-style: normal">.
+It can do this by making clones of the <TT>PKIXCertPathChecker</TT>
+objects <I>before</I> each certificate is processed, for example:</SPAN></P>
+<pre>
+	/* clone checkers */
+	List newList = new ArrayList(checkers);
+	ListIterator li = newList.listIterator();
+	while (li.hasNext()) {   
+	    PKIXCertPathChecker checker = (PKIXCertPathChecker) li.next();
+	    li.set(checker.clone());
+	}
+</pre>
+</blockquote>
+<H2><A NAME="ServiceProvider"></A>Implementing
+a Service Provider</H2>
+	<P>This section is intended for
+	experienced programmers wishing to create their own provider
+	packages supplying certification path service implementations. This
+	section assumes you have read the document: <A HREF="../HowToImplAProvider.html">How
+	to Implement a Provider for the Java Cryptography Architecture</A>. 
+	</P>
+	<P>The following engine classes are
+	defined in the Java Certification Path API: 
+	</P>
+	<UL>
+		<LI><P><B><code>CertPathValidator</code>
+		</B>- used to validate certification paths 
+		</P>
+		<LI><P><B><code>CertPathBuilder</code></B>
+		- used to build certification paths 
+		</P>
+		<LI><P><B><code>CertStore</code></B>
+		- used to retrieve certificates and CRLs from a repository 
+		</P>
+	</UL>
+	<P>In addition, the pre-existing
+	<code>CertificateFactory</code> engine
+	class has been enhanced in the J2SDK, v 1.4 to support generation of 
+	certification paths. 
+	</P>
+	<P>The application interfaces supplied
+	by an engine class are implemented in terms of a &quot;Service
+	Provider Interface&quot; (SPI). The name of each SPI class is the
+	same as that of the corresponding engine class, followed by &quot;Spi&quot;.
+	For example, the SPI class corresponding to the <TT>CertPathValidator</TT>
+	engine class is the <TT>CertPathValidatorSpi</TT> class. Each SPI
+	class is abstract. To supply the implementation of a particular type
+	of service, for a specific algorithm or type, a provider must subclass the
+	corresponding SPI class and provide implementations for all the
+	abstract methods. For example, the <TT>CertStore</TT> class provides
+	access to the functionality of retrieving certificates and CRLs from
+	a repository. The actual implementation supplied in a <TT>CertStoreSpi</TT>
+	subclass would be that for a specific type of certificate
+	repository, such as LDAP. 
+	</P>
+	<H3>Steps to Implement and Integrate a Provider</H3>
+	<P>Developers should follow the
+	required <A HREF="../HowToImplAProvider.html#Steps">steps
+	listed in the <I>How To Implement A Provider for the Java
+	Cryptography Architecture </I><SPAN STYLE="font-style: normal">document.</SPAN></A>
+	Here are some additional rules to follow for certain steps: 
+	</P>
+	<UL>
+		<P><B>Step 3: Write your &quot;Master
+		Class&quot;, a subclass of Provider</B> 
+		</P>
+		<P>These are the properties that must
+		be defined for the certification path services, where the
+		algorithm name is substituted
+		for <I>algName</I>, and certstore type for <I>storeType</I>:<br><br> 
+		<UL>
+			<LI><P><TT>CertPathValidator</TT>.<I>algName</I>
+						</P>
+			<LI><P><TT>CertPathBuilder</TT>.<I>algName</I>
+						</P>
+			<LI><P><TT>CertStore</TT>.<I>storeType</I></P>
+		</UL>
+		<P>See <A HREF="#AppA">Appendix A</A>
+		for the standard names that are defined for <i>algName</i> 
+		and <i>storeType</i>. The value of 
+		each property must be the fully qualified name of the class implementing 
+		the specified algorithm, or certstore type. That is, it must be the 
+		package name followed by the class name, where the two are separated by 
+		a period. For example, a provider sets the <code>CertPathValidator.PKIX</code>
+		property to have the value "sun.security.provider.certpath.PKIXCertPathValidator"
+		as follows:
+		<blockquote><code>
+                      put("CertPathValidator.PKIX", "sun.security.provider.certpath.PKIXCertPathValidator")
+		</code></blockquote>
+
+		<p>In addition,
+		service attributes can be defined for the certification path
+		services. These attributes can be used as filters for selecting
+		service providers. See Appendix A for the definition of some
+		standard service attributes. For example, a provider may set the
+		<code>ValidationAlgorithm</code> service attribute to the 
+		name of an RFC or specification that defines the PKIX validation
+		algorithm:
+		<blockquote><code>
+                      put("CertPathValidator.PKIX ValidationAlgorithm", "RFC3280");
+		</code></blockquote>
+		<P><B>Step 8: Document your Provider
+		and its Supported Services</B></P>
+		<P>Certification path service
+		providers should document the following information for each SPI:</P>
+		<UL>
+			<P><B>Certificate Factories</B><P>A
+			provider should document what types of certification paths (and
+			the version numbers of the certificates in the path, if relevant)
+			can be created by the factory. A provider should describe the
+			ordering of the certificates in the certification path, as well as
+			the contents. 
+			</P>
+			<P>A provider should document the
+			list of encoding formats supported. This is not technically
+			necessary, since the client can request them by calling the
+			<TT>getCertPathEncodings</TT> method. However, the documentation
+			should describe each encoding format in more detail and reference
+			any standards when applicable. 
+			</P>
+			<P><B>Certification Path Validators</B>
+			<p>A provider should document any relevant information regarding the
+			<TT>CertPathValidator</TT> implementation, including the types of
+			certification paths that it validates. In particular, a PKIX
+			<TT>CertPathValidator</TT> implementation should document the
+			following information: 
+			</P><p>
+			<UL>
+				<LI>The RFC or specification it is compliant with.
+				<LI>The mechanism it uses to
+				check that certificates have not been revoked. 
+				<LI>Any optional certificate or
+				CRL extensions that it recognizes and how it processes them.
+			</UL>
+			<P><B>Certification Path Builders</B>
+						</P>
+			<P>A provider should document any
+			relevant information regarding the <TT>CertPathBuilder</TT>
+			implementation, including the types of certification paths that it
+			creates and whether or not they are validated. In particular a
+			PKIX <TT>CertPathBuilder</TT> implementation should document the
+			following information: 
+			</P><p>
+			<UL>
+				<LI>The RFC or specification it is compliant with.
+				<LI>The mechanism it uses to
+				check that certificates have not been revoked.
+				<LI>Any optional certificate or
+				CRL extensions that it recognizes and how it processes them.
+				<LI>Details on the algorithm it
+				uses for finding certification paths. Ex: depth-first,
+				breadth-first, forward (i.e., from target to trust anchor(s)),
+				reverse (i.e., from trust anchor(s) to target). 
+				<LI>The algorithm it uses to
+				select and sort potential certificates. For example, given two
+				certificates that are potential candidates for the next
+				certificate in the path, what criteria are used to select one
+				before the other? What criteria are used to reject a certificate? 
+				<LI>If applicable, the algorithm
+				it uses for backtracking or constructing another path (i.e., when
+				potential paths do not meet constraints). 
+				<LI>The types of <TT>CertStore</TT>
+				implementations that have been tested. The implementation should
+				be designed to work with any <TT>CertStore</TT> type, but this
+				information may still be useful.
+			</UL>
+			<P>All <TT>CertPathBuilder</TT>
+			implementations should provide additional debugging support, in
+			order to analyze and correct potential path building problems.
+			Details on how to access this debugging information should be
+			documented.</P>
+			<P><B>Certificate/CRL Stores</B> 
+			</P>
+			<P>A provider should document what
+			types of certificates and CRLs (and the version numbers, if
+			relevant) are retrieved by the <TT>CertStore</TT>. 
+			</P>
+			<P>A provider should also document
+			any relevant information regarding the <TT>CertStore</TT>
+			implementation&nbsp;(such as protocols used or formats supported).
+			For example, an LDAP <TT>CertStore</TT> implementation should
+			describe which versions of LDAP are supported and which standard
+			attributes are used for finding certificates and CRLs. It should
+			also document if the implementation caches results, and for how
+			long (i.e., under what conditions are they refreshed). 
+			</P>
+			<P>If the implementation returns the
+			certificates and CRLs in a particular order, it should describe
+			the sorting algorithm. An implementation should also document any
+			additional or default initialization parameters.<BR><BR>Finally,
+			an implementation should document if and how it uses information
+			in the <TT>CertSelector</TT> or <TT>CRLSelector</TT> objects to
+			find certificates and CRLs.</P>
+		</UL>
+	</UL>
+	<H3>Service Interdependencies</H3>
+	<P>Here are some common types of
+	algorithm interdependencies in certification path service
+	implementations: 
+	</P>
+	<UL>
+		<P><B>Certification Path Validation
+		and Signature Algorithms</B> 
+		</P>
+		<P>A <TT>CertPathValidator</TT>
+		implementation often requires use of a signature algorithm to
+		verify each certificate's digital signature. The <TT>setSigProvider</TT>
+		method of the <TT>PKIXParameters</TT> class allows a user to
+		specify a specific <TT>Signature</TT> provider. 
+		</P>
+		<P><B>Certification Path Builders and
+		Certificate Factories</B> 
+		</P>
+		<P>A <TT>CertPathBuilder</TT>
+		implementation will often utilize a <TT>CertificateFactory</TT> to
+		generate a certification path from a list of certificates. 
+		</P>
+		<P><B>CertStores and Certificate
+		Factories</B> 
+		</P>
+		<P>A <TT>CertStore</TT> implementation
+		will often utilize a <TT>CertificateFactory</TT> to generate
+		certificates and CRLs from their encodings. For example, an LDAP
+		<TT>CertStore</TT> implementation may use an X.509
+		<TT>CertificateFactory</TT> to generate X.509 certificates and CRLs
+		from their ASN.1 encoded form. &nbsp;</P>
+	</UL>
+	<H3>Certification Path Parameter Specification Interfaces</H3>
+	<P>The Certification Path API contains
+	two interfaces representing <I>transparent</I> specifications of
+	parameters, the <TT>CertPathParameters</TT> and <TT>CertStoreParameters</TT>
+	interfaces. 
+	</P>
+	<P>Two implementations of the
+	<TT>CertPathParameters</TT> interface are included, the
+	<TT>PKIXParameters</TT> and <TT>PKIXBuilderParameters</TT> classes.
+	If you are working with PKIX certification path validation and
+	algorithm parameters, you can utilize these classes. If you need
+	parameters for a different algorithm, you will need to supply your
+	own <TT>CertPathParameters</TT> implementation for that algorithm. 
+	</P>
+	<P>Two implementations of the
+	<TT>CertStoreParameters</TT> interface are included, the
+	<TT>LDAPCertStoreParameters</TT> and the
+	<TT>CollectionCertStoreParameters</TT> classes. These classes are to
+	be used with LDAP and Collection <TT>CertStore</TT> implementations,
+	respectively. If you need parameters for a different repository
+	type, you will need to supply your own <TT>CertStoreParameters</TT>
+	implementation for that type. 
+	<P>The <code>CertPathParameters</code> and 
+	<code>CertStoreParameters</code> interfaces each define a 
+	<code>clone</code> method that implementations should override. A
+	typical implementation will perform a "deep" copy of the object,
+	such that subsequent changes to the copy will not affect the original
+        (and vice versa). However, this is not an absolute requirement for
+        implementations of <code>CertStoreParameters</code>. A shallow copy 
+	implementation of <code>clone</code> is more appropriate for 
+        applications that need to hold a reference to a parameter contained 
+        in the <code>CertStoreParameters</code>. For example, since
+        <code>CertStore.getInstance</code> makes a clone of the specified
+        <code>CertStoreParamter</code>s, a shallow copy <code>clone</code> 
+	allows an application to hold a reference to and later release the 
+	resources of a particular <code>CertStore</code> initialization 
+	parameter, rather than waiting for the garbage collection mechanism. 
+	This should be done with the utmost care, since the 
+	<code>CertStore</code> may still be in use by other threads. 
+	</P>
+	<H3>Certification Path Result Specification Interfaces</H3>
+	<P>The Certification Path API contains
+	two interfaces representing <I>transparent</I> specifications of
+	results, the <TT>CertPathValidatorResult</TT> and
+	<TT>CertPathBuilderResult</TT> interfaces. 
+	</P>
+	<P>One implementation for each of the
+	interfaces is included: the <TT>PKIXCertPathValidatorResult</TT> and
+	<TT>PKIXCertPathBuilderResult</TT> classes. If you are implementing
+	PKIX certification path service providers, you can utilize these
+	classes. If you need certification path results for a different
+	algorithm, you will need to supply your own <TT>CertPathValidatorResult</TT>
+	or <TT>CertPathBuilderResult </TT>implementation for that algorithm.
+		</P>
+	<P>A PKIX implementation of a
+	<TT>CertPathValidator</TT> or a <TT>CertPathBuilder</TT> may find it
+	useful to store additional information in the
+	<TT>PKIXCertPathValidatorResult</TT> or <TT>PKIXCertPathBuilderResult</TT>,
+	such as debugging traces. In these cases, the implementation should
+	implement a subclass of the appropriate result class with methods to
+	retrieve the relevant information. These classes must be shipped
+	with the provider classes, for example, as part of the provider JAR
+	file. 
+	</P>
+	<H3>Certification Path Exception Classes</H3>
+	The Certification Path API contains a set of exception classes for
+	handling errors. <TT>CertPathValidatorException,
+	CertPathBuilderException</TT>, and <code>CertStoreException</code>
+	are subclasses of <TT>GeneralSecurityException</TT>. <BR><BR>You may
+	need to extend these classes in your service provider
+	implementation. For example, a <TT>CertPathBuilder</TT>
+	implementation may provide additional information such as debugging
+	traces when a <TT>CertPathBuilderException</TT> is thrown. The
+	implementation may throw a subclass of <TT>CertPathBuilderException</TT>
+	that holds this information. Likewise, a <TT>CertStore</TT>
+	implementation can provide additional information when a failure
+	occurs by throwing a subclass of <TT>CertStoreException</TT>. Also,
+	you may want to implement a subclass of <TT>CertPathValidatorException</TT>
+	to describe a particular failure mode of your <TT>CertPathValidator</TT>
+	implementation. <BR><BR>In each case, the new exception classes must
+	be shipped with the provider classes, for example, as part of the
+	provider JAR file. Each provider should document the exception
+	subclasses.
+	<H3>TrustAnchor  Class</H3>
+	<P><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">
+	As previously mentioned, a PKIX <code>CertPathValidator</code> or
+	<code>CertPathBuilder</code> is not required to support the
+	<code>nameConstraints</code> parameter of the <code>TrustAnchor</code>
+	class. Implementations should throw an 
+	<code>InvalidAlgorithmParameterException</code> if this parameter
+	is not supported.</blockquote>
+
+<H2><A NAME="AppA"></A>Appendix A:
+Standard Names</H2>
+<P>The Java Certification Path API
+requires and utilizes a set of standard names for certification path
+validation algorithms, encodings and certificate storage types. It
+supplements the list of standard names defined in <A HREF="../CryptoSpec.html#AppA">Appendix
+A</A> in the <I>Java Cryptography Architecture API Specification and
+Reference</I>. Note that algorithm names are treated as
+case-insensitive (for comparison). 
+<p>Please note that a service provider may choose to define a new name for
+a proprietary or non-standard algorithm not mentioned below. However, to
+prevent name collisions, it is recommended that the name be prefixed with
+the reverse Internet domain name of the provider's organization (for example: <code>com.sun.MyCertPathValidator</code>). 
+</P>
+<H3><A NAME="CPVAlgs"></A>
+CertPathValidator Algorithms</H3>
+<P>The algorithm
+names in this section can be specified when generating an instance of
+<TT>CertPathValidator</TT>. 
+</P>
+<blockquote>
+<P><B>PKIX</B>: The
+PKIX certification path validation algorithm as defined in the <A HREF="#SvcAttrs">ValidationAlgorithm
+service attribute</A>.
+</blockquote>
+<H3><A NAME="CPBAlgs"></A>
+CertPathBuilder Algorithms</H3>
+<P>The algorithm
+names in this section can be specified when generating an instance of
+<TT>CertPathBuilder</TT>. 
+</P>
+<blockquote><P><B>PKIX</B>: The
+PKIX certification path validation algorithm as defined in the <A HREF="#SvcAttrs">ValidationAlgorithm
+service attribute</A>. 
+The output of <TT>CertPathBuilder</TT> instances
+implementing this algorithm is a certification path validated against
+the PKIX validation algorithm.</P>
+</blockquote>
+<H3><A NAME="CSTypes"></A>
+CertStore Types</H3>
+<P>The following
+types can be specified when generating an instance of <TT>CertStore</TT>:
+</P>
+<blockquote>
+<P><B>LDAP</B>: A
+<TT>CertStore</TT> implementation that fetches certificates and CRLs
+from an LDAP directory using the schema defined in the <A HREF="#SvcAttrs">LDAPSchema
+service attribute</A>.
+<P><B>Collection</B>:
+A <TT>CertStore</TT> implementation that retrieves certificates and
+CRLs from a <TT>Collection</TT>. This type of <code>CertStore</code> is
+particularly useful in applications where certificates or CRLs are received 
+in a bag or some sort of attachment, such as with a signed email message 
+or in an SSL negotiation.
+</blockquote>
+<H3>CertPath Encodings</H3>
+<P>
+The following encodings may be passed to the <TT>getEncoded</TT>
+method of <TT>CertPath</TT> or the <TT>generateCertPath(InputStream
+inStream, String encoding)</TT> method of <TT>CertificateFactory</TT>.</P>
+<blockquote>
+<B>PKCS7</B><SPAN STYLE="font-weight: medium">: A PKCS#7 SignedData
+object, with the only significant field being certificates. In
+particular, the signature and the contents are ignored. If no
+certificates are present, a zero-length <TT>CertPath</TT> is assumed.
+<b><i>Warning:</i></b> PKCS#7 does not maintain the order of 
+certificates in a certification path. This means that if a 
+<code>CertPath</code> is converted to PKCS#7 encoded bytes and then
+converted back, the order of the certificates may change, potentially
+rendering the <code>CertPath</code> invalid. Users should be aware of
+this behavior.<br><br> 
+<b>PkiPath</b>: an ASN.1 DER encoded sequence of certificates, defined as
+follows:
+<p><blockquote><code>PkiPath ::=	SEQUENCE OF Certificate</code></blockquote>
+<p>Within the sequence, the order of certificates is such that the subject of
+the first certificate is the issuer of the second certificate, etc. Each
+certificate in <code>PkiPath</code> shall be unique. No certificate may appear
+more than once in a value of <code>Certificate</code> in <code>PkiPath</code>. 
+The <code>PkiPath</code> format is defined in defect report 279 against 
+X.509 (2000) and is 
+incorporated into Technical Corrigendum 1 (DTC 2) for the 
+ITU-T Recommendation X.509 (2000) at: 
+<a href="ftp://ftp.bull.com/pub/OSIdirectory/DefectResolution/TechnicalCorrigenda/ApprovedTechnicalCorrigendaToX.509/8%7CX.509-TC1%284th%29.pdf">ftp://ftp.bull.com/pub/OSIdirectory/DefectResolution/TechnicalCorrigenda/ApprovedTechnicalCorrigendaToX.509/8%7CX.509-TC1%284th%29.pdf</A>.
+</blockquote>
+</SPAN>
+</P>
+<H3><A NAME="SvcAttrs"></A>
+Service Attributes</H3>
+<blockquote>
+<P><B>ValidationAlgorithm</B>: 
+The name of the specification that defines the certification path 
+validation algorithm that an implementation of <code>CertPathBuilder</code> or 
+<code>CertPathValidator</code> supports. RFCs should be specified as "RFC#" 
+(ex: "RFC3280") and Internet Drafts as the name of the draft 
+(ex: "draft-ietf-pkix-rfc2560bis-01.txt"). Values for this attribute 
+that are specified as selection criteria to the 
+<code>Security.getProviders</code> method will be compared using 
+the <code>String.equalsIgnoreCase</code> method.
+All PKIX implementations of
+<TT>CertPathBuilder</TT> and <TT>CertPathValidator</TT>
+should provide a value for this attribute.
+</blockquote>
+<blockquote>
+<P><B>LDAPSchema</B>: 
+The name of the specification that defines the LDAP schema 
+that an implementation of an LDAP CertStore uses to retrieve
+certificates and CRLs. The format and semantics of this attribute is
+the same as described for the ValidationAlgorithm attribute.
+All LDAP implementations of <TT>CertStore</TT>
+should provide a value for this attribute.
+</blockquote>
+<hr>
+<h2><A NAME="AppB">Appendix B: The "SUN" Provider</A></H2>
+The "SUN" provider which is supplied with J2SDK has been enhanced for
+version 1.4 to support the following standard algorithms, types and encodings:
+<ul>
+<li><code>CertificateFactory</code>: <b>X.509</b> <code>CertPath</code>
+type with <b>PKCS7</b> and <b>PkiPath</b> encodings
+<li><code>CertPathValidator</code>: <b>PKIX</b> algorithm
+<li><code>CertPathBuilder</code>: <b>PKIX</b> algorithm
+<li><code>CertStore</code>: <b>LDAP</b> and <b>Collection</b> 
+<code>CertStore</code> types
+</ul>
+Each of these service provider interface implementations is discussed in
+more detail below.
+<h3>CertificateFactory</h3>
+The "SUN" provider for the <code>CertificateFactory</code>
+engine class has been enhanced to support generation of X.509
+<code>CertPath</code> objects. The PKCS7 and PkiPath encodings are supported.
+The PKCS#7 implementation supports a subset of 
+<a href="http://www.ietf.org/rfc/rfc2315.txt">RFC 2315</a> (only the 
+SignedData ContentInfo type is supported).
+The certificates in the <code>CertPath</code> are ordered in the forward
+direction (from target to trust anchor). Each certificate in the
+<code>CertPath</code> is of type
+<code>java.security.cert.X509Certificate</code>, and versions
+1, 2 and 3 are supported.
+<h3>CertPathValidator</h3>
+The "SUN" provider supplies a PKIX implementation of the
+<code>CertPathValidator</code> engine class. The implementation validates
+<code>CertPath</code>s of type X.509 and 
+implements the certification path validation algorithm defined in 
+<a href="http://www.ietf.org/rfc/rfc3280.txt">
+RFC 3280: <I>PKIX Certificate and CRL Profile</I></a>. 
+This implementation sets the <code>ValidationAlgorithm</code> service 
+attribute to "RFC3280".
+
+<p>The PKIX Certificate and CRL Profile has many optional features.
+The "SUN" provider implements support for the policy mapping extension and the
+reason code CRL entry extension. It does not implement support for
+the CRL distribution point, Freshest CRL, Authority Information
+Access, or Subject Information Access certificate extensions. It
+also does not include support for the Freshest CRL, Delta CRL,
+and Issuing Distribution Point CRL extensions and the Certificate
+Issuer, Invalidity Date, and Hold Instruction Code CRL entry
+extensions.
+<p>The implementation supports a CRL revocation checking mechanism that
+conforms to section 6.3 of the PKIX Certificate and CRL Profile. An
+application must specify one or more <code>CertStore</code>s containing
+CRLs in a <code>PKIXParameters</code> object. For each certificate in
+the <code>CertPath</code>, the <code>CertPathValidator</code> searches the
+specified <code>CertStore</code>s for applicable CRLs. OCSP
+(<a href="http://www.ietf.org/rfc/rfc2560.txt">RFC 2560</a>) is not
+currently supported as a built in revocation checking mechanism.
+<p>The implementation does not support the <code>nameConstraints</code>
+parameter of the <code>TrustAnchor</code> class and the <code>validate</code> 
+method throws an <code>InvalidAlgorithmParameterException</code> if it is 
+specified.
+<h3>CertPathBuilder</h3>
+The "SUN" provider supplies a PKIX implementation of the
+<code>CertPathBuilder</code> engine class. The implementation builds
+<code>CertPath</code>s of type X.509. Each <code>CertPath</code>
+is validated according to the PKIX algorithm defined in 
+<a href="http://www.ietf.org/rfc/rfc3280.txt">
+RFC 3280: <I>PKIX Certificate and CRL Profile</I></a>. 
+This implementation sets the <code>ValidationAlgorithm</code> service 
+attribute to "RFC3280".
+
+<p>The implementation requires that the <code>targetConstraints</code> 
+parameter of a <code>PKIXBuilderParameters</code> object is an instance 
+of <code>X509CertSelector</code> and the subject criterion is set to
+ a non-null value. Otherwise the <code>build</code> method
+throws an <code>InvalidAlgorithmParameterException</code>.
+<p>The implementation builds <code>CertPath</code> objects in a forward
+direction using a depth-first algorithm. It backtracks to previous
+states and tries alternate paths when a potential path is determined to
+be invalid or exceeds the <code>PKIXBuilderParameters</code>
+<code>maxPathLength</code> parameter.
+<p>Validation of the path is performed in the same manner as the
+<code>CertPathValidator</code> implementation. The implementation 
+validates most of the path as it is being built, in order to eliminate 
+invalid paths earlier in the process. Validation checks that cannot
+be executed on certificates ordered in a forward direction are delayed
+and executed on the path after it has been constructed (but before it
+is returned to the application).
+<p>When two or more potential certificates are discovered that may
+lead to finding a path that meets the specified constraints, the
+implementation uses the following criteria to prioritize the certificates
+(in the examples below, assume a <code>TrustAnchor</code> distinguished name
+of "ou=D,ou=C,o=B,c=A" is specified):
+<ol>
+<li>The issuer DN of the certificate matches the
+DN of one of the specified <code>TrustAnchor</code>s (ex: issuerDN =
+"ou=D,ou=C,o=B,c=A").
+<li>The issuer DN of the certificate is a descendant of the DN of one of the
+<code>TrustAnchor</code>s, ordered by proximity to the anchor (ex: issuerDN =
+"ou=E,ou=D,ou=C,o=B,c=A").
+<li>The issuer DN of the certificate is an ancestor of the DN of one of the
+<code>TrustAnchor</code>s, ordered by proximity to the anchor (ex: issuerDN =
+"ou=C,o=B,c=A".
+<li>The issuer DN of the certificate is in the same namespace of one of the
+<code>TrustAnchor</code>s, ordered by proximity to the anchor (ex: issuerDN =
+"ou=G,ou=C,o=B,c=A").
+<li>The issuer DN of the certificate is an ancestor of the subject DN
+of the certificate, ordered by proximity to the subject.
+</ol>
+These are followed by certificates which don't meet any of the above
+criteria.
+<p>This implementation has been tested with the LDAP and Collection 
+<code>CertStore</code> implementations included in this release of the
+"SUN" provider.
+<p>Debugging support can be enabled by setting the 
+<code>java.security.debug</code> property to <code>certpath</code>. For
+example:
+<pre>
+	java -Djava.security.debug=certpath BuildCertPath
+</pre>
+This will print additional debugging information to standard error.
+<h3>CertStore</h3>
+The "SUN" provider supports two implementations of the <code>CertStore</code>
+engine class: Collection and LDAP.
+<blockquote>
+<h3>Collection CertStore</h3>
+The Collection <code>CertStore</code> implementation can hold any objects
+that are an instance of <code>java.security.cert.Certificate</code>
+or <code>java.security.cert.CRL</code>.
+<p>The certificates and CRLs are not returned in any particular order
+and will not contain duplicates.
+<h3>LDAP CertStore</h3>
+The LDAP <code>CertStore</code> implementation retrieves certificates
+and CRLs from an LDAP directory using the LDAP schema defined in 
+<a href="http://www.ietf.org/rfc/rfc2587.txt">RFC 2587</a>. The
+LDAPSchema service attribute is set to "RFC2587".
+<p>The implementation fetches certificates from different
+locations, depending on the values of the subject, issuer, and
+basicConstraints selection criteria specified in the
+<code>X509CertSelector</code>. It performs as many of the following
+operations as possible:
+<ol>
+<li>Subject non-null, basicConstraints <= -1
+<p>Looks for certificates in the subject DN's "userCertificate" attribute.<p>
+<li>Subject non-null, basicConstraints >= -1
+<p>Looks for certificates in the forward element of the subject DN's
+"crossCertificatePair" attribute AND in the subject's
+"caCertificate" attribute.<p>
+<li>Issuer non-null, basicConstraints >= -1
+<p>Looks for certificates in the reverse element of the issuer DN's
+"crossCertificatePair" attribute AND in the issuer DN's "caCertificate"
+attribute.
+</ol>
+<p>In each case, certificates are checked using
+<code>X509CertSelector.match()</code> before adding them to the resulting 
+collection.
+<p>If none of the conditions specified above applies, then an exception is
+thrown to indicate that it was impossible to fetch certificates using
+the criteria supplied. Note that even if one or more of the conditions
+apply, the Collection returned may still be empty if there are no
+certificates in the directory.
+<p>The implementation fetches CRLs from the issuer DNs specified
+in the <code>setCertificateChecking</code>, <code>addIssuerName</code> or
+<code>setIssuerNames</code> methods of the <code>X509CRLSelector</code> class.
+If no issuer DNs have been specified using one of these methods, the
+implementation throws an exception indicating it was impossible to
+fetch CRLs using the criteria supplied. Otherwise, the CRLs are searched as
+follows:
+<p>The implementation first creates a list of issuer names. If a certificate
+was specified in the <code>setCertificateChecking</code> method, it uses the
+issuer of that certificate. Otherwise, it uses the issuer names specified
+using the <code>addIssuerName</code> or <code>setIssuerNames</code> methods.
+<p>Next, the implementation iterates through the list of issuer names.
+For each issuer name, it searches first in the issuer's
+"authorityRevocationList" attribute and then, if no matching CRL was found
+there, in the issuer's "certificateRevocationList" attribute.
+One exception to the above is that if the issuer name was obtained from
+the certificate specified in the <code>setCertificateChecking</code> method,
+it only checks the issuer's "authorityRevocationList" attribute if the
+specified certificate is a CA certificate.
+<p>All CRLs are checked using <code>X509CRLSelector.match()</code> before
+adding them to the resulting collection.
+<p>If no CRLs satisfying the selection criteria can be found, an empty
+Collection is returned.
+
+<blockquote>
+<H4>Caching</H4>
+By default each LDAP CertStore instance caches lookups for a 
+maximum of 30 seconds. The cache lifetime can be changed by 
+setting the system property 
+<code>sun.security.certpath.ldap.cache.lifetime</code> to a 
+value in seconds. A value of <code>0</code> disables the cache 
+completely. A value of <code>-1</code> means unlimited lifetime.
+</blockquote>
+</blockquote>
+
+<H3>Support for the CRL Distribution Points Extension</H3>
+
+Limited support for the CRL Distribution Points extension is available. 
+It is disabled by default for compatibility and can be enabled by 
+setting the system property <code>com.sun.security.enableCRLDP</code> to the value 
+<code>true</code>.
+<P>
+If active CRLs will be retrieved for the locations specified in the 
+extension, provided the following three criteria are all met: 
+<OL>
+<LI>the distribution point specifies a fullName of type URI. 
+<LI>The URI is not of type LDAP.
+<LI>TRLIssuer and reasons are not set.
+</OL>
+This allows interoperability with many simple certification 
+infrastructures as in use on the Internet today. We plan to remove the 
+above limitations in a future release.
+<blockquote>
+<hr>
+<B>Note:</B> Depending on your network and firewall setup, it may be 
+necessary to also configure your networking proxy servers as described 
+in the <A HREF="../../net/properties.html">networking documentation</A>.
+<hr>
+</blockquote>
+
+
+<HR SIZE=3 NOSHADE>
+
+<TABLE summary="layout" BORDER="0" WIDTH="100%">
+
+<TR VALIGN=TOP>
+
+<TD>
+
+<P><FONT SIZE="-2">
+   Copyright &#169; 1998-2003, Sun Microsystems, Inc.
+   4150 Network Circle
+   Santa Clara, California 95054
+   All Rights Reserved.</FONT></P>
+
+   <FONT SIZE="-1">
+   Please send comments to: <a href="mailto:java-security@sun.com">java-security@sun.com</a>. This is not a subscription list.
+   </FONT>
+
+</TD>
+
+</TR>
+
+</TABLE>
+
+</BODY>
+</HTML>

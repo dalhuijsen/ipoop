@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Example Applications</title>
+</head>
+
+<body>
+<hr>
+<h1>Example Applications </h1>
+<hr>
+<p>Below are two application examples:</p>
+<ul>
+  <li><a href="#bound">Bound Properties: <code>boundprop.exe</code></a></li>
+  <li><a href="#calendar">Calendar: <code>cal.exe</code></a></li>
+</ul>
+<h2><a name="bound"></a>Bound Properties</h2>
+<p>This application consists of an ActiveX container with two beans packaged as 
+  ActiveX controls: <code>BoundPropTest</code>, a <code>JavaBeans</code> button; 
+  and the <code>JellyBean</code> bean. The applications works because the button 
+  is registered as a listener with <code>JellyBean</code>. Every time the <code>JellyBean</code> 
+  is clicked, the button receives notification and code is called that changes 
+  the text on the button. The resources for this application&#8212;<code>boundprop.exe</code>, 
+  <code>BoundPropTest.dll</code>, and <code>JellyBean.dll</code>&#8212;can be 
+  found in the <code><a href="boundprop">boundprop</a></code> subdirectory of 
+  this document, should you care to set it up and run it.</p>
+<p>To run the application on your computer, copy <code>BoundPropTest.dll</code> 
+  and <code>JellyBean.dll</code> to <code>&lt;jre_home&gt;\axbridge\bin</code> 
+  on your computer. Register both <code>.dll</code> files with <code>regsvr32.exe</code>. 
+  Then execute <code>boundprop.exe</code>. You should see the following:</p>
+<p align="center"><img src="images/boundprop-1.gif" alt="Sample window" width="489" height="266"></p>
+<p align="left">&nbsp;</p>
+<h2><a name="calendar"></a>Calendar</h2>
+<p>The Calendar application is similar. It consists of an ActiveX container with 
+  an ActiveX control calendar and a JavaBean calendar. In this application, both 
+  components are registered with each other as listeners. Changes in one calendar 
+  are reflected in the other via change notification. Resources for this application&#8212;<code>cal.exe</code> 
+  and <code>JCalendarPanel.dll</code>&#8212;can be found in the <code><a href="cal">cal</a></code> 
+  subdirectory of this document, should you care to set it up and run it. (Copy 
+  <code>JCalendarPanel.dll</code> to <code>&lt;jre_home&gt;\axbridge\bin</code> 
+  and register it; then execute <code>cal.exe</code>. You should see the following.</p>
+<p align="center"><img src="images/cal.gif" alt="Sample calendar window" width="976" height="542"></p>
+<p align="left">&nbsp;</p>
+</body>
+</html>

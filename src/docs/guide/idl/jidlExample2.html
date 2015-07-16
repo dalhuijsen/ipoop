@@ -1,0 +1,769 @@
+<HTML>
+
+<HEAD>
+
+   <TITLE>Java IDL: The "Hello World" Example</TITLE>
+
+<!-- Changed by: carson 7/2001 for j2se 1.4 -->
+
+   <X-SAS-WINDOW TOP=42 BOTTOM=477 LEFT=4 RIGHT=534>
+
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+
+<H1 ALIGN=CENTER>Java IDL: The "Hello World" Example</H1>
+
+<BR>
+<P ALIGN=CENTER>Using the POA, a persistent server, and a persistent naming service</P>
+<HR>
+<P>This document is a high-level overview of how to create a complete CORBA (Common 
+Object 
+Request Broker Architecture) application using IDL (Interface Definiton Language) to 
+define 
+interfaces and the Java IDL compiler to generate stubs and skeletons.  For more 
+information 
+on the development process, and a more detailed tutorial on creating a CORBA 
+application 
+using IDL, link to <A HREF="GShome.html"><em>Getting Started with Java IDL: The Hello 
+World 
+Tutorial</em></A>.  You can also create CORBA applications by defining the interfaces in 
+the 
+Java 
+programming language.  For more information and a tutorial on this development 
+process, 
+link to <A HREF="../rmi-iiop/index.html"><em>Java RMI-IIOP documentation</em></A>.
+
+<P>For more information on transient vs. persistent servers, please refer to the document <a href="jidlServers.html"><em>Developing Servers</em></a>.
+
+<P>This document contains:
+<UL>
+
+   <LI>The <A href="#IDL"><em>IDL</em></A> for a simple "Hello World" program
+
+   
+
+   <LI>A <A href="#server"><em><bold>persistent</bold> server</em></A> that creates an object and 
+
+   publishes it with the naming service using the default server-side
+  implementation (POA)
+  
+  <LI>A <A href="#servant"><em>servant</em></A> that implements each of the IDL interfaces
+
+   
+
+   <LI>An <A HREF="#application"><em>application client</em></A>  that knows the 
+object's name, retrieves a reference for it from the naming service, and invokes the 
+object
+
+   
+   <LI><A href="#instructions"><em>Instructions</em></A> for compiling and running 
+
+the example
+
+   </UL>
+
+
+
+<P>
+
+
+
+
+
+
+<!--************IDL*************-->
+
+
+
+<A name="IDL">
+
+<H2>Defining the Interface (<code>PersistentHello.idl</code>)</H2></A>
+
+<P>The first step to creating a CORBA application is to specify all of
+your objects and their interfaces using the OMG's Interface
+Definition Language (IDL). IDL has a syntax similar to C++ and
+can be used to define modules, interfaces, data structures, and
+more. The IDL can be mapped to a variety of programming
+languages. The IDL mapping for Java is summarized in 
+<a href="mapping/jidlMapping.html"><em>IDL to Java Language Mapping Summary</em></a>.
+
+<P>The following code is written in the OMG IDL, and describes a CORBA
+ object whose <TT>sayHello()</TT> operation returns a string and whose 
+<TT>shutdown()</TT> 
+method
+ shuts down the ORB.  
+ To learn more about OMG IDL Syntax and Semantics, link to the OMG Web site, 
+ and read Chapter 3 of the 
+ <a href="http://www.omg.org/docs/formal/99-10-07.pdf"><em>CORBA Specification</em></a>.</P>
+
+<P>
+<EM><STRONG>PersistentHello.idl</STRONG></EM>
+<P>
+<UL>
+<PRE>
+module Persistent {
+    interface Hello {
+        string sayHello( );
+        oneway void shutdown();
+    };
+};
+</PRE>
+</UL>
+
+<A name="interop">
+<B>NOTE:</B> When writing code in OMG IDL,
+  do not use an interface name as the name of a module. 
+  Doing so runs the risk of getting inconsistent results when 
+  compiling with tools from different vendors, thereby jeopardizing
+  the code's portability.  For example, 
+  code containing the same names could be compiled with the IDL to Java 
+  compiler from Sun Microsystems and get one result. 
+  The same code compiled with another vendor's IDL to Java 
+  compiler could produce a different result. 
+<p>
+
+To complete the application, you simply provide the server 
+(<code>PersistentServer.java</code>), servant (<code>PersistentHelloServant.java</code>), 
+and client (<code>PersistentClient.java</code>)
+implementations.
+
+
+
+<!--************PERSISTENT SERVER*************-->
+
+
+
+<A NAME="server">
+
+<H2>Implementing the Server (<code>PersistentServer.java</code>)</H2></A>
+
+
+
+<P>The example server,  <tt>PersistentServer</tt>, has the server's
+ <TT>main()</TT> method, which:
+
+</P>
+<UL>
+
+   <LI>Creates and initializes an ORB instance
+   
+   <LI>Creates a servant   
+   
+   <LI>Gets a reference to the root POA 
+
+   <LI>Creates the policy that makes the server persistent
+   
+   <LI>Creates a persistent POA by passing in the persistent policy
+   
+   <LI>Activates the persistent POA's <tt>POAManager</tt>
+   
+   <LI>Associates the servant with the persistent POA
+
+   <LI>Gets a CORBA object reference for the root naming context in which to
+
+   register the new CORBA object
+   
+   <LI>Narrows the object reference to a naming context
+
+
+   <LI>Registers the new object in the naming context under the 
+   name "PersistentServerTutorial"
+
+
+   <LI>Waits for invocations of the new object from the client
+</UL>
+
+<P>This example provides an example of a persistent object server.  For an example of 
+the "Hello World" program with a transient object server, see <a 
+href="jidlExample.html"><em>Hello World with a Transient Server</em></a>.  For more 
+discussion of CORBA servers, see <a href="jidlServers.html"><em>Developing 
+Servers</em></a>.
+
+
+
+<P>
+<EM><STRONG>PersistentServer.java</STRONG></EM>
+<P>
+<UL>
+<PRE>
+// <STRONG>PersistentServer.java</STRONG>
+// <A HREF="examplelicense.html">Copyright and License</A> 
+import java.util.Properties;
+import org.omg.CORBA.Object;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CORBA.Policy;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.*;
+import org.omg.PortableServer.Servant;
+
+public class PersistentServer {
+
+    public static void main( String args[] ) {
+        Properties properties = System.getProperties();
+        properties.put( "org.omg.CORBA.ORBInitialHost",
+            "localhost" );
+        properties.put( "org.omg.CORBA.ORBInitialPort",
+            "1050" );
+    
+        try {
+            // Step 1: Instantiate the ORB
+            ORB orb = ORB.init(args, properties);
+
+            // Step 2: Instantiate the servant
+            PersistentHelloServant servant = new PersistentHelloServant(orb); 
+
+            // Step 3 : Create a POA with Persistent Policy
+            // *******************  
+            // Step 3-1: Get the rootPOA 
+            POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            // Step 3-2: Create the Persistent Policy
+            Policy[] persistentPolicy = new Policy[1];
+            persistentPolicy[0] = rootPOA.create_lifespan_policy(
+                LifespanPolicyValue.PERSISTENT);
+            // Step 3-3: Create a POA by passing the Persistent Policy
+            POA persistentPOA = rootPOA.create_POA("childPOA", null, 
+                persistentPolicy ); 
+            // Step 3-4: Activate PersistentPOA's POAManager, Without this
+            // All calls to Persistent Server will hang because POAManager
+            // will be in the 'HOLD' state.
+            persistentPOA.the_POAManager().activate( );
+            // ***********************
+ 
+            // Step 4: Associate the servant with PersistentPOA
+            persistentPOA.activate_object( servant );
+
+            // Step 5: Resolve RootNaming context and bind a name for the
+            // servant.
+            // NOTE: If the Server is persistent in nature then using Persistent
+            // Name Service is a good choice. Even if ORBD is restarted the Name
+            // Bindings will be intact. To use Persistent Name Service use
+            // 'NameService' as the key for resolve_initial_references() when
+            // ORBD is running.
+            org.omg.CORBA.Object obj = orb.resolve_initial_references(
+                "NameService" );
+            NamingContextExt rootContext = NamingContextExtHelper.narrow( obj );
+
+            NameComponent[] nc = rootContext.to_name( 
+                "PersistentServerTutorial" );
+            rootContext.rebind( nc, persistentPOA.servant_to_reference( 
+                servant ) );
+
+            // Step 6: We are ready to receive client requests
+            orb.run();
+        } catch ( Exception e ) {
+            System.err.println( "Exception in Persistent Server Startup " + e );
+        }
+    }
+}
+</PRE>
+</UL>
+
+<!-- ****************  SERVANT  ****************-->
+
+<A NAME="servant">
+
+<H2>Implementing the Servant (<code>PersistentHelloServant.java</code>)</H2></A>
+
+
+
+<P>The example servant, <TT>PersistentHelloServant</TT>, is the implementation of
+
+the <TT>Hello</TT> IDL interface; each <TT>Hello</TT> instance is implemented
+
+by a <TT>PersistentHelloServant</TT> instance. The servant is a subclass of
+
+<TT>HelloPOA</TT>, which 
+
+is generated by the <TT>idlj</TT> compiler from the example IDL.
+
+The servant contains one method for each IDL operation, in this
+
+example, the <TT>sayHello()</TT>  and <tt>shutdown()</tt> methods. Servant methods 
+are
+
+just like ordinary Java methods; the extra code to deal with the ORB,
+
+with marshaling arguments and results, and so on, is provided by the
+
+skeleton.</P>
+
+
+
+<P>
+<EM><STRONG>PersistentHelloServant.java</STRONG></EM>
+<P>
+<UL>
+<PRE>
+// <STRONG>PersistentHelloServant.java</STRONG>
+// <A HREF="examplelicense.html">Copyright and License</A> 
+import org.omg.CORBA.ORB;
+
+public class PersistentHelloServant extends Persistent.HelloPOA {
+    private ORB orb;
+  
+    public PersistentHelloServant( ORB orb ) {
+        this.orb = orb;
+    }
+
+    /**
+     *  sayHello() method implementation returns a simple message.
+     */
+    public String sayHello( ) {
+        return "Hello From Persistent Server...";
+    }
+
+    /**
+     *  shutdown() method shuts down the Persistent Server.
+     *  See NOTE below.
+     */
+    public void shutdown( ) {
+        orb.shutdown( false );
+    }
+}
+</PRE>
+</UL>
+
+<P><strong>Note: </strong> For convenience of presentation in this example, the shutdown() method is included as part of the servant.  This has been done in order to demonstrate the persistence of the server in this example.  This is not a recommended programming convention for the following reasons:
+<P>
+<UL>
+<LI>If the <tt>orb.shutdown()</tt> method is called with parameter <tt>true</tt> (meaning "wait for
+completion") within the implementation of a remote method, the ORB will hang in a
+deadlock. Other threads can invoke <tt>orb.shutdown()</tt> without deadlock.
+<LI>If you have multiple servants associated with the ORB, using the <tt>shutdown(false)</tt>
+method by one of them will make all of them unavailable.
+<LI>The <tt>orb.shutdown(false)</tt> method should be called as part of the SERVER code under more controlled circumstances. 
+</UL>
+
+
+
+<!--************APPLICATION*************-->
+
+
+
+<A name="application">
+
+<H2>Implementing the Client Application (<code>PersistentClient.java</code>)</H2></A>
+
+
+
+<P>The example application client that follows:</P>
+
+
+
+<UL>
+
+   <LI>Creates and initializes an ORB.
+
+   
+
+   <LI>Resolves the <tt>PersistentHelloServant</tt> by using the 
+   <a href="jidlNaming.html#INS"><em>Interoperable
+   Naming Service</em></a>'s (INS) <tt>corbaname url</tt>.  The URL locates
+   the Naming Service running on host localhost and listening on port 1050.
+   When located, it resolves "PersistentServerTutorial" from than Naming 
+   Service.
+
+   
+   
+
+   <LI>Invokes the object's <TT>sayHello()</TT> and <tt>shutdown()</tt> operations 
+and prints
+
+   the result.  In this example, the client calls the <TT>sayHello()</TT> method
+   every 3 seconds, then shuts down the server.  The next call from the client
+   will restart the server (because of the persistent lifespan of the server).
+
+</UL>
+
+
+<P>
+<EM><STRONG>PersistentClient.java</STRONG></EM>
+<P>
+
+<PRE>// <A HREF="examplelicense.html">Copyright and License</A> 
+&nbsp;
+import java.util.Properties;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.OBJ_ADAPTER;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.CosNaming.NameComponent;
+import org.omg.PortableServer.POA;
+
+import Persistent.HelloHelper;
+import Persistent.Hello;
+
+public class PersistentClient {
+
+    public static void main(String args[]) {
+
+        try {
+            // Step 1: Instantiate the ORB
+            ORB orb = ORB.init(args, null);
+
+            // Step 2: Resolve the PersistentHelloServant by using INS's
+            // corbaname url. The URL locates the NameService running on
+            // localhost and listening on 1050 and resolve 
+            // 'PersistentServerTutorial' from that NameService
+            org.omg.CORBA.Object obj = orb.string_to_object( 
+                "corbaname::localhost:1050#PersistentServerTutorial");
+ 
+            Hello hello = HelloHelper.narrow( obj );
+
+            // Step 3: Call the sayHello() method every 60 seconds and shutdown
+            // the server. Next call from the client will restart the server,
+            // because it is persistent in nature.
+            while( true ) {
+                System.out.println( "Calling Persistent Server.." );
+                String helloFromServer = hello.sayHello();
+                System.out.println("Message From Persistent Server: " +
+                    helloFromServer );
+                System.out.println( "Shutting down Persistent Server.." );
+                hello.shutdown( );
+                Thread.sleep( 60000 );
+            }
+        } catch ( Exception e ) {
+            System.err.println( "Exception in PersistentClient.java..." + e );
+            e.printStackTrace( );
+        }
+    }
+}
+</PRE>
+
+
+
+
+<!--************COMPILING THE EXAMPLES************-->
+
+
+
+<A name="instructions">
+
+<H2>Building and Running Hello World</H2></A>
+
+<P>Despite its simple design, the Hello World program lets you learn and
+experiment with all the tasks required to develop almost any CORBA program
+that uses <A href="jidlGlossary.html#invocation"><em>static invocation</em></A>.  
+
+<P>This example requires a naming service, which is a CORBA service that allows <A 
+href="jidlGlossary.html#CORBA object"><em>CORBA objects</em></A>
+to be named by means of binding a name to an object reference.
+The <A HREF="jidlGlossary.html#name binding"><em>name binding</em></A> may be stored
+in the naming service, and a client may supply the name
+to obtain the desired object reference.  This example uses 
+<a href="orbd.html"><em>orbd</em></a>, which contains a Persistent Naming 
+Service and a Server Manager. 
+
+<P>When running this example, remember that, when using 
+Solaris software, you must become root to start a process on a port under 1024.  For 
+this 
+reason, we recommend that you use a port number greater than or equal to 1024.  
+The following instructions assume you can set the 
+<TT>-ORBInitialPort</TT> option to use port 1050
+for the Java&nbsp;IDL Object Request Broker Daemon, <tt>orbd</tt>. You can substitute 
+a 
+different
+port if necessary.  </P>
+
+
+<P> To run this client-server application on your development machine: 
+<OL>
+
+<LI>Change to the directory that contains the file <TT>PersistentHello.idl</TT>.
+<P>
+<LI>Run the IDL-to-Java compiler, <TT>idlj</TT>, on the IDL file to
+create stubs and skeletons.  This step assumes that you have included
+the path to the <tt>java/bin</tt> directory in your path. <BR>
+
+<PRE>
+  idlj  -fall -td . -verbose  PersistentHello.idl
+</PRE>
+
+<P>You must use the <TT>-fall</TT> option with the <TT>idlj</TT> compiler to generate 
+both 
+client and server-side bindings.  This command line will generate the default 
+server-side 
+bindings, 
+which assumes the POA  Inheritance server-side model. For more information on the 
+<TT>idlj</TT> options, link 
+to <A HREF = "../rmi-iiop/toJavaPortableUG.html"><em>IDL-to-Java compiler options</em></A>.  
+
+<P>The <TT>idlj</TT> compiler generates a number of files.  The actual number of 
+files 
+generated depends on the options
+selected when the IDL file is compiled.  The generated files provide standard
+functionality, so you can
+ignore them until it is time to deploy and run your program.
+The files generated by the <TT>idlj</TT> compiler for <TT>PersistentHello.idl</TT>, with the 
+<TT>-fall</TT> command 
+line option, are: 
+<P>
+<UL>
+<LI><TT>HelloPOA.java</TT>
+<P>This abstract class is the stream-based
+<A href="jidlGlossary.html#server skeleton"><em>server skeleton</em></A>, 
+providing basic CORBA 
+functionality for the server. It extends <a 
+href="../../api/org/omg/PortableServer/Servant.html">
+<em>org.omg.PortableServer.Servant</em>
+</A>,  
+and implements the <tt>InvokeHandler</tt> interface and the <tt>HelloOperations</tt> 
+interface.  
+The 
+server class <TT>PersistentHelloServant</TT> extends <TT>HelloPOA</TT>.  
+<P>
+<LI><TT>_HelloStub.java</TT>
+<P>This class is the 
+<A href="jidlGlossary.html#client stub"><em>client stub</em></A>, 
+providing CORBA functionality for the
+client. It extends <tt>org.omg.CORBA.portable.ObjectImpl</tt> and implements the 
+<TT>Hello.java</TT> 
+interface.
+<P>
+<LI><TT>Hello.java</TT>
+<P>This interface contains the Java version of our IDL interface. The 
+<TT>Hello.java</TT> 
+interface extends
+<TT>org.omg.CORBA.Object</TT>, providing standard CORBA object functionality.  It 
+also extends 
+the 
+<tt>HelloOperations</tt> interface and <tt>org.omg.CORBA.portable.IDLEntity</tt>.
+<P>
+<LI><TT>HelloHelper.java</TT>
+<P>This class provides auxiliary functionality, notably the 
+<TT>narrow()</TT> method required to cast CORBA 
+<A href="jidlGlossary.html#object reference"><em>object references</em></A> to their 
+proper types.The Helper class is 
+responsible for reading and writing the data type to CORBA streams, and inserting and 
+extracting the data type from <tt>Any</tt>s.  The Holder class delegates to the 
+methods in the 
+Helper class for reading and writing.
+<P>
+<LI><TT>HelloHolder.java</TT>
+<P>This final class holds a public instance member of type <TT>Hello</TT>.  Whenever
+the IDL type is an <tt>out</tt> or an <tt>inout</tt> parameter, the Holder class is 
+used.  It 
+provides operations for <TT>org.omg.CORBA.portable.OutputStream</TT> and 
+<TT>org.omg.CORBA.portable.InputStream</TT> arguments, which CORBA allows, but 
+which do not map easily to Java's semantics. The Holder class delegates to the 
+methods in the 
+Helper class for reading and writing. It implements 
+<tt>org.omg.CORBA.portable.Streamable</tt>. 
+<P>
+<LI><TT>HelloOperations.java</TT>
+<P>This interface contains the methods <TT>sayHello()</TT> and <tt>shutdown()</tt>. 
+The 
+IDL-to-Java 
+mapping 
+puts all of the operations 
+defined on the IDL interface into this file, which is shared by both the stubs and 
+skeletons.
+</UL>
+
+<P>
+<LI>Compile the <TT>.java</TT> files, including the stubs and skeletons
+(which are in the directory <TT>Persistent</TT>).  This step assumes the <tt>java/bin </tt> directory is included in your path.
+<PRE>
+   javac *.java Persistent/*.java
+</PRE>
+
+<LI>Start <tt>orbd</tt>.  
+
+<P>To start <tt>orbd</tt>, enter:
+   <P>   
+<PRE>
+  orbd -ORBInitialPort 1050 -serverPollingTime 200 
+</PRE>
+   
+ <P>Note that <TT>1050</TT> is the port on which you want the name server to run.   
+The <tt>-ORBInitialPort</tt> argument is a required command-line argument.  Note that when using  Solaris  software, you must become root to start a process on a port under 1024.  For this  reason, we recommend that you use a port number greater than or equal to 1024.
+
+<P>The <tt>-serverPollingTime 200</tt> argument specifies how often ORBD checks for the health of persistent servers registered via <tt>servertool</tt>. The default value is 1,000 ms.  We are setting this parameter to 200 ms in this example to enable more frequent monitoring of failures.  In the event that a server failure is detected, the server will be restarted to its proper state.
+
+
+<P>
+ 
+<LI>Start the Hello server:
+
+<P>To register a persistent server with the ORBD, the server must 
+be started using <A HREF="servertool.html"><em>servertool</em></A>, which is 
+a command-line interface  for application programmers to register, unregister, 
+startup, and shutdown a persistent server.  When the <tt>servertool</tt> is started, you must specify  the port and the host (if different)  on which 
+<tt>orbd</tt> is executing.
+ 
+  
+<P>To start the Hello server, 
+<P>
+<OL>
+<P>
+<LI>Start the <tt>servertool</tt> from the command line as follows:
+
+   <P>   
+<PRE>
+  servertool -ORBInitialPort 1050 
+</PRE>
+
+<P>Make sure the name server (<tt>orbd</tt>) port is the same as in the previous step, for 
+example, 
+<TT>-ORBInitialPort  1050</TT>. The <tt>servertool</tt> must be started on 
+the same port as the name server.
+
+<P>
+<P>The <tt>servertool</tt> command line interface appears:
+<P>
+<center><IMAGE SRC="images/servertool1.gif"   ALT="Server Tool"></center>
+<P>
+
+<LI>Register the <tt>PersistentServer</tt> from the <tt>servertool</tt> prompt, as shown below.  Type
+the information in one long string without returns.
+<P>
+<PRE>
+  servertool  > register -server PersistentServer -applicationName s1 
+                -classpath <em>path_to_server_class_files</em> 
+</PRE>
+<P>The <tt>servertool</tt> registers the server, assigns it the name of 
+"s1",  and displays its server id.
+<P>
+</OL>
+<P>   
+<LI>Run the client application:<P>
+<PRE>
+  java -classpath . PersistentClient 
+  </PRE>
+  
+  <P>The terminal window or DOS prompt displays the following messages:
+<P>
+<PRE>
+Calling Persistent Server..
+Message From Persistent Server: Hello From Persistent Server...
+Shutting down Persistent Server..
+Calling Persistent Server..
+Message From Persistent Server: Hello From Persistent Server...
+Shutting down Persistent Server..
+</PRE>
+
+</OL>
+<P>In this example, the client invokes the <tt>sayHello()</tt> method every minute and then kills the persistent server, which will be automatically restarted the next time the client invokes the <tt>sayHello()</tt> method.
+   
+   
+   <P>When you have finished this tutorial, be sure to shut down or kill the name 
+server 
+(<tt>orbd</tt>).  To do this from a DOS prompt, select 
+the window 
+that is running the server and enter <TT>Ctrl+C</TT> to shut it down.  
+To do this from a Unix shell, type <tt>pkill ordb</tt> from a terminal window.
+  The server will 
+continue to 
+wait for 
+invocations until it is explicitly stopped.
+
+
+<P><STRONG><a href="tutorial/jidl2machines.html"><em>Running the Hello World Application 
+on Two 
+Machines</em></a></STRONG> describes one way of distributing the simple application across 
+two 
+machines - a client and a server.
+
+<!--   *********  MAKEFILE ************** -->
+<H2>Running the Example on Unix Using a Makefile</H2>
+<P>The following code provides an example of a Makefile that can be used to run this example.  Change the location of your JDK installation to the location where you have installed the JDK.  Change the classpath to the directory where you have created the sample application.
+
+<P>
+<PRE>
+<strong>#Change to location of your JDK installation.</strong>
+JAVA_HOME=/usr/local/java/jdk1.4/solsparc
+
+CLASSPATH=.
+
+JAVAC=$(JAVA_HOME)/bin/javac
+JAVA=$(JAVA_HOME)/bin/java
+
+ORB_INITIAL_PORT=1050
+ORB_INITIAL_HOST=localhost
+ORB_ACTIVATION_PORT=1049
+
+<strong>#Change ClassPath based on where your PersistentServer is located.</strong>
+export CLASSPATH=&lt;path to server class files&gt;
+IDLJ :=$(JAVA_HOME)/bin/idlj 
+
+ORB_PROPS=-Dorg.omg.CORBA.ORBInitialHost=$(ORB_INITIAL_HOST) 
+-Dorg.omg.CORBA.ORBInitialPort=$(ORB_INITIAL_PORT)
+
+IDLJ_FLAGS=-fall -td . -verbose 
+
+ORBD=${JAVA_HOME}/bin/orbd -ORBInitialPort ${ORB_INITIAL_PORT} 
+-port ${ORB_ACTIVATION_PORT} -serverPollingTime 200 
+-serverStartupDelay 1000 
+
+SERVERTOOL=${JAVA_HOME}/bin/servertool
+
+all: clean build run
+
+build: stubs
+
+stubs:
+	$(IDLJ) $(IDLJ_FLAGS) PersistentHello.idl
+	$(JAVAC) *.java
+	$(JAVAC) Persistent/*.java
+
+runc:
+	$(JAVA) -classpath . PersistentClient 
+        
+runorbd:
+	$(ORBD) 
+
+<strong># Enter the following command in servertool to register server:
+# (without the # sign)</strong>
+# register -server PersistentServer -applicationName s1 
+-classpath <em>path_to_server_class_files</em>
+
+servertool:
+	$(SERVERTOOL) -ORBInitialPort $(ORB_INITIAL_PORT) 
+
+clean: 
+	rm -rf Persistent 
+	rm -rf *.class 
+</PRE>
+
+<P>To run the application using the Makefile, enter the following commands:
+<P>
+<OL>
+<LI>gnumake build 
+<LI>gnumake runorbd
+<LI>gnumake runservertool
+<LI>In <tt>servertool</tt>, enter the commands as shown above
+<LI>gnumake runc
+</OL>
+
+
+
+
+<CENTER><P><HR>
+
+<TABLE summary="layout" cellpadding=8 cellspacing=4>
+<TR>
+  <TD ALIGN=CENTER><A href="index.html"><em>Java IDL Home</em></A></TD>
+</TR></TABLE>
+
+
+<HR><P><FONT SIZE="-2">
+
+<!-- server side include for page footer -->
+
+  <!--#include virtual="/share/include/normal.footer.v4.0.html"-->
+
+<!-- end server side include for footer -->
+
+</CENTER>
+
+
+
+</BODY>
+
+</HTML>

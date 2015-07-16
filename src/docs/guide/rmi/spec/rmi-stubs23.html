@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>Java Remote Method Invocation: 8 - Stub/Skeleton Interfaces
+
+</title>
+</head>
+<body bgcolor="#ffffff">
+<a href="#skip" title="Skip navigation bar"></a> 
+<table width="100%" SUMMARY="layout"><tr>
+<td> <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-stubs22.html">PREV</a>
+ | <a href="rmi-stubs24.html">NEXT</a> 
+</td><td align=right><i>Java Remote Method Invocation</i></td>
+</tr></table>
+<br>
+ 
+<a name="skip"></a>
+<p>
+<hr size="8" width="35%" align="left" noshade>
+
+<h2><a name="6720"><i>	8.2	</i> The <code>RemoteCall</code> Interface
+</a></h2>
+
+<blockquote>
+<a name="6721"><!-- --></a>
+The interface <code>RemoteCall</code> is an abstraction used by the stubs and skeletons of remote objects to carry out a call to a remote object.<p>
+</blockquote>
+<blockquote>
+<blockquote><hr noshade size="1">
+<b><a name="6722">Note - </a></b>The <code>RemoteCall</code> interface is deprecated as of the Java 2 SDK, Standard Edition, v1.2. The 1.2 stub protocol does not make use of this interface anymore. As of the Java 2 SDK, Standard Edition, v1.2, stubs now use the new <code>invoke</code> method which does not require <code>RemoteCall</code> as a parameter. 
+<hr noshade size="1">
+</blockquote>
+</blockquote>
+<blockquote><pre>package java.rmi.server;
+
+import java.io.*;
+
+public interface RemoteCall {
+	ObjectOutput getOutputStream() throws IOException;
+	void releaseOutputStream() throws IOException;
+	ObjectInput getInputStream() throws IOException;
+	void releaseInputStream() throws IOException;
+	ObjectOutput getResultStream(boolean success)
+		throws IOException, StreamCorruptedException;
+	void executeCall() throws Exception;
+	void done() throws IOException;
+}
+
+
+</pre></blockquote><blockquote>
+<a name="6061"><!-- --></a>
+The method <code>getOutputStream</code> returns the output stream into which either the stub marshals arguments or the skeleton marshals results.<p>
+<a name="6066"><!-- --></a>
+The method <code>releaseOutputStream</code> releases the output stream; in some transports this will release the stream.<p>
+<a name="6071"><!-- --></a>
+The method <code>getInputStream</code> returns the <code>InputStream</code> from which the stub unmarshals results or the skeleton unmarshals parameters.<p>
+<a name="6076"><!-- --></a>
+The method <code>releaseInputStream</code> releases the input stream. This will allow some transports to release the input side of a connection early.<p>
+<a name="6081"><!-- --></a>
+The method <code>getResultStream</code> returns an output stream (after writing out header information relating to the success of the call). Obtaining a result stream should only succeed once per remote call. If <em>success</em> is <code>true</code>, then the result to be marshaled is a normal return; otherwise the result is an exception. <code>StreamCorruptedException</code> is thrown if the result stream has already been obtained for this remote call.<p>
+<a name="6086"><!-- --></a>
+The method <code>executeCall</code> does whatever it takes to execute the call.<p>
+<a name="6091"><!-- --></a>
+The method <code>done</code> allows cleanup after the remote call has completed.<p>
+</blockquote>
+<br>
+<hr>
+ <a href="rmiTOC.html">CONTENTS</a> | <a href="rmi-stubs22.html">PREV</a>
+ | <a href="rmi-stubs24.html">NEXT</a> 
+
+
+<hr>
+<font size="-1"><i><A HREF=http://java.sun.com/j2se/1.4.2/docs/relnotes/SMICopyright.html>
+Copyright</a> &#169 1997-2003 Sun Microsystems, Inc. All Rights Reserved.</i></font>
+
+
+<!-- This HTML file was created with Quadralay WebWorks Publisher 3.5.0 -->
+<!-- by Susan Snyder -->
+<!-- Last updated: Friday, October 4, 2002 -->
+ 
+
+
+</body>
+</html>
+
+

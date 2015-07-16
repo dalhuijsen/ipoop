@@ -1,0 +1,186 @@
+<html>
+<head>
+<title>javah - C Header and Stub File Generator</title>
+</head><BODY BGCOLOR="#FFFFFF">
+
+<h1>javah - C Header and Stub File Generator</h1>
+<blockquote>
+<b>javah</b> produces C header files and C source files from
+a Java class. These files provide the connective glue that allow
+your Java and C code to interact.
+</blockquote>
+
+<h2>SYNOPSIS</h2>
+<blockquote>
+<pre>
+javah [ <a href="javah.html#Options">options</a> ] fully-qualified-classname. . .
+javah_g [ <a href="javah.html#Options">options</a> ] fully-qualified-classname. . .
+</pre>
+</blockquote>
+
+<h2>DESCRIPTION</h2>
+<blockquote>
+<b>javah</b> generates C header and source files that are needed to
+implement native methods. The generated header and source files
+are used by C programs to reference an object's instance variables from
+native source code. The .h file contains a struct definition whose
+layout parallels the layout of the corresponding class. The fields
+in the struct correspond to instance variables in the class.
+
+<p>
+The name of the header file and the structure declared within it are
+derived from the name of the class. If the class passed to <b>javah</b> is 
+inside a package, the package name is prepended to both the header file name 
+and the structure name. Underscores (_) are used as name delimiters.
+
+<p>
+By default <b>javah</b> creates a header file for each class listed
+on the command line and puts the files in the current directory.
+Use the <i>-stubs</i> option to create source files.
+Use the <i>-o</i> option to concatenate the results for all listed classes
+into a single file.
+
+<p>
+The new native method interface, Java Native Interface (JNI), does not require header information 
+or stub files. <b>javah</b> can still be used 
+to generate native method function proptotypes needed for JNI-style native
+methods. <b>javah</b> produces JNI-style output by default, and places the result in the .h file.
+
+<p>
+<b>javah_g</b> is a non-optimized version of <b>javah</b> suitable for use with 
+debuggers like <a href=jdb.html><b>jdb</b></a>.
+</blockquote>
+
+<a name=Options>
+<h2>OPTIONS</h2>
+</a>
+<blockquote>
+
+<dl>
+<dt><b>-o <i>outputfile</i></b>
+<dd>
+Concatenates the resulting header or source files for all the
+classes listed on the command line into <i>outputfile</i>. Only 
+one of <b>-o</b> or <b>-d</b> may be used.
+<p>
+
+<dt><b>-d <i>directory</i></b>
+<dd>
+Sets the directory where <b>javah</b> saves the header files 
+or the stub files. Only one of <b>-d</b> or <b>-o</b> may be used.
+<p>
+
+<dt><b>-stubs</b>
+<dd>
+Causes <b>javah</b> to generate C declarations from the Java 
+object file.
+<p>
+
+<dt><b>-verbose</b>
+<dd>
+Indicates verbose output and causes <b>javah</b> to print a message to stdout concerning the status of 
+the generated files.
+
+<p>
+<dt><b>-help</b>
+<dd>
+Print help message for <b>javah</b> usage.
+<p>
+
+<dt><b>-version</b>
+<dd>
+Print out <b>javah</b> version information.
+
+
+<p>
+
+<dt><b>-jni</b>
+<dd>
+Causes <b>javah</b> to create an output file containing JNI-style native
+method function prototypes. This is the default output, so use of <b>-jni</b> 
+is optional. 
+<p>
+
+<dt><b>-classpath <i>path</i></b>
+<dd>
+Specifies the path <b>javah</b> uses to look up classes. Overrides the default 
+or the CLASSPATH environment variable if it is set. Directories are separated by 
+colons. Thus the general format for <i>path</i> is:
+
+<pre>
+   .:&lt;your_path&gt;
+</pre>
+
+For example:
+
+<pre>
+   .:/home/avh/classes:/usr/local/java/classes
+</pre>
+
+<dt><b>-bootclasspath <i>path</i></b>
+<dd>
+Specifies path from which to load bootstrap classes.  By default, 
+the bootstrap classes are the classes implementing the core Java 2 platform located in <tt>jre/lib/rt.jar</tt> and several other jar files.
+<p>
+<dt><b>-old</b>
+<dd>
+Specifies that old JDK1.0-style header files should be generated.
+<p>
+<dt><b>-force</b>
+<dd>
+Specifies that output files should always be written.
+<p>
+<dt><b>-J</b><i>option</i>
+    <dd>Pass <i>option</i> to the Java virtual machine, where 
+    <i>option</i> is one of the options described on the 
+    reference page for the <a href="java.html">java application 
+    launcher</a>.  For example, <b>-J-Xms48m</b> sets the startup
+    memory to 48 megabytes.  
+</dl>
+</blockquote>
+
+<h2>ENVIRONMENT VARIABLES</h2>
+<blockquote>
+<dl>
+<dt>CLASSPATH
+<dd>Used to provide the system a path to user-defined classes. Directories are
+separated by colons, for example,
+
+<pre>
+.:/home/avh/classes:/usr/local/java/classes
+</pre>
+
+</dl>
+</blockquote>
+
+<h2>SEE ALSO</h2>
+<blockquote>
+<a href="javac.html">javac</a>,  
+<a href="java.html">java</a>,
+<a href="jdb.html">jdb</a>,
+<a href="javap.html">javap</a>,
+<a href="javadoc.html">javadoc</a>
+</blockquote>
+
+<HR SIZE=3 NOSHADE>
+<TABLE BORDER="0" WIDTH="100%" summary="layout">
+<TR VALIGN=TOP>
+<TD>
+<P><FONT SIZE="-2">
+  <A HREF="../../relnotes/SMICopyright.html">Copyright</A> &#169; 2002
+  <A HREF="http://www.sun.com">Sun Microsystems, Inc.</A>
+  All Rights Reserved.</FONT></P>
+</TD>
+<TD ALIGN=RIGHT>
+  <IMG SRC="../../images/sunlogo64x30.gif" ALT="Sun" BORDER=0 WIDTH=64 HEIGHT=30>
+  <BR>
+  <FONT SIZE="+1">
+  <i>Java Software</i>
+  </FONT>
+</TD>
+</TR>
+</TABLE>
+
+
+</body>
+</html>
